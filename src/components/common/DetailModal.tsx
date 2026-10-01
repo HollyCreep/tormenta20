@@ -263,7 +263,7 @@ export const DetailModal: React.FC<DetailModalProps> = ({ data, onClose }) => {
               }}
             >
               <Sliders size={14} />
-              <span>Stats</span>
+              <span>Estatísticas</span>
             </button>
 
             <button
@@ -284,7 +284,7 @@ export const DetailModal: React.FC<DetailModalProps> = ({ data, onClose }) => {
               }}
             >
               <FileText size={14} />
-              <span>Bio</span>
+              <span>Descrição</span>
             </button>
 
             <button
@@ -305,7 +305,7 @@ export const DetailModal: React.FC<DetailModalProps> = ({ data, onClose }) => {
               }}
             >
               <BookOpen size={14} />
-              <span>Rules</span>
+              <span>Regras</span>
             </button>
           </div>
         </div>
@@ -520,7 +520,7 @@ export const DetailModal: React.FC<DetailModalProps> = ({ data, onClose }) => {
               {!data.prerequisites && !data.execution && !data.range && !data.duration && !data.targetArea && !data.resistance && (!data.stats || data.stats.length === 0) && (
                 <div style={{ textAlign: 'center', padding: '2rem 1rem', color: 'var(--text-dim)' }}>
                   <p style={{ margin: 0, fontSize: '0.9rem' }}>Nenhum parâmetro numérico adicional disponível para este registro.</p>
-                  <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.825rem' }}>Consulte a aba <strong>Bio</strong> para a descrição completa ou <strong>Rules</strong> para o manual.</p>
+                  <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.825rem' }}>Consulte a aba <strong>Descrição</strong> para a descrição completa ou <strong>Regras</strong> para o manual.</p>
                 </div>
               )}
             </div>
