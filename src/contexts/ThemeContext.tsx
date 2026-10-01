@@ -10,7 +10,7 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType>({
   theme: 't20-classic',
-  setTheme: () => {},
+  setTheme: () => { },
   themeName: 'Tormenta 20 (Clássico)',
 });
 
@@ -31,10 +31,10 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const themeName =
     theme === 'modern-dark'
-      ? 'Escuro Moderno'
+      ? 'Escuro'
       : theme === 'light'
-      ? 'Claro (Solar)'
-      : 'Tormenta 20 (Padrão)';
+        ? 'Claro (Solar)'
+        : 'Tormenta 20 (Padrão)';
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme, themeName }}>

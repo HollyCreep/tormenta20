@@ -1,14 +1,17 @@
 {
   "name": "app-tormenta20",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Criador de Personagens e Ficha Interativa para Tormenta 20 - Edição Jogo do Ano (v1.3)",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "index:pdf": "python scripts/index_manual_pdf.py",
+    "export:data": "npx tsx scripts/export_all_data.ts",
+    "mcp:server": "python mcp-server/t20_oracle_server.py"
   },
   "dependencies": {
     "canvas-confetti": "^1.9.4",

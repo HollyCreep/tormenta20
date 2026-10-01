@@ -7,7 +7,7 @@ export const ThemeSelector: React.FC = () => {
 
   const themes: { id: AppTheme; label: string; icon: React.ReactNode }[] = [
     { id: 't20-classic', label: 'T20 Clássico', icon: <Shield size={14} /> },
-    { id: 'modern-dark', label: 'Escuro Moderno', icon: <Moon size={14} /> },
+    { id: 'modern-dark', label: 'Escuro', icon: <Moon size={14} /> },
     { id: 'light', label: 'Claro', icon: <Sun size={14} /> },
   ];
 

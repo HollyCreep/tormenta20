@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "tormenta20-oracle": {
+      "command": "python",
+      "args": [
+        "D:\\Projetos\\app-tormenta20\\mcp-server\\t20_oracle_server.py"
+      ],
+      "env": {
+        "PYTHONIOENCODING": "utf-8"
+      }
+    }
+  }
+}

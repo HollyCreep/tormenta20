@@ -5,6 +5,7 @@ import { RULES_CITATIONS } from '../../data/rulesCitations';
 import { DetailModal, DetailModalData } from '../common/DetailModal';
 import { ItemCard } from '../common/ItemCard';
 import { ItemModifierModal } from './ItemModifierModal';
+import { getEquipmentDetailModalData } from '../../utils/equipmentDetail';
 import { Search, ArrowLeft, BookOpen, Wrench } from 'lucide-react';
 
 interface ItemsCompendiumProps {
@@ -71,33 +72,7 @@ export const ItemsCompendium: React.FC<ItemsCompendiumProps> = ({ onBack }) => {
   };
 
   const handleOpenDetailModal = (it: EquipmentItem) => {
-    setModalDetail({
-      title: it.name,
-      category: getCategoryLabel(it.category),
-      subtitle: `Preço: ${it.price} • Espaços: ${it.spaces || 1}`,
-      description: it.description || 'Item de equipamento de Tormenta 20.',
-      stats: [
-        { label: 'Preço', value: it.price },
-        { label: 'Espaços', value: it.spaces || 1 },
-        ...(it.damage ? [{ label: 'Dano', value: it.damage }] : []),
-        ...(it.critical ? [{ label: 'Crítico', value: it.critical }] : []),
-        ...(it.range ? [{ label: 'Alcance', value: it.range }] : []),
-        ...(it.damageType ? [{ label: 'Tipo de Dano', value: it.damageType }] : []),
-        ...(it.defenseBonus ? [{ label: 'Bônus Defesa', value: `+${it.defenseBonus}` }] : []),
-        ...(it.armorPenalty !== undefined ? [{ label: 'Penalidade Armadura', value: it.armorPenalty }] : []),
-      ],
-      ruleCitation: {
-        id: it.id,
-        title: it.name,
-        book: 'Tormenta 20: Edição Jogo do Ano (v1.3)',
-        chapter: 'Capítulo 3: Equipamento',
-        section: getCategoryLabel(it.category),
-        page: 'Página 142-177',
-        quote: `“${it.name}. Preço: ${it.price}; Espaços: ${it.spaces || 1}.${it.description ? ` ${it.description}` : ''}”`,
-        explanation:
-          'Itens normais podem ser comprados com Tibares (T$) durante a criação de personagem ou no decorrer de suas aventuras.',
-      },
-    });
+    setModalDetail(getEquipmentDetailModalData(it));
   };
 
   return (

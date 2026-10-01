@@ -2,6 +2,14 @@ import React from 'react';
 import { X, Sparkles, Shield, Sword, BookOpen, Compass, Zap } from 'lucide-react';
 import { RuleCitation } from '../../data/rulesCitations';
 
+export interface DetailStat {
+  label: string;
+  value: string | number;
+  subtext?: string;
+  color?: string;
+  icon?: React.ReactNode;
+}
+
 export interface DetailModalData {
   title: string;
   subtitle?: string;
@@ -16,7 +24,7 @@ export interface DetailModalData {
   description: string;
   ruleCitation?: RuleCitation;
   upgrades?: { cost: string; description: string }[];
-  stats?: { label: string; value: string | number }[];
+  stats?: DetailStat[];
 }
 
 interface DetailModalProps {
@@ -149,15 +157,46 @@ export const DetailModal: React.FC<DetailModalProps> = ({ data, onClose }) => {
             </div>
           )}
 
-          {/* Estatísticas Numéricas (como armas e armaduras) */}
+          {/* Estatísticas Numéricas Detalhadas (sem abreviações) */}
           {data.stats && data.stats.length > 0 && (
-            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-              {data.stats.map((s, i) => (
-                <div key={i} style={{ background: 'rgba(255, 255, 255, 0.04)', padding: '0.5rem 0.8rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)' }}>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>{s.label}</div>
-                  <div style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--t20-gold-light)', fontFamily: 'var(--font-mono)' }}>{s.value}</div>
-                </div>
-              ))}
+            <div>
+              <h4 style={{ fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--t20-gold-light)', marginBottom: '0.65rem' }}>
+                Propriedades & Estatísticas Detalhadas
+              </h4>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                  gap: '0.75rem',
+                }}
+              >
+                {data.stats.map((s, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.03)',
+                      padding: '0.75rem 0.95rem',
+                      borderRadius: 'var(--radius-md)',
+                      border: '1px solid var(--border-color)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '0.25rem',
+                    }}
+                  >
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 }}>
+                      {s.label}
+                    </div>
+                    <div style={{ fontSize: '1.15rem', fontWeight: 700, color: s.color || 'var(--t20-gold-light)', fontFamily: 'var(--font-mono)' }}>
+                      {s.value}
+                    </div>
+                    {s.subtext && (
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', lineHeight: 1.35, marginTop: '0.15rem' }}>
+                        {s.subtext}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 

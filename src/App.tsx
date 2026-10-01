@@ -160,9 +160,6 @@ export function App() {
           >
             <Shield size={24} style={{ color: 'var(--t20-ruby)' }} />
             <span className="app-brand-title">Tormenta 20</span>
-            <span className="badge badge-ruby" style={{ fontSize: '0.65rem', padding: '0.15rem 0.45rem' }}>
-              Jogo do Ano
-            </span>
           </div>
 
           {/* Navegação por Abas Principais (Button Group Segmentado) */}

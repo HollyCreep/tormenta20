@@ -1,6 +1,6 @@
 # ⚔️ App Tormenta 20 — Edição Jogo do Ano (v1.3)
 
-[![Version](https://img.shields.io/badge/version-0.1.0-gold.svg)](./RELEASE.md)
+[![Version](https://img.shields.io/badge/version-0.2.0-gold.svg)](./RELEASE.md)
 [![Tormenta 20](https://img.shields.io/badge/T20-Edição%20Jogo%20do%20Ano%20v1.3-crimson.svg)](./RELEASE.md)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue.svg)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-19-cyan.svg)](https://react.dev/)
@@ -42,6 +42,11 @@ Aplicativo web moderno, intuitivo e completo para **criação de personagens, ge
   - Widget retrátil flutuante de dados (d4 a d100) com modificadores e histórico.
   - 3 Temas imersivos: *T20 Clássico*, *Escuro Moderno* e *Claro*.
   - Citações de regras com livro, capítulo e página oficial do manual.
+
+- **🔮 Oráculo de Regras MCP Server & Indexador FTS Oficial**:
+  - Servidor **Model Context Protocol (MCP)** integrado para contextualização e assistência de IA sem alucinações.
+  - Busca Full-Text instantânea nas 407 páginas de *Tormenta 20: Edição Jogo do Ano (v1.3)* com capítulo e página de referência.
+  - Ferramentas nativas de validação determinística de regras, cálculos canônicos e catálogo de dados.
 
 ---
 

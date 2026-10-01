@@ -14,6 +14,7 @@ import {
   Search,
   ShoppingBag,
 } from 'lucide-react';
+import { getEquipmentDetailModalData } from '../../utils/equipmentDetail';
 
 interface StepEquipmentProps {
   inventory: CharacterInventoryItem[];
@@ -435,14 +436,7 @@ export const StepEquipment: React.FC<StepEquipmentProps> = ({
                 item={eq}
                 onAdd={() => handleAddItem(eq)}
                 onCustomize={() => handleOpenCustomizeFromShop(eq)}
-                onOpenDetail={() =>
-                  onOpenDetail({
-                    title: eq.name,
-                    category: eq.category.replace('_', ' ').toUpperCase(),
-                    subtitle: `Preço: ${eq.price} • Espaços: ${eq.spaces || 1}`,
-                    description: eq.description || 'Equipamento de Tormenta 20.',
-                  })
-                }
+                onOpenDetail={() => onOpenDetail(getEquipmentDetailModalData(eq))}
                 actionType="add"
               />
             ))}
@@ -483,6 +477,8 @@ export const StepEquipment: React.FC<StepEquipmentProps> = ({
                   description: it.description,
                 };
 
+                const sourceLabel = it.source === 'origem' ? `Origem: ${currentOrigin?.name || 'Origem'}` : it.source === 'inicial' ? 'Kit Inicial' : undefined;
+
                 return (
                   <ItemCard
                     key={it.id}
@@ -490,17 +486,19 @@ export const StepEquipment: React.FC<StepEquipmentProps> = ({
                     appliedModifiers={it.appliedModifiers}
                     isEquipped={it.isEquipped}
                     isFree={it.isFree}
-                    sourceBadge={it.source === 'origem' ? `Origem: ${currentOrigin?.name || 'Origem'}` : it.source === 'inicial' ? 'Kit Inicial' : undefined}
+                    sourceBadge={sourceLabel}
                     onToggleEquipped={() => handleToggleEquipped(it.id)}
                     onCustomize={() => handleOpenCustomize(it)}
                     onRemove={() => handleRemoveItem(it.id)}
                     onOpenDetail={() =>
-                      onOpenDetail({
-                        title: it.name,
-                        category: it.category.replace('_', ' ').toUpperCase(),
-                        subtitle: `Preço: ${it.price || 'T$ 0'} • Espaços: ${it.spaces || 1}`,
-                        description: it.description || 'Item no inventário.',
-                      })
+                      onOpenDetail(
+                        getEquipmentDetailModalData(
+                          asEquipItem,
+                          sourceLabel,
+                          it.appliedModifiers,
+                          it.specialMaterial
+                        )
+                      )
                     }
                     actionType="inventory"
                   />

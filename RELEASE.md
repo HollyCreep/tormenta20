@@ -1,4 +1,40 @@
 # Tormenta 20 — Edição Jogo do Ano (v1.3)
+
+## Pacote de Release: Versão 0.2.0
+Data de Lançamento: Outubro de 2026  
+Status: **Versão Estável com Oráculo MCP & Indexação do Manual (0.2.0)**  
+Compatibilidade de Regras: **Tormenta 20 Edição Jogo do Ano (v1.3)**
+
+### 🔮 Principais Destaques da Versão 0.2.0
+
+1. **Oráculo de Regras MCP Server (`mcp-server/t20_oracle_server.py`)**:
+   - Servidor oficial baseado no Model Context Protocol (MCP 2.x) para contextualização profunda e assistência de agentes de IA.
+   - Ferramentas nativas expostas:
+     - `t20_search_book`: Busca instantânea no texto integral de 407 páginas do manual oficial com retorno de capítulo, seção, página impressa, página no PDF e trecho literal.
+     - `t20_get_book_page`: Recuperação da íntegra de qualquer página do livro por número impresso ou do PDF.
+     - `t20_get_rule_citation`: Citações canônicas de regras estruturadas (compra de pontos, treinamento não-cumulativo, perícias de origem, pré-requisitos, etc.).
+     - `t20_list_rule_citations`: Catálogo completo de citações canônicas cadastradas.
+     - `t20_validate_character`: Validação determinística de criação de ficha (atributos, duplicidade de perícias, limite de carga).
+     - `t20_calculate_stats`: Cálculo matemático canônico de PV, PM, Defesa discriminada, penalidade de armadura e testes de perícias.
+     - `t20_query_database`: Consulta rápida e estruturada de 197 magias, 113 poderes, equipamentos, classes, raças e deuses.
+
+2. **Indexador Local Full-Text do Manual Oficial (`scripts/index_manual_pdf.py`)**:
+   - Criação da base SQLite FTS5 (`src/data/t20_manual_index.db`) indexando 100% do PDF *Tormenta20-Edicao-Jogo-do-Ano-v1.3.pdf* em ~1.8 segundos com normalização `unicode61 remove_diacritics`.
+   - Consulta offline em milissegundos sem custos de tokens ou latência de rede.
+
+3. **Workspace Rules & Diretrizes Anti-Alucinação (`.agents/rules/`)**:
+   - `system-rules.md`: Persona estrita do Oráculo de T20 com mandato inviolável de citações de regras e diretrizes explícitas anti-D&D 5e/3.5e (sem saving throws separados, valor do atributo é o modificador, compra progressiva de 10 pontos, etc.).
+   - `t20-mechanics.md`: Compêndio de mecânicas matemáticas com fórmulas canônicas.
+
+4. **Inspeção Enriquecida de Itens & Equipamentos (`src/utils/equipmentDetail.ts`)**:
+   - Modal unificado de inspeção com detalhamento de armas (dano, tipo de dano, margem e crítico, alcance, empunhadura), armaduras (bônus de Defesa, penalidade de armadura), materiais especiais e melhorias aplicadas.
+
+5. **Consolidação de Dados & Grafo de Conhecimento**:
+   - `src/data/t20_database.json`: Export consolidado dos dados canônicos.
+   - `graphify-out/`: Grafo de conhecimento com 309 nós e 762 arestas divididos em 27 comunidades para navegação inteligente.
+
+---
+
 ## Pacote de Release: Versão 0.1.0
 
 Data de Lançamento: Outubro de 2026  
