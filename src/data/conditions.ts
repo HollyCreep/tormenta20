@@ -1,0 +1,146 @@
+import { Condition } from '../types/rules';
+
+export const CONDITIONS_LIST: Condition[] = [
+  {
+    id: 'abalado',
+    name: 'Abalado',
+    description: 'O personagem está com medo ou sob forte tensão psicológica.',
+    effects: ['-2 em testes de perícia e testes de ataque.'],
+  },
+  {
+    id: 'cego',
+    name: 'Cego',
+    description: 'O personagem não enxerga.',
+    effects: [
+      'Fica desprevenido.',
+      'Lento (deslocamento reduzido à metade).',
+      '-5 em testes de perícias baseadas em Força ou Destreza.',
+      'Todos os alvos têm camuflagem total contra seus ataques (50% de chance de erro).',
+    ],
+  },
+  {
+    id: 'debilitado',
+    name: 'Debilitado',
+    description: 'O personagem está fisicamente enfraquecido.',
+    effects: ['-5 em testes de perícia baseadas em Força, Destreza e Constituição, e em testes de ataque.'],
+  },
+  {
+    id: 'desprevenido',
+    name: 'Desprevenido',
+    description: 'O personagem foi pego de surpresa ou não consegue se defender com eficácia.',
+    effects: ['-5 na Defesa', '-5 em testes de Reflexos.'],
+  },
+  {
+    id: 'enfeiticado',
+    name: 'Enfeitiçado',
+    description: 'O personagem passa a considerar a fonte do efeito um amigo próximo.',
+    effects: ['Recebe +10 em testes de Diplomacia e Enganação da fonte.', 'Não atacará a fonte.'],
+  },
+  {
+    id: 'enredado',
+    name: 'Enredado',
+    description: 'O personagem está preso por cordas, teias ou galhos.',
+    effects: [
+      'Lento (deslocamento reduzido à metade).',
+      'Não pode correr ou fazer investida.',
+      '-2 em testes de ataque',
+      '-2 na Defesa',
+      'Deve passar em teste de Misticismo para lançar magias (CD 15 + custo em PM).',
+    ],
+  },
+  {
+    id: 'esmorecido',
+    name: 'Esmorecido',
+    description: 'O personagem perdeu sua determinação ou ânimo.',
+    effects: ['-5 em testes de Inteligência, Sabedoria e Carisma.'],
+  },
+  {
+    id: 'exausto',
+    name: 'Exausto',
+    description: 'O personagem está à beira do colapso físico.',
+    effects: ['Debilitado (-5 em perícias físicas e ataques).', 'Lento (deslocamento reduzido à metade).', 'Não pode correr ou fazer investidas.'],
+  },
+  {
+    id: 'fascinado',
+    name: 'Fascinado',
+    description: 'A atenção do personagem é capturada por algo deslumbrante.',
+    effects: ['-5 em testes de Percepção.', 'Não pode realizar ações além de prestar atenção no efeito fascinante.'],
+  },
+  {
+    id: 'fatigado',
+    name: 'Fatigado',
+    description: 'O personagem está cansado.',
+    effects: ['Fraco (-2 em perícias físicas e ataques).', 'Não pode correr nem fazer investidas.'],
+  },
+  {
+    id: 'fraco',
+    name: 'Fraco',
+    description: 'O personagem está com a musculatura e vigor afetados.',
+    effects: ['-2 em testes de Força, Destreza e Constituição, e em testes de ataque.'],
+  },
+  {
+    id: 'imovel',
+    name: 'Imóvel',
+    description: 'O personagem não pode se deslocar pelo cenário.',
+    effects: ['Deslocamento torna-se 0m.', '-5 na Defesa.'],
+  },
+  {
+    id: 'inconsciente',
+    name: 'Inconsciente',
+    description: 'O personagem está desacordado ou dormindo.',
+    effects: ['Indefeso.', 'Fica caído.', 'Não pode realizar nenhuma ação.'],
+  },
+  {
+    id: 'indefeso',
+    name: 'Indefeso',
+    description: 'O personagem está paralisado, amarrado ou dormindo.',
+    effects: [
+      'Desprevenido.',
+      '-10 na Defesa.',
+      'Falha automática em testes de Reflexos.',
+      'Golpes de misericórdia podem ser aplicados com acerto crítico automático.',
+    ],
+  },
+  {
+    id: 'lento',
+    name: 'Lento',
+    description: 'O personagem move-se com extrema dificuldade.',
+    effects: ['Todos os modos de deslocamento são reduzidos pela metade.', 'Não pode correr ou fazer investida.'],
+  },
+  {
+    id: 'ofuscado',
+    name: 'Ofuscado',
+    description: 'Uma luz brilhante ou poeira prejudica a visão.',
+    effects: ['-2 em testes de ataque e testes de Percepção.'],
+  },
+  {
+    id: 'paralisado',
+    name: 'Paralisado',
+    description: 'O personagem está totalmente rígido.',
+    effects: ['Indefeso.', 'Imóvel (não pode se mover ou falar).'],
+  },
+  {
+    id: 'pasmo',
+    name: 'Pasmo',
+    description: 'O personagem está congelado de espanto ou choque momentâneo.',
+    effects: ['Não pode realizar ações em seu turno.'],
+  },
+  {
+    id: 'sangrando',
+    name: 'Sangrando',
+    description: 'O personagem tem uma ferida aberta que jorra sangue.',
+    effects: ['No início de cada um de seus turnos, deve fazer teste de Fortitude (CD 15) ou perde 1d6 PV.'],
+  },
+  {
+    id: 'surdo',
+    name: 'Surdo',
+    description: 'O personagem não escuta sons.',
+    effects: ['Falha automática em testes de Percepção auditiva.', '-5 em testes de Iniciativa.'],
+  },
+  {
+    id: 'vulneravel',
+    name: 'Vulnerável',
+    description: 'A guarda do personagem está aberta.',
+    effects: ['-2 na Defesa.'],
+  },
+];
