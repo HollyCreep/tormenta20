@@ -54,20 +54,21 @@ jobs:
         run: npx cap sync android
 
       - name: Build Debug APK with Gradle
+        shell: bash
         run: |
           cd android
-          set +e
-          ./gradlew :app:assembleDebug -PcompileSdkVersion=35 -PtargetSdkVersion=35 -PminSdkVersion=24 --no-daemon --stacktrace > ../gradle.log 2>&1
-          GRADLE_EXIT=$?
-          set -e
-          cat ../gradle.log
+          ./gradlew :app:assembleDebug -PcompileSdkVersion=35 -PtargetSdkVersion=35 -PminSdkVersion=24 --no-daemon --stacktrace 2>&1 | tee ../gradle.log
+          GRADLE_EXIT=${PIPESTATUS[0]}
           if [ $GRADLE_EXIT -ne 0 ]; then
             echo "## ❌ Gradle Build Error Log" >> $GITHUB_STEP_SUMMARY
             echo '```text' >> $GITHUB_STEP_SUMMARY
             tail -n 80 ../gradle.log >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
-            ERR=$(tail -n 25 ../gradle.log | tr '\r\n' ' ')
-            echo "::error title=Gradle Build Error::${ERR:-Build failed, check gradle.log}"
+            ERR=$(awk '/\* What went wrong:/,/\* Try:/' ../gradle.log | head -n 12 | tr '\r\n' ' ' | cut -c 1-600)
+            if [ -z "$ERR" ]; then
+              ERR=$(grep -C 4 "Execution failed for task" ../gradle.log | head -n 10 | tr '\r\n' ' ' | cut -c 1-600)
+            fi
+            echo "::error title=Gradle Root Cause::${ERR:-Build failed, check log}"
             exit $GRADLE_EXIT
           fi
 
