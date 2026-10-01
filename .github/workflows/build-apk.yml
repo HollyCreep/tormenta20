@@ -66,7 +66,7 @@ jobs:
             echo '```text' >> $GITHUB_STEP_SUMMARY
             tail -n 80 ../gradle.log >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
-            ERR=$(grep -E "(FAILURE:|What went wrong:|Caused by:|ERROR:|> Task)" ../gradle.log | head -n 10 | tr '\n' ' ')
+            ERR=$(tail -n 25 ../gradle.log | tr '\r\n' ' ')
             echo "::error title=Gradle Build Error::${ERR:-Build failed, check gradle.log}"
             exit $GRADLE_EXIT
           fi
