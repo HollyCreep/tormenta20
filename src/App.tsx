@@ -13,6 +13,10 @@ import { SpellsCompendium } from './components/compendium/SpellsCompendium';
 import { RollHistoryModal } from './components/history/RollHistoryModal';
 import { ChangeLogModal } from './components/history/ChangeLogModal';
 import { Shield, Sparkles, Package, Users, BookOpen, Dices, FileText } from 'lucide-react';
+import { App as CapApp } from '@capacitor/app';
+import { StatusBar, Style } from '@capacitor/status-bar';
+import { SplashScreen } from '@capacitor/splash-screen';
+import { Capacitor } from '@capacitor/core';
 
 export function App() {
   const [view, setView] = useState<'list' | 'wizard' | 'sheet' | 'powers' | 'items' | 'spells'>('list');
@@ -29,6 +33,35 @@ export function App() {
     const loaded = storageService.loadCharacters();
     setCharacters(loaded);
   }, []);
+
+  // Integração com Recursos Nativos do Mobile (Status Bar, Splash Screen e Botão Voltar)
+  useEffect(() => {
+    if (Capacitor.isNativePlatform()) {
+      StatusBar.setStyle({ style: Style.Dark }).catch(() => {});
+      StatusBar.setBackgroundColor({ color: '#090d16' }).catch(() => {});
+      SplashScreen.hide().catch(() => {});
+    }
+
+    const backListener = CapApp.addListener('backButton', () => {
+      if (isRollHistoryOpen) {
+        setIsRollHistoryOpen(false);
+      } else if (isChangeLogOpen) {
+        setIsChangeLogOpen(false);
+      } else if (view === 'powers' || view === 'spells' || view === 'items') {
+        setView(prevView);
+      } else if (view === 'wizard') {
+        setView('list');
+      } else if (view === 'sheet') {
+        setView('list');
+      } else {
+        CapApp.exitApp();
+      }
+    });
+
+    return () => {
+      backListener.then((sub) => sub.remove()).catch(() => {});
+    };
+  }, [view, prevView, isRollHistoryOpen, isChangeLogOpen]);
 
   const activeCharacter = characters.find((c) => c.id === activeCharacterId) || null;
 
@@ -207,7 +240,7 @@ export function App() {
           </div>
 
           {/* Navegação por Abas Principais (Button Group Segmentado) */}
-          <div className="btn-group">
+          <div className="btn-group desktop-nav-group">
             <button
               type="button"
               onClick={() => {
@@ -381,6 +414,60 @@ export function App() {
         activeCharacterId={activeCharacterId || undefined}
         onClose={() => setIsChangeLogOpen(false)}
       />
+
+      {/* Barra de Navegação Inferior Nativa / Mobile (Bottom Navigation) */}
+      <nav className="app-bottom-nav no-print" aria-label="Navegação Mobile">
+        <button
+          type="button"
+          onClick={() => {
+            if (activeCharacterId && view !== 'sheet') {
+              setView('sheet');
+            } else {
+              setView('list');
+            }
+          }}
+          className={`app-bottom-nav-item ${view === 'list' || view === 'sheet' || view === 'wizard' ? 'active' : ''}`}
+        >
+          {view === 'sheet' && activeCharacter ? <Shield size={20} /> : <Users size={20} />}
+          <span>{view === 'sheet' && activeCharacter ? 'Ficha' : 'Heróis'}</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => handleOpenCompendium('powers')}
+          className={`app-bottom-nav-item ${view === 'powers' ? 'active' : ''}`}
+        >
+          <Sparkles size={20} />
+          <span>Poderes</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => handleOpenCompendium('spells')}
+          className={`app-bottom-nav-item ${view === 'spells' ? 'active' : ''}`}
+        >
+          <BookOpen size={20} />
+          <span>Magias</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => handleOpenCompendium('items')}
+          className={`app-bottom-nav-item ${view === 'items' ? 'active' : ''}`}
+        >
+          <Package size={20} />
+          <span>Itens</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setIsRollHistoryOpen(true)}
+          className={`app-bottom-nav-item ${isRollHistoryOpen ? 'active' : ''}`}
+        >
+          <Dices size={20} />
+          <span>Dados</span>
+        </button>
+      </nav>
     </div>
   );
 }

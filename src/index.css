@@ -744,3 +744,153 @@ input:focus, select:focus, textarea:focus {
   transform: scale(1.1);
 }
 
+/* ========================================================= */
+/* ESTILOS MOBILE NATIVO & RESPONSIVIDADE (Capacitor / Android) */
+/* ========================================================= */
+
+:root {
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-left: env(safe-area-inset-left, 0px);
+  --safe-area-right: env(safe-area-inset-right, 0px);
+}
+
+body {
+  padding-top: var(--safe-area-top);
+  padding-bottom: var(--safe-area-bottom);
+  padding-left: var(--safe-area-left);
+  padding-right: var(--safe-area-right);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* Ocultar barra mobile por padrão em desktop */
+.app-bottom-nav {
+  display: none;
+}
+
+/* Ajustes Específicos para Dispositivos Móveis e Telas <= 768px */
+@media (max-width: 768px) {
+  /* Oculta navegação de desktop */
+  .desktop-nav-group {
+    display: none !important;
+  }
+
+  /* Espaçamento inferior global para não sobrepor a barra de navegação inferior */
+  .app-layout {
+    padding-bottom: calc(70px + var(--safe-area-bottom)) !important;
+  }
+
+  /* Topbar compacta */
+  .app-topbar {
+    padding: 0.5rem 0.75rem !important;
+  }
+
+  .app-brand-title {
+    font-size: 1.1rem !important;
+  }
+
+  .hidden-mobile {
+    display: none !important;
+  }
+
+  /* Barra de Navegação Inferior Mobile Nativa */
+  .app-bottom-nav {
+    display: flex !important;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 999;
+    height: calc(60px + var(--safe-area-bottom));
+    padding-bottom: var(--safe-area-bottom);
+    background: rgba(11, 15, 25, 0.94);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border-gold);
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.7);
+    justify-content: space-around;
+    align-items: center;
+  }
+
+  .app-bottom-nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    gap: 0.2rem;
+    padding: 0.35rem 0;
+    cursor: pointer;
+    transition: var(--transition);
+    text-decoration: none;
+    font-family: var(--font-sans);
+  }
+
+  .app-bottom-nav-item span {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  .app-bottom-nav-item:active,
+  .app-bottom-nav-item.active {
+    color: var(--t20-gold-light);
+    transform: scale(1.05);
+  }
+
+  .app-bottom-nav-item.active svg {
+    filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.6));
+    color: var(--t20-gold);
+  }
+
+  /* Widget de Rolagem de Dados em Mobile: elevado acima da bottom nav */
+  .dice-roller-widget-container {
+    bottom: calc(68px + var(--safe-area-bottom) + 0.5rem) !important;
+    right: 0.75rem !important;
+  }
+
+  /* Modais no Mobile: Estilo Bottom Sheet Nativo */
+  .modal-overlay {
+    align-items: flex-end !important;
+    padding: 0 !important;
+  }
+
+  .modal-content {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 24px 24px 0 0 !important;
+    max-height: 90vh !important;
+    margin: 0 !important;
+    animation: slideUpMobile 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    padding: 1.25rem 1rem !important;
+  }
+
+  @keyframes slideUpMobile {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  /* Grid e Cards no Mobile */
+  .character-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+
+  .char-info-pill {
+    padding: 0.35rem 0.55rem !important;
+  }
+
+  /* Inputs maiores para toque confortável */
+  input, select, textarea, button {
+    touch-action: manipulation;
+  }
+}
+

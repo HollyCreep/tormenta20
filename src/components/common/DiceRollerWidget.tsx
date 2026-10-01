@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Dices, RotateCcw, X, Sparkles, ChevronDown, ChevronUp, History, AlertTriangle, FileText } from 'lucide-react';
+import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
 
 export interface RollResult {
   id: string;
@@ -61,6 +62,19 @@ export const DiceRollerWidget: React.FC<DiceRollerWidgetProps> = ({
       setIsToastVisible(true);
       setProgress(100);
 
+      // Vibração tátil nativa no dispositivo mobile
+      try {
+        if (latestRoll.isCrit) {
+          Haptics.notification({ type: NotificationType.Success });
+        } else if (latestRoll.isFumble) {
+          Haptics.notification({ type: NotificationType.Error });
+        } else {
+          Haptics.impact({ style: ImpactStyle.Light });
+        }
+      } catch {
+        // Fallback transparente na web
+      }
+
       if (dismissTimerRef.current) clearTimeout(dismissTimerRef.current);
       if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
 
@@ -99,6 +113,7 @@ export const DiceRollerWidget: React.FC<DiceRollerWidgetProps> = ({
 
   return (
     <div
+      className="dice-roller-widget-container"
       style={{
         position: 'fixed',
         bottom: '5.25rem',
