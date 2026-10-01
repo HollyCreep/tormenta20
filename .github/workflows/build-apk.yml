@@ -54,21 +54,20 @@ jobs:
         run: npx cap sync android
 
       - name: Build Debug APK with Gradle
-        id: gradle_build
         run: |
           cd android
-          ./gradlew :app:assembleDebug -PcompileSdkVersion=35 -PtargetSdkVersion=35 -PminSdkVersion=24 --no-daemon --stacktrace 2>&1 | tee ../gradle.log
-        continue-on-error: true
-
-      - name: Report Gradle Failure
-        if: steps.gradle_build.outcome == 'failure'
-        run: |
-          echo "## ❌ Gradle Build Error Log" >> $GITHUB_STEP_SUMMARY
-          echo '```text' >> $GITHUB_STEP_SUMMARY
-          tail -n 120 gradle.log >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          cat gradle.log
-          exit 1
+          set +e
+          ./gradlew :app:assembleDebug -PcompileSdkVersion=35 -PtargetSdkVersion=35 -PminSdkVersion=24 --no-daemon --stacktrace > ../gradle.log 2>&1
+          GRADLE_EXIT=$?
+          set -e
+          cat ../gradle.log
+          if [ $GRADLE_EXIT -ne 0 ]; then
+            echo "## ❌ Gradle Build Error Log" >> $GITHUB_STEP_SUMMARY
+            echo '```text' >> $GITHUB_STEP_SUMMARY
+            tail -n 80 ../gradle.log >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            exit $GRADLE_EXIT
+          fi
 
       - name: List Generated APKs
         run: |
