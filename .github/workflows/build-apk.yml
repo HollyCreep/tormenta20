@@ -66,8 +66,18 @@ jobs:
             echo '```text' >> $GITHUB_STEP_SUMMARY
             tail -n 80 ../gradle.log >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
+            ERR=$(grep -E "(FAILURE:|What went wrong:|Caused by:|ERROR:|> Task)" ../gradle.log | head -n 10 | tr '\n' ' ')
+            echo "::error title=Gradle Build Error::${ERR:-Build failed, check gradle.log}"
             exit $GRADLE_EXIT
           fi
+
+      - name: Upload Build Log Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gradle-build-log
+          path: gradle.log
+          if-no-files-found: ignore
 
       - name: List Generated APKs
         run: |
