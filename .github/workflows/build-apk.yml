@@ -30,7 +30,7 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v4
         with:
-          packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
+          packages: 'platform-tools platforms;android-36 platforms;android-35 build-tools;36.0.0'
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -54,44 +54,21 @@ jobs:
         run: npx cap sync android
 
       - name: Build Debug APK with Gradle
-        shell: bash
-        run: |
-          cd android
-          ./gradlew :app:assembleDebug -PcompileSdkVersion=35 -PtargetSdkVersion=35 -PminSdkVersion=24 --no-daemon --stacktrace 2>&1 | tee ../gradle.log
-          GRADLE_EXIT=${PIPESTATUS[0]}
-          if [ $GRADLE_EXIT -ne 0 ]; then
-            echo "## ❌ Gradle Build Error Log" >> $GITHUB_STEP_SUMMARY
-            echo '```text' >> $GITHUB_STEP_SUMMARY
-            tail -n 80 ../gradle.log >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            ERR=$(awk '/\* What went wrong:/,/\* Try:/' ../gradle.log | head -n 12 | tr '\r\n' ' ' | cut -c 1-600)
-            if [ -z "$ERR" ]; then
-              ERR=$(grep -C 4 "Execution failed for task" ../gradle.log | head -n 10 | tr '\r\n' ' ' | cut -c 1-600)
-            fi
-            echo "::error title=Gradle Root Cause::${ERR:-Build failed, check log}"
-            exit $GRADLE_EXIT
-          fi
-
-      - name: Upload Build Log Artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: gradle-build-log
-          path: gradle.log
-          if-no-files-found: ignore
+        run: ./gradlew :app:assembleDebug --no-daemon --stacktrace
+        working-directory: android
 
       - name: List Generated APKs
         run: |
           echo "### Generated APK Files:" >> $GITHUB_STEP_SUMMARY
           echo '```text' >> $GITHUB_STEP_SUMMARY
-          find . -name "*.apk" | tee -a $GITHUB_STEP_SUMMARY
+          find android/app/build/outputs/apk -name "*.apk" | tee -a $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: tormenta20-app-debug
-          path: "**/*.apk"
+          path: "android/app/build/outputs/apk/debug/*.apk"
           if-no-files-found: error
           retention-days: 30
 
@@ -99,7 +76,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: "**/*.apk"
+          files: "android/app/build/outputs/apk/debug/*.apk"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
