@@ -57,7 +57,7 @@ jobs:
         id: gradle_build
         run: |
           cd android
-          ./gradlew assembleDebug -PcompileSdkVersion=35 -PtargetSdkVersion=35 -PminSdkVersion=24 --no-daemon --stacktrace 2>&1 | tee ../gradle.log
+          ./gradlew :app:assembleDebug -PcompileSdkVersion=35 -PtargetSdkVersion=35 -PminSdkVersion=24 --no-daemon --stacktrace 2>&1 | tee ../gradle.log
         continue-on-error: true
 
       - name: Report Gradle Failure
@@ -72,14 +72,16 @@ jobs:
 
       - name: List Generated APKs
         run: |
-          echo "### Generated APK Files:"
-          find android/app/build/outputs/apk -type f -name "*.apk" || ls -la android/app/build/outputs/
+          echo "### Generated APK Files:" >> $GITHUB_STEP_SUMMARY
+          echo '```text' >> $GITHUB_STEP_SUMMARY
+          find . -name "*.apk" | tee -a $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: tormenta20-app-debug
-          path: android/app/build/outputs/apk/**/*.apk
+          path: "**/*.apk"
           if-no-files-found: error
           retention-days: 30
 
@@ -87,7 +89,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: android/app/build/outputs/apk/**/*.apk
+          files: "**/*.apk"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
