@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { SPELLS_LIST } from '../../data/spells';
-import { Spell } from '../../types/rules';
 import { DetailModal, DetailModalData } from '../common/DetailModal';
+import { SchoolBadge, CircleBadge, SpellTypeBadge } from '../common/T20Badge';
+import { cleanT20Text, getSpellRuleCitation } from '../../utils/textUtils';
 import {
   Search,
   Sparkles,
@@ -44,29 +45,6 @@ export const SpellsCompendium: React.FC<SpellsCompendiumProps> = ({ onBack }) =>
       );
     });
   }, [circleFilter, schoolFilter, typeFilter, search]);
-
-  const getSchoolColor = (school: string) => {
-    switch (school.toLowerCase()) {
-      case 'evocação':
-        return { color: '#f87171', border: 'rgba(239, 68, 68, 0.3)', icon: <Flame size={12} /> };
-      case 'abjuração':
-        return { color: '#60a5fa', border: 'rgba(59, 130, 246, 0.3)', icon: <Shield size={12} /> };
-      case 'adivinhação':
-        return { color: '#fbbf24', border: 'rgba(245, 158, 11, 0.3)', icon: <Eye size={12} /> };
-      case 'convocação':
-        return { color: '#34d399', border: 'rgba(16, 185, 129, 0.3)', icon: <Layers size={12} /> };
-      case 'encantamento':
-        return { color: '#c084fc', border: 'rgba(192, 132, 252, 0.3)', icon: <Sparkles size={12} /> };
-      case 'ilusão':
-        return { color: '#38bdf8', border: 'rgba(56, 189, 248, 0.3)', icon: <Eye size={12} /> };
-      case 'necromancia':
-        return { color: '#a3a3a3', border: 'rgba(163, 163, 163, 0.3)', icon: <Skull size={12} /> };
-      case 'transmutação':
-        return { color: '#fb923c', border: 'rgba(251, 146, 60, 0.3)', icon: <RefreshCw size={12} /> };
-      default:
-        return { color: '#cbd5e1', border: 'rgba(203, 213, 225, 0.3)', icon: <Sparkles size={12} /> };
-    }
-  };
 
   return (
     <div style={{ maxWidth: '1240px', margin: '0 auto', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -205,7 +183,7 @@ export const SpellsCompendium: React.FC<SpellsCompendiumProps> = ({ onBack }) =>
       {/* Grade de Magias */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '1.25rem' }}>
         {filteredSpells.map((sp) => {
-          const schInfo = getSchoolColor(sp.school);
+          const cleanDesc = cleanT20Text(sp.description);
           return (
             <div
               key={`${sp.id}-${sp.circle}`}
@@ -221,32 +199,14 @@ export const SpellsCompendium: React.FC<SpellsCompendiumProps> = ({ onBack }) =>
               <div>
                 {/* Header: Nome e Badges */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                  <h3 style={{ fontSize: '1.2rem', color: '#ffffff', margin: 0 }}>{sp.name}</h3>
-                  <span
-                    className="badge"
-                    style={{
-                      background: 'rgba(0,0,0,0.3)',
-                      color: schInfo.color,
-                      border: `1px solid ${schInfo.border}`,
-                      fontSize: '0.7rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.25rem',
-                    }}
-                  >
-                    {schInfo.icon}
-                    {sp.school}
-                  </span>
+                  <h3 style={{ fontSize: '1.2rem', color: '#ffffff', margin: 0 }}>{cleanT20Text(sp.name)}</h3>
+                  <SchoolBadge school={sp.school} />
                 </div>
 
                 {/* Sub-badges: Círculo, Tipo, PM base */}
                 <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap', marginBottom: '0.65rem' }}>
-                  <span className="badge badge-gold" style={{ fontSize: '0.7rem' }}>
-                    {sp.circle}º Círculo
-                  </span>
-                  <span className={`badge ${sp.type === 'arcana' ? 'badge-blue' : sp.type === 'divina' ? 'badge-ruby' : 'badge-slate'}`} style={{ fontSize: '0.7rem', textTransform: 'capitalize' }}>
-                    {sp.type}
-                  </span>
+                  <CircleBadge circle={sp.circle} />
+                  <SpellTypeBadge type={sp.type} />
                   <span className="badge badge-slate" style={{ fontSize: '0.7rem' }}>
                     {sp.circle === 1 ? '1 PM' : sp.circle === 2 ? '3 PM' : sp.circle === 3 ? '6 PM' : sp.circle === 4 ? '10 PM' : '15 PM'}
                   </span>
@@ -254,14 +214,14 @@ export const SpellsCompendium: React.FC<SpellsCompendiumProps> = ({ onBack }) =>
 
                 {/* Estatísticas Rápidas */}
                 <div style={{ fontSize: '0.775rem', color: '#94a3b8', lineHeight: 1.5, background: 'rgba(0,0,0,0.25)', padding: '0.5rem 0.65rem', borderRadius: 'var(--radius-sm)', marginBottom: '0.75rem' }}>
-                  <div><strong>Execução:</strong> {sp.execution} • <strong>Alcance:</strong> {sp.range}</div>
-                  <div><strong>Alvo/Área:</strong> {sp.targetArea} • <strong>Duração:</strong> {sp.duration}</div>
-                  {sp.resistance && <div><strong>Resistência:</strong> {sp.resistance}</div>}
+                  <div><strong>Execução:</strong> {cleanT20Text(sp.execution)} • <strong>Alcance:</strong> {cleanT20Text(sp.range)}</div>
+                  <div><strong>Alvo/Área:</strong> {cleanT20Text(sp.targetArea)} • <strong>Duração:</strong> {cleanT20Text(sp.duration)}</div>
+                  {sp.resistance && <div><strong>Resistência:</strong> {cleanT20Text(sp.resistance)}</div>}
                 </div>
 
                 {/* Descrição Principal */}
                 <p style={{ fontSize: '0.85rem', color: '#cbd5e1', lineHeight: 1.5, margin: 0 }}>
-                  {sp.description}
+                  {cleanDesc}
                 </p>
 
                 {/* Aprimoramentos */}
@@ -273,7 +233,7 @@ export const SpellsCompendium: React.FC<SpellsCompendiumProps> = ({ onBack }) =>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
                       {sp.upgrades.slice(0, 2).map((up, idx) => (
                         <div key={idx} style={{ fontSize: '0.75rem', color: '#cbd5e1', lineHeight: 1.4 }}>
-                          <strong style={{ color: 'var(--t20-mana)' }}>{up.cost}:</strong> {up.description}
+                          <strong style={{ color: 'var(--t20-mana)' }}>{cleanT20Text(up.cost)}:</strong> {cleanT20Text(up.description)}
                         </div>
                       ))}
                       {sp.upgrades.length > 2 && (
@@ -290,37 +250,27 @@ export const SpellsCompendium: React.FC<SpellsCompendiumProps> = ({ onBack }) =>
               <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '0.65rem', display: 'flex', justifyContent: 'flex-end' }}>
                 <button
                   type="button"
-                  onClick={() =>
+                  onClick={() => {
+                    const citation = getSpellRuleCitation(sp);
                     setModalDetail({
                       title: sp.name,
                       category: `Magia ${sp.type.toUpperCase()} • ${sp.circle}º Círculo (${sp.school})`,
-                      subtitle: `Execução: ${sp.execution} • Alcance: ${sp.range} • Duração: ${sp.duration}`,
-                      description: sp.description,
+                      subtitle: `Execução: ${cleanT20Text(sp.execution)} • Alcance: ${cleanT20Text(sp.range)} • Duração: ${cleanT20Text(sp.duration)}`,
+                      description: cleanDesc,
                       stats: [
                         { label: 'Círculo', value: `${sp.circle}º Círculo` },
                         { label: 'Custo Base', value: sp.circle === 1 ? '1 PM' : sp.circle === 2 ? '3 PM' : sp.circle === 3 ? '6 PM' : sp.circle === 4 ? '10 PM' : '15 PM' },
                         { label: 'Escola', value: sp.school },
                         { label: 'Tradição', value: sp.type },
-                        { label: 'Execução', value: sp.execution },
-                        { label: 'Alcance', value: sp.range },
-                        { label: 'Alvo/Área', value: sp.targetArea },
-                        { label: 'Duração', value: sp.duration },
-                        ...(sp.resistance ? [{ label: 'Resistência', value: sp.resistance }] : []),
+                        { label: 'Execução', value: cleanT20Text(sp.execution) },
+                        { label: 'Alcance', value: cleanT20Text(sp.range) },
+                        { label: 'Alvo/Área', value: cleanT20Text(sp.targetArea) },
+                        { label: 'Duração', value: cleanT20Text(sp.duration) },
+                        ...(sp.resistance ? [{ label: 'Resistência', value: cleanT20Text(sp.resistance) }] : []),
                       ],
-                      ruleCitation: {
-                        id: sp.id,
-                        title: sp.name,
-                        book: 'Tormenta 20: Edição Jogo do Ano (v1.3)',
-                        chapter: 'Capítulo 4: Magia',
-                        section: `${sp.type.toUpperCase()} — ${sp.school.toUpperCase()}`,
-                        page: 'Páginas 184-217',
-                        quote: `“${sp.name}. ${sp.type.toUpperCase()} ${sp.circle} (${sp.school}). Execução: ${sp.execution}; Alcance: ${sp.range}; Duração: ${sp.duration}.”`,
-                        explanation: sp.upgrades && sp.upgrades.length > 0
-                          ? `Aprimoramentos disponíveis:\n${sp.upgrades.map((u) => `• ${u.cost}: ${u.description}`).join('\n')}`
-                          : 'Esta magia não possui aprimoramentos adicionais.',
-                      },
-                    })
-                  }
+                      ruleCitation: citation,
+                    });
+                  }}
                   className="btn btn-ghost"
                   style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem', color: 'var(--t20-gold)', gap: '0.3rem' }}
                 >

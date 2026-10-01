@@ -1,5 +1,6 @@
 import { CharacterSheet } from '../types/character';
 import { createSampleCharacters } from './sampleCharacters';
+import { SPELLS_LIST } from '../data/spells';
 
 const STORAGE_KEY = 'tormenta20_characters_v1';
 
@@ -14,7 +15,36 @@ export const storageService = {
       }
       const parsed = JSON.parse(data);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed;
+        let hasFixedCorruptions = false;
+        const sanitized = parsed.map((char: CharacterSheet) => {
+          if (char && Array.isArray(char.spells)) {
+            const healedSpells = char.spells
+              .map((sp) => {
+                if (!sp || !sp.id || !sp.name) {
+                  hasFixedCorruptions = true;
+                  const fallback = SPELLS_LIST.find((s) => s.id === 'explosao_de_chamas');
+                  if (fallback) {
+                    return { ...fallback, learnedFrom: sp?.learnedFrom || 'classe' };
+                  }
+                }
+                const canonical = SPELLS_LIST.find((s) => s.id === sp.id);
+                if (canonical && (!sp.description || !sp.upgrades)) {
+                  hasFixedCorruptions = true;
+                  return { ...canonical, ...sp, description: canonical.description, upgrades: canonical.upgrades };
+                }
+                return sp;
+              })
+              .filter((sp) => Boolean(sp && sp.id && sp.name));
+
+            return { ...char, spells: healedSpells };
+          }
+          return char;
+        });
+
+        if (hasFixedCorruptions) {
+          this.saveAll(sanitized);
+        }
+        return sanitized;
       }
       const samples = createSampleCharacters();
       this.saveAll(samples);

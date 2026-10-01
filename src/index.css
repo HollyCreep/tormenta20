@@ -1,36 +1,40 @@
 :root {
-  /* Paleta Tormenta 20: Jogo do Ano */
-  --bg-main: #0c0e17;
-  --bg-surface: #141726;
-  --bg-surface-elevated: #1b2034;
-  --bg-surface-hover: #232942;
-  --bg-card: rgba(20, 23, 38, 0.85);
-  --bg-glass: rgba(18, 21, 35, 0.72);
-  --border-color: rgba(160, 175, 215, 0.15);
-  --border-hover: rgba(230, 57, 70, 0.45);
+  /* Paleta Tormenta 20: Jogo do Ano (Arton Nobre & Ouro Lendário) */
+  --bg-main: #0b0f19;
+  --bg-surface: #111827;
+  --bg-surface-elevated: #1e293b;
+  --bg-surface-hover: #29354d;
+  --bg-card: rgba(17, 24, 39, 0.88);
+  --bg-glass: rgba(15, 23, 42, 0.78);
+  --border-color: rgba(148, 163, 184, 0.15);
+  --border-hover: rgba(245, 158, 11, 0.45);
   --border-gold: rgba(245, 158, 11, 0.4);
 
-  /* Acentos */
-  --t20-ruby: #e63946;
-  --t20-ruby-hover: #ff4d6d;
-  --t20-ruby-dark: #9b111e;
-  --t20-ruby-glow: rgba(230, 57, 70, 0.35);
-
+  /* Acento Primário: Ouro de Valkaria */
   --t20-gold: #f59e0b;
   --t20-gold-light: #fbbf24;
   --t20-gold-dark: #b45309;
-  --t20-gold-glow: rgba(245, 158, 11, 0.3);
+  --t20-gold-glow: rgba(245, 158, 11, 0.28);
+  --artonian-gold: #f59e0b;
 
+  /* Vermelho Rubro: Estritamente reservado para PV, Dano, Falhas Críticas e Perigo */
+  --t20-ruby: #ef4444;
+  --t20-ruby-hover: #f87171;
+  --t20-ruby-dark: #b91c1c;
+  --t20-ruby-glow: rgba(239, 68, 68, 0.35);
+
+  /* Mana & Arcano: Azul Profundo */
   --t20-mana: #3b82f6;
   --t20-mana-light: #60a5fa;
   --t20-mana-glow: rgba(59, 130, 246, 0.35);
 
+  /* Vida & Natureza */
   --t20-life: #10b981;
   --t20-life-light: #34d399;
   --t20-life-glow: rgba(16, 185, 129, 0.35);
 
   /* Texto */
-  --text-main: #f1f5f9;
+  --text-main: #f8fafc;
   --text-muted: #94a3b8;
   --text-dim: #64748b;
   --text-inverse: #0f172a;
@@ -48,51 +52,52 @@
   --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.6);
-  --shadow-ruby: 0 0 20px rgba(230, 57, 70, 0.25);
-  --shadow-gold: 0 0 20px rgba(245, 158, 11, 0.2);
+  --shadow-ruby: 0 0 20px rgba(239, 68, 68, 0.25);
+  --shadow-gold: 0 0 20px rgba(245, 158, 11, 0.22);
   --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 [data-theme="modern-dark"] {
-  --bg-main: #121214;
-  --bg-surface: #202024;
-  --bg-surface-elevated: #29292e;
-  --bg-surface-hover: #323238;
-  --bg-card: rgba(32, 32, 36, 0.94);
-  --bg-glass: rgba(18, 18, 20, 0.88);
-  --border-color: #323238;
-  --border-hover: #8257e5;
-  --border-gold: #996dff;
+  --bg-main: #090a0f;
+  --bg-surface: #121520;
+  --bg-surface-elevated: #1a1e2e;
+  --bg-surface-hover: #242a3e;
+  --bg-card: rgba(18, 21, 32, 0.94);
+  --bg-glass: rgba(12, 14, 22, 0.88);
+  --border-color: rgba(148, 163, 184, 0.16);
+  --border-hover: rgba(56, 189, 248, 0.45);
+  --border-gold: rgba(245, 158, 11, 0.4);
 
-  --t20-ruby: #8257e5;
-  --t20-ruby-hover: #996dff;
-  --t20-ruby-dark: #6833e4;
-  --t20-ruby-glow: rgba(130, 87, 229, 0.4);
+  --t20-ruby: #ef4444;
+  --t20-ruby-hover: #f87171;
+  --t20-ruby-dark: #b91c1c;
+  --t20-ruby-glow: rgba(239, 68, 68, 0.35);
 
-  --t20-gold: #04d361;
-  --t20-gold-light: #48e58a;
-  --t20-gold-dark: #00875f;
-  --t20-gold-glow: rgba(4, 211, 97, 0.3);
+  --t20-gold: #f59e0b;
+  --t20-gold-light: #fbbf24;
+  --t20-gold-dark: #b45309;
+  --t20-gold-glow: rgba(245, 158, 11, 0.25);
+  --artonian-gold: #f59e0b;
 
-  --t20-mana: #6379f4;
-  --t20-mana-light: #8395f8;
-  --t20-mana-glow: rgba(99, 121, 244, 0.35);
+  --t20-mana: #38bdf8;
+  --t20-mana-light: #7dd3fc;
+  --t20-mana-glow: rgba(56, 189, 248, 0.35);
 
-  --text-main: #e1e1e6;
-  --text-muted: #a8a8b3;
-  --text-dim: #737380;
-  --text-inverse: #121214;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
+  --text-inverse: #090a0f;
 }
 
 [data-theme="light"] {
-  --bg-main: #f1f5f9;
+  --bg-main: #f8fafc;
   --bg-surface: #ffffff;
-  --bg-surface-elevated: #f8fafc;
+  --bg-surface-elevated: #f1f5f9;
   --bg-surface-hover: #e2e8f0;
   --bg-card: #ffffff;
   --bg-glass: rgba(255, 255, 255, 0.95);
   --border-color: #cbd5e1;
-  --border-hover: #dc2626;
+  --border-hover: #d97706;
   --border-gold: #d97706;
 
   --t20-ruby: #dc2626;
@@ -104,6 +109,7 @@
   --t20-gold-light: #b45309;
   --t20-gold-dark: #78350f;
   --t20-gold-glow: rgba(217, 119, 6, 0.2);
+  --artonian-gold: #d97706;
 
   --t20-mana: #2563eb;
   --t20-mana-light: #3b82f6;
@@ -129,7 +135,7 @@
 }
 
 [data-theme="light"] h1 {
-  background: linear-gradient(135deg, #0f172a 0%, #b45309 60%, #dc2626 100%);
+  background: linear-gradient(135deg, #0f172a 0%, #b45309 60%, #d97706 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -218,7 +224,7 @@ p {
 
 .t20-card:hover {
   border-color: var(--border-hover);
-  box-shadow: var(--shadow-ruby);
+  box-shadow: var(--shadow-gold);
 }
 
 .t20-card-gold {
@@ -277,6 +283,108 @@ p {
   border: 1px solid rgba(148, 163, 184, 0.25);
 }
 
+/* ⚔️ Badges Canônicos do Sistema Tormenta 20 ⚔️ */
+/* Escolas de Magia */
+.badge-school-evocacao {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+}
+.badge-school-abjuracao {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.35);
+}
+.badge-school-adivinhacao {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+.badge-school-convocacao {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+.badge-school-encantamento {
+  background: rgba(192, 132, 252, 0.15);
+  color: #c084fc;
+  border: 1px solid rgba(192, 132, 252, 0.35);
+}
+.badge-school-ilusao {
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+}
+.badge-school-necromancia {
+  background: rgba(163, 163, 163, 0.15);
+  color: #a3a3a3;
+  border: 1px solid rgba(163, 163, 163, 0.35);
+}
+.badge-school-transmutacao {
+  background: rgba(251, 146, 60, 0.15);
+  color: #fb923c;
+  border: 1px solid rgba(251, 146, 60, 0.35);
+}
+
+/* Categorias de Poderes */
+.badge-power-combate {
+  background: rgba(230, 57, 70, 0.15);
+  color: #ff6b7b;
+  border: 1px solid rgba(230, 57, 70, 0.35);
+}
+.badge-power-destino {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+.badge-power-magia {
+  background: rgba(168, 85, 247, 0.15);
+  color: #c084fc;
+  border: 1px solid rgba(168, 85, 247, 0.35);
+}
+.badge-power-tormenta {
+  background: rgba(153, 27, 27, 0.3);
+  color: #fca5a5;
+  border: 1px solid rgba(220, 38, 38, 0.5);
+}
+.badge-power-concedido {
+  background: rgba(14, 165, 233, 0.15);
+  color: #38bdf8;
+  border: 1px solid rgba(14, 165, 233, 0.35);
+}
+.badge-power-classe {
+  background: rgba(217, 119, 6, 0.18);
+  color: #fde68a;
+  border: 1px solid rgba(217, 119, 6, 0.4);
+}
+
+/* Tipos de Execução */
+.badge-exec-padrao {
+  background: rgba(100, 116, 139, 0.15);
+  color: #cbd5e1;
+  border: 1px solid rgba(100, 116, 139, 0.3);
+}
+.badge-exec-movimento {
+  background: rgba(6, 182, 212, 0.15);
+  color: #67e8f9;
+  border: 1px solid rgba(6, 182, 212, 0.3);
+}
+.badge-exec-completa {
+  background: rgba(234, 88, 12, 0.15);
+  color: #fdba74;
+  border: 1px solid rgba(234, 88, 12, 0.3);
+}
+.badge-exec-reacao {
+  background: rgba(225, 29, 72, 0.15);
+  color: #fda4af;
+  border: 1px solid rgba(225, 29, 72, 0.3);
+}
+.badge-exec-livre {
+  background: rgba(16, 185, 129, 0.15);
+  color: #6ee7b7;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
 /* Botões */
 .btn {
   display: inline-flex;
@@ -297,13 +405,14 @@ p {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--t20-ruby) 0%, var(--t20-ruby-dark) 100%);
-  color: #ffffff;
-  box-shadow: 0 4px 14px rgba(230, 57, 70, 0.4);
+  background: linear-gradient(135deg, var(--artonian-gold, #f59e0b) 0%, var(--t20-gold-dark, #b45309) 100%);
+  color: #0f172a;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
 }
 .btn-primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, var(--t20-ruby-hover) 0%, var(--t20-ruby) 100%);
-  box-shadow: 0 6px 20px rgba(230, 57, 70, 0.6);
+  background: linear-gradient(135deg, var(--t20-gold-light, #fbbf24) 0%, var(--artonian-gold, #f59e0b) 100%);
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.5);
   transform: translateY(-1px);
 }
 
@@ -335,9 +444,9 @@ p {
   border: 1px solid var(--border-color);
 }
 .btn-outline:hover:not(:disabled) {
-  border-color: var(--t20-ruby);
-  color: #ff6b7b;
-  background: rgba(230, 57, 70, 0.08);
+  border-color: var(--t20-gold);
+  color: var(--t20-gold-light);
+  background: rgba(245, 158, 11, 0.08);
 }
 
 .btn-danger {
@@ -466,8 +575,8 @@ input, select, textarea {
 }
 
 input:focus, select:focus, textarea:focus {
-  border-color: var(--t20-ruby);
-  box-shadow: 0 0 0 3px rgba(230, 57, 70, 0.25);
+  border-color: var(--t20-gold);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25);
 }
 
 /* Tooltip & Popover */
@@ -566,3 +675,72 @@ input:focus, select:focus, textarea:focus {
     page-break-after: always;
   }
 }
+
+/* 🛡️ Cartão de Informações do Personagem (Hero Info Pills) 🛡️ */
+.char-info-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.45rem 0.75rem;
+  transition: var(--transition);
+}
+
+.char-info-pill:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: var(--border-hover);
+}
+
+[data-theme="light"] .char-info-pill {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+[data-theme="light"] .char-info-pill:hover {
+  background: #f1f5f9;
+  border-color: var(--t20-gold);
+}
+
+.char-info-label {
+  display: block;
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.char-info-value {
+  display: block;
+  font-size: 0.825rem;
+  font-weight: 700;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.char-info-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--t20-gold);
+  padding: 0.2rem;
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+  opacity: 0.75;
+}
+
+.char-info-btn:hover {
+  opacity: 1;
+  background: rgba(245, 158, 11, 0.15);
+  transform: scale(1.1);
+}
+

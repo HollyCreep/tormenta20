@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { CharacterSheet } from './types/character';
 import { storageService } from './services/storage';
+import { logService, ChangeLogOptions } from './services/logService';
 import { CharacterList } from './components/hub/CharacterList';
 import { WizardContainer } from './components/wizard/WizardContainer';
 import { CharacterSheetView } from './components/sheet/CharacterSheetView';
@@ -9,7 +10,9 @@ import { ItemsCompendium } from './components/compendium/ItemsCompendium';
 import { ThemeSelector } from './components/common/ThemeSelector';
 import { DiceRollerWidget, RollResult } from './components/common/DiceRollerWidget';
 import { SpellsCompendium } from './components/compendium/SpellsCompendium';
-import { Shield, Sparkles, Package, Users, BookOpen } from 'lucide-react';
+import { RollHistoryModal } from './components/history/RollHistoryModal';
+import { ChangeLogModal } from './components/history/ChangeLogModal';
+import { Shield, Sparkles, Package, Users, BookOpen, Dices, FileText } from 'lucide-react';
 
 export function App() {
   const [view, setView] = useState<'list' | 'wizard' | 'sheet' | 'powers' | 'items' | 'spells'>('list');
@@ -18,6 +21,8 @@ export function App() {
   const [activeCharacterId, setActiveCharacterId] = useState<string | null>(null);
   const [wizardCharacter, setWizardCharacter] = useState<CharacterSheet | null>(null);
   const [diceRolls, setDiceRolls] = useState<RollResult[]>([]);
+  const [isRollHistoryOpen, setIsRollHistoryOpen] = useState(false);
+  const [isChangeLogOpen, setIsChangeLogOpen] = useState(false);
 
   // Carrega personagens do LocalStorage na montagem
   useEffect(() => {
@@ -107,10 +112,10 @@ export function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Rolador de Dados Global
-  const handleRoll = (title: string, sides: number, modifier: number, count: number = 1) => {
+  // Rolador de Dados Global com Registro Canônico de Auditoria
+  const handleRoll = (rawTitle: string, sides: number, modifier: number, count: number = 1) => {
     let rollSum = 0;
-    const rollsArray = [];
+    const rollsArray: number[] = [];
     for (let i = 0; i < count; i++) {
       const r = Math.floor(Math.random() * sides) + 1;
       rollsArray.push(r);
@@ -121,6 +126,26 @@ export function App() {
     const isCrit = sides === 20 && rollSum === 20;
     const isFumble = sides === 20 && rollSum === 1;
 
+    // Extrai título amigável e detalhes de fórmulas entre colchetes
+    let title = rawTitle.trim();
+    let components = '';
+    const match = rawTitle.match(/^(.*?)\s*\[(.*)\]$/);
+    if (match) {
+      title = match[1].trim();
+      components = match[2].trim();
+    }
+
+    // Inferência de categoria para filtros
+    let category: 'ataque' | 'dano' | 'pericia' | 'atributo' | 'magia' | 'livre' = 'livre';
+    const low = title.toLowerCase();
+    if (low.includes('ataque')) category = 'ataque';
+    else if (low.includes('dano')) category = 'dano';
+    else if (low.includes('teste de') || low.includes('perícia') || low.includes('pericia')) category = 'pericia';
+    else if (low.includes('magia') || low.includes('lançar')) category = 'magia';
+    else if (low.includes('força') || low.includes('destreza') || low.includes('constituição') || low.includes('inteligência') || low.includes('sabedoria') || low.includes('carisma')) category = 'atributo';
+
+    const rollType = sides === 20 ? 'd20' : sides === 6 ? 'd6' : sides === 8 ? 'd8' : sides === 10 ? 'd10' : sides === 12 ? 'd12' : sides === 4 ? 'd4' : sides === 100 ? 'd100' : 'multiplo';
+
     const formula =
       modifier !== 0
         ? `${count > 1 ? `${count}d${sides}` : `d${sides}`} [${rollsArray.join(', ')}] ${modifier > 0 ? `+ ${modifier}` : `- ${Math.abs(modifier)}`} = ${total}`
@@ -128,7 +153,8 @@ export function App() {
 
     const newRoll: RollResult = {
       id: 'roll_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
-      title,
+      title: rawTitle,
+      cleanTitle: title,
       formula,
       diceResult: rollSum,
       modifier,
@@ -136,9 +162,27 @@ export function App() {
       isCrit,
       isFumble,
       timestamp: new Date().toLocaleTimeString(),
+      breakdown: components,
     };
 
     setDiceRolls((prev) => [newRoll, ...prev.slice(0, 19)]);
+
+    // Grava no histórico persistente
+    logService.addRoll({
+      characterId: activeCharacter?.id,
+      characterName: activeCharacter?.name,
+      userName: activeCharacter?.playerName || 'Jogador',
+      category,
+      rollType: rollType as any,
+      title,
+      formula,
+      components,
+      diceResults: rollsArray,
+      modifier,
+      total,
+      isCrit,
+      isFumble,
+    });
   };
 
   return (
@@ -207,8 +251,30 @@ export function App() {
             </button>
           </div>
 
-          {/* Seletor de Tema Visual */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          {/* Seletor de Tema Visual e Acesso a Históricos */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+            <button
+              type="button"
+              onClick={() => setIsRollHistoryOpen(true)}
+              className="btn btn-sm btn-outline"
+              title="Histórico Completo de Rolagens de Dados"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
+            >
+              <Dices size={14} style={{ color: 'var(--artonian-gold, #d97706)' }} />
+              <span className="hidden-mobile">Histórico</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setIsChangeLogOpen(true)}
+              className="btn btn-sm btn-outline"
+              title="Registro de Auditoria e Alterações da Ficha"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
+            >
+              <FileText size={14} style={{ color: 'var(--color-mana, #3b82f6)' }} />
+              <span className="hidden-mobile">Auditoria</span>
+            </button>
+
             <ThemeSelector />
           </div>
         </div>
@@ -247,7 +313,14 @@ export function App() {
       {view === 'sheet' && activeCharacter && (
         <CharacterSheetView
           character={activeCharacter}
-          onUpdateCharacter={(updated) => {
+          onUpdateCharacter={(updated, logOptions) => {
+            // Registra alterações comparando o estado anterior com o atual
+            logService.diffAndLogChanges(
+              activeCharacter,
+              updated,
+              updated.playerName || 'Jogador',
+              logOptions
+            );
             storageService.saveCharacter(updated);
             setCharacters(storageService.loadCharacters());
           }}
@@ -257,7 +330,7 @@ export function App() {
             setPrevView('list');
           }}
           onExportJson={() => handleExportCharacter(activeCharacter)}
-          onRollDice={(title, sides, mod) => handleRoll(title, sides, mod)}
+          onRollDice={(title, sides, mod, count) => handleRoll(title, sides, mod, count || 1)}
         />
       )}
 
@@ -289,6 +362,24 @@ export function App() {
         rolls={diceRolls}
         onRoll={(title, sides, mod) => handleRoll(title, sides, mod)}
         onClearHistory={() => setDiceRolls([])}
+        onOpenFullHistory={() => setIsRollHistoryOpen(true)}
+        onOpenChangeLog={() => setIsChangeLogOpen(true)}
+      />
+
+      {/* Modal de Histórico de Rolagens Completo */}
+      <RollHistoryModal
+        isOpen={isRollHistoryOpen}
+        characterNames={characters.map((c) => ({ id: c.id, name: c.name }))}
+        activeCharacterId={activeCharacterId || undefined}
+        onClose={() => setIsRollHistoryOpen(false)}
+      />
+
+      {/* Modal de Auditoria e Alterações da Ficha */}
+      <ChangeLogModal
+        isOpen={isChangeLogOpen}
+        characterNames={characters.map((c) => ({ id: c.id, name: c.name }))}
+        activeCharacterId={activeCharacterId || undefined}
+        onClose={() => setIsChangeLogOpen(false)}
       />
     </div>
   );

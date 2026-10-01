@@ -67,6 +67,13 @@ export interface CharacterSpell extends Spell {
   learnedFrom: 'classe' | 'raca' | 'origem' | 'poder';
 }
 
+export interface CharacterClassLevel {
+  classId: string;
+  className: string;
+  level: number;
+  subclass?: string;
+}
+
 export interface CharacterSheet {
   id: string;
   name: string;
@@ -82,9 +89,10 @@ export interface CharacterSheet {
   selectedRacialSkills?: string[];
   selectedRacialPower?: string;
 
-  // Classe
+  // Classe e Multiclasse
   classId: string;
   classSubclass?: string; // e.g. Bruxo, Feiticeiro (Dracônico), Mago
+  classes?: CharacterClassLevel[]; // Suporte completo a multiclasse (Cap. 1, pág. 37)
   selectedClassSkills: string[];
   selectedIntSkills: string[]; // skills picked because of INT > 0
 
@@ -152,6 +160,65 @@ export interface CharacterSheet {
     notes?: string;
   };
 
+  // Caderno de Anotações Rico
+  notes?: CharacterNote[];
+
   createdAt: string;
   updatedAt: string;
 }
+
+export interface CharacterNoteImage {
+  id: string;
+  dataUrl: string;
+  caption?: string;
+  createdAt: string;
+}
+
+export interface CharacterNote {
+  id: string;
+  title: string;
+  content: string;
+  category: 'missao' | 'npc' | 'local' | 'loot' | 'lore' | 'geral';
+  images?: CharacterNoteImage[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface RollHistoryEntry {
+  id: string;
+  characterId?: string;
+  characterName?: string;
+  userName?: string;
+  category: 'ataque' | 'dano' | 'pericia' | 'atributo' | 'magia' | 'livre';
+  rollType: 'd20' | 'd6' | 'd8' | 'd10' | 'd12' | 'd4' | 'd100' | 'multiplo';
+  title: string;
+  formula: string;
+  components?: string;
+  diceResults: number[];
+  modifier: number;
+  total: number;
+  isCrit: boolean;
+  isFumble: boolean;
+  timestamp: string; // ISO 8601
+  timeFormatted: string; // HH:mm:ss
+  dateFormatted: string; // DD/MM/YYYY
+}
+
+export interface CharacterChangeLogEntry {
+  id: string;
+  characterId: string;
+  characterName: string;
+  userName?: string;
+  timestamp: string; // ISO 8601
+  timeFormatted: string; // HH:mm:ss
+  dateFormatted: string; // DD/MM/YYYY
+  changeType: 'recursos' | 'atributos' | 'pericias' | 'poderes' | 'magias' | 'inventario' | 'nivel' | 'condicoes' | 'notas' | 'geral';
+  title: string;
+  description: string;
+  diff?: {
+    field: string;
+    from: string | number;
+    to: string | number;
+  }[];
+}
+

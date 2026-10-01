@@ -5,6 +5,8 @@ import { CharacterSheet } from '../../types/character';
 import { RULES_CITATIONS } from '../../data/rulesCitations';
 import { DetailModal, DetailModalData } from '../common/DetailModal';
 import { PrerequisiteContext, checkPowerPrerequisites } from '../../utils/rulesValidation';
+import { PowerCategoryBadge } from '../common/T20Badge';
+import { cleanT20Text, getGeneralPowerRuleCitation } from '../../utils/textUtils';
 import {
   Search,
   Sparkles,
@@ -32,7 +34,7 @@ export const PowersCompendium: React.FC<PowersCompendiumProps> = ({
   characters = [],
 }) => {
   const [search, setSearch] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState<'todas' | 'combate' | 'destino' | 'magia' | 'tormenta'>('todas');
+  const [categoryFilter, setCategoryFilter] = useState<'todas' | 'combate' | 'destino' | 'magia' | 'concedido' | 'tormenta'>('todas');
   const [onlyEligible, setOnlyEligible] = useState(false);
   const [selectedCharId, setSelectedCharId] = useState<string>(activeCharacter?.id || (characters.length > 0 ? characters[0].id : ''));
   const [modalDetail, setModalDetail] = useState<DetailModalData | null>(null);
@@ -74,21 +76,6 @@ export const PowersCompendium: React.FC<PowersCompendiumProps> = ({
 
     return true;
   });
-
-  const getCategoryBadge = (cat: string) => {
-    switch (cat) {
-      case 'combate':
-        return <span className="badge badge-ruby" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Sword size={11} /> Combate</span>;
-      case 'destino':
-        return <span className="badge badge-gold" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Compass size={11} /> Destino</span>;
-      case 'magia':
-        return <span className="badge badge-blue" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Sparkles size={11} /> Magia</span>;
-      case 'tormenta':
-        return <span className="badge badge-slate" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', borderColor: '#a855f7', color: '#c084fc' }}><Flame size={11} /> Tormenta</span>;
-      default:
-        return <span className="badge badge-slate">{cat}</span>;
-    }
-  };
 
   return (
     <div style={{ maxWidth: '1240px', margin: '0 auto', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -135,7 +122,7 @@ export const PowersCompendium: React.FC<PowersCompendiumProps> = ({
       {/* Barra de Filtros, Busca e Seletor de Personagem */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
         <div className="btn-group">
-          {(['todas', 'combate', 'destino', 'magia', 'tormenta'] as const).map((cat) => (
+          {(['todas', 'combate', 'destino', 'magia', 'concedido', 'tormenta'] as const).map((cat) => (
             <button
               key={cat}
               type="button"
@@ -217,6 +204,8 @@ export const PowersCompendium: React.FC<PowersCompendiumProps> = ({
         {filteredPowers.map((pow) => {
           const prereqRes = prereqContext ? checkPowerPrerequisites(pow.id, prereqContext) : null;
           const hasPrereqText = Boolean(pow.prerequisites && pow.prerequisites.trim().length > 0);
+          const cleanDesc = cleanT20Text(pow.description);
+          const cleanPrereq = cleanT20Text(pow.prerequisites || '');
 
           return (
             <div
@@ -238,8 +227,8 @@ export const PowersCompendium: React.FC<PowersCompendiumProps> = ({
             >
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem', marginBottom: '0.4rem' }}>
-                  <h3 style={{ fontSize: '1.15rem', color: 'var(--t20-gold-light)', margin: 0 }}>{pow.name}</h3>
-                  {getCategoryBadge(pow.category)}
+                  <h3 style={{ fontSize: '1.15rem', color: 'var(--t20-gold-light)', margin: 0 }}>{cleanT20Text(pow.name)}</h3>
+                  <PowerCategoryBadge category={pow.category} />
                 </div>
 
                 {/* Status de Pré-requisito */}
@@ -256,7 +245,7 @@ export const PowersCompendium: React.FC<PowersCompendiumProps> = ({
                     )
                   ) : hasPrereqText ? (
                     <span className="badge badge-slate" style={{ fontSize: '0.725rem', color: '#f87171' }}>
-                      <ShieldAlert size={11} /> Pré-requisito: {pow.prerequisites}
+                      <ShieldAlert size={11} /> Pré-requisito: {cleanPrereq}
                     </span>
                   ) : (
                     <span className="badge badge-green" style={{ fontSize: '0.725rem' }}>
@@ -266,34 +255,24 @@ export const PowersCompendium: React.FC<PowersCompendiumProps> = ({
                 </div>
 
                 <p style={{ fontSize: '0.875rem', color: '#cbd5e1', lineHeight: 1.55, margin: 0 }}>
-                  {pow.description}
+                  {cleanDesc}
                 </p>
               </div>
 
               <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '0.65rem', display: 'flex', justifyContent: 'flex-end' }}>
                 <button
                   type="button"
-                  onClick={() =>
+                  onClick={() => {
+                    const citation = getGeneralPowerRuleCitation(pow);
                     setModalDetail({
                       title: pow.name,
                       category: `Poder Geral (${pow.category})`,
-                      subtitle: pow.prerequisites ? `Pré-requisitos: ${pow.prerequisites}` : 'Sem pré-requisitos',
-                      description: pow.description,
-                      prerequisites: pow.prerequisites,
-                      ruleCitation: {
-                        id: pow.id,
-                        title: pow.name,
-                        book: 'Tormenta 20: Edição Jogo do Ano (v1.3)',
-                        chapter: 'Capítulo 2: Perícias & Poderes',
-                        section: `Poderes Gerais — ${pow.category.toUpperCase()}`,
-                        page: 'Página 124-135',
-                        quote: `“${pow.name}. ${pow.description}”`,
-                        explanation: pow.prerequisites
-                          ? `Para adquirir e utilizar este poder, o personagem deve cumprir: ${pow.prerequisites}.`
-                          : 'Este poder não exige pré-requisitos e pode ser aprendido por qualquer personagem.',
-                      },
-                    })
-                  }
+                      subtitle: cleanPrereq ? `Pré-requisitos: ${cleanPrereq}` : 'Sem pré-requisitos',
+                      description: cleanDesc,
+                      prerequisites: cleanPrereq,
+                      ruleCitation: citation,
+                    });
+                  }}
                   className="btn btn-ghost"
                   style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem', color: 'var(--t20-gold)', gap: '0.3rem' }}
                 >

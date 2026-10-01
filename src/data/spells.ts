@@ -11,15 +11,15 @@ export const SPELLS_LIST: Spell[] = [
     "range": "curto",
     "targetArea": "alimento para 1 criatura",
     "duration": "Instantânea",
-    "description": "Execução: padrão; Alcance: curto; \nAlvo: alimento para 1 criatura; Dura-\nção: cena.\nVocê purifica e abençoa uma porção de \ncomida ou dose de bebida. Isso torna \num alimento sujo, estragado ou enve-\nnenado próprio para consumo. Além \ndisso, se for consumido até o final da \nduração, o alimento oferece 5 PV tem-\nporários ou 1 PM temporário (além de \nquaisquer bônus que já oferecesse). \nBônus de alimentação duram um dia e \ncada personagem só pode receber um \nbônus de alimentação por dia.",
+    "description": "Execução: padrão; Alcance: curto; Alvo: alimento para 1 criatura; Duração: cena. Você purifica e abençoa uma porção de comida ou dose de bebida. Isso torna um alimento sujo, estragado ou envenenado próprio para consumo. Além disso, se for consumido até o final da duração, o alimento oferece 5 PV temporários ou 1 PM temporário (além de quaisquer bônus que já oferecesse). Bônus de alimentação duram um dia e cada personagem só pode receber um bônus de alimentação por dia.",
     "upgrades": [
       {
         "cost": "Truque",
-        "description": "o alimento é purificado (não \ncausa nenhum efeito nocivo se estava \nestragado ou envenenado), mas não \nfornece bônus ao ser consumido."
+        "description": "o alimento é purificado (não causa nenhum efeito nocivo se estava estragado ou envenenado), mas não fornece bônus ao ser consumido."
       },
       {
         "cost": "+1 PM",
-        "description": "aumenta o número de alvos \nem"
+        "description": "aumenta o número de alvos em"
       }
     ]
   },
@@ -33,7 +33,7 @@ export const SPELLS_LIST: Spell[] = [
     "range": "curto",
     "targetArea": "1 animal",
     "duration": "cena",
-    "description": "Execução: padrão; Alcance: curto; \nAlvo: 1 animal; Duração: cena; Resis-\ntência: Vontade anula.\nO animal fica prestativo em relação a \nvocê. Ele não fica sob seu controle, mas \npercebe suas palavras e ações da manei-\nra mais favorável possível. Você recebe \n+10 nos testes de Adestramento e Di-\nplomacia que fizer contra o animal.\nUm alvo hostil ou que esteja envolvido \nem um combate recebe +5 em seu teste \nde resistência. Se você ou seus aliados \ntomarem qualquer ação hostil contra o \nalvo, a magia é dissipada e ele retorna à \natitude que tinha antes (ou piorada, de \nacordo com o mestre). Se tratar bem o \nalvo, a atitude pode permanecer mesmo \napós o término da magia.",
+    "description": "Execução: padrão; Alcance: curto; Alvo: 1 animal; Duração: cena; Resistência: Vontade anula. O animal fica prestativo em relação a você. Ele não fica sob seu controle, mas percebe suas palavras e ações da maneira mais favorável possível. Você recebe +10 nos testes de Adestramento e Diplomacia que fizer contra o animal. Um alvo hostil ou que esteja envolvido em um combate recebe +5 em seu teste de resistência. Se você ou seus aliados tomarem qualquer ação hostil contra o alvo, a magia é dissipada e ele retorna à atitude que tinha antes (ou piorada, de acordo com o mestre). Se tratar bem o alvo, a atitude pode permanecer mesmo após o término da magia.",
     "upgrades": [
       {
         "cost": "+1 PM",
@@ -41,11 +41,11 @@ export const SPELLS_LIST: Spell[] = [
       },
       {
         "cost": "+1 PM",
-        "description": "muda o alvo para 1 monstro ou \nespírito com Inteligência -5 ou -4.\nDescrição das magias"
+        "description": "muda o alvo para 1 monstro ou espírito com Inteligência -5 ou -4. Descrição das magias"
       },
       {
         "cost": "+2 PM",
-        "description": "aumenta o número de alvos \nem"
+        "description": "aumenta o número de alvos em"
       }
     ]
   },
@@ -58,17 +58,17 @@ export const SPELLS_LIST: Spell[] = [
     "execution": "padrão",
     "range": "curto",
     "targetArea": "1 criatura",
-    "duration": "instantâ-\nnea",
-    "description": "Você manifesta e dispara uma adaga \nimaterial contra a mente do alvo, que \nsofre 2d6 pontos de dano psíquico e \nfica atordoado por uma rodada. Se pas-\nsar no teste de resistência, sofre ape-\nnas metade do dano e evita a condição. \nUma criatura só pode ficar atordoada \npor esta magia uma vez por cena.",
+    "duration": "instantânea",
+    "description": "Você manifesta e dispara uma adaga imaterial contra a mente do alvo, que sofre 2d6 pontos de dano psíquico e fica atordoado por uma rodada. Se passar no teste de resistência, sofre ape-nas metade do dano e evita a condição. Uma criatura só pode ficar atordoada por esta magia uma vez por cena.",
     "resistance": "Vontade parcial",
     "upgrades": [
       {
         "cost": "+1 PM",
-        "description": "você lança a magia sem gesticu-\nlar ou pronunciar palavras (o que per-\nmite lançar esta magia de armadura) e \na adaga se torna invisível. Se o alvo fa-\nlhar no teste de resistência, não percebe \nque você lançou uma magia contra ele."
+        "description": "você lança a magia sem gesticular ou pronunciar palavras (o que permite lançar esta magia de armadura) e a adaga se torna invisível. Se o alvo falhar no teste de resistência, não percebe que você lançou uma magia contra ele."
       },
       {
         "cost": "+2 PM",
-        "description": "muda a duração para um dia. \nAlém do normal, você “finca” a adaga \nna mente do alvo. Enquanto a magia \ndurar, você sabe a direção e localização \ndo alvo, desde que ele esteja no mes-\nmo mundo."
+        "description": "muda a duração para um dia. Além do normal, você “finca” a adaga na mente do alvo. Enquanto a magia durar, você sabe a direção e localização do alvo, desde que ele esteja no mesmo mundo."
       }
     ]
   },
@@ -82,15 +82,15 @@ export const SPELLS_LIST: Spell[] = [
     "range": "curto",
     "targetArea": "esfera com 9m de raio",
     "duration": "Instantânea",
-    "description": "Execução: padrão; Alcance: curto; \nÁrea: esfera com 9m de raio; Dura-\nção: 1 dia.\nVocê cria uma barreira protetora in-\nvisível que detecta qualquer criatura \nque tocar ou entrar na área protegida. \nAo lançar a magia, você pode escolher \nquais criaturas podem entrar na área \nsem ativar seus efeitos. Alarme pode \nemitir um aviso telepático ou sono-\nro, decidido quando a magia é lança-\nda. Um aviso telepático alerta apenas \nvocê, inclusive acordando-o se estiver \ndormindo, mas apenas se estiver a até \n1km da área protegida. Um aviso so-\nnoro alerta todas as criaturas em al-\ncance longo.",
+    "description": "Execução: padrão; Alcance: curto; Área: esfera com 9m de raio; Duração: 1 dia. Você cria uma barreira protetora invisível que detecta qualquer criatura que tocar ou entrar na área protegida. Ao lançar a magia, você pode escolher quais criaturas podem entrar na área sem ativar seus efeitos. Alarme pode emitir um aviso telepático ou sonoro, decidido quando a magia é lançada. Um aviso telepático alerta apenas você, inclusive acordando-o se estiver dormindo, mas apenas se estiver a até 1km da área protegida. Um aviso sonoro alerta todas as criaturas em alcance longo.",
     "upgrades": [
       {
         "cost": "+2 PM",
-        "description": "muda o alcance para pessoal. \nA área é emanada a partir de você."
+        "description": "muda o alcance para pessoal. A área é emanada a partir de você."
       },
       {
         "cost": "+5 PM",
-        "description": "além do normal, você também \npercebe qualquer efeito de adivinhação \nque seja usado dentro da área ou atra-\nvesse a área. Você pode fazer um tes-\nte oposto de Misticismo contra quem \nusou o efeito; se passar, tem um vis-\nlumbre de seu rosto e uma ideia apro-\nximada de sua localização (“três dias \nde viagem ao norte”, por exemplo)."
+        "description": "além do normal, você também percebe qualquer efeito de adivinhação que seja usado dentro da área ou atravesse a área. Você pode fazer um tes-te oposto de Misticismo contra quem usou o efeito; se passar, tem um vislumbre de seu rosto e uma ideia aproximada de sua localização (“três dias de viagem ao norte”, por exemplo)."
       }
     ]
   },
@@ -104,19 +104,19 @@ export const SPELLS_LIST: Spell[] = [
     "range": "curto",
     "targetArea": "1 animal prestativo",
     "duration": "1 dia",
-    "description": "Execução: padrão; Alcance: curto; \nAlvo: 1 animal prestativo; Duração: \n1 dia.\nVocê cria um vínculo mental com um \nanimal prestativo em relação a você. \nO Aliado Animal obedece a você no \nmelhor de suas capacidades, mesmo \nque isso arrisque a vida dele. Ele fun-\nciona como um parceiro veterano, de \num tipo a sua escolha entre ajudante, \ncombatente, fortão, guardião, monta-\nria ou perseguidor.",
+    "description": "Execução: padrão; Alcance: curto; Alvo: 1 animal prestativo; Duração: 1 dia. Você cria um vínculo mental com um animal prestativo em relação a você. O Aliado Animal obedece a você no melhor de suas capacidades, mesmo que isso arrisque a vida dele. Ele funciona como um parceiro veterano, de um tipo a sua escolha entre ajudante, combatente, fortão, guardião, montaria ou perseguidor.",
     "upgrades": [
       {
         "cost": "+1 PM",
-        "description": "muda o alvo para 1 animal Mi-\nnúsculo e a duração para 1 semana. Em \nvez do normal, o animal se desloca no \nmelhor de suas capacidades até um lo-\ncal designado por você - em geral, para \nlevar um item, carta ou similar. Quando \no animal chega ao destino, fica esperan-\ndo até o fim da magia, permitindo ape-\nnas que uma ou mais criaturas escolhi-\ndas por você se aproximem e peguem o \nque ele estiver carregando."
+        "description": "muda o alvo para 1 animal Minúsculo e a duração para 1 semana. Em vez do normal, o animal se desloca no melhor de suas capacidades até um local designado por você - em geral, para levar um item, carta ou similar. Quando o animal chega ao destino, fica esperando até o fim da magia, permitindo ape-nas que uma ou mais criaturas escolhidas por você se aproximem e peguem o que ele estiver carregando."
       },
       {
         "cost": "+7 PM",
-        "description": "muda o parceiro para mestre. \nRequer 3º círculo."
+        "description": "muda o parceiro para mestre. Requer 3º círculo."
       },
       {
         "cost": "+12 PM",
-        "description": "muda o alvo para 2 animais \nprestativos. Cada animal funciona \ncomo um parceiro de um tipo diferen-\nte, e você pode receber a ajuda de am-\nbos (mas ainda precisa seguir o limite \nde parceiros de acordo com o seu ní-\nvel de personagem). Requer 4º círculo.\n178\nMagia"
+        "description": "muda o alvo para 2 animais prestativos. Cada animal funciona como um parceiro de um tipo diferen-te, e você pode receber a ajuda de ambos (mas ainda precisa seguir o limite de parceiros de acordo com o seu nível de personagem). Requer 4º círculo. 178 Magia"
       }
     ]
   },
@@ -142,12 +142,12 @@ export const SPELLS_LIST: Spell[] = [
     "range": "toque",
     "targetArea": "1 criatura",
     "duration": "instantânea",
-    "description": "Você invade a mente do alvo e altera ou \napaga suas memórias da última hora.",
+    "description": "Você invade a mente do alvo e altera ou apaga suas memórias da última hora.",
     "resistance": "Vontade anula",
     "upgrades": [
       {
         "cost": "+2 PM",
-        "description": "muda o alcance para pessoal e \no alvo para área cone de 4,5m."
+        "description": "muda o alcance para pessoal e o alvo para área cone de 4,5m."
       }
     ]
   },
@@ -161,19 +161,19 @@ export const SPELLS_LIST: Spell[] = [
     "range": "curto",
     "targetArea": "1 objeto",
     "duration": "1 dia",
-    "description": "Esta magia aumenta ou diminui o \ntamanho de um item mundano em \naté três categorias (um objeto Enor-\nme vira Pequeno, por exemplo). Você \ntambém pode mudar a consistência \ndo item, deixando-o rígido como pe-\ndra ou flexível como seda (isso não al-\ntera sua RD ou PV, apenas suas pro-\npriedades físicas). Se lançar a magia \nnum objeto de uma criatura involun-\ntária, ela pode fazer um teste de Von-\ntade para anulá-la.",
+    "description": "Esta magia aumenta ou diminui o tamanho de um item mundano em até três categorias (um objeto Enor-me vira Pequeno, por exemplo). Você também pode mudar a consistência do item, deixando-o rígido como pedra ou flexível como seda (isso não altera sua RD ou PV, apenas suas propriedades físicas). Se lançar a magia num objeto de uma criatura involuntária, ela pode fazer um teste de Vontade para anulá-la.",
     "upgrades": [
       {
         "cost": "+1 PM",
-        "description": "aumenta o número de alvos \nem"
+        "description": "aumenta o número de alvos em"
       },
       {
         "cost": "+2 PM",
-        "description": "muda o alcance para toque e \no alvo para 1 criatura. Em vez do nor-\nmal, o alvo aumenta uma categoria de \ntamanho (seu equipamento se ajusta \nao novo tamanho). O alvo também re-\ncebe Força"
+        "description": "muda o alcance para toque e o alvo para 1 criatura. Em vez do normal, o alvo aumenta uma categoria de tamanho (seu equipamento se ajusta ao novo tamanho). O alvo também recebe Força"
       },
       {
         "cost": "+3 PM",
-        "description": "muda o alcance para toque e \no alvo para 1 criatura. Em vez do nor-\nmal, o alvo diminui uma categoria de \ntamanho (seu equipamento se ajus-\nta ao novo tamanho). O alvo também \nrecebe Destreza"
+        "description": "muda o alcance para toque e o alvo para 1 criatura. Em vez do normal, o alvo diminui uma categoria de tamanho (seu equipamento se ajusta ao novo tamanho). O alvo também recebe Destreza"
       }
     ]
   },
@@ -187,15 +187,15 @@ export const SPELLS_LIST: Spell[] = [
     "range": "médio",
     "targetArea": "1 criatura",
     "duration": "cena",
-    "description": "Execução: padrão; Alcance: médio; \nAlvo: 1 criatura; Duração: cena; Re-\nsistência: Reflexos anula.\nTrês laços de energia surgem e se en-\nroscam no alvo, deixando-o agarra-\ndo. A vítima pode tentar se livrar, gas-\ntando uma ação padrão para fazer um \nteste de Atletismo. Se passar, destrói \num laço, mais um laço adicional para \ncada 5 pontos pelos quais superou a \nCD. Os laços também podem ser ata-\ncados e destruídos: cada um tem De-\nfesa 10, 10 PV, RD 5 e imunidade a \ndano mágico. Se todos os laços forem \ndestruídos, a magia é dissipada. Por \nserem feitos de energia, os laços afe-\ntam criaturas incorpóreas.",
+    "description": "Execução: padrão; Alcance: médio; Alvo: 1 criatura; Duração: cena; Resistência: Reflexos anula. Três laços de energia surgem e se enroscam no alvo, deixando-o agarrado. A vítima pode tentar se livrar, gastando uma ação padrão para fazer um teste de Atletismo. Se passar, destrói um laço, mais um laço adicional para cada 5 pontos pelos quais superou a CD. Os laços também podem ser atacados e destruídos: cada um tem Defesa 10, 10 PV, RD 5 e imunidade a dano mágico. Se todos os laços forem destruídos, a magia é dissipada. Por serem feitos de energia, os laços afetam criaturas incorpóreas.",
     "upgrades": [
       {
         "cost": "+2 PM",
-        "description": "aumenta o número de alvos \nem"
+        "description": "aumenta o número de alvos em"
       },
       {
         "cost": "+2 PM",
-        "description": "aumenta o número de laços em \num alvo a sua escolha em"
+        "description": "aumenta o número de laços em um alvo a sua escolha em"
       }
     ]
   },
@@ -209,12 +209,12 @@ export const SPELLS_LIST: Spell[] = [
     "range": "curto",
     "targetArea": "1 animal ou humanoide",
     "duration": "Instantânea",
-    "description": "Execução: padrão; Alcance: curto; \nAlvo: 1 animal ou humanoide; Du-\nração: cena; Resistência: Vontade \nparcial.\nO alvo é envolvido por energias som-\nbrias e assustadoras. Se falhar na re-\nsistência, fica apavorado por 1 rodada, \ndepois abalado. Se passar, fica abalado \npor 1d4 rodadas.",
-    "resistance": "Vontade \nparcial",
+    "description": "Execução: padrão; Alcance: curto; Alvo: 1 animal ou humanoide; Duração: cena; Resistência: Vontade parcial. O alvo é envolvido por energias sombrias e assustadoras. Se falhar na resistência, fica apavorado por 1 rodada, depois abalado. Se passar, fica abalado por 1d4 rodadas.",
+    "resistance": "Vontade parcial",
     "upgrades": [
       {
         "cost": "+2 PM",
-        "description": "alvos que falhem na resis-\ntência ficam apavorados por 1d4"
+        "description": "alvos que falhem na resistência ficam apavorados por 1d4"
       },
       {
         "cost": "+2 PM",
@@ -222,7 +222,7 @@ export const SPELLS_LIST: Spell[] = [
       },
       {
         "cost": "+5 PM",
-        "description": "afeta todos os alvos válidos a \nsua escolha dentro do alcance."
+        "description": "afeta todos os alvos válidos a sua escolha dentro do alcance."
       }
     ]
   },
@@ -236,23 +236,23 @@ export const SPELLS_LIST: Spell[] = [
     "range": "curto",
     "targetArea": "1 criatura ou objeto",
     "duration": "cena",
-    "description": "Execução: padrão; Alcance: curto; \nAlvo: 1 criatura ou objeto; Duração: \ncena.\nO alvo é envolvido por um campo de \nforça cor de esmeralda que impede \nqualquer movimento planar. Isso in-\nclui magias de convocação (como Sal-\nto Dimensional e Teletransporte), viagens \nastrais e a habilidade incorpóreo.",
+    "description": "Execução: padrão; Alcance: curto; Alvo: 1 criatura ou objeto; Duração: cena. O alvo é envolvido por um campo de força cor de esmeralda que impede qualquer movimento planar. Isso inclui magias de convocação (como Salto Dimensional e Teletransporte), viagens astrais e a habilidade incorpóreo.",
     "upgrades": [
       {
         "cost": "+2 PM",
-        "description": "muda o alcance para médio, \na área para esfera com 3m de raio e o \nalvo para criaturas escolhidas."
+        "description": "muda o alcance para médio, a área para esfera com 3m de raio e o alvo para criaturas escolhidas."
       },
       {
         "cost": "+2 PM",
-        "description": "muda o efeito para criar um \nfio de energia cor de esmeralda que \nprende o alvo a um ponto no espaço \ndentro do alcance. O ponto precisa ser \nfixo, mas não precisa de nenhum apoio \nou superfície (pode simplesmente flu-\ntuar no ar). O alvo não pode se afas-\ntar mais de 3m do ponto, nem fisica-\nmente, nem com movimento planar. \nO fio possui 20 PV e redução de dano \n20 (mas pode ser dissipado por efei-\ntos que libertam criaturas, como o Jul-\ngamento Divino: Libertação do paladino)."
+        "description": "muda o efeito para criar um fio de energia cor de esmeralda que prende o alvo a um ponto no espaço dentro do alcance. O ponto precisa ser fixo, mas não precisa de nenhum apoio ou superfície (pode simplesmente flutuar no ar). O alvo não pode se afastar mais de 3m do ponto, nem fisicamente, nem com movimento planar. O fio possui 20 PV e redução de dano 20 (mas pode ser dissipado por efeitos que libertam criaturas, como o Julgamento Divino: Libertação do paladino)."
       },
       {
         "cost": "+4 PM",
-        "description": "como acima, mas em vez de \num fio, cria uma corrente de energia, \ncom 20 PV e redução de dano 40."
+        "description": "como acima, mas em vez de um fio, cria uma corrente de energia, com 20 PV e redução de dano 40."
       },
       {
         "cost": "+4 PM",
-        "description": "muda o alvo para área de cubo \nde 9m, a duração para permanente e \nadiciona componente material (chave \nde esmeralda no valor de T$ 2.000). \nEm vez do normal, nenhum tipo de \nmovimento planar pode ser feito para \nentrar ou sair da área."
+        "description": "muda o alvo para área de cubo de 9m, a duração para permanente e adiciona componente material (chave de esmeralda no valor de T$ 2.000). Em vez do normal, nenhum tipo de movimento planar pode ser feito para entrar ou sair da área."
       }
     ]
   },
@@ -264,13 +264,13 @@ export const SPELLS_LIST: Spell[] = [
     "school": "Transmutação",
     "execution": "padrão",
     "range": "médio",
-    "targetArea": "até 8 objetos Minúsculos ou Pe-\nquenos, 4 objetos Médios, 2 objetos \nGrandes ou 1 objeto Enorme",
+    "targetArea": "até 8 objetos Minúsculos ou Pequenos, 4 objetos Médios, 2 objetos Grandes ou 1 objeto Enorme",
     "duration": "Instantânea",
-    "description": "Execução: padrão; Alcance: médio; \nAlvo: até 8 objetos Minúsculos ou Pe-\nquenos, 4 objetos Médios, 2 objetos \nGrandes ou 1 objeto Enorme; Dura-\nção: cena.\nVocê concede vida a objetos inanima-\ndos. Cada objeto se torna um parceiro \nsob seu controle. O tipo dele é escolhi-\ndo da lista de tamanho e ele não conta \nem seu limite de parceiros. Com uma \nação de movimento, você pode coman-\ndar mentalmente qualquer objeto ani-\nmado dentro do alcance para que au-\nxilie você ou outra criatura. Outros \nusos criativos para os objetos ficam \na cargo do mestre. Objetos animados\n179\nCapítulo Quatro\nsão construtos com valores de Força, \nDestreza e PV de acordo com seu ta-\nmanho. Todos os outros atributos são \nnulos, eles não têm valor de Defesa ou \ntestes de resistência e falham automati-\ncamente em qualquer teste oposto. Di-\nferente de parceiros comuns, um obje-\nto pode ser alvo de ações hostis.\nEsta magia não afeta itens mágicos, \nnem objetos que estejam sendo carre-\ngados por outra criatura.",
+    "description": "Execução: padrão; Alcance: médio; Alvo: até 8 objetos Minúsculos ou Pequenos, 4 objetos Médios, 2 objetos Grandes ou 1 objeto Enorme; Duração: cena. Você concede vida a objetos inanimados. Cada objeto se torna um parceiro sob seu controle. O tipo dele é escolhido da lista de tamanho e ele não conta em seu limite de parceiros. Com uma ação de movimento, você pode comandar mentalmente qualquer objeto animado dentro do alcance para que auxilie você ou outra criatura. Outros usos criativos para os objetos ficam a cargo do mestre. Objetos animados 179 Capítulo Quatro são construtos com valores de Força, Destreza e PV de acordo com seu tamanho. Todos os outros atributos são nulos, eles não têm valor de Defesa ou testes de resistência e falham automaticamente em qualquer teste oposto. Diferente de parceiros comuns, um objeto pode ser alvo de ações hostis. Esta magia não afeta itens mágicos, nem objetos que estejam sendo carregados por outra criatura.",
     "upgrades": [
       {
         "cost": "+5 PM",
-        "description": "muda a duração para perma-\nnente e adiciona componente material \n(prataria no valor de T$ 1.000). Você \npode ter um máximo de objetos ani-\nmados igual à metade do seu nível.\nEstatísticas de objetos animados\nMinúsculo: For -3, Des 4, 5 PV; Assas-\nsino ou Combatente Iniciante.\nPequeno: For -2, Des 2, 10 PV; Comba-\ntente ou Guardião Iniciante.\nMédio: For 0, Des 1, 20 PV; Combaten-\nte ou Guardião Veterano.\nGrande: For 2, Des 0, 40 PV; Fortão, \nGuardião ou Montaria (cavalo) Veterano."
+        "description": "muda a duração para permanente e adiciona componente material (prataria no valor de T$ 1.000). Você pode ter um máximo de objetos animados igual à metade do seu nível. Estatísticas de objetos animados Minúsculo: For -3, Des 4, 5 PV; Assassino ou Combatente Iniciante. Pequeno: For -2, Des 2, 10 PV; Combatente ou Guardião Iniciante. Médio: For 0, Des 1, 20 PV; Combaten-te ou Guardião Veterano. Grande: For 2, Des 0, 40 PV; Fortão, Guardião ou Montaria (cavalo) Veterano."
       }
     ]
   },
@@ -284,15 +284,15 @@ export const SPELLS_LIST: Spell[] = [
     "range": "pessoal",
     "targetArea": "esfera com 6m de raio",
     "duration": "Instantânea",
-    "description": "Execução: padrão; Alcance: pessoal; \nÁrea: esfera com 6m de raio; Dura-\nção: ver texto.\nEsta magia cria uma onda de escuridão \nque causa diversos efeitos. Magias de \naté 3º círculo na área são dissipadas se \nvocê passar num teste de Religião contra \na CD de cada uma. Seus aliados na área \nsão protegidos por uma aura sombria e \nrecebem +4 na Defesa até o fim da cena. \nInimigos na área ficam enjoados por \n1d4 rodadas (apenas uma vez por cena). \nAnular a Luz anula Dispersar as Trevas (este \nefeito tem duração instantânea).",
+    "description": "Execução: padrão; Alcance: pessoal; Área: esfera com 6m de raio; Duração: ver texto. Esta magia cria uma onda de escuridão que causa diversos efeitos. Magias de até 3º círculo na área são dissipadas se você passar num teste de Religião contra a CD de cada uma. Seus aliados na área são protegidos por uma aura sombria e recebem +4 na Defesa até o fim da cena. Inimigos na área ficam enjoados por 1d4 rodadas (apenas uma vez por cena). Anular a Luz anula Dispersar as Trevas (este efeito tem duração instantânea).",
     "upgrades": [
       {
         "cost": "+2 PM",
-        "description": "aumenta o bônus na Defesa \nem"
+        "description": "aumenta o bônus na Defesa em"
       },
       {
         "cost": "+4 PM",
-        "description": "muda as magias dissipadas \npara até 4º círculo. Requer 4º círculo."
+        "description": "muda as magias dissipadas para até 4º círculo. Requer 4º círculo."
       }
     ]
   },
@@ -306,7 +306,7 @@ export const SPELLS_LIST: Spell[] = [
     "range": "pessoal",
     "targetArea": "você",
     "duration": "cena",
-    "description": "Esta magia lhe concede um rosto idea-\nlizado, porte físico garboso, voz me-\nlodiosa e olhar sedutor. Caso seu Ca-\nrisma seja 5 ou mais, você recebe +2 \nneste atributo. Do contrário, ele se tor-\nna 5 (isso conta como um bônus). Além \ndisso, você recebe +5 em Diploma-\ncia e Enganação. Quando a magia aca-\nba, quaisquer observadores percebem a \nmudança e tendem a suspeitar de você. \nDa mesma maneira, pessoas que o vi-\nram sob o efeito da magia sentirão que \n“algo está errado” ao vê-lo em condi-\nções normais. Quando a cena acabar, \nvocê pode gastar os PM da magia nova-\nmente como uma ação livre para man-\ntê-la ativa. Este efeito não fornece PV \nou PM adicionais."
+    "description": "Esta magia lhe concede um rosto idealizado, porte físico garboso, voz melodiosa e olhar sedutor. Caso seu Carisma seja 5 ou mais, você recebe +2 neste atributo. Do contrário, ele se tor-na 5 (isso conta como um bônus). Além disso, você recebe +5 em Diplomacia e Enganação. Quando a magia acaba, quaisquer observadores percebem a mudança e tendem a suspeitar de você. Da mesma maneira, pessoas que o viram sob o efeito da magia sentirão que “algo está errado” ao vê-lo em condições normais. Quando a cena acabar, você pode gastar os PM da magia novamente como uma ação livre para mantê-la ativa. Este efeito não fornece PV ou PM adicionais."
   },
   {
     "id": "aprisionamento",
@@ -318,7 +318,7 @@ export const SPELLS_LIST: Spell[] = [
     "range": "curto",
     "targetArea": "1 criatura",
     "duration": "permanente",
-    "description": "Você cria uma prisão mágica para apri-\nsionar uma criatura. Se falhar no teste \nde resistência, o alvo sofre o efeito da \nmagia; se passar, fica imune a esta ma-\ngia por uma semana. Enquanto estiver \naprisionada, a criatura não precisa res-\npirar e alimentar-se, e não envelhece. \nMagias de adivinhação não conseguem \nlocalizar ou perceber o alvo. Ao lançar a \nmagia, você escolhe uma das seguintes \nformas de prisão. O componente mate-\nrial varia, mas todos custam T$ 1.000.\nAcorrentamento: o alvo é preso por cor-\nrentes firmemente enraizadas no chão, \nque o mantém no lugar. O alvo fica pa-\nralisado e não pode se mover ou ser \nmovido por qualquer meio. Componente \nMaterial: uma fina corrente de mitral.\nContenção Mínima: o alvo diminui para \n2 cm de altura e é preso dentro de uma \npedra preciosa ou objeto semelhante. \nLuz passa através da pedra, permitin-\ndo que o alvo veja o lado de fora e seja \nvisto, mas nada mais pode passar, nem \npor meio de teletransporte ou viagem \nplanar. A pedra não pode ser quebrada \nenquanto o alvo estiver dentro. Com-\nponente Material: uma pedra preciosa, \ncomo um diamante ou rubi.\nPrisão Dimensional: o alvo é transporta-\ndo para um semiplano protegido contra \nteletransporte e viagens planares. Pode \nser um labirinto, uma gaiola, uma torre \nou qualquer estrutura ou área confina-\nda e pequena a sua escolha. Componente \nMaterial: uma representação em minia-\ntura da prisão, feita de jade.\nSepultamento: o alvo é sepultado nas \nprofundezas da terra, em uma esfera \nmágica. Nada pode destruir ou atraves-\nsar a esfera, nem mesmo teletranspor-\nte ou viagens planares. Componente Ma-\nterial: um pequeno orbe de adamante.\nSono Eterno: o alvo adormece e não pode \nser acordado. Componente Material: fruta \npreparada com ervas soníferas raras.",
+    "description": "Você cria uma prisão mágica para aprisionar uma criatura. Se falhar no teste de resistência, o alvo sofre o efeito da magia; se passar, fica imune a esta magia por uma semana. Enquanto estiver aprisionada, a criatura não precisa respirar e alimentar-se, e não envelhece. Magias de adivinhação não conseguem localizar ou perceber o alvo. Ao lançar a magia, você escolhe uma das seguintes formas de prisão. O componente material varia, mas todos custam T$ 1.000. Acorrentamento: o alvo é preso por correntes firmemente enraizadas no chão, que o mantém no lugar. O alvo fica paralisado e não pode se mover ou ser movido por qualquer meio. Componente Material: uma fina corrente de mitral. Contenção Mínima: o alvo diminui para 2 cm de altura e é preso dentro de uma pedra preciosa ou objeto semelhante. Luz passa através da pedra, permitindo que o alvo veja o lado de fora e seja visto, mas nada mais pode passar, nem por meio de teletransporte ou viagem planar. A pedra não pode ser quebrada enquanto o alvo estiver dentro. Componente Material: uma pedra preciosa, como um diamante ou rubi. Prisão Dimensional: o alvo é transportado para um semiplano protegido contra teletransporte e viagens planares. Pode ser um labirinto, uma gaiola, uma torre ou qualquer estrutura ou área confinada e pequena a sua escolha. Componente Material: uma representação em miniatura da prisão, feita de jade. Sepultamento: o alvo é sepultado nas profundezas da terra, em uma esfera mágica. Nada pode destruir ou atravessar a esfera, nem mesmo teletranspor-te ou viagens planares. Componente Material: um pequeno orbe de adamante. Sono Eterno: o alvo adormece e não pode ser acordado. Componente Material: fruta preparada com ervas soníferas raras.",
     "resistance": "Vontade anula"
   },
   {
@@ -329,9 +329,9 @@ export const SPELLS_LIST: Spell[] = [
     "school": "Convocação",
     "execution": "padrão",
     "range": "curto",
-    "targetArea": "quadrado de 3m ou 1 \nobjeto",
+    "targetArea": "quadrado de 3m ou 1 objeto",
     "duration": "cena",
-    "description": "Execução: padrão; Alcance: curto; \nAlvo ou Área: quadrado de 3m ou 1 \nobjeto; Duração: cena; Resistência: \nReflexos (veja texto).\nEsta magia recobre uma superfície com \numa substância gordurosa e escorrega-\ndia. Criaturas na área devem passar na \nresistência para não cair. Nas rodadas \nseguintes, criaturas que tentem movi-\nmentar-se pela área devem fazer testes \nde Acrobacia para equilíbrio (CD 10).\nÁrea Escorregadia pode tornar um item \nescorregadio. Uma criatura seguran-\ndo um objeto afetado deve passar na \nresistência para não deixar o item cair \ncada vez que usá-lo.",
+    "description": "Execução: padrão; Alcance: curto; Alvo ou Área: quadrado de 3m ou 1 objeto; Duração: cena; Resistência: Reflexos (veja texto). Esta magia recobre uma superfície com uma substância gordurosa e escorregadia. Criaturas na área devem passar na resistência para não cair. Nas rodadas seguintes, criaturas que tentem movimentar-se pela área devem fazer testes de Acrobacia para equilíbrio (CD 10). Área Escorregadia pode tornar um item escorregadio. Uma criatura segurando um objeto afetado deve passar na resistência para não deixar o item cair cada vez que usá-lo.",
     "resistance": "Reflexos (veja texto)",
     "upgrades": [
       {
@@ -340,7 +340,7 @@ export const SPELLS_LIST: Spell[] = [
       },
       {
         "cost": "+2 PM",
-        "description": "muda a CD dos testes de \nAcrobacia para 15."
+        "description": "muda a CD dos testes de Acrobacia para 15."
       }
     ]
   },
@@ -354,27 +354,27 @@ export const SPELLS_LIST: Spell[] = [
     "range": "pessoal",
     "targetArea": "você",
     "duration": "cena",
-    "description": "Você invoca a arma preferida de sua \ndivindade (caso sua divindade possua \numa), que surge flutuando a seu lado. \nUma vez por rodada, quando você so-\nfre um ataque corpo a corpo, pode \nusar uma reação para que a arma cau-\nse automaticamente 2d6 pontos de \ndano do tipo da arma - por exemplo, \numa espada longa causa dano de corte \n- no oponente que fez o ataque. Esta \nmagia se dissipa se você morrer.",
+    "description": "Você invoca a arma preferida de sua divindade (caso sua divindade possua uma), que surge flutuando a seu lado. Uma vez por rodada, quando você sofre um ataque corpo a corpo, pode usar uma reação para que a arma cau-se automaticamente 2d6 pontos de dano do tipo da arma - por exemplo, uma espada longa causa dano de corte - no oponente que fez o ataque. Esta magia se dissipa se você morrer.",
     "upgrades": [
       {
         "cost": "+1 PM",
-        "description": "além do normal, a arma o pro-\ntege. Você recebe"
+        "description": "além do normal, a arma o protege. Você recebe"
       },
       {
         "cost": "+2 PM",
-        "description": "aumenta o bônus na Defesa \nem"
+        "description": "aumenta o bônus na Defesa em"
       },
       {
         "cost": "+2 PM",
-        "description": "muda a duração para susten-\ntada. Além do normal, uma vez por ro-\ndada, você pode gastar uma ação livre \npara fazer a arma acertar automatica-\nmente um alvo adjacente. Se a arma \natacar, não poderá contra-atacar até \nseu próximo turno. Requer 2º círculo."
+        "description": "muda a duração para sustentada. Além do normal, uma vez por rodada, você pode gastar uma ação livre para fazer a arma acertar automaticamente um alvo adjacente. Se a arma atacar, não poderá contra-atacar até seu próximo turno. Requer 2º círculo."
       },
       {
         "cost": "+2 PM",
-        "description": "muda o tipo do dano para es-\nsência. Requer 2º círculo."
+        "description": "muda o tipo do dano para essência. Requer 2º círculo."
       },
       {
         "cost": "+2 PM",
-        "description": "aumenta o dano causado pela \narma em"
+        "description": "aumenta o dano causado pela arma em"
       }
     ]
   },
@@ -388,7 +388,7 @@ export const SPELLS_LIST: Spell[] = [
     "range": "toque",
     "targetArea": "1 arma empunhada",
     "duration": "cena",
-    "description": "A arma é considerada mágica e fornece \n+1 nos testes de ataque e rolagens de \ndano (isso conta como um bônus de en-\ncanto). Caso você esteja empunhando a \narma, pode usar seu atributo-chave de \nmagias em vez do atributo original nos \ntestes de ataque (não cumulativo com \nefeitos que somam este atributo).",
+    "description": "A arma é considerada mágica e fornece +1 nos testes de ataque e rolagens de dano (isso conta como um bônus de encanto). Caso você esteja empunhando a arma, pode usar seu atributo-chave de magias em vez do atributo original nos testes de ataque (não cumulativo com efeitos que somam este atributo).",
     "upgrades": [
       {
         "cost": "+2 PM",
@@ -410,15 +410,15 @@ export const SPELLS_LIST: Spell[] = [
     "range": "pessoal",
     "targetArea": "você",
     "duration": "cena",
-    "description": "Esta magia cria uma película proteto-\nra invisível, mas tangível, fornecendo \n+5 na Defesa. Esse bônus é cumula-\ntivo com outras magias, mas não com \nbônus fornecido por armaduras.",
+    "description": "Esta magia cria uma película protetora invisível, mas tangível, fornecendo +5 na Defesa. Esse bônus é cumulativo com outras magias, mas não com bônus fornecido por armaduras.",
     "upgrades": [
       {
         "cost": "+1 PM",
-        "description": "muda a execução para reação. \nEm vez do normal, quando sofre um \nataque, você cria um escudo mágico que \nfornece"
+        "description": "muda a execução para reação. Em vez do normal, quando sofre um ataque, você cria um escudo mágico que fornece"
       },
       {
         "cost": "+2 PM",
-        "description": "aumenta o bônus na Defesa \nem"
+        "description": "aumenta o bônus na Defesa em"
       },
       {
         "cost": "+2 PM",
@@ -436,7 +436,7 @@ export const SPELLS_LIST: Spell[] = [
     "range": "toque",
     "targetArea": "1 arma (veja texto)",
     "duration": "cena",
-    "description": "Execução: padrão; Alcance: toque; \nAlvo: 1 arma (veja texto); Duração: \ncena.\nVocê fortalece uma arma mundana pri-\nmitiva (sem custo em T$, como bor-\ndão, clava, funda ou tacape), uma arma \nnatural ou um ataque desarmado. O \ndano da arma aumenta em um passo \ne ela é considerada mágica. Ao lançar a \nmagia, você pode mudar o tipo de dano \nda arma (escolhendo entre corte, im-\npacto ou perfuração).",
+    "description": "Execução: padrão; Alcance: toque; Alvo: 1 arma (veja texto); Duração: cena. Você fortalece uma arma mundana primitiva (sem custo em T$, como bordão, clava, funda ou tacape), uma arma natural ou um ataque desarmado. O dano da arma aumenta em um passo e ela é considerada mágica. Ao lançar a magia, você pode mudar o tipo de dano da arma (escolhendo entre corte, impacto ou perfuração).",
     "upgrades": [
       {
         "cost": "+1 PM",
@@ -444,11 +444,11 @@ export const SPELLS_LIST: Spell[] = [
       },
       {
         "cost": "+2 PM",
-        "description": "muda a execução para ação de \nmovimento."
+        "description": "muda a execução para ação de movimento."
       },
       {
         "cost": "+3 PM",
-        "description": "aumenta o bônus nos testes de \nataque em"
+        "description": "aumenta o bônus nos testes de ataque em"
       }
     ]
   },
@@ -461,9 +461,9 @@ export const SPELLS_LIST: Spell[] = [
     "execution": "padrão",
     "range": "longo",
     "targetArea": "1 criatura",
-    "duration": "cena, até \nser descarregada",
-    "description": "Execução: padrão; Alcance: longo; \nAlvo: 1 criatura; Duração: cena, até \nser descarregada; Resistência: Vonta-\nde anula, Fortitude parcial.\nUsando os medos subconscientes do \nalvo, você cria uma imagem daquilo \nque ele mais teme. Apenas a própria \nvítima pode ver o Assassino Fantasmagó-\nrico com nitidez; outras criaturas pre-\nsentes (incluindo o conjurador) enxer-\ngam apenas um espectro sombrio.\nQuando você lança a magia, o espec-\ntro surge adjacente a você e a vítima \nfaz um teste de Vontade. Se ela passar, \npercebe que o espectro é uma ilusão e \na magia é dissipada. Se falhar, acredi-\nta na existência do espectro, que então \nflutua 18m por rodada em direção à ví-\ntima, sempre no fim do seu turno. Ele \né incorpóreo e imune a magias (exceto \nmagias que dissipam outras).\nSe o espectro terminar seu turno adja-\ncente à vítima, ela deve fazer um teste \nde Fortitude. Se passar, sofre 6d6 pon-\ntos de dano de trevas (este dano não \npode reduzir o alvo a menos de 0 PV e \nnão o deixa sangrando). Se falhar, so-\nfre um colapso, ficando imediatamente \ncom -1 PV e sangrando.\nO espectro persegue o alvo implacavel-\nmente. Ele desaparece se o alvo ficar \ninconsciente ou se afastar além de al-\ncance longo dele, ou se for dissipado.",
-    "resistance": "Vonta-\nde anula, Fortitude parcial"
+    "duration": "cena, até ser descarregada",
+    "description": "Execução: padrão; Alcance: longo; Alvo: 1 criatura; Duração: cena, até ser descarregada; Resistência: Vontade anula, Fortitude parcial. Usando os medos subconscientes do alvo, você cria uma imagem daquilo que ele mais teme. Apenas a própria vítima pode ver o Assassino Fantasmagórico com nitidez; outras criaturas pre-sentes (incluindo o conjurador) enxergam apenas um espectro sombrio. Quando você lança a magia, o espectro surge adjacente a você e a vítima faz um teste de Vontade. Se ela passar, percebe que o espectro é uma ilusão e a magia é dissipada. Se falhar, acredita na existência do espectro, que então flutua 18m por rodada em direção à vítima, sempre no fim do seu turno. Ele é incorpóreo e imune a magias (exceto magias que dissipam outras). Se o espectro terminar seu turno adjacente à vítima, ela deve fazer um teste de Fortitude. Se passar, sofre 6d6 pontos de dano de trevas (este dano não pode reduzir o alvo a menos de 0 PV e não o deixa sangrando). Se falhar, sofre um colapso, ficando imediatamente com -1 PV e sangrando. O espectro persegue o alvo implacavelmente. Ele desaparece se o alvo ficar inconsciente ou se afastar além de alcance longo dele, ou se for dissipado.",
+    "resistance": "Vontade anula, Fortitude parcial"
   },
   {
     "id": "augurio",
@@ -475,23 +475,23 @@ export const SPELLS_LIST: Spell[] = [
     "range": "pessoal",
     "targetArea": "você",
     "duration": "instantânea",
-    "description": "Esta magia diz se uma ação que você \ntomará em breve - no máximo uma \nhora no futuro - trará resultados bons \nou ruins. O mestre rola 1d6 em segre-\ndo; com um resultado de 2 a 6, a ma-\ngia funciona e você recebe uma das se-\nguintes respostas: “felicidade” (a ação \ntrará bons resultados); “miséria” (a \nação trará maus resultados); “felicida-\nde e miséria” (para ambos) ou “nada” \n(para ações que não trarão resultados \nbons ou ruins).\nCom um resultado 1, a magia falha \ne oferece o resultado “nada”. Não há \ncomo saber se esse resultado foi dado \nporque a magia falhou ou não. Lan-\nçar esta magia múltiplas vezes sobre \no mesmo assunto gera sempre o pri-\nmeiro resultado.\nPor exemplo, se o grupo está prestes \na entrar em uma câmara, o augúrio \ndirá “felicidade” se a câmara contém \num tesouro desprotegido, “miséria” \nse contém um monstro, “felicidade e \nmiséria” se houver um tesouro e um \nmonstro ou “nada” se a câmara esti-\nver vazia.",
+    "description": "Esta magia diz se uma ação que você tomará em breve - no máximo uma hora no futuro - trará resultados bons ou ruins. O mestre rola 1d6 em segredo; com um resultado de 2 a 6, a magia funciona e você recebe uma das seguintes respostas: “felicidade” (a ação trará bons resultados); “miséria” (a ação trará maus resultados); “felicidade e miséria” (para ambos) ou “nada” (para ações que não trarão resultados bons ou ruins). Com um resultado 1, a magia falha e oferece o resultado “nada”. Não há como saber se esse resultado foi dado porque a magia falhou ou não. Lançar esta magia múltiplas vezes sobre o mesmo assunto gera sempre o primeiro resultado. Por exemplo, se o grupo está prestes a entrar em uma câmara, o augúrio dirá “felicidade” se a câmara contém um tesouro desprotegido, “miséria” se contém um monstro, “felicidade e miséria” se houver um tesouro e um monstro ou “nada” se a câmara estiver vazia.",
     "upgrades": [
       {
         "cost": "+3 PM",
-        "description": "muda a execução para 1 minu-\nto. Em vez do normal, você pode con-\nsultar uma divindade, fazendo uma \npergunta sobre um evento que acon-\ntecerá até um dia no futuro. O mestre \nrola a chance de falha; com um resul-\ntado de 2 a 6, você recebe uma respos-\nta, desde uma simples frase até uma \nprofecia ou enigma. Em geral, este \nuso sempre oferece pistas, indicando \num caminho a tomar para descobrir a \nresposta que se procura. Numa falha \nvocê não recebe resposta alguma. Re-\nquer 3º círculo."
+        "description": "muda a execução para 1 minuto. Em vez do normal, você pode consultar uma divindade, fazendo uma pergunta sobre um evento que acontecerá até um dia no futuro. O mestre rola a chance de falha; com um resultado de 2 a 6, você recebe uma resposta, desde uma simples frase até uma profecia ou enigma. Em geral, este uso sempre oferece pistas, indicando um caminho a tomar para descobrir a resposta que se procura. Numa falha você não recebe resposta alguma. Requer 3º círculo."
       },
       {
         "cost": "+7 PM",
-        "description": "muda a execução para 10 mi-\nnutos e a duração para 1 minuto. Em \nvez do normal, você consulta uma di-\nvindade, podendo fazer uma pergun-\nta por rodada, desde que ela possa ser \nrespondida com “sim”, “não” ou “não \nsei” (embora poderosos, os deuses \nnão são oniscientes). O mestre rola \na chance de falha para cada pergunta. \nEm caso de falha, a resposta também \né “não sei”. Requer 4º círculo."
+        "description": "muda a execução para 10 minutos e a duração para 1 minuto. Em vez do normal, você consulta uma divindade, podendo fazer uma pergunta por rodada, desde que ela possa ser respondida com “sim”, “não” ou “não sei” (embora poderosos, os deuses não são oniscientes). O mestre rola a chance de falha para cada pergunta. Em caso de falha, a resposta também é “não sei”. Requer 4º círculo."
       },
       {
         "cost": "+7 PM",
-        "description": "o mestre rola 1d12; a magia só \nfalha em um resultado 1."
+        "description": "o mestre rola 1d12; a magia só falha em um resultado 1."
       },
       {
         "cost": "+12 PM",
-        "description": "o mestre rola 1d20; a magia \nsó falha em um resultado 1.\n181\nCapítulo Quatro"
+        "description": "o mestre rola 1d20; a magia só falha em um resultado 1. 181 Capítulo Quatro"
       }
     ]
   },
@@ -505,7 +505,7 @@ export const SPELLS_LIST: Spell[] = [
     "range": "pessoal",
     "targetArea": "esfera com 9m de raio",
     "duration": "cena",
-    "description": "Você se torna um conduíte da energia \nde sua divindade, emanando uma aura \nbrilhante. Você e aliados devotos da \nmesma divindade ficam imunes a en-\ncantamento e recebem +10 na Defesa \ne em testes de resistência. Aliados não \ndevotos da mesma divindade recebem \n+5 na Defesa e em testes de resistên-\ncia. Além disso, inimigos que entrem \nna área devem fazer um teste de Vonta-\nde; em caso de falha, recebem uma con-\ndição a sua escolha entre esmorecido, \ndebilitado ou lento até o fim da cena. \nO teste deve ser refeito cada vez que a \ncriatura entrar novamente na área.",
+    "description": "Você se torna um conduíte da energia de sua divindade, emanando uma aura brilhante. Você e aliados devotos da mesma divindade ficam imunes a encantamento e recebem +10 na Defesa e em testes de resistência. Aliados não devotos da mesma divindade recebem +5 na Defesa e em testes de resistência. Além disso, inimigos que entrem na área devem fazer um teste de Vontade; em caso de falha, recebem uma condição a sua escolha entre esmorecido, debilitado ou lento até o fim da cena. O teste deve ser refeito cada vez que a criatura entrar novamente na área.",
     "resistance": "Vontade parcial"
   },
   {
@@ -518,19 +518,19 @@ export const SPELLS_LIST: Spell[] = [
     "range": "longo",
     "targetArea": "1 criatura",
     "duration": "instantânea",
-    "description": "Envia um aviso telepático para uma \ncriatura, mesmo que não possa vê-la \nnem tenha linha de efeito. Escolha um:\nAlerta: o alvo recebe +5 em seu próxi-\nmo teste de Iniciativa e de Percepção \n até o fim da próxima cena.\nMensagem: o alvo recebe uma mensa-\ngem sua de até 25 palavras. Vocês de-\nvem ter um idioma em comum para o \nalvo poder entendê-lo.\nLocalização: o alvo sabe onde você está \nnaquele momento. Se você mudar de \nposição, ele não saberá.",
+    "description": "Envia um aviso telepático para uma criatura, mesmo que não possa vê-la nem tenha linha de efeito. Escolha um: Alerta: o alvo recebe +5 em seu próximo teste de Iniciativa e de Percepção até o fim da próxima cena. Mensagem: o alvo recebe uma mensagem sua de até 25 palavras. Vocês devem ter um idioma em comum para o alvo poder entendê-lo. Localização: o alvo sabe onde você está naquele momento. Se você mudar de posição, ele não saberá.",
     "upgrades": [
       {
         "cost": "+1 PM",
-        "description": "aumenta o alcance em um fa-\ntor de 10 (90m para 900m, 900m para \n9km e assim por diante)."
+        "description": "aumenta o alcance em um fator de 10 (90m para 900m, 900m para 9km e assim por diante)."
       },
       {
         "cost": "+1 PM",
-        "description": "se escolher mensagem, o alvo \npode enviar uma resposta de até 25 pa-\nlavras para você até o fim de seu pró-\nximo turno."
+        "description": "se escolher mensagem, o alvo pode enviar uma resposta de até 25 palavras para você até o fim de seu pró-ximo turno."
       },
       {
         "cost": "+2 PM",
-        "description": "se escolher localização, muda \na duração para cena. O alvo sabe onde \nvocê está mesmo que você mude de \nposição."
+        "description": "se escolher localização, muda a duração para cena. O alvo sabe onde você está mesmo que você mude de posição."
       }
     ]
   },
@@ -543,8 +543,8 @@ export const SPELLS_LIST: Spell[] = [
     "execution": "1d3+1 rodadas",
     "range": "curto",
     "targetArea": "1 criatura",
-    "duration": "ins-\ntantânea",
-    "description": "Você expulsa uma criatura não nati-\nva de Arton. Um alvo nativo de outro \nmundo (como muitos espíritos), é te-\nletransportado de volta para um lugar \naleatório de seu mundo de origem. Já \num alvo morto-vivo tem sua conexão \ncom as energias negativas rompidas, \nsendo reduzido a 0 PV. Se passar na re-\nsistência, em vez dos efeitos acima, o \nalvo fica enjoado por 1d4 rodadas.\nSe você tiver um ou mais itens que se \noponham ao alvo de alguma maneira, a \nCD do teste de resistência aumenta em \n+2 por item. Por exemplo, se lançar a \nmagia contra demônios do frio (vul-\nneráveis a água benta e que odeiam \nluz e calor) enquanto segura um fras-\nco de água benta e uma tocha acesa, a \nCD aumenta em +4. O mestre decide \nse determinado item é forte o bastante \ncontra a criatura para isso.",
+    "duration": "instantânea",
+    "description": "Você expulsa uma criatura não nativa de Arton. Um alvo nativo de outro mundo (como muitos espíritos), é teletransportado de volta para um lugar aleatório de seu mundo de origem. Já um alvo morto-vivo tem sua conexão com as energias negativas rompidas, sendo reduzido a 0 PV. Se passar na resistência, em vez dos efeitos acima, o alvo fica enjoado por 1d4 rodadas. Se você tiver um ou mais itens que se oponham ao alvo de alguma maneira, a CD do teste de resistência aumenta em +2 por item. Por exemplo, se lançar a magia contra demônios do frio (vulneráveis a água benta e que odeiam luz e calor) enquanto segura um frasco de água benta e uma tocha acesa, a CD aumenta em +4. O mestre decide se determinado item é forte o bastante contra a criatura para isso.",
     "resistance": "Vontade parcial"
   },
   {
@@ -557,16 +557,16 @@ export const SPELLS_LIST: Spell[] = [
     "range": "longo",
     "targetArea": "4 esferas elementais",
     "duration": "Instantânea",
-    "description": "Execução: padrão; Alcance: longo; \nEfeito: 4 esferas elementais; Dura-\nção: instantânea; Resistência: Refle-\nxos parcial.\nCriada pelo arquimago Vectorius, esta \nmagia produz quatro esferas, de áci-\ndo, eletricidade, fogo e frio, que voam \naté um ponto a sua escolha. Quando \natingem o ponto escolhido, explodem \ncausando 6d6 pontos de dano de seu \nrespectivo tipo numa área com 12m \nde raio. Um teste de Reflexos reduz o \ndano à metade. Você pode mirar cada \nesfera em uma criatura ou ponto dife-\nrente. Uma criatura ao alcance da ex-\nplosão de mais de uma esfera deve fa-\nzer um teste de resistência para cada \numa. Além disso, as esferas causam os \nseguintes efeitos em criaturas que fa-\nlharem em seus testes de resistência:\n•\t Ácido: vulnerável até o fim da cena.\n•\t Elétrica: atordoado por 1 rodada \n(apenas uma vez por cena).\n•\t Fogo: em chamas.\n•\t Frio: lento até o fim da cena.",
-    "resistance": "Refle-\nxos parcial",
+    "description": "Execução: padrão; Alcance: longo; Efeito: 4 esferas elementais; Duração: instantânea; Resistência: Reflexos parcial. Criada pelo arquimago Vectorius, esta magia produz quatro esferas, de ácido, eletricidade, fogo e frio, que voam até um ponto a sua escolha. Quando atingem o ponto escolhido, explodem causando 6d6 pontos de dano de seu respectivo tipo numa área com 12m de raio. Um teste de Reflexos reduz o dano à metade. Você pode mirar cada esfera em uma criatura ou ponto diferente. Uma criatura ao alcance da ex-plosão de mais de uma esfera deve fazer um teste de resistência para cada uma. Além disso, as esferas causam os seguintes efeitos em criaturas que falharem em seus testes de resistência: • Ácido: vulnerável até o fim da cena. • Elétrica: atordoado por 1 rodada (apenas uma vez por cena). • Fogo: em chamas. • Frio: lento até o fim da cena.",
+    "resistance": "Reflexos parcial",
     "upgrades": [
       {
         "cost": "+5 PM",
-        "description": "aumenta o dano de cada esfe-\nra em"
+        "description": "aumenta o dano de cada esfera em"
       },
       {
         "cost": "+5 PM",
-        "description": "muda o tipo de dano de todas \nas esferas para essência (mas elas ain-\nda causam os outros efeitos como se \nseu tipo de dano não mudasse)."
+        "description": "muda o tipo de dano de todas as esferas para essência (mas elas ainda causam os outros efeitos como se seu tipo de dano não mudasse)."
       }
     ]
   },
@@ -580,11 +580,11 @@ export const SPELLS_LIST: Spell[] = [
     "range": "curto",
     "targetArea": "1 criatura",
     "duration": "cena",
-    "description": "Abençoa seus aliados, que recebem \n+1 em testes de ataque e rolagens de \ndano. Bênção anula Perdição.",
+    "description": "Abençoa seus aliados, que recebem +1 em testes de ataque e rolagens de dano. Bênção anula Perdição.",
     "upgrades": [
       {
         "cost": "+1 PM",
-        "description": "muda o alvo para 1 cadáver e a \nduração para 1 semana. O cadáver não \nse decompõe nem pode ser transfor-\nmado em morto-vivo."
+        "description": "muda o alvo para 1 cadáver e a duração para 1 semana. O cadáver não se decompõe nem pode ser transformado em morto-vivo."
       }
     ]
   },
@@ -598,8 +598,8 @@ export const SPELLS_LIST: Spell[] = [
     "range": "médio",
     "targetArea": "esfera com 6m de raio",
     "duration": "Instantânea",
-    "description": "Execução: padrão; Alcance: médio; \nÁrea: esfera com 6m de raio; Dura-\nção: instantânea; Resistência: Refle-\nxos reduz à metade.\nEsta famosa magia de ataque cria uma \npoderosa explosão, causando 6d6 pon-\ntos de dano de fogo em todas as criatu-\nras e objetos livres na área.",
-    "resistance": "Refle-\nxos reduz à metade",
+    "description": "Execução: padrão; Alcance: médio; Área: esfera com 6m de raio; Duração: instantânea; Resistência: Reflexos reduz à metade. Esta famosa magia de ataque cria uma poderosa explosão, causando 6d6 pontos de dano de fogo em todas as criaturas e objetos livres na área.",
+    "resistance": "Reflexos reduz à metade",
     "upgrades": [
       {
         "cost": "+2 PM",
@@ -607,7 +607,7 @@ export const SPELLS_LIST: Spell[] = [
       },
       {
         "cost": "+2 PM",
-        "description": "muda a área para efeito de es-\nfera flamejante com tamanho Médio e \na duração para cena. Em vez do nor-\nmal, cria uma esfera flamejante com \n1,5m de diâmetro que causa 3d6 pon-\ntos de dano a qualquer criatura no \nmesmo espaço. Você pode gastar uma \nação de movimento para fazer a esfe-\nra voar 9m em qualquer direção. Ela é \nimune a dano, mas pode ser apagada \ncom água. Uma criatura só pode sofrer \ndano da esfera uma vez por rodada."
+        "description": "muda a área para efeito de esfera flamejante com tamanho Médio e a duração para cena. Em vez do normal, cria uma esfera flamejante com 1,5m de diâmetro que causa 3d6 pontos de dano a qualquer criatura no mesmo espaço. Você pode gastar uma ação de movimento para fazer a esfera voar 9m em qualquer direção. Ela é imune a dano, mas pode ser apagada com água. Uma criatura só pode sofrer dano da esfera uma vez por rodada."
       }
     ]
   },
@@ -620,8 +620,8 @@ export const SPELLS_LIST: Spell[] = [
     "execution": "completa",
     "range": "longo",
     "targetArea": "buraco negro",
-    "duration": "3 ro-\ndadas",
-    "description": "Esta magia cria um vácuo capaz de su-\ngar tudo nas proximidades. Escolha \num espaço desocupado para o buraco \nnegro. No início de cada um de seus \ntrês turnos seguintes, todas as criatu-\nras a até alcance longo do buraco ne-\ngro, incluindo você, devem fazer um\n182\nMagia",
+    "duration": "3 rodadas",
+    "description": "Esta magia cria um vácuo capaz de sugar tudo nas proximidades. Escolha um espaço desocupado para o buraco negro. No início de cada um de seus três turnos seguintes, todas as criaturas a até alcance longo do buraco negro, incluindo você, devem fazer um 182 Magia",
     "resistance": "Fortitude parcial"
   },
   {
@@ -634,15 +634,15 @@ export const SPELLS_LIST: Spell[] = [
     "range": "curto",
     "targetArea": "criaturas escolhidas",
     "duration": "1 dia",
-    "description": "Você invoca espíritos da natureza, pe-\ndindo que eles abram seu caminho. As \ncriaturas afetadas recebem deslocamen-\nto +3m e ignoram penalidades por ter-\nreno difícil em terrenos naturais.",
+    "description": "Você invoca espíritos da natureza, pedindo que eles abram seu caminho. As criaturas afetadas recebem deslocamento +3m e ignoram penalidades por terreno difícil em terrenos naturais.",
     "upgrades": [
       {
         "cost": "Truque",
-        "description": "muda o alcance para pessoal \ne o alvo para você. Em vez do normal, \nvocê recebe"
+        "description": "muda o alcance para pessoal e o alvo para você. Em vez do normal, você recebe"
       },
       {
         "cost": "+1 PM",
-        "description": "além do normal, a CD para \nrastrear os alvos em terreno natural \naumenta em"
+        "description": "além do normal, a CD para rastrear os alvos em terreno natural aumenta em"
       }
     ]
   },
@@ -656,7 +656,7 @@ export const SPELLS_LIST: Spell[] = [
     "range": "pessoal",
     "targetArea": "você",
     "duration": "sustentada",
-    "description": "Você é cercado por uma barreira invisí-\nvel com 3m de raio que o acompanha. \nQualquer habilidade mágica ou item \nmágico que entre na área da barreira é \nsuprimida enquanto estiver lá.\nCriaturas convocadas que entrem em \num Campo Antimagia desaparecem. Elas \nreaparecem na mesma posição quando \na duração do Campo termina - supon-\ndo que a duração da magia que as con-\nvocou ainda não tenha terminado.\nCriaturas mágicas ou imbuídas com \nmagia durante sua criação não são di-\nretamente afetadas pelo Campo An-\ntimagia. Entretanto, como qualquer \ncriatura, não poderão usar magias ou \nhabilidades mágicas dentro dele."
+    "description": "Você é cercado por uma barreira invisível com 3m de raio que o acompanha. Qualquer habilidade mágica ou item mágico que entre na área da barreira é suprimida enquanto estiver lá. Criaturas convocadas que entrem em um Campo Antimagia desaparecem. Elas reaparecem na mesma posição quando a duração do Campo termina - supondo que a duração da magia que as convocou ainda não tenha terminado. Criaturas mágicas ou imbuídas com magia durante sua criação não são diretamente afetadas pelo Campo Antimagia. Entretanto, como qualquer criatura, não poderão usar magias ou habilidades mágicas dentro dele."
   },
   {
     "id": "campo_de_forca",
@@ -668,23 +668,23 @@ export const SPELLS_LIST: Spell[] = [
     "range": "pessoal",
     "targetArea": "você",
     "duration": "cena",
-    "description": "Esta magia cria uma película protetora \nsobre você. Você recebe 30 pontos de \nvida temporários.",
+    "description": "Esta magia cria uma película protetora sobre você. Você recebe 30 pontos de vida temporários.",
     "upgrades": [
       {
         "cost": "+1 PM",
-        "description": "muda a execução para reação \ne a duração para instantânea. Em vez \ndo normal, você recebe RD 30 contra o \npróximo dano que sofrer."
+        "description": "muda a execução para reação e a duração para instantânea. Em vez do normal, você recebe RD 30 contra o próximo dano que sofrer."
       },
       {
         "cost": "+3 PM",
-        "description": "muda os PV temporários ou a \nRD para 50. Requer 3º círculo."
+        "description": "muda os PV temporários ou a RD para 50. Requer 3º círculo."
       },
       {
         "cost": "+7 PM",
-        "description": "muda os PV temporários ou a \nRD para 70. Requer 4º círculo."
+        "description": "muda os PV temporários ou a RD para 70. Requer 4º círculo."
       },
       {
         "cost": "+7 PM",
-        "description": "muda o alcance para curto, o \nalvo para outra criatura ou objeto solto \nEnorme ou menor e a duração para sus-\ntentada. Em vez do normal, cria uma \nesfera imóvel e tremeluzente ao redor \ndo alvo. Nenhuma criatura, objeto ou \nefeito de dano pode passar pela esfera, \nembora criaturas possam respirar nor-\nmalmente. Criaturas na área podem fa-\nzer um teste de Reflexos para evitar se-\nrem aprisionadas e sempre que você se \nconcentrar. Requer 4º círculo."
+        "description": "muda o alcance para curto, o alvo para outra criatura ou objeto solto Enorme ou menor e a duração para sustentada. Em vez do normal, cria uma esfera imóvel e tremeluzente ao redor do alvo. Nenhuma criatura, objeto ou efeito de dano pode passar pela esfera, embora criaturas possam respirar normalmente. Criaturas na área podem fazer um teste de Reflexos para evitar serem aprisionadas e sempre que você se concentrar. Requer 4º círculo."
       }
     ]
   },
@@ -698,15 +698,15 @@ export const SPELLS_LIST: Spell[] = [
     "range": "toque",
     "targetArea": "1 criatura",
     "duration": "cena",
-    "description": "O alvo fica com sua imagem nublada, \ncomo se vista através de um líquido, re-\ncebendo os efeitos de camuflagem leve.",
+    "description": "O alvo fica com sua imagem nublada, como se vista através de um líquido, recebendo os efeitos de camuflagem leve.",
     "upgrades": [
       {
         "cost": "+3 PM",
-        "description": "muda a duração para sustenta-\nda. A imagem do alvo fica mais distor-\ncida, aumentando a chance de falha da \ncamuflagem leve para 50%."
+        "description": "muda a duração para sustentada. A imagem do alvo fica mais distorcida, aumentando a chance de falha da camuflagem leve para 50%."
       },
       {
         "cost": "+7 PM",
-        "description": "muda o alcance para curto e o \nalvo para criaturas escolhidas. Requer \n4º círculo."
+        "description": "muda o alcance para curto e o alvo para criaturas escolhidas. Requer 4º círculo."
       }
     ]
   },
@@ -720,8 +720,8 @@ export const SPELLS_LIST: Spell[] = [
     "range": "longo",
     "targetArea": "quadrado com 18m de lado",
     "duration": "Instantânea",
-    "description": "Execução: completa; Alcance: longo; \nÁrea: quadrado com 18m de lado; Du-\nração: instantânea; Resistência: Re-\nflexos parcial.\nMeteoros caem dos céus, devastando \na área afetada. Criaturas na área so-\nfrem 15d6 pontos de dano de impac-\nto, 15d6 pontos de dano de fogo e fi-\ncam caídas e presas sob os escombros \n(agarradas). Uma criatura que passe \nno teste de resistência sofre metade \ndo dano total e não fica caída e agarra-\nda. Uma criatura agarrada pode esca-\npar gastando uma ação padrão e pas-\nsando em um teste de Atletismo. Toda \na área afetada fica coberta de escom-\nbros, sendo considerada terreno di-\nfícil, e imersa numa nuvem de poei-\nra (camuflagem leve). Esta magia só \npode ser utilizada a céu aberto.",
-    "resistance": "Re-\nflexos parcial"
+    "description": "Execução: completa; Alcance: longo; Área: quadrado com 18m de lado; Duração: instantânea; Resistência: Reflexos parcial. Meteoros caem dos céus, devastando a área afetada. Criaturas na área sofrem 15d6 pontos de dano de impacto, 15d6 pontos de dano de fogo e ficam caídas e presas sob os escombros (agarradas). Uma criatura que passe no teste de resistência sofre metade do dano total e não fica caída e agarrada. Uma criatura agarrada pode escapar gastando uma ação padrão e passando em um teste de Atletismo. Toda a área afetada fica coberta de escombros, sendo considerada terreno difícil, e imersa numa nuvem de poeira (camuflagem leve). Esta magia só pode ser utilizada a céu aberto.",
+    "resistance": "Reflexos parcial"
   },
   {
     "id": "circulo_da_justica",
@@ -733,20 +733,20 @@ export const SPELLS_LIST: Spell[] = [
     "range": "curto",
     "targetArea": "esfera com 9m de raio",
     "duration": "1 dia",
-    "description": "Também conhecida como Lágrimas de \nHyninn, esta magia é usada em tribu-\nnais e para proteger áreas sensíveis. \nCriaturas na área sofrem -10 em tes-\ntes de Acrobacia, Enganação, Furtivi-\ndade e Ladinagem e não podem mentir \ndeliberadamente - mas podem tentar \nevitar perguntas que normalmente res-\nponderiam com uma mentira (sendo \nevasivas ou cometendo omissões, por \nexemplo). Uma criatura que passe na \nresistência tem as penalidades reduzi-\ndas para -5 e pode mentir.",
+    "description": "Também conhecida como Lágrimas de Hyninn, esta magia é usada em tribunais e para proteger áreas sensíveis. Criaturas na área sofrem -10 em testes de Acrobacia, Enganação, Furtividade e Ladinagem e não podem mentir deliberadamente - mas podem tentar evitar perguntas que normalmente responderiam com uma mentira (sendo evasivas ou cometendo omissões, por exemplo). Uma criatura que passe na resistência tem as penalidades reduzidas para -5 e pode mentir.",
     "resistance": "Vontade parcial",
     "upgrades": [
       {
         "cost": "+1 PM",
-        "description": "muda a execução para ação \npadrão, o alcance para pessoal, o alvo \npara você, a duração para cena e a re-\nsistência para nenhuma. Em vez do \nnormal, qualquer criatura ou objeto \ninvisível em alcance curto se torna vi-\nsível. Isso não dissipa o efeito mágico; \nse sair do seu alcance, a criatura ou ob-\njeto voltam a ficar invisíveis."
+        "description": "muda a execução para ação padrão, o alcance para pessoal, o alvo para você, a duração para cena e a resistência para nenhuma. Em vez do normal, qualquer criatura ou objeto invisível em alcance curto se torna visível. Isso não dissipa o efeito mágico; se sair do seu alcance, a criatura ou objeto voltam a ficar invisíveis."
       },
       {
         "cost": "+3 PM",
-        "description": "muda a penalidade nas perí-\ncias para -10 (se passar na resistência) \ne -20 (se falhar). Requer 4º círculo."
+        "description": "muda a penalidade nas perícias para -10 (se passar na resistência) e -20 (se falhar). Requer 4º círculo."
       },
       {
         "cost": "+7 PM",
-        "description": "muda a duração para perma-\nnente e adiciona componente material \n(balança de prata no valor de T$ 5.000).\n183\nCapítulo Quatro"
+        "description": "muda a duração para permanente e adiciona componente material (balança de prata no valor de T$ 5.000). 183 Capítulo Quatro"
       }
     ]
   },
@@ -760,7 +760,7 @@ export const SPELLS_LIST: Spell[] = [
     "range": "curto",
     "targetArea": "esfera com 3m de raio",
     "duration": "Instantânea",
-    "description": "Execução: padrão; Alcance: curto; \nÁrea: esfera com 3m de raio; Dura-\nção: 5 rodadas.\nVocê evoca um círculo de luz que \nemana uma energia poderosa. Qual-\nquer criatura viva que termine o tur-\nno dentro do círculo recupera 3d8+3 \nPV e 1 PM. Mortos-vivos e criaturas \nque sofrem dano por luz perdem PV e \nPM na mesma quantidade. Uma cria-\ntura pode recuperar no máximo 5 PM \npor dia com esta magia."
+    "description": "Execução: padrão; Alcance: curto; Área: esfera com 3m de raio; Duração: 5 rodadas. Você evoca um círculo de luz que emana uma energia poderosa. Qualquer criatura viva que termine o tur-no dentro do círculo recupera 3d8+3 PV e 1 PM. Mortos-vivos e criaturas que sofrem dano por luz perdem PV e PM na mesma quantidade. Uma criatura pode recuperar no máximo 5 PM por dia com esta magia."
   },
   {
     "id": "colera_de_azgher",
@@ -772,8 +772,8 @@ export const SPELLS_LIST: Spell[] = [
     "range": "médio",
     "targetArea": "esfera com 6m de raio",
     "duration": "instantânea",
-    "description": "Execução: padrão; Alcance: médio; \nÁrea: esfera com 6m de raio; Duração: \ninstantânea. Resistência: Reflexos par-\ncial.\nVocê cria um fulgor dourado e intenso. \nCriaturas na área ficam cegas por 1d4 \nrodadas e em chamas, e sofrem 10d6 \npontos de dano de fogo (mortos-vivos \nsofrem 10d8 pontos de dano). Uma \ncriatura que passe no teste de resistên-\ncia não fica cega nem em chamas e so-\nfre metade do dano.",
-    "resistance": "Reflexos par-\ncial",
+    "description": "Execução: padrão; Alcance: médio; Área: esfera com 6m de raio; Duração: instantânea. Resistência: Reflexos parcial. Você cria um fulgor dourado e intenso. Criaturas na área ficam cegas por 1d4 rodadas e em chamas, e sofrem 10d6 pontos de dano de fogo (mortos-vivos sofrem 10d8 pontos de dano). Uma criatura que passe no teste de resistência não fica cega nem em chamas e sofre metade do dano.",
+    "resistance": "Reflexos parcial",
     "upgrades": [
       {
         "cost": "+2 PM",
@@ -793,9 +793,9 @@ export const SPELLS_LIST: Spell[] = [
     "school": "Evocação",
     "execution": "padrão",
     "range": "longo",
-    "targetArea": "cilindro com 3m de raio e 30m \nde altura",
+    "targetArea": "cilindro com 3m de raio e 30m de altura",
     "duration": "instantânea",
-    "description": "Execução: padrão; Alcance: longo; \nÁrea: cilindro com 3m de raio e 30m \nde altura; Duração: instantânea; Re-\nsistência: Reflexos reduz à metade.\nUm pilar de fogo sagrado desce dos \ncéus, causando 6d6 pontos de dano de \nfogo mais 6d6 pontos de dano de luz \nnas criaturas e objetos livres na área.",
+    "description": "Execução: padrão; Alcance: longo; Área: cilindro com 3m de raio e 30m de altura; Duração: instantânea; Resistência: Reflexos reduz à metade. Um pilar de fogo sagrado desce dos céus, causando 6d6 pontos de dano de fogo mais 6d6 pontos de dano de luz nas criaturas e objetos livres na área.",
     "upgrades": [
       {
         "cost": "+1 PM",
@@ -812,8 +812,8 @@ export const SPELLS_LIST: Spell[] = [
     "execution": "padrão",
     "range": "curto",
     "targetArea": "1 humanoide",
-    "duration": "1 roda-\nda",
-    "description": "Você dá uma ordem irresistível, que o \nalvo deve ser capaz de ouvir (mas não\nprecisa entender). Se falhar na resis-\ntência, ele deve obedecer ao comando \nem seu próprio turno da melhor ma-\nneira possível. Escolha um dos efeitos.\nFuja: o alvo gasta seu turno se afastando \nde você (usando todas as suas ações).\nLargue: o alvo solta quaisquer itens que \nesteja segurando e não pode pegá-los \nnovamente até o início de seu próximo \nturno. Como esta é uma ação livre, ele \nainda pode executar outras ações (ex-\nceto pegar aquilo que largou).\nPare: o alvo fica pasmo (apenas uma \nvez por cena).\nSenta: com uma ação livre, o alvo senta \nno chão (se estava pendurado ou voan-\ndo, desce até o chão). Ele pode fazer \noutras ações, mas não se levantar até o \ninício de seu próximo turno.\nVenha: o alvo gasta seu turno se apro-\nximando de você (usando todas as \nsuas ações).",
+    "duration": "1 rodada",
+    "description": "Você dá uma ordem irresistível, que o alvo deve ser capaz de ouvir (mas não precisa entender). Se falhar na resistência, ele deve obedecer ao comando em seu próprio turno da melhor maneira possível. Escolha um dos efeitos. Fuja: o alvo gasta seu turno se afastando de você (usando todas as suas ações). Largue: o alvo solta quaisquer itens que esteja segurando e não pode pegá-los novamente até o início de seu próximo turno. Como esta é uma ação livre, ele ainda pode executar outras ações (ex-ceto pegar aquilo que largou). Pare: o alvo fica pasmo (apenas uma vez por cena). Senta: com uma ação livre, o alvo senta no chão (se estava pendurado ou voando, desce até o chão). Ele pode fazer outras ações, mas não se levantar até o início de seu próximo turno. Venha: o alvo gasta seu turno se aproximando de você (usando todas as suas ações).",
     "resistance": "Vontade anula",
     "upgrades": [
       {
@@ -832,8 +832,8 @@ export const SPELLS_LIST: Spell[] = [
     "range": "toque",
     "targetArea": "1 criatura ou texto",
     "duration": "cena",
-    "description": "Execução: padrão; Alcance: toque; \nAlvo: 1 criatura ou texto; Duração: \ncena; Resistência: Vontade anula (veja \ndescrição).\nEssa magia lhe confere compreensão \nsobrenatural. Você pode tocar um tex-\nto e entender as palavras mesmo que \nnão conheça o idioma. Se tocar numa \ncriatura inteligente, pode se comunicar \ncom ela mesmo que não tenham um \nidioma em comum. Se tocar uma cria-\ntura não inteligente, como um animal, \npode perceber seus sentimentos.\nVocê também pode gastar uma ação de \nmovimento para ouvir os pensamentos \nde uma criatura tocada (você “ouve” \no que o alvo está pensando), mas um \nalvo involuntário tem direito a um tes-\nte de Vontade para proteger seus pen-\nsamentos e evitar este efeito.",
-    "resistance": "Vontade anula (veja \ndescrição)",
+    "description": "Execução: padrão; Alcance: toque; Alvo: 1 criatura ou texto; Duração: cena; Resistência: Vontade anula (veja descrição). Essa magia lhe confere compreensão sobrenatural. Você pode tocar um texto e entender as palavras mesmo que não conheça o idioma. Se tocar numa criatura inteligente, pode se comunicar com ela mesmo que não tenham um idioma em comum. Se tocar uma criatura não inteligente, como um animal, pode perceber seus sentimentos. Você também pode gastar uma ação de movimento para ouvir os pensamentos de uma criatura tocada (você “ouve” o que o alvo está pensando), mas um alvo involuntário tem direito a um tes-te de Vontade para proteger seus pensamentos e evitar este efeito.",
+    "resistance": "Vontade anula (veja descrição)",
     "upgrades": [
       {
         "cost": "+1 PM",
@@ -841,11 +841,11 @@ export const SPELLS_LIST: Spell[] = [
       },
       {
         "cost": "+2 PM",
-        "description": "muda o alcance para curto e \no alvo para criaturas escolhidas. Você \npode entender todas as criaturas afeta-\ndas, mas só pode ouvir os pensamen-\ntos de uma por vez."
+        "description": "muda o alcance para curto e o alvo para criaturas escolhidas. Você pode entender todas as criaturas afetadas, mas só pode ouvir os pensamentos de uma por vez."
       },
       {
         "cost": "+2 PM",
-        "description": "muda o alvo para 1 criatura. \nEm vez do normal, pode vasculhar os \npensamentos do alvo para extrair in-\nformações. O alvo tem direito a um \nteste de Vontade para anular este efei-\nto. O mestre decide se a criatura sabe\nou não a informação que você procura. \nRequer 2º círculo."
+        "description": "muda o alvo para 1 criatura. Em vez do normal, pode vasculhar os pensamentos do alvo para extrair informações. O alvo tem direito a um teste de Vontade para anular este efeito. O mestre decide se a criatura sabe ou não a informação que você procura. Requer 2º círculo."
       }
     ]
   },
@@ -859,19 +859,19 @@ export const SPELLS_LIST: Spell[] = [
     "range": "pes-\nsoal",
     "targetArea": "você",
     "duration": "1 dia",
-    "description": "Após uma breve união com a natureza \nlocal, você obtém informações e intui-\nções sobre a região em que está, numa \ndistância equivalente a um dia de via-\ngem. Você recebe 6d4 dados de auxílio. \nEnquanto a magia durar, sempre que for \nrealizar um teste de perícia em áreas na-\nturais, você pode gastar 2d4 (mais 2d4 \npara cada círculo de magias acima do 3º \nque puder lançar) e adicionar o resulta-\ndo rolado como bônus no teste. A magia \ntermina se você ficar sem dados.",
+    "description": "Após uma breve união com a natureza local, você obtém informações e intuições sobre a região em que está, numa distância equivalente a um dia de viagem. Você recebe 6d4 dados de auxílio. Enquanto a magia durar, sempre que for realizar um teste de perícia em áreas naturais, você pode gastar 2d4 (mais 2d4 para cada círculo de magias acima do 3º que puder lançar) e adicionar o resultado rolado como bônus no teste. A magia termina se você ficar sem dados.",
     "upgrades": [
       {
         "cost": "+1 PM",
-        "description": "muda a execução para 1 minu-\nto e a duração para instantânea. Em vez \ndo normal, você descobre 1d4"
+        "description": "muda a execução para 1 minuto e a duração para instantânea. Em vez do normal, você descobre 1d4"
       },
       {
         "cost": "+3 PM",
-        "description": "aumenta o número de dados \nde auxílio em"
+        "description": "aumenta o número de dados de auxílio em"
       },
       {
         "cost": "+4 PM",
-        "description": "muda o tipo dos dados de \nauxílio para d6."
+        "description": "muda o tipo dos dados de auxílio para d6."
       }
     ]
   },
@@ -884,12 +884,12 @@ export const SPELLS_LIST: Spell[] = [
     "execution": "padrão",
     "range": "toque",
     "targetArea": "1 criatura",
-    "duration": "permanen-\nte até ser descarregada",
-    "description": "Execução: padrão; Alcance: toque; \nAlvo: 1 criatura; Duração: permanen-\nte até ser descarregada.\nVocê transfere um pouco de seu poder \ndivino a outra criatura. Escolha uma \nmagia de até 2º círculo que você co-\nnheça; o alvo pode lançar essa magia \numa vez, sem pagar o custo dela em \nPM (aprimoramentos podem ser usa-\ndos, mas o alvo deve gastar seus pró-\nprios PM). Você sofre uma penalidade \nde -3 PM até que o alvo lance a magia.",
+    "duration": "permanen-te até ser descarregada",
+    "description": "Execução: padrão; Alcance: toque; Alvo: 1 criatura; Duração: permanen-te até ser descarregada. Você transfere um pouco de seu poder divino a outra criatura. Escolha uma magia de até 2º círculo que você conheça; o alvo pode lançar essa magia uma vez, sem pagar o custo dela em PM (aprimoramentos podem ser usados, mas o alvo deve gastar seus pró-prios PM). Você sofre uma penalidade de -3 PM até que o alvo lance a magia.",
     "upgrades": [
       {
         "cost": "+4 PM",
-        "description": "muda o círculo da magia con-\ncedida para 3º e a penalidade de PM \npara -6.\n184\nMagia"
+        "description": "muda o círculo da magia concedida para 3º e a penalidade de PM para -6. 184 Magia"
       }
     ]
   },
@@ -903,19 +903,19 @@ export const SPELLS_LIST: Spell[] = [
     "range": "pessoal",
     "targetArea": "você",
     "duration": "1 rodada",
-    "description": "Você amplia sua percepção, antecipan-\ndo movimentos dos inimigos e achan-\ndo brechas em sua defesa. Quando faz \num teste de ataque, você rola dois da-\ndos e usa o melhor resultado.",
+    "description": "Você amplia sua percepção, antecipando movimentos dos inimigos e achando brechas em sua defesa. Quando faz um teste de ataque, você rola dois dados e usa o melhor resultado.",
     "upgrades": [
       {
         "cost": "+2 PM",
-        "description": "muda a execução para padrão e \na duração para cena. Requer 2º círculo."
+        "description": "muda a execução para padrão e a duração para cena. Requer 2º círculo."
       },
       {
         "cost": "+5 PM",
-        "description": "além do normal, ao atacar \nvocê, um inimigo deve rolar dois da-\ndos e usar o pior resultado. Requer 3º \ncírculo."
+        "description": "além do normal, ao atacar você, um inimigo deve rolar dois dados e usar o pior resultado. Requer 3º círculo."
       },
       {
         "cost": "+9 PM",
-        "description": "muda a execução para pa-\ndrão, o alcance para curto, o alvo para \ncriaturas escolhidas e a duração para \ncena. Requer 4º círculo."
+        "description": "muda a execução para padrão, o alcance para curto, o alvo para criaturas escolhidas e a duração para cena. Requer 4º círculo."
       }
     ]
   },
@@ -929,11 +929,11 @@ export const SPELLS_LIST: Spell[] = [
     "range": "curto",
     "targetArea": "até 5 criaturas",
     "duration": "cena",
-    "description": "Pela duração da magia, você sabe a po-\nsição e status (PV atuais, se estão com \numa condição ou sob efeito de ma-\ngia...) dos alvos. Depois de lançada, a \ndistância dos alvos não importa - a \nmagia só deixa de detectar um alvo se \nele morrer ou for para outro plano.",
+    "description": "Pela duração da magia, você sabe a posição e status (PV atuais, se estão com uma condição ou sob efeito de magia...) dos alvos. Depois de lançada, a distância dos alvos não importa - a magia só deixa de detectar um alvo se ele morrer ou for para outro plano.",
     "upgrades": [
       {
         "cost": "+1 PM",
-        "description": "aumenta o número de alvos \nem"
+        "description": "aumenta o número de alvos em"
       }
     ]
   },
@@ -947,11 +947,11 @@ export const SPELLS_LIST: Spell[] = [
     "range": "médio",
     "targetArea": "parceiro elemental",
     "duration": "sustentada",
-    "description": "Execução: completa; Alcance: médio; \nEfeito: parceiro elemental; Duração: \nsustentada.\nEsta magia transforma uma porção de \num elemento inerte em uma criatura \nelemental Grande do tipo do elemen-\nto alvo. Por exemplo, lançar esta ma-\ngia numa fogueira ou tocha cria um \nelemental do fogo. Você pode criar ele-\nmentais do ar, água, fogo e terra com \nessa magia. O elemental obedece a to-\ndos os seus comandos e pode funcio-\nnar como um parceiro do tipo destrui-\ndor (cuja habilidade custa apenas 2 PM \npara ser usada) e mais um tipo entre os \nindicados na lista abaixo, ambos mes-\ntres. O elemental auxilia apenas você e \nnão conta em seu limite de parceiros.\nAr: assassino, perseguidor ou vigilante. \nDano de eletricidade.\nÁgua: ajudante, guardião ou médico. \nDano de frio.\nFogo: atirador, combatente ou fortão. \nDano de fogo.\nTerra: combatente, guardião ou montaria. \nDano de impacto.",
+    "description": "Execução: completa; Alcance: médio; Efeito: parceiro elemental; Duração: sustentada. Esta magia transforma uma porção de um elemento inerte em uma criatura elemental Grande do tipo do elemento alvo. Por exemplo, lançar esta magia numa fogueira ou tocha cria um elemental do fogo. Você pode criar elementais do ar, água, fogo e terra com essa magia. O elemental obedece a todos os seus comandos e pode funcionar como um parceiro do tipo destruidor (cuja habilidade custa apenas 2 PM para ser usada) e mais um tipo entre os indicados na lista abaixo, ambos mestres. O elemental auxilia apenas você e não conta em seu limite de parceiros. Ar: assassino, perseguidor ou vigilante. Dano de eletricidade. Água: ajudante, guardião ou médico. Dano de frio. Fogo: atirador, combatente ou fortão. Dano de fogo. Terra: combatente, guardião ou montaria. Dano de impacto.",
     "upgrades": [
       {
         "cost": "+5 PM",
-        "description": "o elemental muda para Enor-\nme e recebe dois tipos de parceiro indi-\ncados no seu elemento."
+        "description": "o elemental muda para Enor-me e recebe dois tipos de parceiro indicados no seu elemento."
       }
     ]
   },
@@ -965,55 +965,55 @@ export const SPELLS_LIST: Spell[] = [
     "range": "curto",
     "targetArea": "1 criatura conjurada",
     "duration": "sustentada",
-    "description": "Execução: completa; Alcance: curto; \nEfeito: 1 criatura conjurada; Duração: \nsustentada.\nVocê conjura um monstro Pequeno \nque ataca seus inimigos. Você esco-\nlhe a aparência do monstro e o tipo de \ndano que ele pode causar, entre cor-\nte, impacto e perfuração. No entan-\nto, ele não é uma criatura real, e sim \n uma criatura feita de energia. Se for \ndestruído, ou quando a magia acaba, \ndesaparece com um brilho, sem dei-\nxar nada para trás. Você só pode ter \num monstro conjurado por esta ma-\ngia por vez.\nO monstro surge em um espaço de-\nsocupado a sua escolha dentro do al-\ncance e age no início de cada um de \nseus turnos, a partir da próxima roda-\nda. O monstro tem deslocamento 9m \ne pode fazer uma ação de movimen-\nto por rodada. Você pode gastar uma \nação padrão para dar uma das seguin-\ntes ordens a ele.\nMover: o monstro se movimenta o do-\nbro do deslocamento nessa rodada.\nAtacar: o monstro causa 2d4+2 pontos \nde dano de corte, impacto ou perfura-\nção a uma criatura adjacente.\nLançar Magia: o monstro pode servir \ncomo ponto de origem para uma ma-\ngia lançada por você com execução de \numa ação padrão ou menor. Ele pode \ndescarregar um Toque Chocante em um\ninimigo distante, ou mesmo “cuspir” \numa Bola de Fogo! Você gasta PM nor-\nmalmente para lançar a magia.\nOutros usos criativos para o monstro \nconjurado ficam a critério do mestre. \nEle não age sem receber uma ordem.\nPara efeitos de jogo, o monstro conju-\nrado tem For 2, Des 3 e todos os ou-\ntros atributos nulos. Ele tem Defesa \nigual a sua, 20 PV, usa o seu valor em \nReflexos e é imune a efeitos que pe-\ndem um teste de Fortitude ou Vontade.",
+    "description": "Execução: completa; Alcance: curto; Efeito: 1 criatura conjurada; Duração: sustentada. Você conjura um monstro Pequeno que ataca seus inimigos. Você esco-lhe a aparência do monstro e o tipo de dano que ele pode causar, entre cor-te, impacto e perfuração. No entanto, ele não é uma criatura real, e sim uma criatura feita de energia. Se for destruído, ou quando a magia acaba, desaparece com um brilho, sem deixar nada para trás. Você só pode ter um monstro conjurado por esta magia por vez. O monstro surge em um espaço desocupado a sua escolha dentro do alcance e age no início de cada um de seus turnos, a partir da próxima rodada. O monstro tem deslocamento 9m e pode fazer uma ação de movimento por rodada. Você pode gastar uma ação padrão para dar uma das seguintes ordens a ele. Mover: o monstro se movimenta o dobro do deslocamento nessa rodada. Atacar: o monstro causa 2d4+2 pontos de dano de corte, impacto ou perfuração a uma criatura adjacente. Lançar Magia: o monstro pode servir como ponto de origem para uma magia lançada por você com execução de uma ação padrão ou menor. Ele pode descarregar um Toque Chocante em um inimigo distante, ou mesmo “cuspir” uma Bola de Fogo! Você gasta PM normalmente para lançar a magia. Outros usos criativos para o monstro conjurado ficam a critério do mestre. Ele não age sem receber uma ordem. Para efeitos de jogo, o monstro conjurado tem For 2, Des 3 e todos os outros atributos nulos. Ele tem Defesa igual a sua, 20 PV, usa o seu valor em Reflexos e é imune a efeitos que pedem um teste de Fortitude ou Vontade.",
     "upgrades": [
       {
         "cost": "+1 PM",
-        "description": "o monstro ganha deslocamen-\nto de escalada ou natação igual ao seu \ndeslocamento terrestre."
+        "description": "o monstro ganha deslocamento de escalada ou natação igual ao seu deslocamento terrestre."
       },
       {
         "cost": "+1 PM",
-        "description": "aumenta o deslocamento do \nmonstro em"
+        "description": "aumenta o deslocamento do monstro em"
       },
       {
         "cost": "+1 PM",
-        "description": "muda o tipo de dano do ata-\nque do monstro para ácido, fogo, frio \nou eletricidade."
+        "description": "muda o tipo de dano do ataque do monstro para ácido, fogo, frio ou eletricidade."
       },
       {
         "cost": "+2 PM",
-        "description": "aumenta os PV do monstro \nem"
+        "description": "aumenta os PV do monstro em"
       },
       {
         "cost": "+2 PM",
-        "description": "aumenta o tamanho do mons-\ntro para Médio. Ele tem For 4, Des 3, \n45 PV, deslocamento 12m e seu ataque \ncausa 2d6"
+        "description": "aumenta o tamanho do monstro para Médio. Ele tem For 4, Des 3, 45 PV, deslocamento 12m e seu ataque causa 2d6"
       },
       {
         "cost": "+2 PM",
-        "description": "o monstro ganha redução 5 \ncontra dois tipos de dano (por exem-\nplo, corte e frio)."
+        "description": "o monstro ganha redução 5 contra dois tipos de dano (por exemplo, corte e frio)."
       },
       {
         "cost": "+4 PM",
-        "description": "o monstro ganha uma nova \nordem: Arma de Sopro. Para dar essa or-\ndem você gasta 1 PM, e faz o monstro \ncausar o dobro de seu dano de ataque \nem um cone de 6m a partir de si (Re-\nflexos reduz à metade)."
+        "description": "o monstro ganha uma nova ordem: Arma de Sopro. Para dar essa ordem você gasta 1 PM, e faz o monstro causar o dobro de seu dano de ataque em um cone de 6m a partir de si (Reflexos reduz à metade)."
       },
       {
         "cost": "+5 PM",
-        "description": "aumenta o tamanho do mons-\ntro para Grande. Ele tem For 7, Des 2, \n75 PV, deslocamento 12m e seu ata-\nque causa 4d6"
+        "description": "aumenta o tamanho do monstro para Grande. Ele tem For 7, Des 2, 75 PV, deslocamento 12m e seu ataque causa 4d6"
       },
       {
         "cost": "+9 PM",
-        "description": "o monstro ganha desloca-\nmento de voo igual ao dobro do des-\nlocamento."
+        "description": "o monstro ganha deslocamento de voo igual ao dobro do deslocamento."
       },
       {
         "cost": "+9 PM",
-        "description": "o monstro ganha imunidade \ncontra dois tipos de dano."
+        "description": "o monstro ganha imunidade contra dois tipos de dano."
       },
       {
         "cost": "+9 PM",
-        "description": "aumenta o tamanho do \nmonstro para Enorme. Ele tem For \n11, Des 1, 110 PV, deslocamento 15m \ne seu ataque causa 4d8"
+        "description": "aumenta o tamanho do monstro para Enorme. Ele tem For 11, Des 1, 110 PV, deslocamento 15m e seu ataque causa 4d8"
       },
       {
         "cost": "+14 PM",
-        "description": "aumenta o tamanho do \nmonstro para Colossal. Ele tem For \n15, Des 0, 180 PV, deslocamento 15m \ne seu ataque causa 4d12"
+        "description": "aumenta o tamanho do monstro para Colossal. Ele tem For 15, Des 0, 180 PV, deslocamento 15m e seu ataque causa 4d12"
       }
     ]
   },
@@ -1027,19 +1027,19 @@ export const SPELLS_LIST: Spell[] = [
     "range": "cur-\nto",
     "targetArea": "6 mortos-vivos",
     "duration": "sustentada",
-    "description": "Execução: completa; Alcance: cur-\nto; Efeito: 6 mortos-vivos; Duração: \nsustentada.\nVocê conjura seis esqueletos capangas \nde tamanho Médio feitos de energia \nnegativa em espaços desocupados den-\ntro do alcance. Você pode gastar uma \nação de movimento para fazer os mor-\ntos-vivos andarem (eles têm desloca-\nmento 9m) ou uma ação padrão para \nfazê-los causar dano a criaturas adja-\ncentes (1d6+2 pontos de dano de tre-\nvas cada). Os esqueletos têm For 2, \nDes 2, Defesa 18 e todos os outros \natributos nulos; eles têm 1 PV e fa-\nlham automaticamente em qualquer \nteste de resistência ou oposto, mas são \nimunes a atordoamento, cansaço, dano \nnão letal, doença, encantamento , frio, \nilusão, paralisia, sono e veneno. Eles \ndesaparecem quando são reduzidos a \n0 PV ou no fim da cena. Os mortos-\n-vivos não agem sem receber uma or-\ndem. Usos criativos para capangas fora \nde combate ficam a critério do mestre.",
+    "description": "Execução: completa; Alcance: curto; Efeito: 6 mortos-vivos; Duração: sustentada. Você conjura seis esqueletos capangas de tamanho Médio feitos de energia negativa em espaços desocupados dentro do alcance. Você pode gastar uma ação de movimento para fazer os mortos-vivos andarem (eles têm deslocamento 9m) ou uma ação padrão para fazê-los causar dano a criaturas adjacentes (1d6+2 pontos de dano de trevas cada). Os esqueletos têm For 2, Des 2, Defesa 18 e todos os outros atributos nulos; eles têm 1 PV e falham automaticamente em qualquer teste de resistência ou oposto, mas são imunes a atordoamento, cansaço, dano não letal, doença, encantamento, frio, ilusão, paralisia, sono e veneno. Eles desaparecem quando são reduzidos a 0 PV ou no fim da cena. Os mortos- -vivos não agem sem receber uma ordem. Usos criativos para capangas fora de combate ficam a critério do mestre.",
     "upgrades": [
       {
         "cost": "+2 PM",
-        "description": "aumenta o número de mortos-\n-vivos conjurados em"
+        "description": "aumenta o número de mortos- -vivos conjurados em"
       },
       {
         "cost": "+3 PM",
-        "description": "em vez de esqueletos, conjura \ncarniçais. Requer 3º círculo."
+        "description": "em vez de esqueletos, conjura carniçais. Requer 3º círculo."
       },
       {
         "cost": "+7 PM",
-        "description": "em vez de esqueletos, conjura \nsombras. Requer 4º círculo.\nCarniçal: como esqueletos, mas têm \nFor 3, Des 3, Defesa 27 e causam \n1d8"
+        "description": "em vez de esqueletos, conjura sombras. Requer 4º círculo. Carniçal: como esqueletos, mas têm For 3, Des 3, Defesa 27 e causam 1d8"
       }
     ]
   },
@@ -1053,15 +1053,15 @@ export const SPELLS_LIST: Spell[] = [
     "range": "longo",
     "targetArea": "esfera com 9m de raio",
     "duration": "Instantânea",
-    "description": "Execução: padrão; Alcance: longo; \nÁrea: esfera com 9m de raio; Dura-\nção: 1 dia.\nVocê enche a área com energia posi-\ntiva. Pontos de vida curados por efei-\ntos de luz são maximizados dentro da\nárea. Isso também afeta dano causa-\ndo em mortos-vivos por esses efeitos. \nPor exemplo, Curar Ferimentos cura au-\ntomaticamente 18 PV. Esta magia não \npode ser lançada em uma área con-\ntendo um símbolo visível dedicado a \numa divindade que não a sua. Consa-\ngrar anula Profanar.",
+    "description": "Execução: padrão; Alcance: longo; Área: esfera com 9m de raio; Duração: 1 dia. Você enche a área com energia positiva. Pontos de vida curados por efeitos de luz são maximizados dentro da área. Isso também afeta dano causado em mortos-vivos por esses efeitos. Por exemplo, Curar Ferimentos cura automaticamente 18 PV. Esta magia não pode ser lançada em uma área contendo um símbolo visível dedicado a uma divindade que não a sua. Consagrar anula Profanar.",
     "upgrades": [
       {
         "cost": "+1 PM",
-        "description": "além do normal, mortos-vivos \nna área sofrem -2 em testes e Defesa."
+        "description": "além do normal, mortos-vivos na área sofrem -2 em testes e Defesa."
       },
       {
         "cost": "+2 PM",
-        "description": "aumenta as penalidades para \nmortos-vivos em -1 (penalidade má-\nxima limitada pelo círculo máximo de \nmagia que você pode lançar)."
+        "description": "aumenta as penalidades para mortos-vivos em -1 (penalidade máxima limitada pelo círculo máximo de magia que você pode lançar)."
       }
     ]
   },
@@ -1075,11 +1075,11 @@ export const SPELLS_LIST: Spell[] = [
     "range": "pes-\nsoal",
     "targetArea": "você",
     "duration": "1 dia",
-    "description": "Sua mente viaja até outro plano de \nexistência, onde entra em contato com \nseres como gênios e demônios. Você \nfirma um contrato com uma dessas en-\ntidades para que o auxilie, em troca de \nse alimentar de seu mana. Quando a \nmagia é lançada, você recebe 6d6 da-\ndos de auxílio. Enquanto a magia du-\nrar, sempre que for realizar um teste \nde perícia, você pode gastar 1d6 (mais \n1d6 para cada círculo de magias acima \ndo 3º que puder lançar) e adicionar o \nresultado como bônus no teste. No en-\ntanto, sempre que rolar um “6” num \ndesses dados, a entidade “suga” 1 PM \nde você. A magia termina se você gas-\ntar todos os dados, ficar sem PM ou no \nfim do dia (o que acontecer primeiro).",
+    "description": "Sua mente viaja até outro plano de existência, onde entra em contato com seres como gênios e demônios. Você firma um contrato com uma dessas entidades para que o auxilie, em troca de se alimentar de seu mana. Quando a magia é lançada, você recebe 6d6 dados de auxílio. Enquanto a magia durar, sempre que for realizar um teste de perícia, você pode gastar 1d6 (mais 1d6 para cada círculo de magias acima do 3º que puder lançar) e adicionar o resultado como bônus no teste. No entanto, sempre que rolar um “6” num desses dados, a entidade “suga” 1 PM de você. A magia termina se você gastar todos os dados, ficar sem PM ou no fim do dia (o que acontecer primeiro).",
     "upgrades": [
       {
         "cost": "+2 PM",
-        "description": "aumenta o número de dados \nde auxílio em"
+        "description": "aumenta o número de dados de auxílio em"
       }
     ]
   },
@@ -1093,7 +1093,7 @@ export const SPELLS_LIST: Spell[] = [
     "range": "médio",
     "targetArea": "cubo de 12m de lado",
     "duration": "sustentada",
-    "description": "Execução: padrão; Alcance: médio; \nÁrea: cubo de 12m de lado; Duração: \nsustentada.\nVocê controla os efeitos da gravidade \ndentro da área. Ao lançar a magia, es-\ncolha um dos efeitos abaixo. Enquan-\nto a magia durar, você pode gastar uma \nação padrão para mudar o efeito.\nAumentar: no início de seus turnos, \ncada criatura na área deve fazer um \nteste de Atletismo. Se passar, fica fa-\ntigada. Se falhar, fica fatigada e caída.\nInverter: inverte a gravidade da área, \nfazendo com que criaturas e objetos \n“caiam” para cima, atingindo o topo \n(12m) em uma rodada. Se um obstá-\nculo (como um teto) impedir o movi-\nmento das criaturas, elas sofrem 1d6 \npontos de dano de impacto para cada \n1,5m de “queda”. Elas podem então se \nlevantar e caminhar no obstáculo, de \ncabeça para baixo. Se não houver obs-\ntáculo, as criaturas e objetos ficam ﬂu-\ntuando no topo da área afetada, sem \npoder sair do lugar. Criaturas voado-\nras podem se movimentar normalmen-\nte. Alguém adjacente a algo que possa \nagarrar tem direito a um teste de Reﬂe-\nxos para evitar a “queda”. A criatura \ndeve permanecer presa pela duração da \nmagia; caso contrário “cairá”."
+    "description": "Execução: padrão; Alcance: médio; Área: cubo de 12m de lado; Duração: sustentada. Você controla os efeitos da gravidade dentro da área. Ao lançar a magia, escolha um dos efeitos abaixo. Enquanto a magia durar, você pode gastar uma ação padrão para mudar o efeito. Aumentar: no início de seus turnos, cada criatura na área deve fazer um teste de Atletismo. Se passar, fica fatigada. Se falhar, fica fatigada e caída. Inverter: inverte a gravidade da área, fazendo com que criaturas e objetos “caiam” para cima, atingindo o topo (12m) em uma rodada. Se um obstáculo (como um teto) impedir o movimento das criaturas, elas sofrem 1d6 pontos de dano de impacto para cada 1,5m de “queda”. Elas podem então se levantar e caminhar no obstáculo, de cabeça para baixo. Se não houver obstáculo, as criaturas e objetos ficam ﬂutuando no topo da área afetada, sem poder sair do lugar. Criaturas voadoras podem se movimentar normalmen-te. Alguém adjacente a algo que possa agarrar tem direito a um teste de Reﬂexos para evitar a “queda”. A criatura deve permanecer presa pela duração da magia; caso contrário “cairá”."
   },
   {
     "id": "controlar_agua",
@@ -1105,7 +1105,7 @@ export const SPELLS_LIST: Spell[] = [
     "range": "longo",
     "targetArea": "esfera com 30m de raio",
     "duration": "Instantânea",
-    "description": "Você controla os movimentos e com-\nportamentos da água. Ao lançar a ma-\ngia, escolha um dos efeitos abaixo.\nCongelar: toda a água mundana na área \né congelada. Criaturas nadando na \nárea ficam imóveis; escapar exige gas-\ntar uma ação padrão e passar num tes-\nte de Atletismo ou Acrobacia.\nDerreter: gelo mundano na área vira \nágua e a magia termina. A critério do \nmestre, isso pode criar terreno difícil.\nEnchente: eleva o nível da água munda-\nna na área em até 4,5m. A sua escolha, \nmuda área para alvo: uma embarcação. \nO alvo recebe +3m em seu desloca-\nmento pela duração do efeito.\nEvaporar: toda a água e gelo mundano \nna área evaporam instantaneamente e \na magia termina. Elementais da água, \nplantas monstruosas e criaturas com \nimunidade a frio na área sofrem 10d8 \npontos de dano de fogo; outras criatu-\nras vivas recebem metade desse dano \n(Fortitude reduz à metade).\n186\nMagia\nPartir: diminui o nível de toda água \nmundana na área em até 4,5m. Em um \ncorpo d’água raso, isso abre um cami-\nnho seco, que pode ser atravessado a \npé. Em um corpo d’água profundo, cria \num redemoinho que pode prender bar-\ncos (um teste de Pilotagem permite ao \npiloto livrar a embarcação). Elemen-\ntais da água na área ficam lentos.",
+    "description": "Você controla os movimentos e comportamentos da água. Ao lançar a magia, escolha um dos efeitos abaixo. Congelar: toda a água mundana na área é congelada. Criaturas nadando na área ficam imóveis; escapar exige gastar uma ação padrão e passar num tes-te de Atletismo ou Acrobacia. Derreter: gelo mundano na área vira água e a magia termina. A critério do mestre, isso pode criar terreno difícil. Enchente: eleva o nível da água munda-na na área em até 4,5m. A sua escolha, muda área para alvo: uma embarcação. O alvo recebe +3m em seu deslocamento pela duração do efeito. Evaporar: toda a água e gelo mundano na área evaporam instantaneamente e a magia termina. Elementais da água, plantas monstruosas e criaturas com imunidade a frio na área sofrem 10d8 pontos de dano de fogo; outras criaturas vivas recebem metade desse dano (Fortitude reduz à metade). 186 Magia Partir: diminui o nível de toda água mundana na área em até 4,5m. Em um corpo d’água raso, isso abre um caminho seco, que pode ser atravessado a pé. Em um corpo d’água profundo, cria um redemoinho que pode prender barcos (um teste de Pilotagem permite ao piloto livrar a embarcação). Elementais da água na área ficam lentos.",
     "resistance": "veja texto"
   },
   {
@@ -1118,11 +1118,11 @@ export const SPELLS_LIST: Spell[] = [
     "range": "curto",
     "targetArea": "veja texto",
     "duration": "cena",
-    "description": "Você pode criar, moldar, mover ou extin-\nguir chamas e emanações de calor. Ao \nlançar a magia, escolha um dos efeitos.\nChamejar: o alvo é armas escolhidas. \nElas causam +1d6 de dano de fogo. \nTambém afeta armas naturais e ata-\nques desarmados.\nEsquentar: o alvo é 1 objeto, que come-\nça a esquentar. Ele sofre 1d6 pontos de \ndano de fogo por rodada e causa o mes-\nmo dano a qualquer criatura que o es-\nteja segurando ou vestindo. A critério \ndo mestre, o objeto ou a criatura ves-\ntindo-o também podem ficar em cha-\nmas. Uma criatura pode gastar uma \nação completa para resfriar o obje-\nto (jogando areia ou se jogando numa \nfonte de água próxima, por exemplo) e \ncancelar o efeito da magia.\nExtinguir: o alvo é 1 chama de tamanho \nGrande ou menor, que é apagada. Isso \ncria uma nuvem de fumaça que ocu-\npa uma esfera com 3m de raio centra-\nda onde estava a chama. Dentro da fu-\nmaça, criaturas têm camuflagem leve.\nModelar: o alvo é 1 chama de tama-\nnho Grande ou menor. A cada roda-\nda, você pode gastar uma ação livre \npara movimentá-la 9m em qualquer \ndireção. Se atravessar o espaço ocupa-\ndo por uma criatura, causa 2d6 pon-\ntos de dano de fogo. Uma criatura só \npode receber dano dessa maneira uma \nvez por rodada.",
+    "description": "Você pode criar, moldar, mover ou extinguir chamas e emanações de calor. Ao lançar a magia, escolha um dos efeitos. Chamejar: o alvo é armas escolhidas. Elas causam +1d6 de dano de fogo. Também afeta armas naturais e ataques desarmados. Esquentar: o alvo é 1 objeto, que começa a esquentar. Ele sofre 1d6 pontos de dano de fogo por rodada e causa o mesmo dano a qualquer criatura que o esteja segurando ou vestindo. A critério do mestre, o objeto ou a criatura vestindo-o também podem ficar em chamas. Uma criatura pode gastar uma ação completa para resfriar o objeto (jogando areia ou se jogando numa fonte de água próxima, por exemplo) e cancelar o efeito da magia. Extinguir: o alvo é 1 chama de tamanho Grande ou menor, que é apagada. Isso cria uma nuvem de fumaça que ocupa uma esfera com 3m de raio centrada onde estava a chama. Dentro da fumaça, criaturas têm camuflagem leve. Modelar: o alvo é 1 chama de tamanho Grande ou menor. A cada rodada, você pode gastar uma ação livre para movimentá-la 9m em qualquer direção. Se atravessar o espaço ocupado por uma criatura, causa 2d6 pontos de dano de fogo. Uma criatura só pode receber dano dessa maneira uma vez por rodada.",
     "upgrades": [
       {
         "cost": "+1 PM",
-        "description": "muda a duração para susten-\ntada e a resistência para Reflexos re-\nduz à metade. Em vez do normal, você \ndeve escolher o seguinte efeito. Laba-\nredas: a cada rodada, você pode gastar \numa ação de movimento para proje-\ntar uma labareda, acertando um alvo \nem alcance curto a partir da chama. O \nalvo sofre 4d6 pontos de dano de fogo \n(Reflexos reduz à metade)."
+        "description": "muda a duração para sustentada e a resistência para Reflexos reduz à metade. Em vez do normal, você deve escolher o seguinte efeito. Labaredas: a cada rodada, você pode gastar uma ação de movimento para projetar uma labareda, acertando um alvo em alcance curto a partir da chama. O alvo sofre 4d6 pontos de dano de fogo (Reflexos reduz à metade)."
       },
       {
         "cost": "+2 PM",
@@ -1138,21 +1138,21 @@ export const SPELLS_LIST: Spell[] = [
     "school": "Transmutação",
     "execution": "padrão",
     "range": "médio",
-    "targetArea": "1 objeto de madeira Grande ou \nmenor",
+    "targetArea": "1 objeto de madeira Grande ou menor",
     "duration": "cena",
-    "description": "Você molda, retorce, altera ou repele \nmadeira. Se lançar esta magia num ob-\njeto de uma criatura involuntária, ela \ntem direito a um teste de Vontade para \nanulá-la. Ao lançar a magia, escolha.\nFortalecer: deixa o alvo mais resistente. \nArmas têm seu dano aumentado em \num passo. Escudos têm seu bônus de \nDefesa aumentado em +2 (isso é uma \nmelhoria no item, portanto é cumula-\ntiva com outras magias). Esses e ou-\ntros itens de madeira recebem +5 na \nRD e dobram seus PV.\nModelar: muda a forma do alvo. Pode \ntransformar um galho em espada, \ncriar uma porta onde antes havia ape-\nnas uma parede, transformar um tron-\nco em uma caixa... Mas não pode criar \nmecanismos complexos (como uma \nbesta) ou itens consumíveis.\nRepelir: o alvo é repelido por você. Se \nfor uma arma, ataques feitos com ela \ncontra você falham automaticamente. \nSe for uma porta ou outro objeto que \npossa ser aberto, ele vai se abrir quan-\ndo você se aproximar, mesmo que es-\nteja trancado. Um objeto que vá atin-\ngi-lo, como uma carroça, tronco ou \nbarril, vai desviar ou parar adjacente a \nvocê, sem lhe causar dano. Os efeitos \nde regras em outros objetos de madei-\nra ficam a cargo do mestre.\nRetorcer: estraga o alvo. Uma porta re-\ntorcida emperra (exigindo um teste \nde Força contra CD 25 para ser aber-\nta). Armas e itens retorcidos impõem \n-5 em testes de perícia. Escudos retor-\ncidos deixam de oferecer bônus (mas \nainda impõem penalidades). Um barco \nretorcido começa a afundar e naufraga \nao final da cena. Os efeitos de regras \nem outros objetos de madeira ficam a \ncargo do mestre.",
+    "description": "Você molda, retorce, altera ou repele madeira. Se lançar esta magia num objeto de uma criatura involuntária, ela tem direito a um teste de Vontade para anulá-la. Ao lançar a magia, escolha. Fortalecer: deixa o alvo mais resistente. Armas têm seu dano aumentado em um passo. Escudos têm seu bônus de Defesa aumentado em +2 (isso é uma melhoria no item, portanto é cumulativa com outras magias). Esses e outros itens de madeira recebem +5 na RD e dobram seus PV. Modelar: muda a forma do alvo. Pode transformar um galho em espada, criar uma porta onde antes havia ape-nas uma parede, transformar um tronco em uma caixa... Mas não pode criar mecanismos complexos (como uma besta) ou itens consumíveis. Repelir: o alvo é repelido por você. Se for uma arma, ataques feitos com ela contra você falham automaticamente. Se for uma porta ou outro objeto que possa ser aberto, ele vai se abrir quando você se aproximar, mesmo que esteja trancado. Um objeto que vá atingi-lo, como uma carroça, tronco ou barril, vai desviar ou parar adjacente a você, sem lhe causar dano. Os efeitos de regras em outros objetos de madeira ficam a cargo do mestre. Retorcer: estraga o alvo. Uma porta retorcida emperra (exigindo um teste de Força contra CD 25 para ser aberta). Armas e itens retorcidos impõem -5 em testes de perícia. Escudos retorcidos deixam de oferecer bônus (mas ainda impõem penalidades). Um barco retorcido começa a afundar e naufraga ao final da cena. Os efeitos de regras em outros objetos de madeira ficam a cargo do mestre.",
     "upgrades": [
       {
         "cost": "+1 PM",
-        "description": "muda o alcance para pessoal, \no alvo para você e a duração para um \ndia. Você e seu equipamento se trans-\nformam em uma árvore de tamanho \nGrande. Nessa forma, você não pode\nfalar ou fazer ações físicas, mas con-\nsegue perceber seus arredores normal-\nmente. Se for atacado nessa forma, a \nmagia é dissipada. Um teste de Sobre-\nvivência (CD 30) revela que você não é \numa árvore verdadeira."
+        "description": "muda o alcance para pessoal, o alvo para você e a duração para um dia. Você e seu equipamento se transformam em uma árvore de tamanho Grande. Nessa forma, você não pode falar ou fazer ações físicas, mas consegue perceber seus arredores normalmente. Se for atacado nessa forma, a magia é dissipada. Um teste de Sobrevivência (CD 30) revela que você não é uma árvore verdadeira."
       },
       {
         "cost": "+3 PM",
-        "description": "muda o alvo para área de qua-\ndrado com 9m de lado e a duração para \ncena. Em vez do normal, qualquer \nvegetação na área fica rígida e afia-\nda. A área é considerada terreno difí-\ncil e criaturas que andem nela sofrem \n1d6 pontos de dano de corte para cada \n1,5m que avancem."
+        "description": "muda o alvo para área de quadrado com 9m de lado e a duração para cena. Em vez do normal, qualquer vegetação na área fica rígida e afiada. A área é considerada terreno difícil e criaturas que andem nela sofrem 1d6 pontos de dano de corte para cada 1,5m que avancem."
       },
       {
         "cost": "+7 PM",
-        "description": "muda o tamanho do alvo para \nEnorme ou menor. Requer 3º círculo."
+        "description": "muda o tamanho do alvo para Enorme ou menor. Requer 3º círculo."
       }
     ]
   },
@@ -1166,7 +1166,7 @@ export const SPELLS_LIST: Spell[] = [
     "range": "2km",
     "targetArea": "esfera com 2km de raio",
     "duration": "Instantânea",
-    "description": "Execução: completa; Alcance: 2km; \nÁrea: esfera com 2km de raio; Dura-\nção: 4d12 horas.\nVocê muda o clima da área onde se \nencontra, podendo criar qualquer \ncondição climática: chuva, neve, ven-\ntos, névoas... Veja o Capítulo 6: O \nMestre para os efeitos do clima."
+    "description": "Execução: completa; Alcance: 2km; Área: esfera com 2km de raio; Duração: 4d12 horas. Você muda o clima da área onde se encontra, podendo criar qualquer condição climática: chuva, neve, ventos, névoas... Veja o Capítulo 6: O Mestre para os efeitos do clima."
   },
   {
     "id": "controlar_o_tempo",
@@ -1178,7 +1178,7 @@ export const SPELLS_LIST: Spell[] = [
     "range": "veja texto",
     "targetArea": "veja texto",
     "duration": "veja texto",
-    "description": "Escolha um dos efeitos a seguir.\nCongelar o tempo: você gera uma bolha \ndo seu tamanho na qual o tempo passa \nmais lentamente. Para outras criaturas, \na bolha surge e desaparece instantanea-\nmente, mas, para você, ela dura 3 roda-\ndas (o que fornece 2 turnos extras após \no atual), durante as quais você pode \nagir e não é afetado por efeitos contí-\nnuos (como chamas). Porém, durante \nessas 3 rodadas, você e quaisquer efei-\ntos que você gerar não podem sair da \nárea que você ocupava quando lançou \nesta magia. Efeitos de área com dura-\nção maior que a da bolha voltam a agir \nnormalmente quando ela termina. Você \nnão pode congelar o tempo nem preparar \nações enquanto está sob esse efeito.\nSaltar no tempo: você e até 5 criaturas \nvoluntárias são transportadas de 1 a \n24 horas para o futuro, desaparecen-\ndo com um brilho. Vocês ressurgem \nno mesmo lugar, com a mesma velo-\ncidade e orientação; do seu ponto de\n187\nCapítulo Quatro\nvista, nenhum tempo se passou. Se \num objeto sólido agora ocupa o es-\npaço de uma criatura, ela ressurge na \nárea vazia mais próxima."
+    "description": "Escolha um dos efeitos a seguir. Congelar o tempo: você gera uma bolha do seu tamanho na qual o tempo passa mais lentamente. Para outras criaturas, a bolha surge e desaparece instantaneamente, mas, para você, ela dura 3 rodadas (o que fornece 2 turnos extras após o atual), durante as quais você pode agir e não é afetado por efeitos contínuos (como chamas). Porém, durante essas 3 rodadas, você e quaisquer efeitos que você gerar não podem sair da área que você ocupava quando lançou esta magia. Efeitos de área com duração maior que a da bolha voltam a agir normalmente quando ela termina. Você não pode congelar o tempo nem preparar ações enquanto está sob esse efeito. Saltar no tempo: você e até 5 criaturas voluntárias são transportadas de 1 a 24 horas para o futuro, desaparecendo com um brilho. Vocês ressurgem no mesmo lugar, com a mesma velocidade e orientação; do seu ponto de 187 Capítulo Quatro vista, nenhum tempo se passou. Se um objeto sólido agora ocupa o espaço de uma criatura, ela ressurge na área vazia mais próxima."
   },
   {
     "id": "controlar_plantas",
@@ -1190,24 +1190,24 @@ export const SPELLS_LIST: Spell[] = [
     "range": "curto",
     "targetArea": "quadrado com 9m de lado",
     "duration": "Instantânea",
-    "description": "Execução: padrão; Alcance: curto; \nÁrea: quadrado com 9m de lado; Du-\nração: cena; Resistência: Reflexos \nanula.\nEsta magia só pode ser lançada em \numa área com vegetação. As plantas \nse enroscam nas criaturas da área. \nAquelas que falharem na resistência \nficam enredadas. Uma vítima pode \nse libertar com uma ação padrão e \num teste de Acrobacia ou Atletismo. \nAlém disso, a área é considerada ter-\nreno difícil. No início de seus turnos, \na vegetação tenta enredar novamen-\nte qualquer criatura na área, exigindo \num novo teste de Reflexos.",
-    "resistance": "Reflexos \nanula",
+    "description": "Execução: padrão; Alcance: curto; Área: quadrado com 9m de lado; Duração: cena; Resistência: Reflexos anula. Esta magia só pode ser lançada em uma área com vegetação. As plantas se enroscam nas criaturas da área. Aquelas que falharem na resistência ficam enredadas. Uma vítima pode se libertar com uma ação padrão e um teste de Acrobacia ou Atletismo. Além disso, a área é considerada terreno difícil. No início de seus turnos, a vegetação tenta enredar novamen-te qualquer criatura na área, exigindo um novo teste de Reflexos.",
+    "resistance": "Reflexos anula",
     "upgrades": [
       {
         "cost": "Truque",
-        "description": "muda a área para alvo de 1 \nplanta e a resistência para nenhuma. \nEm vez do normal, você pode fazer a \nplanta se mover como se fosse animada. \nEla não pode causar dano ou atrapalhar \na concentração de um conjurador."
+        "description": "muda a área para alvo de 1 planta e a resistência para nenhuma. Em vez do normal, você pode fazer a planta se mover como se fosse animada. Ela não pode causar dano ou atrapalhar a concentração de um conjurador."
       },
       {
         "cost": "+1 PM",
-        "description": "muda a duração para instantâ-\nnea. Em vez do normal, as plantas na \nárea diminuem, como se tivessem sido \npodadas. Terreno difícil muda para ter-\nreno normal e não fornece camufla-\ngem. Esse efeito dissipa o uso normal \nde Controlar Plantas."
+        "description": "muda a duração para instantânea. Em vez do normal, as plantas na área diminuem, como se tivessem sido podadas. Terreno difícil muda para terreno normal e não fornece camuflagem. Esse efeito dissipa o uso normal de Controlar Plantas."
       },
       {
         "cost": "+1 PM",
-        "description": "além do normal, criaturas que \nfalhem na resistência também ficam \nimóveis."
+        "description": "além do normal, criaturas que falhem na resistência também ficam imóveis."
       },
       {
         "cost": "+2 PM",
-        "description": "muda o alcance para pessoal, a \nárea para alvo (você) e a resistência para \nnenhuma. Em vez do normal, você con-\nsegue se comunicar com plantas, que \ncomeçam com atitude prestativa em re-\nlação a você. Além disso, você pode fa-\nzer testes de Diplomacia com plantas. \nEm geral, plantas têm uma percepção \nlimitada de seus arredores e normal-\nmente fornecem respostas simplórias."
+        "description": "muda o alcance para pessoal, a área para alvo (você) e a resistência para nenhuma. Em vez do normal, você consegue se comunicar com plantas, que começam com atitude prestativa em relação a você. Além disso, você pode fazer testes de Diplomacia com plantas. Em geral, plantas têm uma percepção limitada de seus arredores e normalmente fornecem respostas simplórias."
       }
     ]
   },
@@ -1221,12 +1221,12 @@ export const SPELLS_LIST: Spell[] = [
     "range": "longo",
     "targetArea": "9 cubos com 1,5m de lado",
     "duration": "instantânea",
-    "description": "Execução: padrão; Alcance: longo; \nÁrea: 9 cubos com 1,5m de lado; \nDuração: instantânea; Resistência: \nveja texto.\nVocê manipula a densidade e a forma de \ntoda terra, pedra, lama, argila ou areia \nna área. Ao lançar a magia, escolha.\nAmolecer: se afetar o teto, uma coluna \nou suporte, provoca um desabamen-\nto que causa 10d6 pontos de dano de \nimpacto às criaturas na área (Reflexos \nreduz à metade). Se afetar um piso de \nterra ou pedra, cria terreno difícil de \nareia ou argila, respectivamente.\nModelar: pode usar pedra ou argila para \ncriar um ou mais objetos simples de ta-\nmanho Enorme ou menor (sem meca-\nnismos ou partes móveis). Por exem-\nplo, pode transformar um tijolo em \numa maça, criar uma passagem onde \nantes havia apenas uma parede ou le-\nvantar uma ou mais paredes que ofe-\nrecem cobertura total (RD 8 e 50 PV \npara cada 3m).\nSolidificar: transforma lama ou areia em \nterra ou pedra. Criaturas com os pés \nna superfície ficam agarradas. Elas po-\ndem se soltar com uma ação padrão e \num teste de Acrobacia ou Atletismo.",
+    "description": "Execução: padrão; Alcance: longo; Área: 9 cubos com 1,5m de lado; Duração: instantânea; Resistência: veja texto. Você manipula a densidade e a forma de toda terra, pedra, lama, argila ou areia na área. Ao lançar a magia, escolha. Amolecer: se afetar o teto, uma coluna ou suporte, provoca um desabamento que causa 10d6 pontos de dano de impacto às criaturas na área (Reflexos reduz à metade). Se afetar um piso de terra ou pedra, cria terreno difícil de areia ou argila, respectivamente. Modelar: pode usar pedra ou argila para criar um ou mais objetos simples de tamanho Enorme ou menor (sem mecanismos ou partes móveis). Por exemplo, pode transformar um tijolo em uma maça, criar uma passagem onde antes havia apenas uma parede ou levantar uma ou mais paredes que oferecem cobertura total (RD 8 e 50 PV para cada 3m). Solidificar: transforma lama ou areia em terra ou pedra. Criaturas com os pés na superfície ficam agarradas. Elas podem se soltar com uma ação padrão e um teste de Acrobacia ou Atletismo.",
     "resistance": "veja texto",
     "upgrades": [
       {
         "cost": "+1 PM",
-        "description": "aumenta o número de cubos \nde 1,5m em"
+        "description": "aumenta o número de cubos de 1,5m em"
       }
     ]
   },
@@ -1240,19 +1240,19 @@ export const SPELLS_LIST: Spell[] = [
     "range": "ilimitado",
     "targetArea": "1 objeto de até 2 espaços",
     "duration": "Instantânea",
-    "description": "Execução: padrão; Alcance: ilimitado; \nAlvo: 1 objeto de até 2 espaços; Dura-\nção: instantânea.\nVocê invoca um objeto de qualquer lu-\ngar para sua mão. O item deve ter sido \npreviamente preparado com uma runa \npessoal sua (ao custo de T$ 5).\nA magia não funciona se o objeto es-\ntiver com outra criatura, mas você sa-\nberá onde ele está e quem o está car-\nregando (ou sua descrição física, caso \nnão conheça a criatura).",
+    "description": "Execução: padrão; Alcance: ilimitado; Alvo: 1 objeto de até 2 espaços; Duração: instantânea. Você invoca um objeto de qualquer lugar para sua mão. O item deve ter sido previamente preparado com uma runa pessoal sua (ao custo de T$ 5). A magia não funciona se o objeto estiver com outra criatura, mas você saberá onde ele está e quem o está carregando (ou sua descrição física, caso não conheça a criatura).",
     "upgrades": [
       {
         "cost": "+1 PM",
-        "description": "além do normal, até 1 hora \napós ter lançado a magia, você pode \ngastar uma ação de movimento para \nenviar o objeto de volta para o local em \nque ele estava antes."
+        "description": "além do normal, até 1 hora após ter lançado a magia, você pode gastar uma ação de movimento para enviar o objeto de volta para o local em que ele estava antes."
       },
       {
         "cost": "+1 PM",
-        "description": "muda o alvo para um baú Mé-\ndio, a duração para permanente e adi-\nciona sacrifício de 1 PM. Em vez do nor-\nmal, você esconde o baú no Éter Entre \nMundos, com até 20 espaços de equipa-\nmento. A magia faz com que qualquer \nobjeto caiba no baú, independentemen-\nte do seu tamanho. Uma vez escondido, \nvocê pode convocar o baú para um es-\npaço livre adjacente, ou de volta para o \nÉter, com uma ação padrão. Componen-\nte material: baú construído com matéria-\n-prima da melhor qualidade (T$ 1.000). \nVocê deve ter em mãos uma miniatura \ndo baú, no valor de T$ 100, para invo-\ncar o baú verdadeiro."
+        "description": "muda o alvo para um baú Médio, a duração para permanente e adiciona sacrifício de 1 PM. Em vez do normal, você esconde o baú no Éter Entre Mundos, com até 20 espaços de equipamento. A magia faz com que qualquer objeto caiba no baú, independentemen-te do seu tamanho. Uma vez escondido, você pode convocar o baú para um espaço livre adjacente, ou de volta para o Éter, com uma ação padrão. Componen-te material: baú construído com matéria- -prima da melhor qualidade (T$ 1.000). Você deve ter em mãos uma miniatura do baú, no valor de T$ 100, para invocar o baú verdadeiro."
       },
       {
         "cost": "+2 PM",
-        "description": "aumenta o número de alvos \nem"
+        "description": "aumenta o número de alvos em"
       }
     ]
   },
@@ -1266,7 +1266,7 @@ export const SPELLS_LIST: Spell[] = [
     "range": "médio",
     "targetArea": "1 criatura",
     "duration": "instantânea",
-    "description": "Esta magia cria um crânio envolto em \nenergia negativa. Quando atinge o \nalvo, ele causa 4d8+4 pontos de dano \nde trevas e se desfaz emitindo um som \nhorrendo, deixando abalado o alvo e \ntodos os inimigos num raio de 3m dele \n(criaturas já abaladas ficam apavoradas \npor 1d4 rodadas). Passar no teste de \nresistência diminui o dano à metade e \nevita a condição (as demais criaturas \nna área também tem direito ao teste \nde resistência, para evitar a condição).",
+    "description": "Esta magia cria um crânio envolto em energia negativa. Quando atinge o alvo, ele causa 4d8+4 pontos de dano de trevas e se desfaz emitindo um som horrendo, deixando abalado o alvo e todos os inimigos num raio de 3m dele (criaturas já abaladas ficam apavoradas por 1d4 rodadas). Passar no teste de resistência diminui o dano à metade e evita a condição (as demais criaturas na área também tem direito ao teste de resistência, para evitar a condição).",
     "resistance": "Fortitude parcial",
     "upgrades": [
       {
@@ -1285,15 +1285,15 @@ export const SPELLS_LIST: Spell[] = [
     "range": "curto",
     "targetArea": "elemento escolhido",
     "duration": "instantânea",
-    "description": "Execução: padrão; Alcance: curto; \nEfeito: elemento escolhido; Duração: \ninstantânea.\n188\nMagia\nVocê cria uma pequena porção de um \nelemento, a sua escolha. Os elemen-\ntos criados são reais, não mágicos. Ele-\nmentos físicos devem surgir em uma \nsuperfície. Em vez de um cubo, pode-\n-se criar objetos simples (sem partes \nmóveis) feitos de gelo, terra ou pedra.\nÁgua: enche um recipiente de tamanho \nMinúsculo (como um odre) com água \npotável ou cria um cubo de gelo de ta-\nmanho Minúsculo.\nAr: cria um vento fraco em um qua-\ndrado de 1,5m. Isso purifica a área de \nqualquer gás ou fumaça, ou remove \nnévoa por uma rodada.\nFogo: cria uma chama que ilumina \ncomo uma tocha. Você pode segurá-la \nna palma de sua mão sem se queimar, \nou fazê-la surgir em um quadrado de \n1,5m. Se uma criatura ou objeto esti-\nver no quadrado, sofre 1d6 pontos de \ndano de fogo; se falhar num teste de \nReflexos, fica em chamas.\nTerra: cria um cubo de tamanho Minús-\nculo feito de terra, argila ou pedra.",
+    "description": "Execução: padrão; Alcance: curto; Efeito: elemento escolhido; Duração: instantânea. 188 Magia Você cria uma pequena porção de um elemento, a sua escolha. Os elementos criados são reais, não mágicos. Elementos físicos devem surgir em uma superfície. Em vez de um cubo, pode- -se criar objetos simples (sem partes móveis) feitos de gelo, terra ou pedra. Água: enche um recipiente de tamanho Minúsculo (como um odre) com água potável ou cria um cubo de gelo de tamanho Minúsculo. Ar: cria um vento fraco em um quadrado de 1,5m. Isso purifica a área de qualquer gás ou fumaça, ou remove névoa por uma rodada. Fogo: cria uma chama que ilumina como uma tocha. Você pode segurá-la na palma de sua mão sem se queimar, ou fazê-la surgir em um quadrado de 1,5m. Se uma criatura ou objeto estiver no quadrado, sofre 1d6 pontos de dano de fogo; se falhar num teste de Reflexos, fica em chamas. Terra: cria um cubo de tamanho Minúsculo feito de terra, argila ou pedra.",
     "upgrades": [
       {
         "cost": "+1 PM",
-        "description": "aumenta a quantidade do ele-\nmento em um passo (uma categoria de \ntamanho para água ou terra,"
+        "description": "aumenta a quantidade do elemento em um passo (uma categoria de tamanho para água ou terra,"
       },
       {
         "cost": "+1 PM",
-        "description": "muda o efeito para alvo 1 cria-\ntura ou objeto e a resistência para Re-\nflexos reduz à metade. Se escolher \nágua ou terra, você arremessa o cubo \nou objeto criado no alvo, causando 2d4 \npontos de dano de impacto. Para cada \ncategoria de tamanho acima de Minús-\nculo, o dano aumenta em um passo. O \ncubo se desfaz em seguida."
+        "description": "muda o efeito para alvo 1 criatura ou objeto e a resistência para Reflexos reduz à metade. Se escolher água ou terra, você arremessa o cubo ou objeto criado no alvo, causando 2d4 pontos de dano de impacto. Para cada categoria de tamanho acima de Minúsculo, o dano aumenta em um passo. O cubo se desfaz em seguida."
       }
     ]
   },
@@ -1305,13 +1305,13 @@ export const SPELLS_LIST: Spell[] = [
     "school": "Ilusão",
     "execution": "padrão",
     "range": "médio",
-    "targetArea": "ilusão que se estende a até 4 \ncubos de 1,5m",
+    "targetArea": "ilusão que se estende a até 4 cubos de 1,5m",
     "duration": "cena",
-    "description": "Execução: padrão; Alcance: médio; \nEfeito: ilusão que se estende a até 4 \ncubos de 1,5m; Duração: cena; Resis-\ntência: Vontade desacredita.\nEsta magia cria uma ilusão visual (uma \ncriatura, uma parede...) ou sonora (um \ngrito de socorro, um uivo assustador...). \nA magia cria apenas imagens ou sons \nsimples, com volume equivalente ao \ntom de voz normal para cada cubo de \n1,5m no efeito. Não é possível criar \ncheiros, texturas ou temperaturas, nem \nsons complexos, como uma música ou \ndiálogo. Criaturas e objetos atravessam \numa ilusão sem sofrer dano, mas a ma-\ngia pode, por exemplo, esconder uma \narmadilha ou inimigo. A magia é dissi-\npada se você sair do alcance.",
+    "description": "Execução: padrão; Alcance: médio; Efeito: ilusão que se estende a até 4 cubos de 1,5m; Duração: cena; Resistência: Vontade desacredita. Esta magia cria uma ilusão visual (uma criatura, uma parede...) ou sonora (um grito de socorro, um uivo assustador...). A magia cria apenas imagens ou sons simples, com volume equivalente ao tom de voz normal para cada cubo de 1,5m no efeito. Não é possível criar cheiros, texturas ou temperaturas, nem sons complexos, como uma música ou diálogo. Criaturas e objetos atravessam uma ilusão sem sofrer dano, mas a magia pode, por exemplo, esconder uma armadilha ou inimigo. A magia é dissipada se você sair do alcance.",
     "upgrades": [
       {
         "cost": "+1 PM",
-        "description": "muda a duração para susten-\ntada. A cada rodada você pode gastar \numa ação livre para mover a imagem \nou alterar levemente o som, como au-\nmentar o volume ou fazer com que pa-\nreça se afastar ou se aproximar, ain-\nda dentro dos limites do efeito. Você \npode, por exemplo, criar a ilusão de \num fantasma que anda pela sala, con-\ntrolando seus movimentos. Quando \nvocê para de sustentar a magia, a ima-\ngem ou som persistem por mais uma \nrodada antes de a magia se dissipar."
+        "description": "muda a duração para sustentada. A cada rodada você pode gastar uma ação livre para mover a imagem ou alterar levemente o som, como aumentar o volume ou fazer com que pareça se afastar ou se aproximar, ainda dentro dos limites do efeito. Você pode, por exemplo, criar a ilusão de um fantasma que anda pela sala, controlando seus movimentos. Quando você para de sustentar a magia, a imagem ou som persistem por mais uma rodada antes de a magia se dissipar."
       },
       {
         "cost": "+1 PM",
@@ -1319,23 +1319,23 @@ export const SPELLS_LIST: Spell[] = [
       },
       {
         "cost": "+1 PM",
-        "description": "também pode criar ilusões de \nimagem e sons combinados."
+        "description": "também pode criar ilusões de imagem e sons combinados."
       },
       {
         "cost": "+1 PM",
-        "description": "também pode criar sons com-\nplexos com volume máximo equivalen-\nte ao que cinco pessoas podem produ-\nzir para cada cubo de 1,5m no efeito. \nCom uma ação livre, você pode alterar \no volume do som ou fazê-lo se apro-\nximar ou se afastar dentro do alcance."
+        "description": "também pode criar sons complexos com volume máximo equivalen-te ao que cinco pessoas podem produzir para cada cubo de 1,5m no efeito. Com uma ação livre, você pode alterar o volume do som ou fazê-lo se aproximar ou se afastar dentro do alcance."
       },
       {
         "cost": "+2 PM",
-        "description": "também pode criar odores e \nsensações térmicas, que são percebi-\ndos a uma distância igual ao dobro do \ntamanho máximo do efeito. Por exem-\nplo, uma miragem de uma fogueira \ncom 4 cubos de 1,5m poderia emanar \ncalor e cheiro de queimado a até 12m."
+        "description": "também pode criar odores e sensações térmicas, que são percebidos a uma distância igual ao dobro do tamanho máximo do efeito. Por exemplo, uma miragem de uma fogueira com 4 cubos de 1,5m poderia emanar calor e cheiro de queimado a até 12m."
       },
       {
         "cost": "+2 PM",
-        "description": "muda o alcance para longo e o \nefeito para esfera com 30m de raio. Em \nvez do normal, você cria um som mui-\nto alto, equivalente a uma multidão. \nCriaturas na área lançam magias como \nse estivessem em uma condição ruim e \na CD de testes de Percepção para ouvir \naumenta em"
+        "description": "muda o alcance para longo e o efeito para esfera com 30m de raio. Em vez do normal, você cria um som muito alto, equivalente a uma multidão. Criaturas na área lançam magias como se estivessem em uma condição ruim e a CD de testes de Percepção para ouvir aumenta em"
       },
       {
         "cost": "+2 PM",
-        "description": "também criar sensações táteis, \ncomo texturas; criaturas que não sai-\nbam que é uma ilusão não conseguem \natravessá-la sem passar em um teste de \nVontade (objetos ainda a atravessam). \nA ilusão ainda é incapaz de causar ou \nsofrer dano. Requer 2º círculo."
+        "description": "também criar sensações táteis, como texturas; criaturas que não saibam que é uma ilusão não conseguem atravessá-la sem passar em um teste de Vontade (objetos ainda a atravessam). A ilusão ainda é incapaz de causar ou sofrer dano. Requer 2º círculo."
       }
     ]
   },
@@ -1349,11 +1349,11 @@ export const SPELLS_LIST: Spell[] = [
     "range": "pessoal",
     "targetArea": "você",
     "duration": "sustentada",
-    "description": "Execução: padrão; Alcance: pessoal; \nAlvo: você; Duração: sustentada; Re-\nsistência: Vontade anula.\nUma cúpula de energia invisível o cer-\nca, impedindo a aproximação de cer-\ntas criaturas. Escolha um tipo de cria-\ntura (animais, espíritos, monstros...) \nou uma raça de humanoides (elfos, go-\nblins, minotauros..). Criaturas do gru-\npo escolhido que tentem se aproximar \na menos de 3m de você (ou seja, que \ntentem ficar adjacentes a você) devem \nfazer um teste de Vontade. Se falha-\nrem, não conseguem, gastam a ação e \nsó podem tentar novamente na rodada \nseguinte. Isso impede ataques corpo a \ncorpo, mas não ataques ou outros efei-\ntos à distância. Se você tentar se apro-\nximar além do limite de 3m, rompe a \ncúpula e a magia é dissipada.",
+    "description": "Execução: padrão; Alcance: pessoal; Alvo: você; Duração: sustentada; Resistência: Vontade anula. Uma cúpula de energia invisível o cerca, impedindo a aproximação de certas criaturas. Escolha um tipo de criatura (animais, espíritos, monstros...) ou uma raça de humanoides (elfos, goblins, minotauros..). Criaturas do grupo escolhido que tentem se aproximar a menos de 3m de você (ou seja, que tentem ficar adjacentes a você) devem fazer um teste de Vontade. Se falharem, não conseguem, gastam a ação e só podem tentar novamente na rodada seguinte. Isso impede ataques corpo a corpo, mas não ataques ou outros efeitos à distância. Se você tentar se aproximar além do limite de 3m, rompe a cúpula e a magia é dissipada.",
     "upgrades": [
       {
         "cost": "+2 PM",
-        "description": "a cúpula impede criaturas de \nse aproximarem a menos de 4,5m de \nvocê (ou seja, deve haver dois quadra-\ndos entre você e as criaturas)."
+        "description": "a cúpula impede criaturas de se aproximarem a menos de 4,5m de você (ou seja, deve haver dois quadrados entre você e as criaturas)."
       }
     ]
   },
@@ -1367,11 +1367,11 @@ export const SPELLS_LIST: Spell[] = [
     "range": "toque",
     "targetArea": "1 criatura",
     "duration": "instantânea",
-    "description": "Você canaliza luz que recupera 2d8+2 \npontos de vida na criatura tocada.\n Curar Ferimentos anula Infligir Ferimentos.",
+    "description": "Você canaliza luz que recupera 2d8+2 pontos de vida na criatura tocada. Curar Ferimentos anula Infligir Ferimentos.",
     "upgrades": [
       {
         "cost": "Truque",
-        "description": "muda o alvo para 1 morto-\n-vivo. Em vez do normal, causa 1d8 \npontos de dano de luz (Vontade reduz \nà metade)."
+        "description": "muda o alvo para 1 morto- -vivo. Em vez do normal, causa 1d8 pontos de dano de luz (Vontade reduz à metade)."
       },
       {
         "cost": "+1 PM",
@@ -1379,7 +1379,7 @@ export const SPELLS_LIST: Spell[] = [
       },
       {
         "cost": "+2 PM",
-        "description": "também remove uma condi-\nção de cansaço do alvo."
+        "description": "também remove uma condição de cansaço do alvo."
       },
       {
         "cost": "+2 PM",
@@ -1397,7 +1397,7 @@ export const SPELLS_LIST: Spell[] = [
     "range": "pes-\nsoal",
     "targetArea": "esfera com 15m de raio",
     "duration": "instantânea",
-    "description": "Execução: completa; Alcance: pes-\nsoal; Área: esfera com 15m de raio; \nDuração: instantânea; Resistência: \nFortitude parcial.\nApós concentrar seu mana, você ema-\nna energia, como uma estrela em ple-\nna terra. Todas as criaturas na área so-\nfrem 150 pontos de dano de essência e \ntodos os itens mágicos (exceto artefa-\ntos) tornam-se mundanos. Você não é \nafetado pela magia. Alvos que passem \nno teste de Fortitude sofrem metade \ndo dano e seus itens mágicos voltam a \nfuncionar após um dia.\n189\nCapítulo Quatro",
+    "description": "Execução: completa; Alcance: pessoal; Área: esfera com 15m de raio; Duração: instantânea; Resistência: Fortitude parcial. Após concentrar seu mana, você ema-na energia, como uma estrela em ple-na terra. Todas as criaturas na área sofrem 150 pontos de dano de essência e todos os itens mágicos (exceto artefatos) tornam-se mundanos. Você não é afetado pela magia. Alvos que passem no teste de Fortitude sofrem metade do dano e seus itens mágicos voltam a funcionar após um dia. 189 Capítulo Quatro",
     "resistance": "Fortitude parcial",
     "upgrades": [
       {
@@ -1415,8 +1415,8 @@ export const SPELLS_LIST: Spell[] = [
     "execution": "completa",
     "range": "veja \ntexto",
     "targetArea": "veja texto",
-    "duration": "veja \ntexto",
-    "description": "Esta é a mais poderosa das magias ar-\ncanas, permitindo alterar a realidade a \nseu bel-prazer. Você pode:\n•\t Dissipar os efeitos de qualquer ma-\ngia de 4º círculo ou menor.\n•\t Transportar até 10 criaturas volun-\ntárias em alcance longo para qualquer \noutro local, em qualquer plano.\n•\t Desfazer um acontecimento recen-\nte. A magia permite que um teste re-\nalizado por uma criatura em alcance \nlongo na última rodada seja realizado \nnovamente. Por exemplo, se um alia-\ndo morreu na última rodada devido ao \nataque de um inimigo, você pode obri-\ngar o inimigo a refazer esse ataque.\nVocê pode desejar por algo ainda mais \npoderoso. Nesse caso, a magia requer \no sacrifício de 2 PM e pode fazer coi-\nsas como:\n•\t Criar um item mundano de até T$ \n30.000.\n•\t Duplicar os efeitos de qualquer ma-\ngia de até 4º círculo. Caso a magia pre-\ncise de um componente material para \nser lançada, ainda é necessário provi-\ndenciar o componente.\n• Aumentar um atributo de uma cria-\ntura em +1. Cada atributo só pode ser \naumentado uma vez com Desejo.",
+    "duration": "veja texto",
+    "description": "Esta é a mais poderosa das magias arcanas, permitindo alterar a realidade a seu bel-prazer. Você pode: • Dissipar os efeitos de qualquer magia de 4º círculo ou menor. • Transportar até 10 criaturas voluntárias em alcance longo para qualquer outro local, em qualquer plano. • Desfazer um acontecimento recen-te. A magia permite que um teste realizado por uma criatura em alcance longo na última rodada seja realizado novamente. Por exemplo, se um aliado morreu na última rodada devido ao ataque de um inimigo, você pode obrigar o inimigo a refazer esse ataque. Você pode desejar por algo ainda mais poderoso. Nesse caso, a magia requer o sacrifício de 2 PM e pode fazer coisas como: • Criar um item mundano de até T$ 30.000. • Duplicar os efeitos de qualquer magia de até 4º círculo. Caso a magia pre-cise de um componente material para ser lançada, ainda é necessário providenciar o componente. • Aumentar um atributo de uma criatura em +1. Cada atributo só pode ser aumentado uma vez com Desejo.",
     "resistance": "veja texto"
   },
   {
@@ -1428,17 +1428,17 @@ export const SPELLS_LIST: Spell[] = [
     "execution": "padrão",
     "range": "pessoal",
     "targetArea": "cone de 6m",
-    "duration": "instan-\ntânea",
-    "description": "Humanoides na área são acometidos de \ngrande tristeza, ficando fracos e frustra-\ndos até o fim da cena (ou por uma roda-\nda, se passarem no teste de resistência).",
+    "duration": "instantânea",
+    "description": "Humanoides na área são acometidos de grande tristeza, ficando fracos e frustrados até o fim da cena (ou por uma rodada, se passarem no teste de resistência).",
     "resistance": "Vontade parcial",
     "upgrades": [
       {
         "cost": "+2 PM",
-        "description": "em vez do normal, as condi-\nções adquiridas são debilitado e es-\nmorecido."
+        "description": "em vez do normal, as condições adquiridas são debilitado e esmorecido."
       },
       {
         "cost": "+3 PM",
-        "description": "em vez do normal, afeta qual-\nquer tipo de criatura."
+        "description": "em vez do normal, afeta qualquer tipo de criatura."
       }
     ]
   },
@@ -1452,8 +1452,8 @@ export const SPELLS_LIST: Spell[] = [
     "range": "médio",
     "targetArea": "1 criatura ou objeto",
     "duration": "instantânea",
-    "description": "Execução: padrão; Alcance: médio; \nAlvo: 1 criatura ou objeto; Duração: \ninstantânea; Resistência: Fortitude \nparcial.\nVocê dispara um raio fino e esverdeado \nque causa 10d12 pontos de dano de \nessência. Se o alvo passar no teste de \nresistência, em vez disso sofre 2d12 \npontos de dano.\nIndependentemente do resultado do \nteste de Fortitude, se os PV do alvo fo-\nrem reduzidos a 0 ou menos, ele será \ncompletamente desintegrado, restando \napenas pó.",
-    "resistance": "Fortitude \nparcial"
+    "description": "Execução: padrão; Alcance: médio; Alvo: 1 criatura ou objeto; Duração: instantânea; Resistência: Fortitude parcial. Você dispara um raio fino e esverdeado que causa 10d12 pontos de dano de essência. Se o alvo passar no teste de resistência, em vez disso sofre 2d12 pontos de dano. Independentemente do resultado do teste de Fortitude, se os PV do alvo forem reduzidos a 0 ou menos, ele será completamente desintegrado, restando apenas pó.",
+    "resistance": "Fortitude parcial"
   },
   {
     "id": "despedacar",
@@ -1463,9 +1463,9 @@ export const SPELLS_LIST: Spell[] = [
     "school": "Evocação",
     "execution": "padrão",
     "range": "curto",
-    "targetArea": "1 criatura ou objeto mundano \nPequeno",
+    "targetArea": "1 criatura ou objeto mundano Pequeno",
     "duration": "instantânea",
-    "description": "Execução: padrão; Alcance: curto; \nAlvo: 1 criatura ou objeto mundano \nPequeno; Duração: instantânea; Re-\nsistência: Fortitude parcial.\nEsta magia emite um som alto e agu-\ndo. O alvo sofre 1d8+2 pontos de dano \nde impacto (ou o dobro disso e igno-\nra RD se for um construto ou objeto \nmundano) e fica atordoado por uma \nrodada (apenas uma vez por cena). Um \nteste de Fortitude reduz o dano à me-\ntade e evita o atordoamento. Despeda-\nçar anula Transmutar Objetos.",
+    "description": "Execução: padrão; Alcance: curto; Alvo: 1 criatura ou objeto mundano Pequeno; Duração: instantânea; Resistência: Fortitude parcial. Esta magia emite um som alto e agudo. O alvo sofre 1d8+2 pontos de dano de impacto (ou o dobro disso e ignora RD se for um construto ou objeto mundano) e fica atordoado por uma rodada (apenas uma vez por cena). Um teste de Fortitude reduz o dano à metade e evita o atordoamento. Despedaçar anula Transmutar Objetos.",
     "upgrades": [
       {
         "cost": "+2 PM",
@@ -1473,23 +1473,23 @@ export const SPELLS_LIST: Spell[] = [
       },
       {
         "cost": "+2 PM",
-        "description": "muda o alvo para objeto mun-\ndano Médio. Requer 2º círculo."
+        "description": "muda o alvo para objeto mundano Médio. Requer 2º círculo."
       },
       {
         "cost": "+5 PM",
-        "description": "muda o alvo para objeto mun-\ndano Grande. Requer 3º círculo."
+        "description": "muda o alvo para objeto mundano Grande. Requer 3º círculo."
       },
       {
         "cost": "+9 PM",
-        "description": "muda o alvo para objeto mun-\ndano Enorme. Requer 4º círculo."
+        "description": "muda o alvo para objeto mundano Enorme. Requer 4º círculo."
       },
       {
         "cost": "+14 PM",
-        "description": "muda o alvo para objeto \nmundano Colossal. Requer 5º círculo."
+        "description": "muda o alvo para objeto mundano Colossal. Requer 5º círculo."
       },
       {
         "cost": "+5 PM",
-        "description": "muda o alcance para pessoal \ne o alvo para área: esfera com 6m de \nraio. Todas as criaturas e objetos mun-\ndanos na área são afetados."
+        "description": "muda o alcance para pessoal e o alvo para área: esfera com 6m de raio. Todas as criaturas e objetos mundanos na área são afetados."
       }
     ]
   },
@@ -1503,11 +1503,11 @@ export const SPELLS_LIST: Spell[] = [
     "range": "toque",
     "targetArea": "1 animal ou planta",
     "duration": "1 dia",
-    "description": "Execução: completa; Alcance: toque; \nAlvo: 1 animal ou planta; Duração: \n1 dia.\nVocê desperta a consciência de um ani-\nmal ou planta. O alvo se torna um par-\nceiro veterano de um tipo a sua esco-\nlha entre ajudante, combatente, fortão, \nguardião, médico, perseguidor ou vigi-\nlante. Se usar esta magia em outro par-\nceiro que já possua, o nível de poder de \num de seus tipos aumenta em um pas-\nso (apenas uma vez por parceiro). Se já \nfor um parceiro mestre, recebe o bônus \nde outro tipo de parceiro iniciante (en-\ntre as escolhas acima). O alvo se torna \numa criatura racional, com Inteligência \n-1, e pode falar.",
+    "description": "Execução: completa; Alcance: toque; Alvo: 1 animal ou planta; Duração: 1 dia. Você desperta a consciência de um animal ou planta. O alvo se torna um parceiro veterano de um tipo a sua escolha entre ajudante, combatente, fortão, guardião, médico, perseguidor ou vigilante. Se usar esta magia em outro parceiro que já possua, o nível de poder de um de seus tipos aumenta em um passo (apenas uma vez por parceiro). Se já for um parceiro mestre, recebe o bônus de outro tipo de parceiro iniciante (entre as escolhas acima). O alvo se torna uma criatura racional, com Inteligência -1, e pode falar.",
     "upgrades": [
       {
         "cost": "+4 PM",
-        "description": "muda o alvo para 1 escultura \nmundana inanimada. Além do normal, \no alvo tem as mesmas características de \num construto."
+        "description": "muda o alvo para 1 escultura mundana inanimada. Além do normal, o alvo tem as mesmas características de um construto."
       }
     ]
   },
@@ -1533,11 +1533,11 @@ export const SPELLS_LIST: Spell[] = [
     "range": "toque",
     "targetArea": "1 criatura ou objeto",
     "duration": "1 dia",
-    "description": "Execução: padrão; Alcance: toque; \nAlvo: 1 criatura ou objeto; Duração: \n1 dia.\n190\nMagia\nEsta magia oculta a presença do alvo \ncontra qualquer meio mágico de detec-\nção, inclusive detectar magia. Um con-\njurador que lance uma magia de adi-\nvinhação para detectar a presença ou \nlocalização do alvo deve fazer um teste \nde Vontade. Se falhar, a magia não fun-\nciona, mas os PM são gastos mesmo \nassim. Se for lançada sobre uma cria-\ntura, Dificultar Detecção protege tanto a \ncriatura quanto seu equipamento.",
+    "description": "Execução: padrão; Alcance: toque; Alvo: 1 criatura ou objeto; Duração: 1 dia. 190 Magia Esta magia oculta a presença do alvo contra qualquer meio mágico de detecção, inclusive detectar magia. Um conjurador que lance uma magia de adivinhação para detectar a presença ou localização do alvo deve fazer um teste de Vontade. Se falhar, a magia não funciona, mas os PM são gastos mesmo assim. Se for lançada sobre uma criatura, Dificultar Detecção protege tanto a criatura quanto seu equipamento.",
     "upgrades": [
       {
         "cost": "+4 PM",
-        "description": "muda o alvo para área de cubo \nde 9m. Qualquer criatura ou objeto na \nárea recebe o efeito da magia enquanto \nestiver dentro dela."
+        "description": "muda o alvo para área de cubo de 9m. Qualquer criatura ou objeto na área recebe o efeito da magia enquanto estiver dentro dela."
       }
     ]
   },
@@ -1551,27 +1551,27 @@ export const SPELLS_LIST: Spell[] = [
     "range": "pessoal",
     "targetArea": "você",
     "duration": "cena",
-    "description": "Execução: padrão; Alcance: pessoal; \nAlvo: você; Duração: cena; Resistên-\ncia: Vontade desacredita.\nVocê muda a aparência do alvo, in-\ncluindo seu equipamento. Isso inclui \naltura, peso, tom de pele, cor de ca-\nbelo, timbre de voz etc. O alvo rece-\nbe +10 em testes de Enganação para \ndisfarce. O alvo não recebe novas habi-\nlidades (você pode ficar parecido com \noutra raça, mas não ganhará as habi-\nlidades dela), nem modifica o equipa-\nmento (uma espada longa disfarçada \nde bordão continua funcionando e cau-\nsando dano como uma espada).",
+    "description": "Execução: padrão; Alcance: pessoal; Alvo: você; Duração: cena; Resistência: Vontade desacredita. Você muda a aparência do alvo, incluindo seu equipamento. Isso inclui altura, peso, tom de pele, cor de cabelo, timbre de voz etc. O alvo recebe +10 em testes de Enganação para disfarce. O alvo não recebe novas habilidades (você pode ficar parecido com outra raça, mas não ganhará as habilidades dela), nem modifica o equipamento (uma espada longa disfarçada de bordão continua funcionando e causando dano como uma espada).",
     "upgrades": [
       {
         "cost": "Truque",
-        "description": "muda o alcance para toque, \no alvo para 1 criatura e a duração para \n1 semana. Em vez do normal, você faz \numa pequena alteração na aparência \ndo alvo, como deixar o nariz vermelho \nou fazer brotar um gerânio no alto da \ncabeça. A mudança é inofensiva, mas \npersistente - se a flor for arrancada, \npor exemplo, outra nascerá no local."
+        "description": "muda o alcance para toque, o alvo para 1 criatura e a duração para 1 semana. Em vez do normal, você faz uma pequena alteração na aparência do alvo, como deixar o nariz vermelho ou fazer brotar um gerânio no alto da cabeça. A mudança é inofensiva, mas persistente - se a flor for arrancada, por exemplo, outra nascerá no local."
       },
       {
         "cost": "+1 PM",
-        "description": "muda o alcance para curto e o \nalvo para 1 objeto. Você pode, por exem-\nplo, transformar pedaços de ferro em \nmoedas de ouro. Você recebe"
+        "description": "muda o alcance para curto e o alvo para 1 objeto. Você pode, por exemplo, transformar pedaços de ferro em moedas de ouro. Você recebe"
       },
       {
         "cost": "+2 PM",
-        "description": "muda o alcance para curto e o \nalvo para 1 criatura. Uma criatura in-\nvoluntária pode anular o efeito com \num teste de Vontade."
+        "description": "muda o alcance para curto e o alvo para 1 criatura. Uma criatura involuntária pode anular o efeito com um teste de Vontade."
       },
       {
         "cost": "+2 PM",
-        "description": "a ilusão inclui odores e sensa-\nções. Isso muda o bônus em testes de \nEnganação para disfarce para"
+        "description": "a ilusão inclui odores e sensações. Isso muda o bônus em testes de Enganação para disfarce para"
       },
       {
         "cost": "+3 PM",
-        "description": "muda o alcance para curto e \no alvo para criaturas escolhidas. Cada \ncriatura pode ter uma aparência dife-\nrente. Criaturas involuntárias podem \nanular o efeito com um teste de Von-\ntade. Requer 2º círculo."
+        "description": "muda o alcance para curto e o alvo para criaturas escolhidas. Cada criatura pode ter uma aparência diferente. Criaturas involuntárias podem anular o efeito com um teste de Vontade. Requer 2º círculo."
       }
     ]
   },
@@ -1585,19 +1585,19 @@ export const SPELLS_LIST: Spell[] = [
     "range": "pessoal",
     "targetArea": "esfera com 6m de raio",
     "duration": "Instantânea",
-    "description": "Execução: padrão; Alcance: pessoal; \nÁrea: esfera com 6m de raio; Dura-\nção: veja texto.\nEsta magia cria um forte brilho (mul-\nticolorido ou de uma cor que remeta a \nsua divindade) que causa diversos efei-\ntos. Todas as magias de 3º círculo ou \nmenor ativas na área são dissipadas se \nvocê passar num teste de Religião con-\ntra a CD de cada magia. Seus aliados \nna área recebem +4 em testes de re-\nsistência e redução de trevas 10 até o \nfim da cena, protegidos por uma aura \nsutil da mesma cor. Inimigos na área \nficam cegos por 1d4 rodadas (apenas \numa vez por cena). Dispersar as Trevas \nanula Anular a Luz (este efeito tem du-\nração instantânea).",
+    "description": "Execução: padrão; Alcance: pessoal; Área: esfera com 6m de raio; Duração: veja texto. Esta magia cria um forte brilho (multicolorido ou de uma cor que remeta a sua divindade) que causa diversos efeitos. Todas as magias de 3º círculo ou menor ativas na área são dissipadas se você passar num teste de Religião contra a CD de cada magia. Seus aliados na área recebem +4 em testes de resistência e redução de trevas 10 até o fim da cena, protegidos por uma aura sutil da mesma cor. Inimigos na área ficam cegos por 1d4 rodadas (apenas uma vez por cena). Dispersar as Trevas anula Anular a Luz (este efeito tem duração instantânea).",
     "upgrades": [
       {
         "cost": "+2 PM",
-        "description": "aumenta o bônus nas resistên-\ncias em"
+        "description": "aumenta o bônus nas resistências em"
       },
       {
         "cost": "+4 PM",
-        "description": "muda o alcance para curto, a \nárea para alvo 1 criatura e a duração \npara cena. O alvo fica imune a efeitos \nde trevas."
+        "description": "muda o alcance para curto, a área para alvo 1 criatura e a duração para cena. O alvo fica imune a efeitos de trevas."
       },
       {
         "cost": "+4 PM",
-        "description": "muda o círculo máximo de \nmagias dissipadas para 4º. Requer 4º \ncírculo."
+        "description": "muda o círculo máximo de magias dissipadas para 4º. Requer 4º círculo."
       }
     ]
   },
@@ -1609,13 +1609,13 @@ export const SPELLS_LIST: Spell[] = [
     "school": "Abjuração",
     "execution": "padrão",
     "range": "médio",
-    "targetArea": "1 criatura ou 1 obje-\nto mágico ou esfera com 3m de raio",
+    "targetArea": "1 criatura ou 1 objeto mágico ou esfera com 3m de raio",
     "duration": "instantânea",
-    "description": "Você dissipa outras magias que este-\njam ativas, como se sua duração tives-\nse acabado. Note que efeitos de magias \ninstantâneas não podem ser dissipados \n(não se pode dissipar uma Bola de Fogo \nou Relâmpago depois que já causaram \ndano...). Se lançar essa magia em uma \ncriatura ou área, faça um teste de Misti-\ncismo; você dissipa as magias com CD \nigual ou menor que o resultado do tes-\nte. Se lançada contra um item mágico, o \ntransforma em um item mundano por \n1d6 rodadas (Vontade anula).",
+    "description": "Você dissipa outras magias que estejam ativas, como se sua duração tives-se acabado. Note que efeitos de magias instantâneas não podem ser dissipados (não se pode dissipar uma Bola de Fogo ou Relâmpago depois que já causaram dano...). Se lançar essa magia em uma criatura ou área, faça um teste de Misticismo; você dissipa as magias com CD igual ou menor que o resultado do tes-te. Se lançada contra um item mágico, o transforma em um item mundano por 1d6 rodadas (Vontade anula).",
     "upgrades": [
       {
         "cost": "+12 PM",
-        "description": "muda a área para esfera com \n9m de raio. Em vez do normal, cria um \nefeito de disjunção. Todas as magias na \nárea são automaticamente dissipadas e \ntodos os itens mágicos na área, exce-\nto aqueles que você estiver carregando, \nviram itens mundanos por uma cena \n(com direito a um teste de Vontade para \nevitar esse efeito). Requer 5º círculo."
+        "description": "muda a área para esfera com 9m de raio. Em vez do normal, cria um efeito de disjunção. Todas as magias na área são automaticamente dissipadas e todos os itens mágicos na área, exceto aqueles que você estiver carregando, viram itens mundanos por uma cena (com direito a um teste de Vontade para evitar esse efeito). Requer 5º círculo."
       }
     ]
   },
@@ -1629,7 +1629,7 @@ export const SPELLS_LIST: Spell[] = [
     "range": "médio",
     "targetArea": "cópia ilusória",
     "duration": "cena",
-    "description": "Você cria uma cópia ilusória semir-\nreal de... você mesmo! Ela é idêntica \nem aparência, som e cheiro, mas é in-\ntangível. A cada turno, você escolhe se \nverá e ouvirá através da duplicata ou \nde seu corpo original. A cópia repro-\nduz todas as suas ações, incluindo fala. \nQualquer magia com alcance de toque \nou maior que você lançar pode se origi-\nnar da duplicata, em vez do seu corpo \noriginal. As magias afetam outros al-\nvos normalmente, com a única diferen-\nça de se originarem da cópia, em vez \nde você. Se quiser que a duplicata faça \nalgo diferente de você, você deve gas-\ntar uma ação de movimento. Qualquer \ncriatura que interagir com a cópia tem \ndireito a um teste de Vontade para per-\nceber que é uma ilusão. As magias que \nse originam dela, no entanto, são reais. \nA cópia desaparece se sair do alcance."
+    "description": "Você cria uma cópia ilusória semirreal de... você mesmo! Ela é idêntica em aparência, som e cheiro, mas é intangível. A cada turno, você escolhe se verá e ouvirá através da duplicata ou de seu corpo original. A cópia reproduz todas as suas ações, incluindo fala. Qualquer magia com alcance de toque ou maior que você lançar pode se originar da duplicata, em vez do seu corpo original. As magias afetam outros alvos normalmente, com a única diferença de se originarem da cópia, em vez de você. Se quiser que a duplicata faça algo diferente de você, você deve gastar uma ação de movimento. Qualquer criatura que interagir com a cópia tem direito a um teste de Vontade para perceber que é uma ilusão. As magias que se originam dela, no entanto, são reais. A cópia desaparece se sair do alcance."
   },
   {
     "id": "enfeiticar",
@@ -1641,20 +1641,20 @@ export const SPELLS_LIST: Spell[] = [
     "range": "curto",
     "targetArea": "1 humanoide",
     "duration": "cena",
-    "description": "O alvo fica enfeitiçado (veja a pági-\nna 394). Um alvo hostil ou que esteja \nenvolvido em um combate recebe +5 \nem seu teste de resistência. Se você ou \nseus aliados tomarem qualquer ação \nhostil contra o alvo, a magia é dissi-\npada e o alvo retorna à atitude que ti-\nnha antes (ou piorada, de acordo com \no mestre).",
+    "description": "O alvo fica enfeitiçado (veja a pági-na 394). Um alvo hostil ou que esteja envolvido em um combate recebe +5 em seu teste de resistência. Se você ou seus aliados tomarem qualquer ação hostil contra o alvo, a magia é dissipada e o alvo retorna à atitude que tinha antes (ou piorada, de acordo com o mestre).",
     "resistance": "Vontade anula",
     "upgrades": [
       {
         "cost": "+2 PM",
-        "description": "em vez do normal, você suge-\nre uma ação para o alvo e ele obede-\nce. A sugestão deve ser feita de modo \nque pareça aceitável, a critério do mes-\ntre. Pedir ao alvo que pule de um pre-\ncipício, por exemplo, dissipa a magia. \nJá sugerir a um guarda que descanse \num pouco, de modo que você e seus \naliados passem por ele, é aceitável. \nQuando o alvo executa a ação, a ma-\ngia termina. Você pode determinar \numa condição específica para a suges-\ntão: por exemplo, que um rico merca-\ndor doe suas moedas para o primeiro \nmendigo que encontrar."
+        "description": "em vez do normal, você sugere uma ação para o alvo e ele obedece. A sugestão deve ser feita de modo que pareça aceitável, a critério do mestre. Pedir ao alvo que pule de um pre-cipício, por exemplo, dissipa a magia. Já sugerir a um guarda que descanse um pouco, de modo que você e seus aliados passem por ele, é aceitável. Quando o alvo executa a ação, a magia termina. Você pode determinar uma condição específica para a sugestão: por exemplo, que um rico mercador doe suas moedas para o primeiro mendigo que encontrar."
       },
       {
         "cost": "+5 PM",
-        "description": "muda o alvo para 1 espírito ou \nmonstro. Requer 3º círculo."
+        "description": "muda o alvo para 1 espírito ou monstro. Requer 3º círculo."
       },
       {
         "cost": "+5 PM",
-        "description": "afeta todos os alvos dentro do \nalcance.\n191\nCapítulo Quatro"
+        "description": "afeta todos os alvos dentro do alcance. 191 Capítulo Quatro"
       }
     ]
   },
@@ -1666,13 +1666,13 @@ export const SPELLS_LIST: Spell[] = [
     "school": "Abjuração",
     "execution": "padrão",
     "range": "médio",
-    "targetArea": "disco de energia com 1,5m de \ndiâmetro",
+    "targetArea": "disco de energia com 1,5m de diâmetro",
     "duration": "sustentada",
-    "description": "Você cria um disco de energia que lem-\nbra uma roda de engenho e flutua no \nponto em que foi conjurado. O disco é \nimune a dano, não pode ser movido e \nfaz uma contramágica automática con-\ntra qualquer magia lançada em alcan-\nce médio dele (exceto as suas), usan-\ndo seu teste de Misticismo. Caso vença \no teste, o engenho não só anula a ma-\ngia como absorve os PM usados para \nlançá-la, acumulando PM temporários. \nNo seu turno, se estiver ao alcance do \ndisco, você pode gastar PM nele para \nlançar magias.",
+    "description": "Você cria um disco de energia que lembra uma roda de engenho e flutua no ponto em que foi conjurado. O disco é imune a dano, não pode ser movido e faz uma contramágica automática contra qualquer magia lançada em alcance médio dele (exceto as suas), usando seu teste de Misticismo. Caso vença o teste, o engenho não só anula a magia como absorve os PM usados para lançá-la, acumulando PM temporários. No seu turno, se estiver ao alcance do disco, você pode gastar PM nele para lançar magias.",
     "upgrades": [
       {
         "cost": "+1 PM",
-        "description": "em vez de flutuar no ponto em \nque foi conjurado, o disco flutua atrás de \nvocê, mantendo-se sempre adjacente."
+        "description": "em vez de flutuar no ponto em que foi conjurado, o disco flutua atrás de você, mantendo-se sempre adjacente."
       }
     ]
   },
@@ -1684,9 +1684,9 @@ export const SPELLS_LIST: Spell[] = [
     "school": "Convocação",
     "execution": "completa",
     "range": "médio",
-    "targetArea": "1 enxame Médio (quadrado de \n1,5m)",
+    "targetArea": "1 enxame Médio (quadrado de 1,5m)",
     "duration": "sustentada",
-    "description": "Resis-\ntência: Fortitude reduz à metade.\nVocê conjura um enxame de criaturas \na sua escolha, como besouros, gafa-\nnhotos, ratos, morcegos ou serpentes. \nO enxame pode passar pelo espaço de \noutras criaturas e não impede que ou-\ntras criaturas entrem no espaço dele. \nNo final de seus turnos, o enxame \ncausa 2d12 pontos de dano de corte a \nqualquer criatura em seu espaço (For-\ntitude reduz à metade). Você pode gas-\ntar uma ação de movimento para mo-\nver o enxame 12m.",
+    "description": "Resistência: Fortitude reduz à metade. Você conjura um enxame de criaturas a sua escolha, como besouros, gafanhotos, ratos, morcegos ou serpentes. O enxame pode passar pelo espaço de outras criaturas e não impede que outras criaturas entrem no espaço dele. No final de seus turnos, o enxame causa 2d12 pontos de dano de corte a qualquer criatura em seu espaço (Fortitude reduz à metade). Você pode gastar uma ação de movimento para mover o enxame 12m.",
     "upgrades": [
       {
         "cost": "+2 PM",
@@ -1694,15 +1694,15 @@ export const SPELLS_LIST: Spell[] = [
       },
       {
         "cost": "+3 PM",
-        "description": "muda a resistência para Refle-\nxos reduz à metade e o enxame para \ncriaturas maiores, como gatos, guaxi-\nnins, compsognatos ou kobolds. Ele \ncausa 3d12 pontos de dano (a sua es-\ncolha entre corte, impacto ou perfura-\nção). O resto da magia segue normal."
+        "description": "muda a resistência para Reflexos reduz à metade e o enxame para criaturas maiores, como gatos, guaxinins, compsognatos ou kobolds. Ele causa 3d12 pontos de dano (a sua escolha entre corte, impacto ou perfuração). O resto da magia segue normal."
       },
       {
         "cost": "+5 PM",
-        "description": "aumenta o número de enxa-\nmes em"
+        "description": "aumenta o número de enxames em"
       },
       {
         "cost": "+7 PM",
-        "description": "muda a resistência para Refle-\nxos reduz à metade e o enxame para \ncriaturas elementais. Ele causa 5d12 \npontos do dano (a sua escolha entre \nácido, eletricidade, fogo ou frio). O \nresto da magia segue normal. Requer \n4º círculo."
+        "description": "muda a resistência para Reflexos reduz à metade e o enxame para criaturas elementais. Ele causa 5d12 pontos do dano (a sua escolha entre ácido, eletricidade, fogo ou frio). O resto da magia segue normal. Requer 4º círculo."
       }
     ]
   },
@@ -1714,13 +1714,13 @@ export const SPELLS_LIST: Spell[] = [
     "school": "Convocação",
     "execution": "padrão",
     "range": "médio",
-    "targetArea": "1 enxame Grande (quadrado \nde 3m)",
+    "targetArea": "1 enxame Grande (quadrado de 3m)",
     "duration": "sustentada",
-    "description": "Execução: padrão; Alcance: médio; \nEfeito: 1 enxame Grande (quadrado \nde 3m); Duração: sustentada; Resis-\ntência: Reflexos reduz à metade.\nVocê conjura um enxame de pequenas \ncriaturas da Tormenta. O enxame pode \npassar pelo espaço de outras criaturas \ne não impede que outras criaturas en-\ntrem no espaço dele. No final de cada \num de seus turnos, o enxame causa \n4d12 pontos de dano de ácido a qual-\nquer criatura em seu espaço (Refle-\nxos reduz à metade). Você pode gastar \numa ação de movimento para mover o \nenxame com deslocamento de 12m.",
+    "description": "Execução: padrão; Alcance: médio; Efeito: 1 enxame Grande (quadrado de 3m); Duração: sustentada; Resistência: Reflexos reduz à metade. Você conjura um enxame de pequenas criaturas da Tormenta. O enxame pode passar pelo espaço de outras criaturas e não impede que outras criaturas entrem no espaço dele. No final de cada um de seus turnos, o enxame causa 4d12 pontos de dano de ácido a qualquer criatura em seu espaço (Reflexos reduz à metade). Você pode gastar uma ação de movimento para mover o enxame com deslocamento de 12m.",
     "upgrades": [
       {
         "cost": "+1 PM",
-        "description": "além do normal, uma criatura \nque falhe no teste de Reflexos fica agar-\nrada (o enxame escala e cobre o corpo \ndela). A criatura pode gastar uma ação \npadrão e fazer um teste de Acrobacia \nou Atletismo para escapar. Se você mo-\nver o enxame, a criatura fica livre."
+        "description": "além do normal, uma criatura que falhe no teste de Reflexos fica agarrada (o enxame escala e cobre o corpo dela). A criatura pode gastar uma ação padrão e fazer um teste de Acrobacia ou Atletismo para escapar. Se você mover o enxame, a criatura fica livre."
       },
       {
         "cost": "+2 PM",
@@ -1732,11 +1732,11 @@ export const SPELLS_LIST: Spell[] = [
       },
       {
         "cost": "+3 PM",
-        "description": "o enxame vira Enorme (qua-\ndrado de 6m de lado)."
+        "description": "o enxame vira Enorme (quadrado de 6m de lado)."
       },
       {
         "cost": "+3 PM",
-        "description": "o enxame ganha deslocamento \nde voo 18m e passa a ocupar um cubo \nao invés de um quadrado."
+        "description": "o enxame ganha deslocamento de voo 18m e passa a ocupar um cubo ao invés de um quadrado."
       }
     ]
   },
@@ -1750,8 +1750,8 @@ export const SPELLS_LIST: Spell[] = [
     "range": "médio",
     "targetArea": "quadrado de 6m de lado",
     "duration": "Instantânea",
-    "description": "Execução: padrão; Alcance: médio; \nÁrea: quadrado de 6m de lado; Dura-\nção: instantânea; Resistência: Refle-\nxos parcial.\nEstacas de gelo irrompem do chão. \nCriaturas na área sofrem 4d6 de dano \nde corte, 4d6 de dano de frio e ficam \ncaídas. Passar no teste de Reflexos evi-\nta o dano de corte e a queda. As esta-\ncas duram pela cena, o que torna a área \nafetada terreno difícil, e concedem co-\nbertura leve para criaturas dentro da \nárea ou atrás dela. As estacas são des-\ntruídas caso sofram qualquer quanti-\ndade de dano por fogo mágico.",
-    "resistance": "Refle-\nxos parcial",
+    "description": "Execução: padrão; Alcance: médio; Área: quadrado de 6m de lado; Duração: instantânea; Resistência: Reflexos parcial. Estacas de gelo irrompem do chão. Criaturas na área sofrem 4d6 de dano de corte, 4d6 de dano de frio e ficam caídas. Passar no teste de Reflexos evita o dano de corte e a queda. As estacas duram pela cena, o que torna a área afetada terreno difícil, e concedem cobertura leve para criaturas dentro da área ou atrás dela. As estacas são destruídas caso sofram qualquer quantidade de dano por fogo mágico.",
+    "resistance": "Reflexos parcial",
     "upgrades": [
       {
         "cost": "+3 PM",
@@ -1769,23 +1769,23 @@ export const SPELLS_LIST: Spell[] = [
     "range": "curto",
     "targetArea": "1 criatura",
     "duration": "1 turno",
-    "description": "Um escudo místico se manifesta mo-\nmentaneamente para bloquear um gol-\npe. O alvo recebe +2 na Defesa.",
+    "description": "Um escudo místico se manifesta momentaneamente para bloquear um golpe. O alvo recebe +2 na Defesa.",
     "upgrades": [
       {
         "cost": "+1 PM",
-        "description": "muda a execução para ação pa-\ndrão, o alcance para toque e a duração \npara cena."
+        "description": "muda a execução para ação padrão, o alcance para toque e a duração para cena."
       },
       {
         "cost": "+1 PM",
-        "description": "também fornece ao alvo camu-\nflagem leve contra ataques à distância."
+        "description": "também fornece ao alvo camuflagem leve contra ataques à distância."
       },
       {
         "cost": "+2 PM",
-        "description": "aumenta o bônus na Defesa \nem"
+        "description": "aumenta o bônus na Defesa em"
       },
       {
         "cost": "+2 PM",
-        "description": "muda a execução para ação pa-\ndrão, o alcance para toque e a duração \npara cena. A magia cria uma conexão \nmística entre você e o alvo. Além do \nefeito normal, o alvo sofre metade do \ndano por ataques e efeitos; a outra me-\ntade do dano é transferida a você. Se \no alvo sair de alcance curto de você, a \nmagia é dissipada. Requer 2º círculo."
+        "description": "muda a execução para ação padrão, o alcance para toque e a duração para cena. A magia cria uma conexão mística entre você e o alvo. Além do efeito normal, o alvo sofre metade do dano por ataques e efeitos; a outra metade do dano é transferida a você. Se o alvo sair de alcance curto de você, a magia é dissipada. Requer 2º círculo."
       }
     ]
   },
@@ -1799,12 +1799,12 @@ export const SPELLS_LIST: Spell[] = [
     "range": "médio",
     "targetArea": "1 criatura ou objeto",
     "duration": "cena",
-    "description": "Esta magia altera os sons emitidos \npelo alvo. Ela não é capaz de criar \nsons, mas pode omiti-los (como fazer \numa carroça ficar silenciosa) ou trans-\nformá-los (como fazer uma pessoa fi-\ncar com voz de passarinho). Você não \npode criar sons que não conhece (não \npode fazer uma criatura falar num idio-\nma que não conheça). Uma vez que es-\ncolha a alteração, ela não pode ser mu-\ndada. Um conjurador que tenha a voz \nmodificada drasticamente não poderá \nlançar magias.\n192\nMagia",
+    "description": "Esta magia altera os sons emitidos pelo alvo. Ela não é capaz de criar sons, mas pode omiti-los (como fazer uma carroça ficar silenciosa) ou transformá-los (como fazer uma pessoa ficar com voz de passarinho). Você não pode criar sons que não conhece (não pode fazer uma criatura falar num idioma que não conheça). Uma vez que escolha a alteração, ela não pode ser mudada. Um conjurador que tenha a voz modificada drasticamente não poderá lançar magias. 192 Magia",
     "resistance": "Vontade anula",
     "upgrades": [
       {
         "cost": "+2 PM",
-        "description": "aumenta o número de alvos \nem"
+        "description": "aumenta o número de alvos em"
       }
     ]
   },
@@ -1818,19 +1818,19 @@ export const SPELLS_LIST: Spell[] = [
     "range": "curto",
     "targetArea": "1 objeto",
     "duration": "cena",
-    "description": "Execução: padrão; Alcance: curto; \nAlvo: 1 objeto; Duração: cena; Resis-\ntência: Vontade anula (veja texto).\nO alvo emana sombras em uma área \ncom 6m de raio. Criaturas dentro da área \nrecebem camuflagem leve por escuridão \nleve. As sombras não podem ser ilumi-\nnadas por nenhuma fonte de luz natu-\nral. O objeto pode ser guardado (em um \nbolso, por exemplo) para interromper a \nescuridão, que voltará a funcionar caso \no objeto seja revelado. Se lançar a ma-\ngia num objeto de uma criatura involun-\ntária, ela tem direito a um teste de Von-\ntade para anulá-la. Escuridão anula Luz.",
+    "description": "Execução: padrão; Alcance: curto; Alvo: 1 objeto; Duração: cena; Resistência: Vontade anula (veja texto). O alvo emana sombras em uma área com 6m de raio. Criaturas dentro da área recebem camuflagem leve por escuridão leve. As sombras não podem ser iluminadas por nenhuma fonte de luz natural. O objeto pode ser guardado (em um bolso, por exemplo) para interromper a escuridão, que voltará a funcionar caso o objeto seja revelado. Se lançar a magia num objeto de uma criatura involuntária, ela tem direito a um teste de Vontade para anulá-la. Escuridão anula Luz.",
     "upgrades": [
       {
         "cost": "+1 PM",
-        "description": "aumenta a área da escuridão \nem"
+        "description": "aumenta a área da escuridão em"
       },
       {
         "cost": "+2 PM",
-        "description": "muda o efeito para fornecer \ncamuflagem total por escuridão total. \n O alvo emana escuridão total e ela blo-\nqueia a visão na área e através dela."
+        "description": "muda o efeito para fornecer camuflagem total por escuridão total. O alvo emana escuridão total e ela bloqueia a visão na área e através dela."
       },
       {
         "cost": "+2 PM",
-        "description": "muda o alvo para 1 criatura \ne a resistência para Fortitude parcial. \nVocê lança a magia nos olhos do alvo, \nque fica cego pela cena. Se passar na \nresistência, fica cego por 1 rodada. \nRequer 2º círculo."
+        "description": "muda o alvo para 1 criatura e a resistência para Fortitude parcial. Você lança a magia nos olhos do alvo, que fica cego pela cena. Se passar na resistência, fica cego por 1 rodada. Requer 2º círculo."
       },
       {
         "cost": "+3 PM",
@@ -1847,8 +1847,8 @@ export const SPELLS_LIST: Spell[] = [
     "execution": "padrão",
     "range": "curto",
     "targetArea": "esfera com 6m de raio",
-    "duration": "instan-\ntânea",
-    "description": "Esta magia cria uma forte explosão de \nluzes estroboscópicas e sons cacofôni-\ncos que desorientam as criaturas atin-\ngidas. O efeito que cada criatura sofre \ndepende do nível ou ND dela.\nNível ou ND 4 ou menor: se falhar no tes-\nte de resistência, fica inconsciente. Se \npassar, fica atordoada por 1d4 rodadas \ne enjoada pelo resto da cena.\nNível ou ND entre 5 e 9: se falhar no teste \nde resistência, fica atordoada por 1d4 \nrodadas e enjoada pelo resto da cena. \nSe passar, fica atordoada por 1 rodada \ne enjoada por 1d4 rodadas.\nNível ou ND 10 ou maior: se falhar no \nteste de resistência, fica atordoada por \n1 rodada e enjoada por 1d4 rodadas. \nSe passar, fica desprevenida e enjoada \npor 1 rodada.",
+    "duration": "instantânea",
+    "description": "Esta magia cria uma forte explosão de luzes estroboscópicas e sons cacofônicos que desorientam as criaturas atingidas. O efeito que cada criatura sofre depende do nível ou ND dela. Nível ou ND 4 ou menor: se falhar no tes-te de resistência, fica inconsciente. Se passar, fica atordoada por 1d4 rodadas e enjoada pelo resto da cena. Nível ou ND entre 5 e 9: se falhar no teste de resistência, fica atordoada por 1d4 rodadas e enjoada pelo resto da cena. Se passar, fica atordoada por 1 rodada e enjoada por 1d4 rodadas. Nível ou ND 10 ou maior: se falhar no teste de resistência, fica atordoada por 1 rodada e enjoada por 1d4 rodadas. Se passar, fica desprevenida e enjoada por 1 rodada.",
     "resistance": "Fortitude parcial"
   },
   {
@@ -1860,13 +1860,13 @@ export const SPELLS_LIST: Spell[] = [
     "execution": "padrão",
     "range": "pessoal",
     "targetArea": "cone de 6m",
-    "duration": "instan-\ntânea",
-    "description": "Execução: padrão; Alcance: pessoal; \nÁrea: cone de 6m; Duração: instan-\ntânea; Resistência: Reflexos reduz à \nmetade.\nUm leque de chamas irrompe de suas \nmãos, causando 2d6 pontos de dano de \nfogo às criaturas na área.",
-    "resistance": "Reflexos reduz à \nmetade",
+    "duration": "instantânea",
+    "description": "Execução: padrão; Alcance: pessoal; Área: cone de 6m; Duração: instantânea; Resistência: Reflexos reduz à metade. Um leque de chamas irrompe de suas mãos, causando 2d6 pontos de dano de fogo às criaturas na área.",
+    "resistance": "Reflexos reduz à metade",
     "upgrades": [
       {
         "cost": "Truque",
-        "description": "muda o alcance para curto, \na área para alvo de 1 objeto e a resis-\ntência para Reflexos anula. Você gera \numa pequena explosão que não causa \ndano mas pode acender uma vela, to-\ncha ou fogueira. Também pode fazer \num objeto inflamável com RD 0 (como \numa corda ou pergaminho) ficar em \nchamas. Uma criatura em posse de um \nobjeto pode evitar esse efeito se passar \nno teste de resistência."
+        "description": "muda o alcance para curto, a área para alvo de 1 objeto e a resistência para Reflexos anula. Você gera uma pequena explosão que não causa dano mas pode acender uma vela, tocha ou fogueira. Também pode fazer um objeto inflamável com RD 0 (como uma corda ou pergaminho) ficar em chamas. Uma criatura em posse de um objeto pode evitar esse efeito se passar no teste de resistência."
       },
       {
         "cost": "+1 PM",
@@ -1883,8 +1883,8 @@ export const SPELLS_LIST: Spell[] = [
     "execution": "padrão",
     "range": "curto",
     "targetArea": "1 criatura",
-    "duration": "sustenta-\nda",
-    "description": "O sangue do alvo aquece até entrar em \nebulição. Quando a magia é lançada, e \nno início de cada um de seus turnos, o \nalvo sofre 4d8 pontos de dano de fogo \ne fica enjoado por uma rodada (Fortitu-\nde reduz o dano à metade e evita a con-\ndição). Se o alvo passar em dois testes \nde Fortitude seguidos, dissipa a magia. \nSe o alvo for reduzido a 0 PV pelo dano \ndesta magia, seu corpo explode, matan-\ndo-o e causando 6d6 pontos de dano de \nfogo em todas as criaturas a até 3m (Re-\nflexos reduz à metade). Essa magia não \nafeta criaturas sem sangue, como cons-\ntrutos ou mortos-vivos.",
+    "duration": "sustentada",
+    "description": "O sangue do alvo aquece até entrar em ebulição. Quando a magia é lançada, e no início de cada um de seus turnos, o alvo sofre 4d8 pontos de dano de fogo e fica enjoado por uma rodada (Fortitude reduz o dano à metade e evita a condição). Se o alvo passar em dois testes de Fortitude seguidos, dissipa a magia. Se o alvo for reduzido a 0 PV pelo dano desta magia, seu corpo explode, matando-o e causando 6d6 pontos de dano de fogo em todas as criaturas a até 3m (Reflexos reduz à metade). Essa magia não afeta criaturas sem sangue, como construtos ou mortos-vivos.",
     "resistance": "Fortitude parcial",
     "upgrades": [
       {
@@ -1893,7 +1893,7 @@ export const SPELLS_LIST: Spell[] = [
       },
       {
         "cost": "+9 PM",
-        "description": "muda alvo para criaturas esco-\nlhidas. Requer 5º círculo."
+        "description": "muda alvo para criaturas escolhidas. Requer 5º círculo."
       }
     ]
   },
@@ -1907,19 +1907,19 @@ export const SPELLS_LIST: Spell[] = [
     "range": "toque",
     "targetArea": "1 criatura",
     "duration": "cena",
-    "description": "Você fortalece o corpo do alvo. Ele re-\ncebe +2 em Força, Destreza ou Cons-\ntituição, a sua escolha. Esse aumento \nnão oferece PV ou PM adicionais.",
+    "description": "Você fortalece o corpo do alvo. Ele recebe +2 em Força, Destreza ou Constituição, a sua escolha. Esse aumento não oferece PV ou PM adicionais.",
     "upgrades": [
       {
         "cost": "+3 PM",
-        "description": "muda o alcance para curto e o \nalvo para criaturas escolhidas."
+        "description": "muda o alcance para curto e o alvo para criaturas escolhidas."
       },
       {
         "cost": "+3 PM",
-        "description": "em vez do normal, o alvo \nrecebe"
+        "description": "em vez do normal, o alvo recebe"
       },
       {
         "cost": "+7 PM",
-        "description": "em vez do normal, o alvo re-\ncebe"
+        "description": "em vez do normal, o alvo recebe"
       }
     ]
   },
@@ -1933,16 +1933,16 @@ export const SPELLS_LIST: Spell[] = [
     "range": "médio",
     "targetArea": "1 criatura ou objeto",
     "duration": "instantânea",
-    "description": "Execução: padrão; Alcance: médio; \nAlvo: 1 criatura ou objeto; Duração: \ninstantânea; Resistência: \nReflexos \nparcial.\nVocê dispara um projétil que causa 4d6 \npontos de dano de ácido. Se falhar no \nteste de resistência, o alvo fica coberto \npor um muco corrosivo, sofrendo mais \n2d6 de dano de ácido no início de seus \ndois próximos turnos. Se lançada con-\ntra um objeto que não esteja em pos-\nse de uma criatura a magia causa dano \ndobrado e ignora a RD do objeto.",
-    "resistance": "Reflexos \nparcial",
+    "description": "Execução: padrão; Alcance: médio; Alvo: 1 criatura ou objeto; Duração: instantânea; Resistência: Reflexos parcial. Você dispara um projétil que causa 4d6 pontos de dano de ácido. Se falhar no teste de resistência, o alvo fica coberto por um muco corrosivo, sofrendo mais 2d6 de dano de ácido no início de seus dois próximos turnos. Se lançada contra um objeto que não esteja em pos-se de uma criatura a magia causa dano dobrado e ignora a RD do objeto.",
+    "resistance": "Reflexos parcial",
     "upgrades": [
       {
         "cost": "+1 PM",
-        "description": "além do normal, se o alvo co-\nberto pelo muco ácido estiver usando \narmadura ou escudo, o item é corroí-\ndo. Isso reduz o bônus na Defesa do \nitem em 1 ponto permanentemente. O \nitem pode ser consertado, restaurando \nseu bônus (veja Ofício, na página 121)."
+        "description": "além do normal, se o alvo coberto pelo muco ácido estiver usando armadura ou escudo, o item é corroído. Isso reduz o bônus na Defesa do item em 1 ponto permanentemente. O item pode ser consertado, restaurando seu bônus (veja Ofício, na página 121)."
       },
       {
         "cost": "+2 PM",
-        "description": "aumenta a redução na Defesa \nem"
+        "description": "aumenta a redução na Defesa em"
       }
     ]
   },
@@ -1956,7 +1956,7 @@ export const SPELLS_LIST: Spell[] = [
     "range": "pessoal",
     "targetArea": "você",
     "duration": "sustentada",
-    "description": "Você e todo o equipamento que está \ncom você são transportados para o pla-\nno etéreo, que existe paralelamente ao \nplano material (o mundo físico). Na \nprática, é como ser transformado em \num fantasma (mas você ainda é con-\nsiderado uma criatura viva). Uma cria-\ntura etérea é invisível (pode alterar en-\n193\nCapítulo Quatro\ntre visível e invisível como ação livre), \nincorpórea e capaz de se mover em \nqualquer direção, inclusive para cima \ne para baixo. Ela enxerga o plano ma-\nterial, mas tudo parece cinza e insubs-\ntancial, reduzindo o alcance da visão \ne audição para 18m. Magias de abju-\nração e essência afetam criaturas eté-\nreas, mas outras magias, não. Da mes-\nma forma, uma criatura etérea não \npode atacar nem lançar magias contra \ncriaturas no plano material. Duas cria-\nturas etéreas podem se afetar normal-\nmente. Uma criatura afetada pode se \nmaterializar como uma ação de movi-\nmento, encerrando a magia. Uma cria-\ntura etérea que se materialize em um \nespaço ocupado é jogada para o espaço \nnão ocupado mais próximo e sofre 1d6 \npontos de dano de impacto para cada \n1,5m de deslocamento."
+    "description": "Você e todo o equipamento que está com você são transportados para o pla-no etéreo, que existe paralelamente ao plano material (o mundo físico). Na prática, é como ser transformado em um fantasma (mas você ainda é considerado uma criatura viva). Uma criatura etérea é invisível (pode alterar en193 Capítulo Quatro tre visível e invisível como ação livre), incorpórea e capaz de se mover em qualquer direção, inclusive para cima e para baixo. Ela enxerga o plano material, mas tudo parece cinza e insubstancial, reduzindo o alcance da visão e audição para 18m. Magias de abjuração e essência afetam criaturas etéreas, mas outras magias, não. Da mesma forma, uma criatura etérea não pode atacar nem lançar magias contra criaturas no plano material. Duas criaturas etéreas podem se afetar normalmente. Uma criatura afetada pode se materializar como uma ação de movimento, encerrando a magia. Uma criatura etérea que se materialize em um espaço ocupado é jogada para o espaço não ocupado mais próximo e sofre 1d6 pontos de dano de impacto para cada 1,5m de deslocamento."
   },
   {
     "id": "furia_do_panteao",
@@ -1967,8 +1967,8 @@ export const SPELLS_LIST: Spell[] = [
     "execution": "completa",
     "range": "longo",
     "targetArea": "cubo de 90m",
-    "duration": "susten-\ntada",
-    "description": "Você cria uma nuvem de tempesta-\nde violenta. Os ventos tornam ata-\nques à distância impossíveis e fazem \na área contar como condição terrível \npara lançar magia. Além disso, inimi-\ngos na área têm a visibilidade reduzi-\nda (como a magia Névoa). Uma vez por \nturno, você pode gastar uma ação de \nmovimento para gerar um dos efeitos \na seguir.\nNevasca. Inimigos na área sofrem 10d6 \npontos de dano de frio (Fortitude re-\nduz à metade). A área fica coberta de \nneve, virando terreno difícil até o fim \nda cena ou até você usar siroco.\nRaios. Até 6 inimigos a sua escolha na \nárea sofrem 10d8 pontos de dano de \neletricidade (Reflexos reduz à metade).\nSiroco. Transforma a chuva em uma \ntempestade de areia escaldante. Ini-\nmigos na área sofrem 10d6 pontos \nde dano (metade corte, metade fogo) \ne ficam sangrando (Fortitude reduz o \ndano à metade e evita a condição).\nTrovões. Inimigos sofrem 10d6 pontos \nde dano de impacto e ficam despreve-\nnidos por uma rodada (Fortitude reduz \no dano à metade e evita a condição).",
+    "duration": "sustentada",
+    "description": "Você cria uma nuvem de tempestade violenta. Os ventos tornam ataques à distância impossíveis e fazem a área contar como condição terrível para lançar magia. Além disso, inimigos na área têm a visibilidade reduzida (como a magia Névoa). Uma vez por turno, você pode gastar uma ação de movimento para gerar um dos efeitos a seguir. Nevasca. Inimigos na área sofrem 10d6 pontos de dano de frio (Fortitude reduz à metade). A área fica coberta de neve, virando terreno difícil até o fim da cena ou até você usar siroco. Raios. Até 6 inimigos a sua escolha na área sofrem 10d8 pontos de dano de eletricidade (Reflexos reduz à metade). Siroco. Transforma a chuva em uma tempestade de areia escaldante. Inimigos na área sofrem 10d6 pontos de dano (metade corte, metade fogo) e ficam sangrando (Fortitude reduz o dano à metade e evita a condição). Trovões. Inimigos sofrem 10d6 pontos de dano de impacto e ficam desprevenidos por uma rodada (Fortitude reduz o dano à metade e evita a condição).",
     "resistance": "veja texto"
   },
   {
@@ -1981,11 +1981,11 @@ export const SPELLS_LIST: Spell[] = [
     "range": "curto",
     "targetArea": "1 globo",
     "duration": "cena",
-    "description": "Cria um globo flutuante e intangível, \ncom 50cm de diâmetro. O globo mostra \numa cena vista até uma semana atrás \npor você ou por uma criatura que você \ntoque ao lançar a magia (mediante uma \npergunta; a criatura pode fazer um teste \nde Vontade para anular o efeito), permi-\ntindo que outras pessoas a vejam.",
+    "description": "Cria um globo flutuante e intangível, com 50cm de diâmetro. O globo mostra uma cena vista até uma semana atrás por você ou por uma criatura que você toque ao lançar a magia (mediante uma pergunta; a criatura pode fazer um teste de Vontade para anular o efeito), permitindo que outras pessoas a vejam.",
     "upgrades": [
       {
         "cost": "+1 PM",
-        "description": "o globo mostra uma cena vista \naté um mês atrás."
+        "description": "o globo mostra uma cena vista até um mês atrás."
       },
       {
         "cost": "+2 PM",
@@ -1993,7 +1993,7 @@ export const SPELLS_LIST: Spell[] = [
       },
       {
         "cost": "+2 PM",
-        "description": "ao lançar a magia, você pode \ntocar um cadáver. O globo mostra a úl-\ntima cena vista por essa criatura."
+        "description": "ao lançar a magia, você pode tocar um cadáver. O globo mostra a última cena vista por essa criatura."
       }
     ]
   },
@@ -2007,11 +2007,11 @@ export const SPELLS_LIST: Spell[] = [
     "range": "pessoal",
     "targetArea": "você",
     "duration": "sustentada",
-    "description": "Você é envolto por uma esfera mági-\nca brilhante com 3m de raio, que de-\ntém qualquer magia de 2º círculo ou \nmenor. Nenhuma magia pode ser lan-\nçada contra um alvo dentro do globo \ne magias de área não têm efeito den-\ntro dele. No entanto, magias ainda po-\ndem ser lançadas de dentro para fora.\nUma magia que dissipe outras magias \nsó dissipa o globo se for usada direta-\nmente sobre você, não o afetando se \nusada em área. Efeitos mágicos não \nsão dissipados quando entram na es-\nfera, apenas suprimidos (voltam a fun-\ncionar fora do globo, caso sua duração \nnão tenha acabado). O globo é imóvel \ne não tem efeito sobre criaturas ou ob-\njetos. Após lançá-lo, você pode entrar \nou sair livremente.",
+    "description": "Você é envolto por uma esfera mágica brilhante com 3m de raio, que detém qualquer magia de 2º círculo ou menor. Nenhuma magia pode ser lançada contra um alvo dentro do globo e magias de área não têm efeito dentro dele. No entanto, magias ainda podem ser lançadas de dentro para fora. Uma magia que dissipe outras magias só dissipa o globo se for usada diretamente sobre você, não o afetando se usada em área. Efeitos mágicos não são dissipados quando entram na esfera, apenas suprimidos (voltam a funcionar fora do globo, caso sua duração não tenha acabado). O globo é imóvel e não tem efeito sobre criaturas ou objetos. Após lançá-lo, você pode entrar ou sair livremente.",
     "upgrades": [
       {
         "cost": "+4 PM",
-        "description": "muda o efeito para afetar ma-\ngias de até 3º círculo. Requer 4º círculo."
+        "description": "muda o efeito para afetar magias de até 3º círculo. Requer 4º círculo."
       }
     ]
   },
@@ -2025,7 +2025,7 @@ export const SPELLS_LIST: Spell[] = [
     "range": "curto",
     "targetArea": "elemental de luz invocado",
     "duration": "cena ou até ser descarregado",
-    "description": "A magia invoca um elemental Pequeno, \ncom a forma de um orbe feito de luz di-\nvina. A criatura é incorpórea, imune a \ndano e ilumina como uma tocha. O ele-\nmental tem 100 pontos de luz."
+    "description": "A magia invoca um elemental Pequeno, com a forma de um orbe feito de luz divina. A criatura é incorpórea, imune a dano e ilumina como uma tocha. O elemental tem 100 pontos de luz."
   },
   {
     "id": "heroismo",
@@ -2037,7 +2037,7 @@ export const SPELLS_LIST: Spell[] = [
     "range": "toque",
     "targetArea": "1 criatura",
     "duration": "cena",
-    "description": "Esta magia imbui uma criatura com \ncoragem e valentia. O alvo fica imune a \nmedo e recebe 40 PV temporários e +4 \nem testes de ataque e rolagens de dano \ncontra o inimigo de maior ND na cena."
+    "description": "Esta magia imbui uma criatura com coragem e valentia. O alvo fica imune a medo e recebe 40 PV temporários e +4 em testes de ataque e rolagens de dano contra o inimigo de maior ND na cena."
   },
   {
     "id": "hipnotismo",
@@ -2049,32 +2049,32 @@ export const SPELLS_LIST: Spell[] = [
     "range": "curto",
     "targetArea": "1 criatura",
     "duration": "Instantânea",
-    "description": "Execução: padrão; Alcance: curto; \nAlvos: 1 animal ou humanoide; Du-\nração: 1d4 rodadas; Resistência: \nVontade anula.\nSuas palavras e movimentos ritmados \ndeixam o alvo fascinado. Esta magia só \nafeta criaturas que possam perceber \nvocê. Se usar esta magia em combate, \no alvo recebe +5 em seu teste de resis-\ntência. Se a criatura passar, fica imune \na este efeito por um dia.",
+    "description": "Execução: padrão; Alcance: curto; Alvos: 1 animal ou humanoide; Duração: 1d4 rodadas; Resistência: Vontade anula. Suas palavras e movimentos ritmados deixam o alvo fascinado. Esta magia só afeta criaturas que possam perceber você. Se usar esta magia em combate, o alvo recebe +5 em seu teste de resistência. Se a criatura passar, fica imune a este efeito por um dia.",
     "resistance": "Vontade anula",
     "upgrades": [
       {
         "cost": "Truque",
-        "description": "muda a duração para 1 ro-\ndada. Em vez de fascinado, o alvo fica \npasmo (apenas uma vez por cena)."
+        "description": "muda a duração para 1 rodada. Em vez de fascinado, o alvo fica pasmo (apenas uma vez por cena)."
       },
       {
         "cost": "+1 PM",
-        "description": "como o normal, mas alvos que \npassem na resistência não sabem que \nforam vítimas de uma magia."
+        "description": "como o normal, mas alvos que passem na resistência não sabem que foram vítimas de uma magia."
       },
       {
         "cost": "+2 PM",
-        "description": "muda o alvo para animais ou \nhumanoides escolhidos."
+        "description": "muda o alvo para animais ou humanoides escolhidos."
       },
       {
         "cost": "+2 PM",
-        "description": "muda a duração para susten-\ntada."
+        "description": "muda a duração para sustentada."
       },
       {
         "cost": "+2 PM",
-        "description": "também afeta espíritos e \nmonstros na área. Requer 2º círculo."
+        "description": "também afeta espíritos e monstros na área. Requer 2º círculo."
       },
       {
         "cost": "+5 PM",
-        "description": "também afeta construtos, es-\npíritos, monstros e mortos-vivos na \nárea. Requer 3º círculo.\n194\nMagia"
+        "description": "também afeta construtos, espíritos, monstros e mortos-vivos na área. Requer 3º círculo. 194 Magia"
       }
     ]
   },
@@ -2087,8 +2087,8 @@ export const SPELLS_LIST: Spell[] = [
     "execution": "padrão",
     "range": "médio",
     "targetArea": "cubo de 9m",
-    "duration": "sustenta-\nda",
-    "description": "Você cria uma ilusão de algum peri-\ngo mortal. Quando a magia é lança-\nda, criaturas na área devem fazer um \nteste de Vontade; uma falha signifi-\nca que a criatura acredita que a ilusão \né real e sofre 3d6 pontos de dano psí-\nquico não letal. Sempre que uma cria-\ntura iniciar seu turno dentro da área, \ndeve repetir o teste de Vontade. Se fa-\nlhar, sofre o dano novamente. Somen-\nte criaturas que falham veem a ilusão, \ne racionalizam o efeito sempre que fa-\nlham no teste (por exemplo, acredita \nque o mesmo teto pode cair sobre ela \nvárias vezes).",
+    "duration": "sustentada",
+    "description": "Você cria uma ilusão de algum perigo mortal. Quando a magia é lançada, criaturas na área devem fazer um teste de Vontade; uma falha significa que a criatura acredita que a ilusão é real e sofre 3d6 pontos de dano psíquico não letal. Sempre que uma criatura iniciar seu turno dentro da área, deve repetir o teste de Vontade. Se falhar, sofre o dano novamente. Somen-te criaturas que falham veem a ilusão, e racionalizam o efeito sempre que falham no teste (por exemplo, acredita que o mesmo teto pode cair sobre ela várias vezes).",
     "resistance": "Vontade anula",
     "upgrades": [
       {
@@ -2107,11 +2107,11 @@ export const SPELLS_LIST: Spell[] = [
     "range": "pessoal",
     "targetArea": "você",
     "duration": "cena",
-    "description": "Três cópias ilusórias suas aparecem. \nAs duplicatas ficam ao seu redor e imi-\ntam suas ações, tornando difícil para \num inimigo saber quem atacar. Você \nrecebe +6 na Defesa. Cada vez que um \nataque contra você erra, uma das ima-\ngens desaparece e o bônus na Defe-\nsa diminui em 2. Um oponente deve \nver as cópias para ser confundido. Se \nvocê estiver invisível, ou o atacante fe-\nchar os olhos, você não recebe o bônus \n(mas o atacante ainda sofre penalida-\ndes normais por não enxergar).",
+    "description": "Três cópias ilusórias suas aparecem. As duplicatas ficam ao seu redor e imitam suas ações, tornando difícil para um inimigo saber quem atacar. Você recebe +6 na Defesa. Cada vez que um ataque contra você erra, uma das imagens desaparece e o bônus na Defesa diminui em 2. Um oponente deve ver as cópias para ser confundido. Se você estiver invisível, ou o atacante fechar os olhos, você não recebe o bônus (mas o atacante ainda sofre penalidades normais por não enxergar).",
     "upgrades": [
       {
         "cost": "+2 PM",
-        "description": "aumenta o número de cópias \nem"
+        "description": "aumenta o número de cópias em"
       }
     ]
   },
@@ -2125,7 +2125,7 @@ export const SPELLS_LIST: Spell[] = [
     "range": "curto",
     "targetArea": "1 humanoide ou animal",
     "duration": "Instantânea",
-    "description": "O alvo fica paralisado; se passar na re-\nsistência, em vez disso fica lento. A \ncada rodada, pode gastar uma ação \ncompleta para fazer um novo teste de \nVontade. Se passar, se liberta do efeito.",
+    "description": "O alvo fica paralisado; se passar na resistência, em vez disso fica lento. A cada rodada, pode gastar uma ação completa para fazer um novo teste de Vontade. Se passar, se liberta do efeito.",
     "resistance": "Vontade parcial",
     "upgrades": [
       {
@@ -2134,7 +2134,7 @@ export const SPELLS_LIST: Spell[] = [
       },
       {
         "cost": "+2 PM",
-        "description": "aumenta o número de alvos \nem"
+        "description": "aumenta o número de alvos em"
       }
     ]
   },
@@ -2148,12 +2148,12 @@ export const SPELLS_LIST: Spell[] = [
     "range": "toque",
     "targetArea": "1 criatura",
     "duration": "instantânea",
-    "description": "Você canaliza energia negativa contra \num alvo, causando 2d8+2 pontos de \ndano de trevas (ou curando 2d8+2 PV, \nse for um morto-vivo). Infligir Ferimentos \nanula Curar Ferimentos.",
+    "description": "Você canaliza energia negativa contra um alvo, causando 2d8+2 pontos de dano de trevas (ou curando 2d8+2 PV, se for um morto-vivo). Infligir Ferimentos anula Curar Ferimentos.",
     "resistance": "Fortitude reduz à metade",
     "upgrades": [
       {
         "cost": "+1 PM",
-        "description": "além do normal , o alvo fica fra-\nco pela cena (passar no teste de resis-\ntência evita)."
+        "description": "além do normal, o alvo fica fraco pela cena (passar no teste de resistência evita)."
       },
       {
         "cost": "+2 PM",
@@ -2161,7 +2161,7 @@ export const SPELLS_LIST: Spell[] = [
       },
       {
         "cost": "+2 PM",
-        "description": "muda a resistência para ne-\nnhum. Como parte da execução da ma-\ngia, você pode fazer um ataque corpo a \ncorpo contra o alvo. Se acertar, causa o \ndano do ataque e o efeito da magia."
+        "description": "muda a resistência para nenhum. Como parte da execução da magia, você pode fazer um ataque corpo a corpo contra o alvo. Se acertar, causa o dano do ataque e o efeito da magia."
       }
     ]
   },
@@ -2174,8 +2174,8 @@ export const SPELLS_LIST: Spell[] = [
     "execution": "completa",
     "range": "veja \ntexto",
     "targetArea": "veja texto",
-    "duration": "veja \ntexto",
-    "description": "Você pede a sua divindade para inter-\nceder diretamente. Você pode:\n•\t Curar todos os PV e condições de \naté 10 criaturas em alcance longo (este \nefeito cura mortos-vivos, em vez de \ncausar dano).\n•\t Dissipar os efeitos de qualquer ma-\ngia de 4º círculo ou menor.\nVocê pode implorar por algo ainda \nmais poderoso. Nesse caso, a magia re-\nquer o sacrifício de 2 PM e pode fazer \ncoisas como:\n•\t Criar um item mundano de até T$ \n30.000.\n•\t Duplicar os efeitos de qualquer ma-\ngia de até 4º círculo. Caso a magia pre-\ncise de um componente material para \nser lançada, ainda é necessário provi-\ndenciar o componente.\n•\t Proteger uma cidade de um desas-\ntre, como uma erupção vulcânica, en-\nchente ou terremoto.\n•\t Ressuscitar uma criatura em alcance \nlongo que tenha morrido há até uma \nrodada. A criatura acorda com 1 PV.\n•\t Qualquer outra coisa que o mestre \nautorize, conforme os desejos e objeti-\nvos da divindade do conjurador.",
+    "duration": "veja texto",
+    "description": "Você pede a sua divindade para interceder diretamente. Você pode: • Curar todos os PV e condições de até 10 criaturas em alcance longo (este efeito cura mortos-vivos, em vez de causar dano). • Dissipar os efeitos de qualquer magia de 4º círculo ou menor. Você pode implorar por algo ainda mais poderoso. Nesse caso, a magia requer o sacrifício de 2 PM e pode fazer coisas como: • Criar um item mundano de até T$ 30.000. • Duplicar os efeitos de qualquer magia de até 4º círculo. Caso a magia pre-cise de um componente material para ser lançada, ainda é necessário providenciar o componente. • Proteger uma cidade de um desastre, como uma erupção vulcânica, enchente ou terremoto. • Ressuscitar uma criatura em alcance longo que tenha morrido há até uma rodada. A criatura acorda com 1 PV. • Qualquer outra coisa que o mestre autorize, conforme os desejos e objetivos da divindade do conjurador.",
     "resistance": "veja texto"
   },
   {
@@ -2188,19 +2188,19 @@ export const SPELLS_LIST: Spell[] = [
     "range": "pessoal",
     "targetArea": "você",
     "duration": "1 rodada",
-    "description": "O alvo fica invisível (incluindo seu equi-\npamento). Um personagem invisível re-\ncebe camuflagem total, +10 em testes \nde Furtividade contra ouvir e criaturas \nque não possam percebê-lo ficam des-\nprevenidas contra seus ataques.\nA magia termina se o alvo faz uma ação \nhostil contra uma criatura. Ações con-\ntra objetos livres não dissipam a Invi-\nsibilidade (você pode tocar ou apanhar \nobjetos que não estejam sendo segura-\ndos por outras criaturas). Causar dano \nindiretamente - por exemplo, acen-\ndendo o pavio de um barril de pólvo-\nra que vai detonar mais tarde - não é \nconsiderado um ataque.\nObjetos soltos pelo alvo voltam a ser \nvisíveis e objetos apanhados por ele fi-\ncam invisíveis. Qualquer parte de um \nitem carregado que se estenda além de \nseu alcance corpo a corpo natural se \ntorna visível. Uma luz nunca fica invi-\nsível (mesmo que sua fonte seja).",
+    "description": "O alvo fica invisível (incluindo seu equipamento). Um personagem invisível recebe camuflagem total, +10 em testes de Furtividade contra ouvir e criaturas que não possam percebê-lo ficam desprevenidas contra seus ataques. A magia termina se o alvo faz uma ação hostil contra uma criatura. Ações contra objetos livres não dissipam a Invisibilidade (você pode tocar ou apanhar objetos que não estejam sendo segurados por outras criaturas). Causar dano indiretamente - por exemplo, acendendo o pavio de um barril de pólvora que vai detonar mais tarde - não é considerado um ataque. Objetos soltos pelo alvo voltam a ser visíveis e objetos apanhados por ele ficam invisíveis. Qualquer parte de um item carregado que se estenda além de seu alcance corpo a corpo natural se torna visível. Uma luz nunca fica invisível (mesmo que sua fonte seja).",
     "upgrades": [
       {
         "cost": "+1 PM",
-        "description": "muda a execução para ação pa-\ndrão, o alcance para toque e o alvo para \n1 criatura ou 1 objeto Grande ou menor."
+        "description": "muda a execução para ação padrão, o alcance para toque e o alvo para 1 criatura ou 1 objeto Grande ou menor."
       },
       {
         "cost": "+3 PM",
-        "description": "muda a duração para cena. \nRequer 3º círculo."
+        "description": "muda a duração para cena. Requer 3º círculo."
       },
       {
         "cost": "+3 PM",
-        "description": "muda a duração para sustenta-\nda. Em vez do normal, o alvo gera uma \nesfera de invisibilidade. Não pode ser \nusado em conjunto com outros apri-\nmoramentos. O alvo e todas as criatu-\nras a até 3m dele se tornam invisíveis, \ncomo no efeito normal da magia (ain-\nda ficam visíveis caso façam uma ação \nhostial). A esfera se move juntamen-\nte com o alvo; qualquer coisa que saia \nda esfera fica visível. Requer 3º círculo."
+        "description": "muda a duração para sustentada. Em vez do normal, o alvo gera uma esfera de invisibilidade. Não pode ser usado em conjunto com outros aprimoramentos. O alvo e todas as criaturas a até 3m dele se tornam invisíveis, como no efeito normal da magia (ainda ficam visíveis caso façam uma ação hostial). A esfera se move juntamen-te com o alvo; qualquer coisa que saia da esfera fica visível. Requer 3º círculo."
       }
     ]
   },
@@ -2214,7 +2214,7 @@ export const SPELLS_LIST: Spell[] = [
     "range": "pessoal",
     "targetArea": "você",
     "duration": "cena",
-    "description": "Esta magia cria uma barreira mágica \nimpenetrável que protege você contra \nefeitos nocivos mentais ou físicos, a \nsua escolha.\nProteção mental: você fica imune às con-\ndições abalado, alquebrado, apavora-\ndo, atordoado, confuso, esmorecido,\n195\nCapítulo Quatro\nfascinado, frustrado e pasmo, além de \nefeitos de encantamento e ilusão.\nProteção física: você fica imune às con-\ndições atordoado, cego, debilitado, en-\njoado, envenenado, exausto, fatiga-\ndo, fraco, lento, ofuscado e paralisado, \nalém de acertos críticos, ataques furti-\nvos e doenças."
+    "description": "Esta magia cria uma barreira mágica impenetrável que protege você contra efeitos nocivos mentais ou físicos, a sua escolha. Proteção mental: você fica imune às condições abalado, alquebrado, apavorado, atordoado, confuso, esmorecido, 195 Capítulo Quatro fascinado, frustrado e pasmo, além de efeitos de encantamento e ilusão. Proteção física: você fica imune às condições atordoado, cego, debilitado, enjoado, envenenado, exausto, fatigado, fraco, lento, ofuscado e paralisado, além de acertos críticos, ataques furtivos e doenças."
   },
   {
     "id": "lagrimas_de_wynna",
@@ -2226,12 +2226,12 @@ export const SPELLS_LIST: Spell[] = [
     "range": "curto",
     "targetArea": "1 criatura",
     "duration": "instantânea",
-    "description": "Se falhar no teste de resistência, o alvo \nperde a habilidade de lançar magias ar-\ncanas até o fim da cena. Se passar, per-\nde a habilidade por uma rodada.",
+    "description": "Se falhar no teste de resistência, o alvo perde a habilidade de lançar magias arcanas até o fim da cena. Se passar, perde a habilidade por uma rodada.",
     "resistance": "Vontade parcial",
     "upgrades": [
       {
         "cost": "+2 PM",
-        "description": "muda a área para esfera com \n6m de raio e o alvo para criaturas es-\ncolhidas."
+        "description": "muda a área para esfera com 6m de raio e o alvo para criaturas escolhidas."
       }
     ]
   },
@@ -2244,8 +2244,8 @@ export const SPELLS_LIST: Spell[] = [
     "execution": "padrão",
     "range": "médio",
     "targetArea": "1 criatura",
-    "duration": "instantâ-\nnea",
-    "description": "Esta magia foi desenvolvida pelo mago \nimortal Aleph Olhos Vermelhos, um \nentusiasta dos estudos vulcânicos. Ela \ndispara um projétil de magma contra o \nalvo, que sofre 4d6 pontos de dano de \nfogo e 4d6 pontos de dano de perfura-\nção e fica em chamas. As chamas cau-\nsam 2d6 pontos de dano por rodada, \nem vez do dano normal. Se passar no \nteste de resistência, o alvo sofre meta-\nde do dano e não fica em chamas.\nRespingos de rocha incandescente se \nespalham com a explosão, atingindo \ntodas as criaturas adjacentes ao alvo, \nque devem fazer um teste de Reflexos. \nSe falharem, ficam em chamas, como \ndescrito acima.",
+    "duration": "instantânea",
+    "description": "Esta magia foi desenvolvida pelo mago imortal Aleph Olhos Vermelhos, um entusiasta dos estudos vulcânicos. Ela dispara um projétil de magma contra o alvo, que sofre 4d6 pontos de dano de fogo e 4d6 pontos de dano de perfuração e fica em chamas. As chamas causam 2d6 pontos de dano por rodada, em vez do dano normal. Se passar no teste de resistência, o alvo sofre metade do dano e não fica em chamas. Respingos de rocha incandescente se espalham com a explosão, atingindo todas as criaturas adjacentes ao alvo, que devem fazer um teste de Reflexos. Se falharem, ficam em chamas, como descrito acima.",
     "resistance": "Reflexos parcial",
     "upgrades": [
       {
@@ -2264,8 +2264,8 @@ export const SPELLS_LIST: Spell[] = [
     "range": "médio",
     "targetArea": "até 10 criaturas na área",
     "duration": "Instantânea",
-    "description": "Execução: padrão; Alcance: médio; \nAlvo: até 10 criaturas na área; Dura-\nção: sustentada. Resistência: Vonta-\nde parcial.\nVocê domina a mente dos alvos. Os al-\nvos obedecem cegamente a seus co-\nmandos, exceto ordens claramente sui-\ncidas. Um alvo tem direito a um teste \nno final de cada um de seus turnos para \nse livrar do efeito. Alvos que passarem \nno teste ficam abalados por 1 rodada \nenquanto recuperam a consciência.",
-    "resistance": "Vonta-\nde parcial"
+    "description": "Execução: padrão; Alcance: médio; Alvo: até 10 criaturas na área; Duração: sustentada. Resistência: Vontade parcial. Você domina a mente dos alvos. Os alvos obedecem cegamente a seus comandos, exceto ordens claramente suicidas. Um alvo tem direito a um teste no final de cada um de seus turnos para se livrar do efeito. Alvos que passarem no teste ficam abalados por 1 rodada enquanto recuperam a consciência.",
+    "resistance": "Vontade parcial"
   },
   {
     "id": "lendas_e_historias",
@@ -2277,11 +2277,11 @@ export const SPELLS_LIST: Spell[] = [
     "range": "toque",
     "targetArea": "1 criatura, objeto ou local",
     "duration": "Instantânea",
-    "description": "Execução: padrão; Alcance: toque; \nAlvo: 1 criatura, objeto ou local; Du-\nração: sustentada.\nVocê descobre informações sobre uma \ncriatura, objeto ou local que esteja to-\ncando. O que exatamente você desco-\nbre depende do mestre: talvez você não \ndescubra tudo que há para saber, mas \nganhe pistas para continuar a investi-\ngação. A cada rodada que mantiver a \nmagia, você descobre:\n•\t Todas as informações sobre o alvo, \ncomo se tivesse passado em todos os \ntestes de Conhecimento para tal.\n•\t Todas as habilidades do alvo. Se for \numa criatura, você sabe suas estatís-\nticas de jogo como raça, classe, nível, \natributos, magias, resistências e fra-\nquezas. Se for um item mágico, apren-\nde seu efeito e funcionamento.\n•\t Se o alvo está sob influência de algu-\nma magia e todas as informações sobre \nas magias ativas, se houver alguma.",
+    "description": "Execução: padrão; Alcance: toque; Alvo: 1 criatura, objeto ou local; Duração: sustentada. Você descobre informações sobre uma criatura, objeto ou local que esteja tocando. O que exatamente você descobre depende do mestre: talvez você não descubra tudo que há para saber, mas ganhe pistas para continuar a investigação. A cada rodada que mantiver a magia, você descobre: • Todas as informações sobre o alvo, como se tivesse passado em todos os testes de Conhecimento para tal. • Todas as habilidades do alvo. Se for uma criatura, você sabe suas estatísticas de jogo como raça, classe, nível, atributos, magias, resistências e fraquezas. Se for um item mágico, aprende seu efeito e funcionamento. • Se o alvo está sob influência de alguma magia e todas as informações sobre as magias ativas, se houver alguma.",
     "upgrades": [
       {
         "cost": "+4 PM",
-        "description": "muda a execução para um dia, \no alcance para ilimitado e adiciona com-\nponente material (cuba de ouro cheia \nd’água e ingredientes mágicos, no va-\nlor de T$ 1.000). Você ainda precisa ter \nalguma informação sobre o alvo, como \num nome, descrição ou localização."
+        "description": "muda a execução para um dia, o alcance para ilimitado e adiciona componente material (cuba de ouro cheia d’água e ingredientes mágicos, no valor de T$ 1.000). Você ainda precisa ter alguma informação sobre o alvo, como um nome, descrição ou localização."
       }
     ]
   },
@@ -2294,17 +2294,17 @@ export const SPELLS_LIST: Spell[] = [
     "execution": "padrão",
     "range": "pessoal",
     "targetArea": "cone de 4,5m",
-    "duration": "instan-\ntânea",
-    "description": "Um cone de luzes brilhantes surge \ndas suas mãos, deixando os animais \ne humanoides na área atordoados por \n1 rodada (apenas uma vez por cena, \nVontade anula) e ofuscados pela cena. \nEsta magia não afeta criaturas cegas.",
+    "duration": "instantânea",
+    "description": "Um cone de luzes brilhantes surge das suas mãos, deixando os animais e humanoides na área atordoados por 1 rodada (apenas uma vez por cena, Vontade anula) e ofuscados pela cena. Esta magia não afeta criaturas cegas.",
     "resistance": "Vontade parcial",
     "upgrades": [
       {
         "cost": "+2 PM",
-        "description": "além do normal, as criaturas \nafetadas ficam vulneráveis pela cena."
+        "description": "além do normal, as criaturas afetadas ficam vulneráveis pela cena."
       },
       {
         "cost": "+2 PM",
-        "description": "também afeta espíritos e \nmonstros na área. Requer 2º círculo."
+        "description": "também afeta espíritos e monstros na área. Requer 2º círculo."
       }
     ]
   },
@@ -2318,19 +2318,19 @@ export const SPELLS_LIST: Spell[] = [
     "range": "curto",
     "targetArea": "1 criatura",
     "duration": "cena",
-    "description": "O alvo fica imune a efeitos de movi-\nmento e ignora qualquer efeito que \nimpeça ou restrinja seu deslocamen-\nto. Por fim, pode usar habilidades \nque exigem liberdade de movimen-\ntos mesmo se estiver usando arma-\ndura ou escudo.",
+    "description": "O alvo fica imune a efeitos de movimento e ignora qualquer efeito que impeça ou restrinja seu deslocamento. Por fim, pode usar habilidades que exigem liberdade de movimentos mesmo se estiver usando armadura ou escudo.",
     "upgrades": [
       {
         "cost": "+2 PM",
-        "description": "além do normal, o alvo pode \ncaminhar sobre a água ou outros lí-\nquidos com seu deslocamento nor-\nmal. Entretanto, isso não protege con-\ntra qualquer efeito que o líquido possa \ncausar (o alvo pode andar sobre lava, \nmas ainda vai sofrer dano)."
+        "description": "além do normal, o alvo pode caminhar sobre a água ou outros líquidos com seu deslocamento normal. Entretanto, isso não protege contra qualquer efeito que o líquido possa causar (o alvo pode andar sobre lava, mas ainda vai sofrer dano)."
       },
       {
         "cost": "+2 PM",
-        "description": "além do normal, o alvo pode \nescolher 20 em todos os testes de \nAtletismo."
+        "description": "além do normal, o alvo pode escolher 20 em todos os testes de Atletismo."
       },
       {
         "cost": "+2 PM",
-        "description": "além do normal, o alvo pode \nescolher 20 em todos os testes de Acro-\nbacia e pode fazer todas as manobras \ndesta perícia mesmo sem treinamento."
+        "description": "além do normal, o alvo pode escolher 20 em todos os testes de Acrobacia e pode fazer todas as manobras desta perícia mesmo sem treinamento."
       },
       {
         "cost": "+5 PM",
@@ -2348,7 +2348,7 @@ export const SPELLS_LIST: Spell[] = [
     "range": "longo",
     "targetArea": "1 criatura",
     "duration": "1 dia",
-    "description": "Execução: padrão; Alcance: longo; \nAlvo: 1 criatura; Duração: 1 dia; Re-\nsistência: Fortitude anula.\nCria uma conexão entre seu corpo e o \nda criatura alvo, deixando uma mar-\nca idêntica na pele de ambos. Enquan-\nto a magia durar, sempre que você so-\nfrer qualquer dano ou condição, o alvo \ndesta magia deve fazer um teste de For-\ntitude; se falhar, sofre o mesmo dano \nque você ou adquire a mesma condição.\n196\nMagia\nA magia termina se o alvo chegar a 0 \npontos de vida."
+    "description": "Execução: padrão; Alcance: longo; Alvo: 1 criatura; Duração: 1 dia; Resistência: Fortitude anula. Cria uma conexão entre seu corpo e o da criatura alvo, deixando uma marca idêntica na pele de ambos. Enquanto a magia durar, sempre que você sofrer qualquer dano ou condição, o alvo desta magia deve fazer um teste de Fortitude; se falhar, sofre o mesmo dano que você ou adquire a mesma condição. 196 Magia A magia termina se o alvo chegar a 0 pontos de vida."
   },
   {
     "id": "ligacao_telepatica",
@@ -2360,11 +2360,11 @@ export const SPELLS_LIST: Spell[] = [
     "range": "toque",
     "targetArea": "2 criaturas voluntárias",
     "duration": "Instantânea",
-    "description": "Execução: padrão; Alcance: toque; \nAlvo: 2 criaturas voluntárias; Dura-\nção: 1 dia.\nVocê cria um elo mental entre duas \ncriaturas com Inteligência - 3 ou maior \n(você pode ser uma delas). As criatu-\nras podem se comunicar independen-\nte de idioma ou distância, mas não em \nmundos diferentes.",
+    "description": "Execução: padrão; Alcance: toque; Alvo: 2 criaturas voluntárias; Duração: 1 dia. Você cria um elo mental entre duas criaturas com Inteligência - 3 ou maior (você pode ser uma delas). As criaturas podem se comunicar independen-te de idioma ou distância, mas não em mundos diferentes.",
     "upgrades": [
       {
         "cost": "+2 PM",
-        "description": "aumenta o número de alvos \nem"
+        "description": "aumenta o número de alvos em"
       }
     ]
   },
@@ -2378,15 +2378,15 @@ export const SPELLS_LIST: Spell[] = [
     "range": "pessoal",
     "targetArea": "esfera com 90m de raio",
     "duration": "Instantânea",
-    "description": "Execução: padrão; Alcance: pessoal; \nÁrea: esfera com 90m de raio; Dura-\nção: cena.\nEsta magia pode encontrar uma cria-\ntura ou objeto a sua escolha. Você \npode pensar em termos gerais (“um \nelfo”, “algo de metal”) ou específicos \n(“Gwen, a elfa”, “uma espada longa”). \nA magia indica a direção e distân-\ncia da criatura ou objeto mais próxi-\nmo desse tipo, caso esteja ao alcance. \nVocê pode movimentar-se para conti-\nnuar procurando. Procurar algo mui-\nto específico (“a espada longa encan-\ntada do Barão Rulyn”) exige que você \ntenha em mente uma imagem preci-\nsa do objeto; caso a imagem não seja \nmuito próxima da verdade, a magia fa-\nlha, mas você gasta os PM mesmo as-\nsim. Esta magia pode ser bloqueada \npor uma fina camada de chumbo.",
+    "description": "Execução: padrão; Alcance: pessoal; Área: esfera com 90m de raio; Duração: cena. Esta magia pode encontrar uma criatura ou objeto a sua escolha. Você pode pensar em termos gerais (“um elfo”, “algo de metal”) ou específicos (“Gwen, a elfa”, “uma espada longa”). A magia indica a direção e distância da criatura ou objeto mais próximo desse tipo, caso esteja ao alcance. Você pode movimentar-se para continuar procurando. Procurar algo muito específico (“a espada longa encantada do Barão Rulyn”) exige que você tenha em mente uma imagem precisa do objeto; caso a imagem não seja muito próxima da verdade, a magia falha, mas você gasta os PM mesmo assim. Esta magia pode ser bloqueada por uma fina camada de chumbo.",
     "upgrades": [
       {
         "cost": "Truque",
-        "description": "muda a área para alvo você. \nEm vez do normal, você sabe onde fica \no norte e recebe"
+        "description": "muda a área para alvo você. Em vez do normal, você sabe onde fica o norte e recebe"
       },
       {
         "cost": "+5 PM",
-        "description": "aumenta a área em um fator \nde 10 (90m para 900m, 900m para \n9km e assim por diante)."
+        "description": "aumenta a área em um fator de 10 (90m para 900m, 900m para 9km e assim por diante)."
       }
     ]
   },
@@ -2400,7 +2400,7 @@ export const SPELLS_LIST: Spell[] = [
     "range": "curto",
     "targetArea": "1 objeto",
     "duration": "cena",
-    "description": "Você fica coberto por um manto de \nenergia sombria. Nesta forma, torna-se \nincorpóreo (inclui seu equipamento): \nsó pode ser afetado por armas e habili-\ndades mágicas, ou por outras criaturas \nincorpóreas, e pode atravessar objetos \nsólidos, mas não manipulá-los. Tam-\nbém não pode atacar criaturas normais \n(mas ainda pode lançar magias nelas). \nAlém disso, se torna vulnerável à luz di-\nreta: se exposto a uma fonte de luz, so-\nfre 1 ponto de dano por rodada.\nVocê pode gastar uma ação de movi-\nmento e 1 PM para “entrar” em uma \nsombra do seu tamanho ou maior e \nse teletransportar para outra sombra, \ntambém do seu tamanho ou maior, em \nalcance médio."
+    "description": "Você fica coberto por um manto de energia sombria. Nesta forma, torna-se incorpóreo (inclui seu equipamento): só pode ser afetado por armas e habilidades mágicas, ou por outras criaturas incorpóreas, e pode atravessar objetos sólidos, mas não manipulá-los. Também não pode atacar criaturas normais (mas ainda pode lançar magias nelas). Além disso, se torna vulnerável à luz direta: se exposto a uma fonte de luz, sofre 1 ponto de dano por rodada. Você pode gastar uma ação de movimento e 1 PM para “entrar” em uma sombra do seu tamanho ou maior e se teletransportar para outra sombra, também do seu tamanho ou maior, em alcance médio."
   },
   {
     "id": "manto_do_cruzado",
@@ -2412,7 +2412,7 @@ export const SPELLS_LIST: Spell[] = [
     "range": "pessoal",
     "targetArea": "você",
     "duration": "sustentada",
-    "description": "Você invoca o poder de sua divinda-\nde na forma de um manto de energia \nque reveste seu corpo. Esta magia tem \nduas versões. Você escolhe qual versão \npode lançar quando aprende esta ma-\ngia. Ela não pode ser mudada.\nManto de Luz: um manto dourado e lu-\nminoso. No início de cada um de seus \nturnos, você e todos os seus aliados \nem alcance curto recuperam 2d8 PV. \nVocê recebe imunidade a dano de tre-\nvas e seus ataques corpo a corpo cau-\nsam +2d8 pontos de dano de luz."
+    "description": "Você invoca o poder de sua divindade na forma de um manto de energia que reveste seu corpo. Esta magia tem duas versões. Você escolhe qual versão pode lançar quando aprende esta magia. Ela não pode ser mudada. Manto de Luz: um manto dourado e luminoso. No início de cada um de seus turnos, você e todos os seus aliados em alcance curto recuperam 2d8 PV. Você recebe imunidade a dano de trevas e seus ataques corpo a corpo causam +2d8 pontos de dano de luz."
   },
   {
     "id": "mao_poderosa_de_talude",
@@ -2424,7 +2424,7 @@ export const SPELLS_LIST: Spell[] = [
     "range": "médio",
     "targetArea": "mão gigante de energia",
     "duration": "Instantânea",
-    "description": "Execução: padrão; Alcance: médio; \nEfeito: mão gigante de energia; Dura-\nção: sustentada.\nEsta magia cria uma mão flutuante \nGrande que sempre se posiciona entre \nvocê e um oponente a sua escolha. A \nmão fornece cobertura leve (+5 na De-\nfesa) contra esse oponente. Nada é ca-\npaz de enganar a mão - coisas como \nescuridão, invisibilidade, metamorfose \ne disfarces mundanos não a impedem \nde protegê-lo. A mão tem Defesa 20 e \nPV e resistências iguais aos seus. Com\n197\nCapítulo Quatro\numa ação de movimento, você pode \ncomandar a mão para que o proteja \nde outro oponente ou para que realize \numa das ações a seguir.\nAgarrar: a mão usa uma manobra agar-\nrar contra o oponente, usando o seu \nMisticismo com um bônus adicional \nde +10. A mão mantém o oponente \nagarrado, mas não causa dano.\nEsmagar: a mão esmaga um oponente \nagarrado, causando 2d6+10 pontos de \ndano de impacto.\nEmpurrar: a mão afasta o oponente \n(manobra empurrar usando o seu Mis-\nticismo com um bônus adicional de \n+10). A mão acompanha o oponente \npara empurrá-lo o máximo que conse-\nguir, dentro do alcance da magia.",
+    "description": "Execução: padrão; Alcance: médio; Efeito: mão gigante de energia; Duração: sustentada. Esta magia cria uma mão flutuante Grande que sempre se posiciona entre você e um oponente a sua escolha. A mão fornece cobertura leve (+5 na Defesa) contra esse oponente. Nada é capaz de enganar a mão - coisas como escuridão, invisibilidade, metamorfose e disfarces mundanos não a impedem de protegê-lo. A mão tem Defesa 20 e PV e resistências iguais aos seus. Com 197 Capítulo Quatro uma ação de movimento, você pode comandar a mão para que o proteja de outro oponente ou para que realize uma das ações a seguir. Agarrar: a mão usa uma manobra agarrar contra o oponente, usando o seu Misticismo com um bônus adicional de +10. A mão mantém o oponente agarrado, mas não causa dano. Esmagar: a mão esmaga um oponente agarrado, causando 2d6+10 pontos de dano de impacto. Empurrar: a mão afasta o oponente (manobra empurrar usando o seu Misticismo com um bônus adicional de +10). A mão acompanha o oponente para empurrá-lo o máximo que conseguir, dentro do alcance da magia.",
     "upgrades": [
       {
         "cost": "+2 PM",
@@ -2440,9 +2440,9 @@ export const SPELLS_LIST: Spell[] = [
     "school": "Adivinhação",
     "execution": "padrão",
     "range": "toque",
-    "targetArea": "superfície ou objeto plano, como \numa mesa ou papel",
+    "targetArea": "superfície ou objeto plano, como uma mesa ou papel",
     "duration": "cena",
-    "description": "Uma fagulha percorre a superfície afe-\ntada, queimando-a enquanto esboça \num mapa da região onde o conjurador \nestá. Se você conhece o lugar, o mapa \nserá completo. Caso contrário, apre-\nsentará apenas um esboço geral, além \nde um ponto de referência (para pos-\nsibilitar localização) e um lugar de in-\nteresse, ambos definidos pelo mestre. \nA região representada no mapa tem ta-\nmanho máximo de um quadrado de \n10km de lado. Caso você esteja dentro \nde uma construção, o mapa mostrará o \nandar no qual você se encontra."
+    "description": "Uma fagulha percorre a superfície afetada, queimando-a enquanto esboça um mapa da região onde o conjurador está. Se você conhece o lugar, o mapa será completo. Caso contrário, apresentará apenas um esboço geral, além de um ponto de referência (para pos-sibilitar localização) e um lugar de interesse, ambos definidos pelo mestre. A região representada no mapa tem tamanho máximo de um quadrado de 10km de lado. Caso você esteja dentro de uma construção, o mapa mostrará o andar no qual você se encontra."
   },
   {
     "id": "marca_da_obediencia",
@@ -2454,11 +2454,11 @@ export const SPELLS_LIST: Spell[] = [
     "range": "toque",
     "targetArea": "1 criatura",
     "duration": "cena",
-    "description": "Execução: padrão; Alcance: toque; \nAlvo: 1 criatura; Duração: cena; Re-\nsistência: Vontade anula.\nVocê toca uma criatura, gravando uma \nmarca mística no corpo dela enquanto \nprofere uma ordem, como “não ataque \na mim ou meus aliados”, “siga-me” ou \n“não saia desta sala”. A criatura deve \nseguir essa ordem, gastando todas as \nações de seu turno para isso. A ordem \nnão pode ser genérica demais (como \n“ajude-me”, por exemplo), nem forçar \no alvo a atos suicidas. A cada rodada, \no alvo pode fazer um teste de Vonta-\nde. Se passar, a magia é dissipada.",
+    "description": "Execução: padrão; Alcance: toque; Alvo: 1 criatura; Duração: cena; Resistência: Vontade anula. Você toca uma criatura, gravando uma marca mística no corpo dela enquanto profere uma ordem, como “não ataque a mim ou meus aliados”, “siga-me” ou “não saia desta sala”. A criatura deve seguir essa ordem, gastando todas as ações de seu turno para isso. A ordem não pode ser genérica demais (como “ajude-me”, por exemplo), nem forçar o alvo a atos suicidas. A cada rodada, o alvo pode fazer um teste de Vontade. Se passar, a magia é dissipada.",
     "upgrades": [
       {
         "cost": "+3 PM",
-        "description": "muda a duração para um dia. \nSe não estiver em combate, a criatura \nsó pode fazer o teste de Vontade a cada \nhora. Requer 3º círculo."
+        "description": "muda a duração para um dia. Se não estiver em combate, a criatura só pode fazer o teste de Vontade a cada hora. Requer 3º círculo."
       }
     ]
   },
@@ -2471,8 +2471,8 @@ export const SPELLS_LIST: Spell[] = [
     "execution": "padrão",
     "range": "médio",
     "targetArea": "1 criatura",
-    "duration": "sustenta-\nda",
-    "description": "Esta magia manipula o sistema ner-\nvoso do alvo. Ao sofrer a magia, e no \ninício de cada um de seus turnos, a \nvítima faz um teste de Fortitude. Se \npassar, a magia é anulada. Se falhar, \ntodas as suas ações físicas naquele \nturno estarão sob controle do conju-\nrador. A vítima ainda tem consciência \nde tudo que acontece à sua volta, po-\ndendo ver, ouvir e até falar com certo \nesforço (mas não para lançar magias). \nContudo, seu corpo realiza apenas os \nmovimentos que o conjurador dese-\nja. A vítima pode ser manipulada para \nse movimentar, lutar, usar habilidades \nde combate... Enfim, qualquer coisa \nde que seja fisicamente capaz.",
+    "duration": "sustentada",
+    "description": "Esta magia manipula o sistema nervoso do alvo. Ao sofrer a magia, e no início de cada um de seus turnos, a vítima faz um teste de Fortitude. Se passar, a magia é anulada. Se falhar, todas as suas ações físicas naquele turno estarão sob controle do conjurador. A vítima ainda tem consciência de tudo que acontece à sua volta, podendo ver, ouvir e até falar com certo esforço (mas não para lançar magias). Contudo, seu corpo realiza apenas os movimentos que o conjurador deseja. A vítima pode ser manipulada para se movimentar, lutar, usar habilidades de combate... Enfim, qualquer coisa de que seja fisicamente capaz.",
     "resistance": "Fortitude anula"
   },
   {
@@ -2485,8 +2485,8 @@ export const SPELLS_LIST: Spell[] = [
     "range": "pessoal",
     "targetArea": "cone de 30m",
     "duration": "instantânea",
-    "description": "Execução: duas rodadas; Alcance: \npessoal; Área: cone de 30m; Duração: \ninstantânea; Resistência: Reflexos re-\nduz à metade.\nEsta é uma das mais poderosas ma-\ngias de destruição existentes. Após \nentoar longos cânticos, o conjurador \ndispara uma carga de energia que var-\nre uma enorme área à sua frente, cau-\nsando 20d12 pontos de dano de essên-\ncia em todas as criaturas, construções \ne objetos livres atingidos. Sempre que \nrola um resultado 12 em um dado de \ndano, a magia causa +1d12 pontos de \ndano. Apesar de seu poder destrutivo, \nesta magia é lenta, tornando seu uso \ndifícil em combate.",
-    "resistance": "Reflexos re-\nduz à metade"
+    "description": "Execução: duas rodadas; Alcance: pessoal; Área: cone de 30m; Duração: instantânea; Resistência: Reflexos reduz à metade. Esta é uma das mais poderosas magias de destruição existentes. Após entoar longos cânticos, o conjurador dispara uma carga de energia que varre uma enorme área à sua frente, causando 20d12 pontos de dano de essência em todas as criaturas, construções e objetos livres atingidos. Sempre que rola um resultado 12 em um dado de dano, a magia causa +1d12 pontos de dano. Apesar de seu poder destrutivo, esta magia é lenta, tornando seu uso difícil em combate.",
+    "resistance": "Reflexos reduz à metade"
   },
   {
     "id": "mente_divina",
@@ -2498,19 +2498,19 @@ export const SPELLS_LIST: Spell[] = [
     "range": "toque",
     "targetArea": "1 criatura",
     "duration": "cena",
-    "description": "Você fortalece a mente do alvo. Ele re-\ncebe +2 em Inteligência, Sabedoria \nou Carisma, a sua escolha. Esse au-\nmento não oferece PV, PM ou perícias \nadicionais.",
+    "description": "Você fortalece a mente do alvo. Ele recebe +2 em Inteligência, Sabedoria ou Carisma, a sua escolha. Esse aumento não oferece PV, PM ou perícias adicionais.",
     "upgrades": [
       {
         "cost": "+3 PM",
-        "description": "muda o alcance para curto e o \nalvo para criaturas escolhidas."
+        "description": "muda o alcance para curto e o alvo para criaturas escolhidas."
       },
       {
         "cost": "+3 PM",
-        "description": "em vez do normal, o alvo re-\ncebe"
+        "description": "em vez do normal, o alvo recebe"
       },
       {
         "cost": "+7 PM",
-        "description": "em vez do normal, o alvo re-\ncebe"
+        "description": "em vez do normal, o alvo recebe"
       }
     ]
   },
@@ -2524,31 +2524,31 @@ export const SPELLS_LIST: Spell[] = [
     "range": "pessoal",
     "targetArea": "você",
     "duration": "cena",
-    "description": "Você muda sua aparência e forma - in-\ncluindo seu equipamento - para qual-\nquer outra criatura, existente ou ima-\nginada. Independentemente da forma \nescolhida, você recebe +20 em testes \nde Enganação para disfarce. Caracte-\nrísticas não mencionadas não mudam.\nSe mudar para uma forma humanoi-\nde, pode mudar o tipo de dano (entre \ncorte, impacto e perfuração) de suas \narmas (se usa uma maça e transfor-\nmá-la em espada longa, ela pode cau-\nsar dano de corte, por exemplo). Se \nquiser, pode assumir uma forma hu-\nmanoide com uma categoria de ta-\nmanho acima ou abaixo da sua; nes-\nse caso aplique os modificadores em \nFurtividade e testes de manobra.\nSe mudar para outras formas, você \npode escolher uma Forma Selvagem do \ndruida (veja no Capítulo 1). Nesse \ncaso você não pode atacar com suas ar-\nmas, falar ou lançar magias até voltar \nao normal, mas recebe uma ou mais ar-\nmas naturais e os bônus da forma sel-\nvagem escolhida.\n198\nMagia",
+    "description": "Você muda sua aparência e forma - incluindo seu equipamento - para qualquer outra criatura, existente ou imaginada. Independentemente da forma escolhida, você recebe +20 em testes de Enganação para disfarce. Características não mencionadas não mudam. Se mudar para uma forma humanoide, pode mudar o tipo de dano (entre corte, impacto e perfuração) de suas armas (se usa uma maça e transformá-la em espada longa, ela pode causar dano de corte, por exemplo). Se quiser, pode assumir uma forma humanoide com uma categoria de tamanho acima ou abaixo da sua; nes-se caso aplique os modificadores em Furtividade e testes de manobra. Se mudar para outras formas, você pode escolher uma Forma Selvagem do druida (veja no Capítulo 1). Nesse caso você não pode atacar com suas armas, falar ou lançar magias até voltar ao normal, mas recebe uma ou mais armas naturais e os bônus da forma selvagem escolhida. 198 Magia",
     "upgrades": [
       {
         "cost": "+1 PM",
-        "description": "a forma escolhida recebe uma \nhabilidade de sentidos entre faro, visão \nna penumbra e visão no escuro."
+        "description": "a forma escolhida recebe uma habilidade de sentidos entre faro, visão na penumbra e visão no escuro."
       },
       {
         "cost": "+3 PM",
-        "description": "a forma escolhida recebe per-\ncepção às cegas. Requer 3º círculo."
+        "description": "a forma escolhida recebe percepção às cegas. Requer 3º círculo."
       },
       {
         "cost": "+3 PM",
-        "description": "muda o alcance para toque, o \nalvo para 1 criatura e adiciona resistên-\ncia (Vontade anula)."
+        "description": "muda o alcance para toque, o alvo para 1 criatura e adiciona resistência (Vontade anula)."
       },
       {
         "cost": "+3 PM",
-        "description": "muda o alcance para médio, \no alvo para 1 criatura e a resistência \npara Vontade anula. Em vez do nor-\nmal, transforma o alvo em uma cria-\ntura ou objeto inofensivo (ovelha, \nsapo, galinha, pudim de ameixa etc.). \nA criatura não pode atacar, falar e lan-\nçar magias; seu deslocamento vira 3m \ne sua Defesa vira 10. Suas outras ca-\nracterísticas não mudam. No início de \nseus turnos, o alvo pode fazer um tes-\nte de Vontade; se passar, retorna à sua \nforma normal e a magia termina. Re-\nquer 3º círculo."
+        "description": "muda o alcance para médio, o alvo para 1 criatura e a resistência para Vontade anula. Em vez do normal, transforma o alvo em uma criatura ou objeto inofensivo (ovelha, sapo, galinha, pudim de ameixa etc.). A criatura não pode atacar, falar e lançar magias; seu deslocamento vira 3m e sua Defesa vira 10. Suas outras características não mudam. No início de seus turnos, o alvo pode fazer um tes-te de Vontade; se passar, retorna à sua forma normal e a magia termina. Requer 3º círculo."
       },
       {
         "cost": "+5 PM",
-        "description": "se mudar para formas não \nhumanoides, pode escolher uma For-\nma Selvagem Aprimorada. Requer 3º \ncírculo."
+        "description": "se mudar para formas não humanoides, pode escolher uma Forma Selvagem Aprimorada. Requer 3º círculo."
       },
       {
         "cost": "+9 PM",
-        "description": "se mudar para formas não hu-\nmanoides, pode escolher uma Forma \nSelvagem Superior. Requer 4º círculo."
+        "description": "se mudar para formas não humanoides, pode escolher uma Forma Selvagem Superior. Requer 4º círculo."
       }
     ]
   },
@@ -2562,12 +2562,12 @@ export const SPELLS_LIST: Spell[] = [
     "range": "médio",
     "targetArea": "nuvem com 6m de raio",
     "duration": "Instantânea",
-    "description": "Execução: padrão; Alcance: médio; \nÁrea: nuvem com 6m de raio; Dura-\nção: instantânea; Resistência: Forti-\ntude (veja texto).\nA área é coberta por emanações le-\ntais. Criaturas na área sofrem 5d6 \npontos de dano de ácido e ficam en-\njoadas por 1 rodada. Se passarem na \nresistência, sofrem metade do dano e \nnão ficam enjoadas.",
-    "resistance": "Forti-\ntude (veja texto)",
+    "description": "Execução: padrão; Alcance: médio; Área: nuvem com 6m de raio; Duração: instantânea; Resistência: Fortitude (veja texto). A área é coberta por emanações letais. Criaturas na área sofrem 5d6 pontos de dano de ácido e ficam enjoadas por 1 rodada. Se passarem na resistência, sofrem metade do dano e não ficam enjoadas.",
+    "resistance": "Fortitude (veja texto)",
     "upgrades": [
       {
         "cost": "Truque",
-        "description": "muda o alcance para toque, \na área para alvo (1 criatura com 0 PV \nou menos), a duração para instantâ-\nnea, a resistência para Fortitude anu-\nla e adiciona componente material (pó \nde ônix no valor de T$ 10). Em vez do \nnormal, você canaliza o Miasma contra \numa vítima. Se falhar na resistência, \nela morre e você recebe"
+        "description": "muda o alcance para toque, a área para alvo (1 criatura com 0 PV ou menos), a duração para instantânea, a resistência para Fortitude anu-la e adiciona componente material (pó de ônix no valor de T$ 10). Em vez do normal, você canaliza o Miasma contra uma vítima. Se falhar na resistência, ela morre e você recebe"
       },
       {
         "cost": "+2 PM",
@@ -2575,7 +2575,7 @@ export const SPELLS_LIST: Spell[] = [
       },
       {
         "cost": "+3 PM",
-        "description": "muda o tipo do dano para \ntrevas."
+        "description": "muda o tipo do dano para trevas."
       }
     ]
   },
@@ -2589,12 +2589,12 @@ export const SPELLS_LIST: Spell[] = [
     "range": "longo",
     "targetArea": "cubo de até 90m de lado",
     "duration": "Instantânea",
-    "description": "Execução: padrão; Alcance: longo; \nÁrea: cubo de até 90m de lado; Du-\nração: 1 dia; Resistência: Vontade \ndesacredita.\nVocê faz um terreno parecer outro, in-\ncluindo sons e cheiros. Uma planície \npode parecer um pântano, uma floresta \npode parecer uma montanha etc. Esta \nmagia pode ser usada para criar arma-\ndilhas: areia movediça pode parecer \nterra firme ou um precipício pode pare-\ncer um lago. Você pode alterar, incluir \ne esconder estruturas dentro da área, \nmas não criaturas (embora elas possam \nse esconder nas estruturas ilusórias).",
-    "resistance": "Vontade \ndesacredita",
+    "description": "Execução: padrão; Alcance: longo; Área: cubo de até 90m de lado; Duração: 1 dia; Resistência: Vontade desacredita. Você faz um terreno parecer outro, incluindo sons e cheiros. Uma planície pode parecer um pântano, uma floresta pode parecer uma montanha etc. Esta magia pode ser usada para criar armadilhas: areia movediça pode parecer terra firme ou um precipício pode parecer um lago. Você pode alterar, incluir e esconder estruturas dentro da área, mas não criaturas (embora elas possam se esconder nas estruturas ilusórias).",
+    "resistance": "Vontade desacredita",
     "upgrades": [
       {
         "cost": "+4 PM",
-        "description": "além do normal, pode alterar \na aparência de criaturas escolhidas na \nárea, como se usando Disfarce Ilusório."
+        "description": "além do normal, pode alterar a aparência de criaturas escolhidas na área, como se usando Disfarce Ilusório."
       }
     ]
   },
@@ -2607,13 +2607,13 @@ export const SPELLS_LIST: Spell[] = [
     "execution": "padrão",
     "range": "curto",
     "targetArea": "1 criatura",
-    "duration": "1 semana \nou até ser descarregada",
-    "description": "Execução: padrão; Alcance: curto; \nAlvo: 1 criatura; Duração: 1 semana \nou até ser descarregada; Resistência: \nVontade anula (veja texto)\nEsta magia obriga o alvo a cumprir uma \ntarefa a sua escolha. Ela dura uma se-\nmana ou até o alvo cumprir a tarefa, o \nque vier primeiro. O alvo pode recusar \na missão - mas, no fim de cada dia em \nque não se esforçar para cumprir a ta-\nrefa, deve fazer um teste de Vontade; se \nfalhar, sofre uma penalidade cumulati-\nva de -2 em todos os testes e rolagens.\nA Missão Divina não pode forçar um ato \nsuicida, nem uma missão impossível \n(como matar um ser que não existe).",
-    "resistance": "Vontade anula (veja texto)\nEsta magia obriga o alvo a cumprir uma \ntarefa a sua escolha",
+    "duration": "1 semana ou até ser descarregada",
+    "description": "Execução: padrão; Alcance: curto; Alvo: 1 criatura; Duração: 1 semana ou até ser descarregada; Resistência: Vontade anula (veja texto) Esta magia obriga o alvo a cumprir uma tarefa a sua escolha. Ela dura uma semana ou até o alvo cumprir a tarefa, o que vier primeiro. O alvo pode recusar a missão - mas, no fim de cada dia em que não se esforçar para cumprir a tarefa, deve fazer um teste de Vontade; se falhar, sofre uma penalidade cumulativa de -2 em todos os testes e rolagens. A Missão Divina não pode forçar um ato suicida, nem uma missão impossível (como matar um ser que não existe).",
+    "resistance": "Vontade anula (veja texto) Esta magia obriga o alvo a cumprir uma tarefa a sua escolha",
     "upgrades": [
       {
         "cost": "+2 PM",
-        "description": "muda o alcance para toque, a \nduração para permanente e adiciona \npenalidade de -1 PM. Em vez do nor-\nmal, você inscreve uma marca (como \numa tatuagem) na pele do alvo e esco-\nlhe um tipo de ação que ativará a mar-\nca. Normalmente, será cometer um \ncrime (roubar, matar...) ou outra coisa \ncontrária às Obrigações & Restrições \nde sua divindade. Sempre que a marca \né ativada, o alvo recebe uma penalida-\nde cumulativa de -2 em todos os tes-\ntes. Muitas vezes, portar essa marca é \num estigma por si só, já que esta magia \nnormalmente é lançada em criminosos \nou traidores. Uma magia que dissipe \noutras suprime a marca e suas pena-\nlidades por um dia; elas só podem ser\ntotalmente removidas pelo conjurador \noriginal ou pela magia Purificação."
+        "description": "muda o alcance para toque, a duração para permanente e adiciona penalidade de -1 PM. Em vez do normal, você inscreve uma marca (como uma tatuagem) na pele do alvo e esco-lhe um tipo de ação que ativará a marca. Normalmente, será cometer um crime (roubar, matar...) ou outra coisa contrária às Obrigações & Restrições de sua divindade. Sempre que a marca é ativada, o alvo recebe uma penalidade cumulativa de -2 em todos os testes. Muitas vezes, portar essa marca é um estigma por si só, já que esta magia normalmente é lançada em criminosos ou traidores. Uma magia que dissipe outras suprime a marca e suas penalidades por um dia; elas só podem ser totalmente removidas pelo conjurador original ou pela magia Purificação."
       }
     ]
   },
@@ -2627,19 +2627,19 @@ export const SPELLS_LIST: Spell[] = [
     "range": "curto",
     "targetArea": "1 criatura",
     "duration": "1 dia",
-    "description": "Esta magia convoca um parceiro cava-\nlo (ou pônei) de guerra veterano. Sua \naparência é de um animal negro com \ncrina e cauda cinzentas e cascos feitos \nde fumaça, mas você pode mudá-la se \nquiser. Além dos benefícios normais, a \nMontaria Arcana pode atravessar terre-\nno difícil sem redução em seu deslo-\ncamento. Você pode usar Misticismo \nno lugar de Cavalgar para efeitos des-\nta montaria (incluindo ser considera-\ndo treinado).",
+    "description": "Esta magia convoca um parceiro cava-lo (ou pônei) de guerra veterano. Sua aparência é de um animal negro com crina e cauda cinzentas e cascos feitos de fumaça, mas você pode mudá-la se quiser. Além dos benefícios normais, a Montaria Arcana pode atravessar terre-no difícil sem redução em seu deslocamento. Você pode usar Misticismo no lugar de Cavalgar para efeitos desta montaria (incluindo ser considerado treinado).",
     "upgrades": [
       {
         "cost": "+1 PM",
-        "description": "além do normal, criaturas do \ntipo animal em alcance curto da mon-\ntaria devem fazer um teste de Vontade. \nSe passarem, ficam abaladas pela cena; \nse falharem, ficam apavoradas por 1d4 \nrodadas, depois abaladas pela cena."
+        "description": "além do normal, criaturas do tipo animal em alcance curto da montaria devem fazer um teste de Vontade. Se passarem, ficam abaladas pela cena; se falharem, ficam apavoradas por 1d4 rodadas, depois abaladas pela cena."
       },
       {
         "cost": "+3 PM",
-        "description": "muda a duração para perma-\nnente e adiciona penalidade de -3 PM."
+        "description": "muda a duração para permanente e adiciona penalidade de -3 PM."
       },
       {
         "cost": "+3 PM",
-        "description": "aumenta o tamanho da mon-\ntaria em uma categoria. Isso também \naumenta o número de criaturas que ela \npode carregar - duas para uma cria-\ntura Enorme, seis para Colossal. Uma \núnica criatura controla a montaria; as \noutras apenas são deslocadas."
+        "description": "aumenta o tamanho da montaria em uma categoria. Isso também aumenta o número de criaturas que ela pode carregar - duas para uma criatura Enorme, seis para Colossal. Uma única criatura controla a montaria; as outras apenas são deslocadas."
       }
     ]
   },
@@ -2653,7 +2653,7 @@ export const SPELLS_LIST: Spell[] = [
     "range": "médio",
     "targetArea": "muro de ossos",
     "duration": "cena",
-    "description": "Uma parede de ossos se eleva da ter-\nra. A parede tem 15m de comprimen-\nto, 9m de altura e 1,5m de espessu-\nra. Ela pode ter qualquer forma - não \nprecisa ser uma linha reta -, mas sua \nbase precisa estar sempre tocando o \nsolo. Quando a parede surge, criatu-\nras na área ocupada ou adjacentes so-\nfrem 4d8 pontos de dano de corte e \nprecisam fazer um teste de Reflexos \npara não ficarem presas no emaranha-\ndo de ossos. Uma criatura presa des-\nsa maneira fica agarrada, e pode gastar \numa ação padrão para fazer um teste \nde Atletismo para se soltar. Se passar \nno teste, sai da muralha para um dos \nlados adjacentes. Se falhar, sofre 4d8 \npontos de dano de corte.\n199\nCapítulo Quatro\nÉ possível destruir o muro para atra-\nvessá-lo ou libertar uma criatura agar-\nrada. Cada trecho de 3m do muro tem \nDefesa 8, 40 PV e redução de corte, \nfrio e perfuração 10. Também é possí-\nvel escalar a parede. Isso exige um tes-\nte de Atletismo e causa 4d8 pontos de \ndano de corte para cada 3m escalados.",
+    "description": "Uma parede de ossos se eleva da terra. A parede tem 15m de comprimento, 9m de altura e 1,5m de espessura. Ela pode ter qualquer forma - não precisa ser uma linha reta -, mas sua base precisa estar sempre tocando o solo. Quando a parede surge, criaturas na área ocupada ou adjacentes sofrem 4d8 pontos de dano de corte e precisam fazer um teste de Reflexos para não ficarem presas no emaranhado de ossos. Uma criatura presa dessa maneira fica agarrada, e pode gastar uma ação padrão para fazer um teste de Atletismo para se soltar. Se passar no teste, sai da muralha para um dos lados adjacentes. Se falhar, sofre 4d8 pontos de dano de corte. 199 Capítulo Quatro É possível destruir o muro para atravessá-lo ou libertar uma criatura agarrada. Cada trecho de 3m do muro tem Defesa 8, 40 PV e redução de corte, frio e perfuração 10. Também é possível escalar a parede. Isso exige um tes-te de Atletismo e causa 4d8 pontos de dano de corte para cada 3m escalados.",
     "upgrades": [
       {
         "cost": "+3 PM",
@@ -2671,12 +2671,12 @@ export const SPELLS_LIST: Spell[] = [
     "range": "médio",
     "targetArea": "muralha de energia",
     "duration": "cena",
-    "description": "Uma muralha de um elemento a sua \nescolha se eleva da terra. Ela pode ser \num muro de até 30m de comprimento \ne 3m de altura (ou o contrário) ou uma \ncúpula de 3m de raio. Os efeitos va-\nriam conforme o elemento escolhido.\nFogo. Faz surgir uma violenta cortina de \nchamas. Um lado da muralha (a sua es-\ncolha) emite ondas de calor, que cau-\nsam 2d6 pontos de dano de fogo em \ncriaturas a até 6m quando você lança a \nmagia e no início de seus turnos. Atra-\nvessar a muralha causa 8d6 pontos de \ndano de fogo. Caso seja criada em uma \nárea onde existem criaturas, elas sofrem \ndano como se estivessem atravessando \na muralha, mas podem fazer um teste \nde Reflexos para reduzir o dano à meta-\nde e escapar para um lado (a criatura es-\ncolhe, mas se escapar para o lado quente \nsofrerá mais 2d6 pontos de dano).\nGelo. Evoca uma parede grossa de gelo \ndenso com 15cm de espessura. Na for-\nma de cúpula, pode prender uma ou \nmais criaturas, mas elas têm direito a \num teste de Reflexos para escapar an-\ntes que a cúpula se forme. Cada tre-\ncho de 3m da muralha tem Defesa 8, \n40 PV e RD 5. Um trecho da muralha \nque atinja 0 PV será rompido. Qual-\nquer efeito de fogo causa dano dobra-\ndo à muralha. Uma criatura que atra-\nvesse um trecho rompido da muralha \nsofre 4d6 pontos de dano de frio.",
+    "description": "Uma muralha de um elemento a sua escolha se eleva da terra. Ela pode ser um muro de até 30m de comprimento e 3m de altura (ou o contrário) ou uma cúpula de 3m de raio. Os efeitos variam conforme o elemento escolhido. Fogo. Faz surgir uma violenta cortina de chamas. Um lado da muralha (a sua escolha) emite ondas de calor, que causam 2d6 pontos de dano de fogo em criaturas a até 6m quando você lança a magia e no início de seus turnos. Atravessar a muralha causa 8d6 pontos de dano de fogo. Caso seja criada em uma área onde existem criaturas, elas sofrem dano como se estivessem atravessando a muralha, mas podem fazer um teste de Reflexos para reduzir o dano à metade e escapar para um lado (a criatura escolhe, mas se escapar para o lado quente sofrerá mais 2d6 pontos de dano). Gelo. Evoca uma parede grossa de gelo denso com 15cm de espessura. Na forma de cúpula, pode prender uma ou mais criaturas, mas elas têm direito a um teste de Reflexos para escapar antes que a cúpula se forme. Cada trecho de 3m da muralha tem Defesa 8, 40 PV e RD 5. Um trecho da muralha que atinja 0 PV será rompido. Qualquer efeito de fogo causa dano dobrado à muralha. Uma criatura que atravesse um trecho rompido da muralha sofre 4d6 pontos de dano de frio.",
     "resistance": "veja texto",
     "upgrades": [
       {
         "cost": "+2 PM",
-        "description": "aumenta o dano por atravessar \na muralha em"
+        "description": "aumenta o dano por atravessar a muralha em"
       },
       {
         "cost": "+2 PM",
@@ -2692,25 +2692,25 @@ export const SPELLS_LIST: Spell[] = [
     "school": "Convocação",
     "execution": "padrão",
     "range": "curto",
-    "targetArea": "nuvem com 6m de raio e 6m \nde altura",
+    "targetArea": "nuvem com 6m de raio e 6m de altura",
     "duration": "cena",
-    "description": "Uma névoa espessa eleva-se de um pon-\nto a sua escolha, obscurecendo toda a \nvisão - criaturas a até 1,5m têm camu-\nflagem leve e criaturas a partir de 3m \ntêm camuflagem total. Um vento for-\nte dispersa a névoa em 4 rodadas e um \nvendaval a dispersa em 1 rodada. Esta \nmagia não funciona sob a água.",
+    "description": "Uma névoa espessa eleva-se de um ponto a sua escolha, obscurecendo toda a visão - criaturas a até 1,5m têm camuflagem leve e criaturas a partir de 3m têm camuflagem total. Um vento for-te dispersa a névoa em 4 rodadas e um vendaval a dispersa em 1 rodada. Esta magia não funciona sob a água.",
     "upgrades": [
       {
         "cost": "+1 PM",
-        "description": "a magia também funciona sob \na água, criando uma nuvem de tinta."
+        "description": "a magia também funciona sob a água, criando uma nuvem de tinta."
       },
       {
         "cost": "+2 PM",
-        "description": "você pode escolher criaturas \nno alcance ao lançar a magia; elas en-\nxergam através do efeito. Requer 2º \ncírculo."
+        "description": "você pode escolher criaturas no alcance ao lançar a magia; elas enxergam através do efeito. Requer 2º círculo."
       },
       {
         "cost": "+2 PM",
-        "description": "a nuvem tem um cheiro horrí-\nvel. No início de seus turnos, qualquer \ncriatura dentro dela, ou qualquer cria-\ntura com faro em alcance curto da nu-\nvem, deve fazer um teste de Fortitude. \nSe falhar, fica enjoada por uma rodada."
+        "description": "a nuvem tem um cheiro horrível. No início de seus turnos, qualquer criatura dentro dela, ou qualquer criatura com faro em alcance curto da nuvem, deve fazer um teste de Fortitude. Se falhar, fica enjoada por uma rodada."
       },
       {
         "cost": "+2 PM",
-        "description": "a nuvem tem um tom esver-\ndeado e se torna cáustica. No início de \nseus turnos, criaturas dentro dela so-\nfrem 2d4 pontos de dano de ácido."
+        "description": "a nuvem tem um tom esverdeado e se torna cáustica. No início de seus turnos, criaturas dentro dela sofrem 2d4 pontos de dano de ácido."
       },
       {
         "cost": "+3 PM",
@@ -2728,7 +2728,7 @@ export const SPELLS_LIST: Spell[] = [
     "range": "curto",
     "targetArea": "1 criatura",
     "duration": "sustentada",
-    "description": "Você e os seus aliados no alcance re-\ncebem +2 em testes de perícia e rola-\ngens de dano, e todos os seus inimigos \nno alcance sofrem -2 em testes de pe-\nrícia e rolagens de dano. Esse efeito é \ncumulativo com outras magias. Compo-\nnente material: T$ 20 por PM gasto em \nincensos ou outras oferendas.",
+    "description": "Você e os seus aliados no alcance recebem +2 em testes de perícia e rolagens de dano, e todos os seus inimigos no alcance sofrem -2 em testes de perícia e rolagens de dano. Esse efeito é cumulativo com outras magias. Componente material: T$ 20 por PM gasto em incensos ou outras oferendas.",
     "upgrades": [
       {
         "cost": "+2 PM",
@@ -2736,11 +2736,11 @@ export const SPELLS_LIST: Spell[] = [
       },
       {
         "cost": "+2 PM",
-        "description": "aumenta as penalidades em \n-1 (penalidade máxima limitada pelo \ncírculo máximo de magia que você \npode lançar)."
+        "description": "aumenta as penalidades em -1 (penalidade máxima limitada pelo círculo máximo de magia que você pode lançar)."
       },
       {
         "cost": "+7 PM",
-        "description": "muda o alcance para médio. \nRequer 3º círculo."
+        "description": "muda o alcance para médio. Requer 3º círculo."
       }
     ]
   },
@@ -2754,15 +2754,15 @@ export const SPELLS_LIST: Spell[] = [
     "range": "curto",
     "targetArea": "1 criatura",
     "duration": "1 rodada",
-    "description": "Em seu próximo teste de perícia, o \nalvo pode rolar dois dados e ficar com \no melhor resultado.",
+    "description": "Em seu próximo teste de perícia, o alvo pode rolar dois dados e ficar com o melhor resultado.",
     "upgrades": [
       {
         "cost": "+2 PM",
-        "description": "muda a duração para cena. \nEm vez do normal, escolha um atri-\nbuto. Sempre que o alvo fizer um tes-\nte de perícia baseado no atributo es-\ncolhido, pode rolar dois dados e ficar \ncom o melhor resultado. Não se apli-\nca a testes de ataque ou resistência. \nRequer 2º círculo."
+        "description": "muda a duração para cena. Em vez do normal, escolha um atributo. Sempre que o alvo fizer um tes-te de perícia baseado no atributo escolhido, pode rolar dois dados e ficar com o melhor resultado. Não se aplica a testes de ataque ou resistência. Requer 2º círculo."
       },
       {
         "cost": "+5 PM",
-        "description": "como acima, mas, em vez de \num atributo, escolha entre atributos \nfísicos (Força, Destreza e Constitui-\nção) ou mentais (Inteligência, Sabe-\ndoria e Carisma). Requer 3º círculo."
+        "description": "como acima, mas, em vez de um atributo, escolha entre atributos físicos (Força, Destreza e Constituição) ou mentais (Inteligência, Sabedoria e Carisma). Requer 3º círculo."
       }
     ]
   },
@@ -2774,9 +2774,9 @@ export const SPELLS_LIST: Spell[] = [
     "school": "Encantamento",
     "execution": "padrão",
     "range": "curto",
-    "targetArea": "1 criatura com menos níveis que \nvocê",
-    "duration": "instantânea ou veja \ntexto",
-    "description": "Você pronuncia uma palavra do idioma \nprimordial da Criação, que causa um \ndos efeitos abaixo, a sua escolha.\nAtordoar: a criatura fica atordoada por \n1d4+1 rodadas (apenas uma vez por \ncena). Se passar no teste de resistên-\ncia, ou se já foi atordoada por esta ma-\ngia, fica desprevenida por 1d4 rodadas.\nCegar: a criatura fica cega. Se passar no \nteste de resistência, fica ofuscada por \n1d4 rodadas.\n200\nMagia",
+    "targetArea": "1 criatura com menos níveis que você",
+    "duration": "instantânea ou veja texto",
+    "description": "Você pronuncia uma palavra do idioma primordial da Criação, que causa um dos efeitos abaixo, a sua escolha. Atordoar: a criatura fica atordoada por 1d4+1 rodadas (apenas uma vez por cena). Se passar no teste de resistência, ou se já foi atordoada por esta magia, fica desprevenida por 1d4 rodadas. Cegar: a criatura fica cega. Se passar no teste de resistência, fica ofuscada por 1d4 rodadas. 200 Magia",
     "resistance": "Vontade parcial"
   },
   {
@@ -2789,12 +2789,12 @@ export const SPELLS_LIST: Spell[] = [
     "range": "pessoal",
     "targetArea": "você",
     "duration": "cena",
-    "description": "Sua pele ganha aspecto e dureza de \nrocha. Você recebe redução de dano 5.",
-    "resistance": "Forti-\ntude anula",
+    "description": "Sua pele ganha aspecto e dureza de rocha. Você recebe redução de dano 5.",
+    "resistance": "Fortitude anula",
     "upgrades": [
       {
         "cost": "+1 PM",
-        "description": "muda o alcance para toque e o \nalvo para 1 criatura."
+        "description": "muda o alcance para toque e o alvo para 1 criatura."
       },
       {
         "cost": "+4 PM",
@@ -2802,11 +2802,11 @@ export const SPELLS_LIST: Spell[] = [
       },
       {
         "cost": "+4 PM",
-        "description": "sua pele ganha aspecto e dure-\nza de aço. Você recebe redução de dano \n10. Requer 4º círculo."
+        "description": "sua pele ganha aspecto e dureza de aço. Você recebe redução de dano 10. Requer 4º círculo."
       },
       {
         "cost": "+4 PM",
-        "description": "muda o alcance para toque, o \nalvo para 1 criatura, a duração para 1d4 \nrodadas e adiciona Resistência: Forti-\ntude anula. Em vez do efeito normal, \na magia transforma o alvo e seu equi-\npamento em uma estátua inerte e sem \nconsciência. A estátua possui os mes-\nmos PV da criatura e redução de dano \n8; se for quebrada, a criatura morrerá. \nRequer 4º círculo."
+        "description": "muda o alcance para toque, o alvo para 1 criatura, a duração para 1d4 rodadas e adiciona Resistência: Fortitude anula. Em vez do efeito normal, a magia transforma o alvo e seu equipamento em uma estátua inerte e sem consciência. A estátua possui os mesmos PV da criatura e redução de dano 8; se for quebrada, a criatura morrerá. Requer 4º círculo."
       }
     ]
   },
@@ -2820,7 +2820,7 @@ export const SPELLS_LIST: Spell[] = [
     "range": "curto",
     "targetArea": "1 criatura",
     "duration": "cena",
-    "description": "Amaldiçoa os alvos, que recebem -1 \nem testes de ataque e rolagens de \ndano. Perdição anula Bênção.",
+    "description": "Amaldiçoa os alvos, que recebem -1 em testes de ataque e rolagens de dano. Perdição anula Bênção.",
     "resistance": "nenhuma"
   },
   {
@@ -2833,8 +2833,8 @@ export const SPELLS_LIST: Spell[] = [
     "range": "médio",
     "targetArea": "nuvem com 6m de raio",
     "duration": "Instantânea",
-    "description": "Execução: padrão; Alcance: médio; \nÁrea: nuvem com 6m de raio; Dura-\nção: cena; Resistência: Fortitude (veja \ntexto).\nVocê manifesta uma nuvem de poei-\nra carregada de energia negativa, que \napodrece lentamente as criaturas na \nárea. Ao lançar a magia, e no início de \nseus turnos, criaturas na área sofrem \n2d8+8 pontos de dano de trevas (For-\ntitude reduz à metade). Alvos que fa-\nlharem no teste não podem recuperar \nPV por uma rodada.",
-    "resistance": "Fortitude (veja \ntexto)",
+    "description": "Execução: padrão; Alcance: médio; Área: nuvem com 6m de raio; Duração: cena; Resistência: Fortitude (veja texto). Você manifesta uma nuvem de poeira carregada de energia negativa, que apodrece lentamente as criaturas na área. Ao lançar a magia, e no início de seus turnos, criaturas na área sofrem 2d8+8 pontos de dano de trevas (Fortitude reduz à metade). Alvos que falharem no teste não podem recuperar PV por uma rodada.",
+    "resistance": "Fortitude (veja texto)",
     "upgrades": [
       {
         "cost": "+2 PM",
@@ -2852,15 +2852,15 @@ export const SPELLS_LIST: Spell[] = [
     "range": "longo",
     "targetArea": "1 criatura",
     "duration": "1 dia",
-    "description": "Execução: padrão; Alcance: longo; \nAlvo: 1 criatura; Duração: 1 dia; Re-\nsistência: Vontade anula.\nVocê projeta sua consciência no corpo \ndo alvo. Enquanto possuir uma criatu-\nra, você assume o controle total do cor-\npo dela. O seu próprio corpo fica in-\nconsciente e a consciência do alvo fica \ninerte. Em termos de jogo, você con-\ntinua usando a sua ficha, mas com os \natributos físicos e deslocamento da \ncriatura. Se o alvo passar no teste de \nresistência, sabe que você tentou pos-\nsuí-lo e fica imune a esta magia por um \ndia. Caso o corpo da criatura morra en-\nquanto você a possui, a criatura morre \ne você deve fazer um teste de Vontade \ncontra a CD da sua própria magia. Se \npassar, sua consciência retorna para o \nseu corpo (contanto que esteja dentro \ndo alcance). Do contrário, você tam-\nbém morre. Retornar para o seu cor-\npo voluntariamente é uma ação livre.",
+    "description": "Execução: padrão; Alcance: longo; Alvo: 1 criatura; Duração: 1 dia; Resistência: Vontade anula. Você projeta sua consciência no corpo do alvo. Enquanto possuir uma criatura, você assume o controle total do corpo dela. O seu próprio corpo fica inconsciente e a consciência do alvo fica inerte. Em termos de jogo, você continua usando a sua ficha, mas com os atributos físicos e deslocamento da criatura. Se o alvo passar no teste de resistência, sabe que você tentou pos-suí-lo e fica imune a esta magia por um dia. Caso o corpo da criatura morra enquanto você a possui, a criatura morre e você deve fazer um teste de Vontade contra a CD da sua própria magia. Se passar, sua consciência retorna para o seu corpo (contanto que esteja dentro do alcance). Do contrário, você também morre. Retornar para o seu corpo voluntariamente é uma ação livre.",
     "upgrades": [
       {
         "cost": "+5 PM",
-        "description": "você ganha acesso às habilida-\ndes de raça e classe da criatura."
+        "description": "você ganha acesso às habilidades de raça e classe da criatura."
       },
       {
         "cost": "+5 PM",
-        "description": "enquanto a magia durar e você \nestiver dentro do alcance do seu corpo \noriginal, pode “saltar” de uma criatura \npossuída para outra. O novo alvo tem \ndireito a um teste de Vontade. Se falhar, \nvocê assume o controle do corpo dele \ne o alvo anterior recobra a consciência."
+        "description": "enquanto a magia durar e você estiver dentro do alcance do seu corpo original, pode “saltar” de uma criatura possuída para outra. O novo alvo tem direito a um teste de Vontade. Se falhar, você assume o controle do corpo dele e o alvo anterior recobra a consciência."
       }
     ]
   },
@@ -2874,11 +2874,11 @@ export const SPELLS_LIST: Spell[] = [
     "range": "pessoal",
     "targetArea": "você",
     "duration": "sustentada",
-    "description": "Você canaliza o poder de sua divinda-\nde. Você aumenta uma categoria de ta-\nmanho (seu equipamento muda de \nacordo) e recebe Força +4 e RD 10. \nVocê não pode lançar magias enquan-\nto estiver sob efeito de Potência Divina.",
+    "description": "Você canaliza o poder de sua divindade. Você aumenta uma categoria de tamanho (seu equipamento muda de acordo) e recebe Força +4 e RD 10. Você não pode lançar magias enquanto estiver sob efeito de Potência Divina.",
     "upgrades": [
       {
         "cost": "+2 PM",
-        "description": "aumenta o bônus de Força \nem"
+        "description": "aumenta o bônus de Força em"
       },
       {
         "cost": "+5 PM",
@@ -2896,11 +2896,11 @@ export const SPELLS_LIST: Spell[] = [
     "range": "pessoal",
     "targetArea": "você",
     "duration": "cena",
-    "description": "Vislumbres do futuro permitem que \nvocê reavalie suas ações. Uma vez por \nrodada, você pode rolar novamente um \nteste recém realizado, mas deve aceitar \no resultado da nova rolagem.",
+    "description": "Vislumbres do futuro permitem que você reavalie suas ações. Uma vez por rodada, você pode rolar novamente um teste recém realizado, mas deve aceitar o resultado da nova rolagem.",
     "upgrades": [
       {
         "cost": "+3 PM",
-        "description": "muda a execução para reação, \no alcance para curto, o alvo para 1 cria-\ntura e a duração para instantânea. Esta \nmagia só pode ser usada em uma criatu-\nra que tenha acabado de fazer um teste. \nObriga a criatura a fazer uma nova rola-\ngem de dados e aceitar o novo resulta-\ndo, seja ele um sucesso ou falha. Cria-\nturas involuntárias têm direito a um \nteste de Vontade para negar o efeito."
+        "description": "muda a execução para reação, o alcance para curto, o alvo para 1 criatura e a duração para instantânea. Esta magia só pode ser usada em uma criatura que tenha acabado de fazer um teste. Obriga a criatura a fazer uma nova rolagem de dados e aceitar o novo resultado, seja ele um sucesso ou falha. Criaturas involuntárias têm direito a um teste de Vontade para negar o efeito."
       }
     ]
   },
@@ -2914,23 +2914,23 @@ export const SPELLS_LIST: Spell[] = [
     "range": "toque",
     "targetArea": "1 criatura",
     "duration": "cena",
-    "description": "Você modifica os limites físicos do \nalvo, que recebe deslocamento +9m e \n+10 em testes de Atletismo.",
+    "description": "Você modifica os limites físicos do alvo, que recebe deslocamento +9m e +10 em testes de Atletismo.",
     "upgrades": [
       {
         "cost": "+1 PM",
-        "description": "além do normal, o alvo rece-\nbe um bônus adicional de"
+        "description": "além do normal, o alvo recebe um bônus adicional de"
       },
       {
         "cost": "+1 PM",
-        "description": "além do normal, o alvo pode \nescalar paredes e tetos sem precisar \nfazer testes de Atletismo. Para isso, \nprecisa estar com as mãos livres, mas \npode usar uma única mão se ficar para-\ndo no lugar. O alvo não fica despreve-\nnido enquanto escala."
+        "description": "além do normal, o alvo pode escalar paredes e tetos sem precisar fazer testes de Atletismo. Para isso, precisa estar com as mãos livres, mas pode usar uma única mão se ficar parado no lugar. O alvo não fica desprevenido enquanto escala."
       },
       {
         "cost": "+1 PM",
-        "description": "muda a execução para ação de \nmovimento, o alcance para pessoal, o \nalvo para você e a duração para instan-\ntânea. Você salta muito alto e pousa \nem alcance corpo a corpo de uma cria-\ntura em alcance curto. Se fizer um ata-\nque corpo a corpo contra essa criatura \nneste turno, recebe os benefícios e pe-\nnalidades de uma investida e sua arma \ncausa um dado extra de dano do mes-\nmo tipo durante este ataque."
+        "description": "muda a execução para ação de movimento, o alcance para pessoal, o alvo para você e a duração para instantânea. Você salta muito alto e pousa em alcance corpo a corpo de uma criatura em alcance curto. Se fizer um ataque corpo a corpo contra essa criatura neste turno, recebe os benefícios e penalidades de uma investida e sua arma causa um dado extra de dano do mesmo tipo durante este ataque."
       },
       {
         "cost": "+3 PM",
-        "description": "além do normal, ao fazer tes-\ntes de perícias baseadas em Força, \nDestreza ou Constituição, o alvo pode \nrolar dois dados e escolher o melhor. \nNão afeta testes de ataque ou resistên-\ncia. Requer 2º círculo.\n201\nCapítulo Quatro"
+        "description": "além do normal, ao fazer testes de perícias baseadas em Força, Destreza ou Constituição, o alvo pode rolar dois dados e escolher o melhor. Não afeta testes de ataque ou resistência. Requer 2º círculo. 201 Capítulo Quatro"
       }
     ]
   },
@@ -2944,15 +2944,15 @@ export const SPELLS_LIST: Spell[] = [
     "range": "longo",
     "targetArea": "esfera com 9m de raio",
     "duration": "Instantânea",
-    "description": "Execução: padrão; Alcance: longo; \nÁrea: esfera com 9m de raio; Dura-\nção: 1 dia.\nVocê enche a área com energia ne-\ngativa. Dano de trevas é maximiza-\ndo dentro da área. Isso também afeta \nPV curados em mortos-vivos por esses \nefeitos. Esta magia não pode ser lança-\nda em uma área contendo um símbolo \nvisível dedicado a uma divindade que \nnão a sua. Profanar anula Consagrar.",
+    "description": "Execução: padrão; Alcance: longo; Área: esfera com 9m de raio; Duração: 1 dia. Você enche a área com energia negativa. Dano de trevas é maximizado dentro da área. Isso também afeta PV curados em mortos-vivos por esses efeitos. Esta magia não pode ser lançada em uma área contendo um símbolo visível dedicado a uma divindade que não a sua. Profanar anula Consagrar.",
     "upgrades": [
       {
         "cost": "+1 PM",
-        "description": "além do normal, mortos-vivos \nna área recebem"
+        "description": "além do normal, mortos-vivos na área recebem"
       },
       {
         "cost": "+2 PM",
-        "description": "aumenta os bônus para mor-\ntos-vivos em"
+        "description": "aumenta os bônus para mortos-vivos em"
       }
     ]
   },
@@ -2964,13 +2964,13 @@ export const SPELLS_LIST: Spell[] = [
     "school": "Adivinhação",
     "execution": "padrão",
     "range": "ilimitado \n(veja texto)",
-    "targetArea": "local ou criatura co-\nnhecidos",
+    "targetArea": "local ou criatura conhecidos",
     "duration": "sustentada",
-    "description": "Esta magia faz com que sua consciência \ndeixe seu corpo e se transporte instan-\ntaneamente para um local ou para per-\nto de uma criatura. Se escolher um lo-\ncal, ele precisa ser conhecido por você. \nSe escolher uma criatura, você trans-\nporta sua consciência até onde ela esti-\nver, desde que esteja no mesmo plano.\nVocê adquire uma forma fantasmagórica \ninvisível, mas pode se mostrar usando \numa ação de movimento. Pode se mover \nem qualquer direção com deslocamen-\nto de voo 18m e, por ser incorpóreo, é \ncapaz de atravessar objetos sólidos, mas \nfica limitado a se mover dentro dos li-\nmites do local, ou dentro de alcance cur-\nto da criatura alvo. Você pode ver e ou-\nvir como se estivesse presente no local \ne pode falar mentalmente com qualquer \ncriatura que possa ver, contanto que te-\nnham um idioma em comum.",
+    "description": "Esta magia faz com que sua consciência deixe seu corpo e se transporte instantaneamente para um local ou para perto de uma criatura. Se escolher um local, ele precisa ser conhecido por você. Se escolher uma criatura, você transporta sua consciência até onde ela estiver, desde que esteja no mesmo plano. Você adquire uma forma fantasmagórica invisível, mas pode se mostrar usando uma ação de movimento. Pode se mover em qualquer direção com deslocamento de voo 18m e, por ser incorpóreo, é capaz de atravessar objetos sólidos, mas fica limitado a se mover dentro dos limites do local, ou dentro de alcance curto da criatura alvo. Você pode ver e ouvir como se estivesse presente no local e pode falar mentalmente com qualquer criatura que possa ver, contanto que tenham um idioma em comum.",
     "upgrades": [
       {
         "cost": "+10 PM",
-        "description": "além do normal, sua proje-\nção é capaz de lançar magias que não \nprecisem de componentes materiais e \ntenham duração diferente de sustenta-\nda. Sua forma fantasmagórica funciona \ncomo na magia Forma Etérea, sendo afe-\ntada por magias de abjuração e essên-\ncia, mas as magias que ela lança podem \nafetar criaturas corpóreas."
+        "description": "além do normal, sua projeção é capaz de lançar magias que não precisem de componentes materiais e tenham duração diferente de sustentada. Sua forma fantasmagórica funciona como na magia Forma Etérea, sendo afetada por magias de abjuração e essência, mas as magias que ela lança podem afetar criaturas corpóreas."
       }
     ]
   },
@@ -2984,7 +2984,7 @@ export const SPELLS_LIST: Spell[] = [
     "range": "toque",
     "targetArea": "1 criatura",
     "duration": "cena",
-    "description": "Você protege o alvo contra efeitos má-\ngicos nocivos. O alvo recebe +5 em \ntestes de resistência contra magias.",
+    "description": "Você protege o alvo contra efeitos mágicos nocivos. O alvo recebe +5 em testes de resistência contra magias.",
     "upgrades": [
       {
         "cost": "+4 PM",
@@ -2992,7 +2992,7 @@ export const SPELLS_LIST: Spell[] = [
       },
       {
         "cost": "+4 PM",
-        "description": "em vez do normal, o alvo fica \nimune a uma escola de magia a sua es-\ncolha. Requer 4º Círculo."
+        "description": "em vez do normal, o alvo fica imune a uma escola de magia a sua escolha. Requer 4º Círculo."
       }
     ]
   },
@@ -3006,19 +3006,19 @@ export const SPELLS_LIST: Spell[] = [
     "range": "toque",
     "targetArea": "1 criatura",
     "duration": "cena",
-    "description": "Esta magia cria uma barreira mística \ninvisível que fornece ao alvo +2 em \ntestes de resistência.",
+    "description": "Esta magia cria uma barreira mística invisível que fornece ao alvo +2 em testes de resistência.",
     "upgrades": [
       {
         "cost": "+2 PM",
-        "description": "aumenta o bônus concedido \nem"
+        "description": "aumenta o bônus concedido em"
       },
       {
         "cost": "+2 PM",
-        "description": "muda a execução para reação, \no alcance para curto e a duração para 1 \nrodada. Em vez do normal, o alvo rece-\nbe"
+        "description": "muda a execução para reação, o alcance para curto e a duração para 1 rodada. Em vez do normal, o alvo recebe"
       },
       {
         "cost": "+2 PM",
-        "description": "muda o alvo para área de es-\nfera com 3m de raio. Todos os aliados \ndentro do círculo recebem o bônus da \nmagia. Requer 2º círculo."
+        "description": "muda o alvo para área de esfera com 3m de raio. Todos os aliados dentro do círculo recebem o bônus da magia. Requer 2º círculo."
       }
     ]
   },
@@ -3032,19 +3032,19 @@ export const SPELLS_LIST: Spell[] = [
     "range": "toque",
     "targetArea": "1 criatura",
     "duration": "instantânea",
-    "description": "Você purifica a criatura tocada, remo-\nvendo uma condição dela entre abala-\ndo, apavorado, alquebrado, atordoado, \ncego, confuso, debilitado, enjoado, en-\nvenenado, esmorecido, exausto, fasci-\nnado, fatigado, fraco, frustrado, lento, \nofuscado, paralisado, pasmo ou surdo.",
+    "description": "Você purifica a criatura tocada, removendo uma condição dela entre abalado, apavorado, alquebrado, atordoado, cego, confuso, debilitado, enjoado, envenenado, esmorecido, exausto, fascinado, fatigado, fraco, frustrado, lento, ofuscado, paralisado, pasmo ou surdo.",
     "upgrades": [
       {
         "cost": "+2 PM",
-        "description": "também recupera todos os PV \nperdidos por veneno."
+        "description": "também recupera todos os PV perdidos por veneno."
       },
       {
         "cost": "+2 PM",
-        "description": "em vez de uma, remove todas \nas condições listadas."
+        "description": "em vez de uma, remove todas as condições listadas."
       },
       {
         "cost": "+3 PM",
-        "description": "também permite que o alvo \nsolte qualquer item amaldiçoado que \nesteja segurando (mas não remove a \nmaldição do item em si)."
+        "description": "também permite que o alvo solte qualquer item amaldiçoado que esteja segurando (mas não remove a maldição do item em si)."
       }
     ]
   },
@@ -3057,16 +3057,16 @@ export const SPELLS_LIST: Spell[] = [
     "execution": "reação",
     "range": "curto",
     "targetArea": "1 criatura",
-    "duration": "até chegar ao solo \nou cena, o que vier primeiro",
-    "description": "Execução: reação; Alcance: curto; Al-\nvos: 1 criatura ou objeto Grande ou \nmenor; Duração: até chegar ao solo \nou cena, o que vier primeiro.\nO alvo cai lentamente. A velocidade da \nqueda é reduzida para 18m por rodada \n- o suficiente para não causar dano. \nComo lançar esta magia é uma reação, \nvocê pode lançá-la rápido o bastante \npara salvar a si ou um aliado de quedas \ninesperadas. Lançada sobre um projétil \n- como uma flecha ou uma rocha lar-\ngada do alto de um penhasco -, a ma-\ngia faz com que ele cause metade do \ndano normal, devido à lentidão.\nQueda Suave só funciona em criaturas e \nobjetos em queda livre; a magia não vai \nfrear um golpe de espada ou o mergu-\nlho rasante de um atacante voador.",
+    "duration": "até chegar ao solo ou cena, o que vier primeiro",
+    "description": "Execução: reação; Alcance: curto; Alvos: 1 criatura ou objeto Grande ou menor; Duração: até chegar ao solo ou cena, o que vier primeiro. O alvo cai lentamente. A velocidade da queda é reduzida para 18m por rodada - o suficiente para não causar dano. Como lançar esta magia é uma reação, você pode lançá-la rápido o bastante para salvar a si ou um aliado de quedas inesperadas. Lançada sobre um projétil - como uma flecha ou uma rocha largada do alto de um penhasco -, a magia faz com que ele cause metade do dano normal, devido à lentidão. Queda Suave só funciona em criaturas e objetos em queda livre; a magia não vai frear um golpe de espada ou o mergulho rasante de um atacante voador.",
     "upgrades": [
       {
         "cost": "Truque",
-        "description": "muda o alvo para objeto \nMinúsculo. Em vez do normal, você \npode gastar uma ação de movimento \npara levitar o alvo até 4,5m em qual-\nquer direção."
+        "description": "muda o alvo para objeto Minúsculo. Em vez do normal, você pode gastar uma ação de movimento para levitar o alvo até 4,5m em qualquer direção."
       },
       {
         "cost": "+2 PM",
-        "description": "muda o alvo para até 10 cria-\nturas ou objetos adequados."
+        "description": "muda o alvo para até 10 criaturas ou objetos adequados."
       }
     ]
   },
@@ -3080,19 +3080,19 @@ export const SPELLS_LIST: Spell[] = [
     "range": "curto",
     "targetArea": "1 criatura",
     "duration": "cena",
-    "description": "Execução: padrão; Alcance: curto; \nAlvo: 1 criatura; Duração: cena; Re-\nsistência: Fortitude parcial.\nVocê dispara um raio púrpura que dre-\nna as forças do alvo. Se falhar na resis-\ntência, o alvo fica fatigado. Se passar, \nfica vulnerável. Note que, como efeitos \nde magia não acumulam, lançar esta \nmagia duas vezes contra o mesmo alvo \nnão irá deixá-lo exausto.",
+    "description": "Execução: padrão; Alcance: curto; Alvo: 1 criatura; Duração: cena; Resistência: Fortitude parcial. Você dispara um raio púrpura que dre-na as forças do alvo. Se falhar na resistência, o alvo fica fatigado. Se passar, fica vulnerável. Note que, como efeitos de magia não acumulam, lançar esta magia duas vezes contra o mesmo alvo não irá deixá-lo exausto.",
     "upgrades": [
       {
         "cost": "Truque",
-        "description": "muda o alcance para toque e \na resistência para Fortitude anula. Em \nvez do normal, sua mão emana um bri-\nlho púrpura e, ao tocar o alvo, ele fica \nfatigado."
+        "description": "muda o alcance para toque e a resistência para Fortitude anula. Em vez do normal, sua mão emana um brilho púrpura e, ao tocar o alvo, ele fica fatigado."
       },
       {
         "cost": "+2 PM",
-        "description": "em vez do normal, se falhar na \nresistência o alvo fica exausto. Se pas-\nsar, fica fatigado. Requer 2º círculo."
+        "description": "em vez do normal, se falhar na resistência o alvo fica exausto. Se passar, fica fatigado. Requer 2º círculo."
       },
       {
         "cost": "+5 PM",
-        "description": "como acima, mas muda o alvo \npara criaturas escolhidas. Requer 3º \ncírculo.\n202\nMagia"
+        "description": "como acima, mas muda o alvo para criaturas escolhidas. Requer 3º círculo. 202 Magia"
       }
     ]
   },
@@ -3106,7 +3106,7 @@ export const SPELLS_LIST: Spell[] = [
     "range": "médio",
     "targetArea": "1 criatura",
     "duration": "instantânea",
-    "description": "Resistência: Fortitude parcial.\nVocê dispara um raio azul esbranqui-\nçado de gelo e ar congelante. O alvo \nsofre 10d8 pontos de dano de frio e \nfica preso em um bloco de gelo (para-\nlisado). Se passar no teste de resistên-\ncia, sofre metade do dano e, em vez de \nparalisado, fica lento por uma rodada.\nÉ possível quebrar o gelo para libertar \numa criatura presa: o bloco tem 20 PV, \nRD 10 e é vulnerável a fogo. Uma cria-\ntura presa pode gastar uma ação com-\npleta para fazer um teste de Atletismo \ne se libertar do gelo; cada vez que pas-\nsar no teste causa 10 pontos de dano \nao bloco, ignorando a RD.",
+    "description": "Resistência: Fortitude parcial. Você dispara um raio azul esbranquiçado de gelo e ar congelante. O alvo sofre 10d8 pontos de dano de frio e fica preso em um bloco de gelo (paralisado). Se passar no teste de resistência, sofre metade do dano e, em vez de paralisado, fica lento por uma rodada. É possível quebrar o gelo para libertar uma criatura presa: o bloco tem 20 PV, RD 10 e é vulnerável a fogo. Uma criatura presa pode gastar uma ação completa para fazer um teste de Atletismo e se libertar do gelo; cada vez que passar no teste causa 10 pontos de dano ao bloco, ignorando a RD.",
     "resistance": "Fortitude parcial",
     "upgrades": [
       {
@@ -3124,13 +3124,13 @@ export const SPELLS_LIST: Spell[] = [
     "execution": "padrão",
     "range": "pessoal",
     "targetArea": "linha de 30m",
-    "duration": "instantâ-\nnea",
-    "description": "Você canaliza uma poderosa rajada de \nenergia positiva que ilumina o campo \nde batalha. Criaturas na área sofrem \n4d8 pontos de dano de luz (ou 4d12, \nse forem mortos-vivos) e ficam ofus-\ncadas por uma rodada. Se passarem na \nresistência, sofrem metade do dano e \nnão ficam ofuscadas.",
+    "duration": "instantânea",
+    "description": "Você canaliza uma poderosa rajada de energia positiva que ilumina o campo de batalha. Criaturas na área sofrem 4d8 pontos de dano de luz (ou 4d12, se forem mortos-vivos) e ficam ofuscadas por uma rodada. Se passarem na resistência, sofrem metade do dano e não ficam ofuscadas.",
     "resistance": "Reflexos (veja texto)",
     "upgrades": [
       {
         "cost": "Truque",
-        "description": "muda a duração para cena e \na resistência para nenhuma. Em vez do \nnormal, cria um facho de luz que ilu-\nmina a área da magia. Uma vez por ro-\ndada, você pode mudar a direção do fa-\ncho como uma ação livre."
+        "description": "muda a duração para cena e a resistência para nenhuma. Em vez do normal, cria um facho de luz que ilumina a área da magia. Uma vez por rodada, você pode mudar a direção do facho como uma ação livre."
       },
       {
         "cost": "+2 PM",
@@ -3138,7 +3138,7 @@ export const SPELLS_LIST: Spell[] = [
       },
       {
         "cost": "+3 PM",
-        "description": "em vez do normal, criaturas \nvivas a sua escolha na área curam 4d8 \npontos de vida; o restante sofre o dano \nnormalmente."
+        "description": "em vez do normal, criaturas vivas a sua escolha na área curam 4d8 pontos de vida; o restante sofre o dano normalmente."
       }
     ]
   },
@@ -3164,19 +3164,19 @@ export const SPELLS_LIST: Spell[] = [
     "range": "curto",
     "targetArea": "domo com 6m de raio",
     "duration": "Instantânea",
-    "description": "Execução: completa; Alcance: curto; \nEfeito: domo com 6m de raio; Dura-\nção: 1 dia.\nEsta magia cria um domo imóvel e \nquase opaco por fora, mas transpa-\nrente pelo lado de dentro. Ele prote-\nge contra calor, frio e forças pequenas, \nmas não contra qualquer coisa capaz \nde causar dano. Assim, o domo pro-\ntege contra neve e vento comuns, mas \nnão contra uma flecha ou Bola de Fogo. \nPorém, como o domo é quase opaco, \nqualquer criatura dentro dele tem ca-\nmuflagem total contra ataques vindos \nde fora. Criaturas podem entrar e sair \ndo domo livremente. Descansar dentro \ndo Refúgio concede recuperação normal \nde PV e PM.",
+    "description": "Execução: completa; Alcance: curto; Efeito: domo com 6m de raio; Duração: 1 dia. Esta magia cria um domo imóvel e quase opaco por fora, mas transparente pelo lado de dentro. Ele protege contra calor, frio e forças pequenas, mas não contra qualquer coisa capaz de causar dano. Assim, o domo protege contra neve e vento comuns, mas não contra uma flecha ou Bola de Fogo. Porém, como o domo é quase opaco, qualquer criatura dentro dele tem camuflagem total contra ataques vindos de fora. Criaturas podem entrar e sair do domo livremente. Descansar dentro do Refúgio concede recuperação normal de PV e PM.",
     "upgrades": [
       {
         "cost": "+1 PM",
-        "description": "além do normal, os limites do \ndomo são envoltos por uma fumaça es-\ncura e espessa, que impede criaturas do \nlado de fora de enxergar ou ouvir o que \nestá dentro. Criaturas do lado de dentro \nenxergam e ouvem normalmente o que \nestá do lado de fora. A fumaça também \nbloqueia magias de adivinhação."
+        "description": "além do normal, os limites do domo são envoltos por uma fumaça escura e espessa, que impede criaturas do lado de fora de enxergar ou ouvir o que está dentro. Criaturas do lado de dentro enxergam e ouvem normalmente o que está do lado de fora. A fumaça também bloqueia magias de adivinhação."
       },
       {
         "cost": "+3 PM",
-        "description": "em vez do normal, cria uma \ncabana que comporta até 10 criaturas \nMédias. Descansar nesse espaço con-\ncede recuperação confortável (recupe-\nra PV e PM igual ao dobro do nível). \nPara todos os efeitos é uma cabana \nnormal, com paredes de madeira, te-\nlhado, uma porta, duas janelas e al-\nguma mobília (camas, uma mesa com \nbancos e uma lareira). A porta e as ja-\nnelas têm 15 PV, RD 5 e são protegidas \npor um efeito idêntico à magia Tranca \nArcana. As paredes têm 200 PV e RD 5."
+        "description": "em vez do normal, cria uma cabana que comporta até 10 criaturas Médias. Descansar nesse espaço concede recuperação confortável (recupera PV e PM igual ao dobro do nível). Para todos os efeitos é uma cabana normal, com paredes de madeira, telhado, uma porta, duas janelas e alguma mobília (camas, uma mesa com bancos e uma lareira). A porta e as janelas têm 15 PV, RD 5 e são protegidas por um efeito idêntico à magia Tranca Arcana. As paredes têm 200 PV e RD 5."
       },
       {
         "cost": "+3 PM",
-        "description": "em vez do normal, cria um es-\npaço extradimensional, similar a uma\ncaverna vazia e escura, que compor-\nta até 10 criaturas Médias. A entrada \npara o espaço precisa estar desenhada \nem um objeto fixo como uma grande \npedra ou árvore. Qualquer criatura que \natravesse a entrada consegue entrar \nno espaço. Nenhum efeito a partir do \nmundo real afeta o espaço e vice-ver-\nsa, mas aqueles que estiverem dentro \npodem observar o mundo real como \nse uma janela de 1m estivesse centra-\nda na entrada. Qualquer coisa que es-\nteja no espaço extradimensional surge \nno mundo real na área vazia mais pró-\nxima da entrada quando a duração da \nmagia acaba. Requer 3º círculo."
+        "description": "em vez do normal, cria um espaço extradimensional, similar a uma caverna vazia e escura, que comporta até 10 criaturas Médias. A entrada para o espaço precisa estar desenhada em um objeto fixo como uma grande pedra ou árvore. Qualquer criatura que atravesse a entrada consegue entrar no espaço. Nenhum efeito a partir do mundo real afeta o espaço e vice-versa, mas aqueles que estiverem dentro podem observar o mundo real como se uma janela de 1m estivesse centrada na entrada. Qualquer coisa que esteja no espaço extradimensional surge no mundo real na área vazia mais pró-xima da entrada quando a duração da magia acaba. Requer 3º círculo."
       }
     ]
   },
@@ -3189,9 +3189,9 @@ export const SPELLS_LIST: Spell[] = [
     "execution": "padrão",
     "range": "pessoal",
     "targetArea": "linha de 30m",
-    "duration": "instan-\ntânea",
-    "description": "Execução: padrão; Alcance: pessoal; \nÁrea: linha de 30m; Duração: instan-\ntânea; Resistência: Reflexos reduz à \nmetade.\nVocê dispara um poderoso raio que \ncausa 6d6 pontos de dano de eletrici-\ndade em todas as criaturas e objetos li-\nvres na área.",
-    "resistance": "Reflexos reduz à \nmetade",
+    "duration": "instantânea",
+    "description": "Execução: padrão; Alcance: pessoal; Área: linha de 30m; Duração: instantânea; Resistência: Reflexos reduz à metade. Você dispara um poderoso raio que causa 6d6 pontos de dano de eletricidade em todas as criaturas e objetos livres na área.",
+    "resistance": "Reflexos reduz à metade",
     "upgrades": [
       {
         "cost": "+2 PM",
@@ -3207,9 +3207,9 @@ export const SPELLS_LIST: Spell[] = [
     "school": "Evocação",
     "execution": "duas rodadas",
     "range": "médio",
-    "targetArea": "bolas de fogo e relâm-\npagos",
+    "targetArea": "bolas de fogo e relâmpagos",
     "duration": "sustentada",
-    "description": "Execução: duas rodadas; Alcance: \nmédio; Efeito: bolas de fogo e relâm-\npagos; Duração: sustentada; Resis-\ntência: Reflexos reduz à metade.\nEsta é uma magia poderosa, desenvol-\nvida pelo metódico e impassível arqui-\nmago Reynard. Você invoca as energias \nelementais do fogo e do relâmpago, fa-\nzendo com que uma de suas mãos fi-\n203\nCapítulo Quatro\nque em chamas e a outra mão eletrifi-\ncada. Pela duração da magia, você pode \ngastar uma ação de movimento para \ndisparar uma bola de fogo (10d6 pon-\ntos de dano de fogo numa esfera com \n6m de raio) ou um relâmpago (10d6 \npontos de dano de eletricidade numa \nlinha). Você também pode, como uma \nação padrão, usar as duas mãos num \nataque de energia mista (20d12 pon-\ntos de dano, metade de fogo e meta-\nde de eletricidade, numa esfera com \n9m de raio). Você precisa estar com as \nduas mãos livres para invocar o efeito \nmisto e isso consome toda a energia \nda magia, terminando-a imediatamen-\nte. Por se tratar de um ritual comple-\nxo, o tempo de execução dessa magia \nnão pode ser reduzido."
+    "description": "Execução: duas rodadas; Alcance: médio; Efeito: bolas de fogo e relâmpagos; Duração: sustentada; Resistência: Reflexos reduz à metade. Esta é uma magia poderosa, desenvolvida pelo metódico e impassível arquimago Reynard. Você invoca as energias elementais do fogo e do relâmpago, fazendo com que uma de suas mãos fi203 Capítulo Quatro que em chamas e a outra mão eletrificada. Pela duração da magia, você pode gastar uma ação de movimento para disparar uma bola de fogo (10d6 pontos de dano de fogo numa esfera com 6m de raio) ou um relâmpago (10d6 pontos de dano de eletricidade numa linha). Você também pode, como uma ação padrão, usar as duas mãos num ataque de energia mista (20d12 pontos de dano, metade de fogo e metade de eletricidade, numa esfera com 9m de raio). Você precisa estar com as duas mãos livres para invocar o efeito misto e isso consome toda a energia da magia, terminando-a imediatamen-te. Por se tratar de um ritual complexo, o tempo de execução dessa magia não pode ser reduzido."
   },
   {
     "id": "requiem",
@@ -3234,23 +3234,23 @@ export const SPELLS_LIST: Spell[] = [
     "range": "toque",
     "targetArea": "1 criatura",
     "duration": "cena",
-    "description": "Ao lançar esta magia, escolha entre \nácido, eletricidade, fogo, frio, luz ou \ntrevas. O alvo recebe redução de dano \n10 contra o tipo de dano escolhido.",
+    "description": "Ao lançar esta magia, escolha entre ácido, eletricidade, fogo, frio, luz ou trevas. O alvo recebe redução de dano 10 contra o tipo de dano escolhido.",
     "upgrades": [
       {
         "cost": "+2 PM",
-        "description": "aumenta a redução de dano \nem"
+        "description": "aumenta a redução de dano em"
       },
       {
         "cost": "+2 PM",
-        "description": "muda a duração para um dia. \nRequer 2º círculo."
+        "description": "muda a duração para um dia. Requer 2º círculo."
       },
       {
         "cost": "+5 PM",
-        "description": "muda o alcance para curto e o \nalvo para criaturas escolhidas. Requer \n3º círculo."
+        "description": "muda o alcance para curto e o alvo para criaturas escolhidas. Requer 3º círculo."
       },
       {
         "cost": "+5 PM",
-        "description": "muda o efeito para redução de \ndano contra todos os tipos listados na \nmagia. Requer 3º círculo."
+        "description": "muda o efeito para redução de dano contra todos os tipos listados na magia. Requer 3º círculo."
       }
     ]
   },
@@ -3263,13 +3263,13 @@ export const SPELLS_LIST: Spell[] = [
     "execution": "padrão",
     "range": "curto",
     "targetArea": "1 criatura",
-    "duration": "sustenta-\nda",
-    "description": "Você entoa cânticos maléficos que \namaldiçoam uma vítima, criando efei-\ntos variados. Ao lançar a magia, escolha \nentre os seguintes.\nDebilidade: o alvo fica esmorecido e não \npode se comunicar ou lançar magias. \nAinda reconhece seus aliados e pode \nsegui-los e ajudá-los, mas sempre de \nmaneira simplória.\nDoença: muda a duração para instantâ-\nnea. O alvo contrai uma doença a sua \nescolha, que o afeta imediatamente \n(sem período de incubação).\nFraqueza: o alvo fica debilitado e lento.\nIsolamento: o alvo perde o uso de um \nde seus cinco sentidos a sua escolha. \nSe perder a visão, fica cego. Se perder a \naudição, fica surdo. Se perder o olfato \nou paladar, não pode usar a habilidade \nfaro. Se perder o tato, fica caído e não \npode se levantar.\nVocê também pode inventar sua pró-\npria maldição, usando esses exemplos \ncomo sugestões, mas o mestre tem a \npalavra final sobre o efeito.",
+    "duration": "sustentada",
+    "description": "Você entoa cânticos maléficos que amaldiçoam uma vítima, criando efeitos variados. Ao lançar a magia, escolha entre os seguintes. Debilidade: o alvo fica esmorecido e não pode se comunicar ou lançar magias. Ainda reconhece seus aliados e pode segui-los e ajudá-los, mas sempre de maneira simplória. Doença: muda a duração para instantânea. O alvo contrai uma doença a sua escolha, que o afeta imediatamente (sem período de incubação). Fraqueza: o alvo fica debilitado e lento. Isolamento: o alvo perde o uso de um de seus cinco sentidos a sua escolha. Se perder a visão, fica cego. Se perder a audição, fica surdo. Se perder o olfato ou paladar, não pode usar a habilidade faro. Se perder o tato, fica caído e não pode se levantar. Você também pode inventar sua pró-pria maldição, usando esses exemplos como sugestões, mas o mestre tem a palavra final sobre o efeito.",
     "resistance": "Fortitude anula",
     "upgrades": [
       {
         "cost": "+3 PM",
-        "description": "aumenta o número de efeitos \nque você pode escolher em"
+        "description": "aumenta o número de efeitos que você pode escolher em"
       }
     ]
   },
@@ -3283,12 +3283,12 @@ export const SPELLS_LIST: Spell[] = [
     "range": "curto",
     "targetArea": "1 criatura",
     "duration": "permanente",
-    "description": "Você rouba a alma da vítima, arma-\nzenando-a em um objeto. Se o alvo \npassar no teste de resistência, sente o\nimpacto de sua alma ser puxada para \nfora do corpo e fica abalado por 1 roda-\nda. Se falhar, seu corpo fica caído, in-\nconsciente e inerte, enquanto sua alma \né transportada para dentro do obje-\nto. O corpo não envelhece nem se de-\ncompõe, permanecendo em estase. Ele \npode ser atacado e destruído normal-\nmente. O objeto escolhido deve custar \nT$ 1.000 por nível ou ND da criatu-\nra e não possuir uma alma presa ou se \nquebrará quando a magia for lançada \n(embora personagens não conheçam \no conceito de “nível” dentro do mun-\ndo de jogo, podem ter noção do poder \ngeral de uma criatura, estimando as-\nsim o valor do objeto). Se o objeto for \ndestruído, a magia se esvai. Se o cor-\npo ainda estiver disponível, a alma re-\ntorna para ele. Caso contrário, escapa \npara os Mundos dos Deuses.\nCusto adicional: sacrifício de 1 PM.",
+    "description": "Você rouba a alma da vítima, armazenando-a em um objeto. Se o alvo passar no teste de resistência, sente o impacto de sua alma ser puxada para fora do corpo e fica abalado por 1 rodada. Se falhar, seu corpo fica caído, inconsciente e inerte, enquanto sua alma é transportada para dentro do objeto. O corpo não envelhece nem se decompõe, permanecendo em estase. Ele pode ser atacado e destruído normalmente. O objeto escolhido deve custar T$ 1.000 por nível ou ND da criatura e não possuir uma alma presa ou se quebrará quando a magia for lançada (embora personagens não conheçam o conceito de “nível” dentro do mundo de jogo, podem ter noção do poder geral de uma criatura, estimando assim o valor do objeto). Se o objeto for destruído, a magia se esvai. Se o corpo ainda estiver disponível, a alma retorna para ele. Caso contrário, escapa para os Mundos dos Deuses. Custo adicional: sacrifício de 1 PM.",
     "resistance": "Vontade parcial",
     "upgrades": [
       {
         "cost": "+5 PM",
-        "description": "o objeto que abriga a alma de-\ntém os mesmos PM totais que o alvo. \nSe estiver empunhando o objeto, você \npode usar esses PM para pagar o cus-\nto de PM para lançar magias. O objeto \nrecupera PM por dia como se o perso-\nnagem estivesse em descanso normal."
+        "description": "o objeto que abriga a alma detém os mesmos PM totais que o alvo. Se estiver empunhando o objeto, você pode usar esses PM para pagar o custo de PM para lançar magias. O objeto recupera PM por dia como se o personagem estivesse em descanso normal."
       }
     ]
   },
@@ -3302,7 +3302,7 @@ export const SPELLS_LIST: Spell[] = [
     "range": "toque",
     "targetArea": "uma área de 6m de raio",
     "duration": "Instantânea",
-    "description": "Você escreve uma runa pessoal em \numa superfície fixa, como uma parede \nou o chão, que protege uma pequena \nárea ao redor. Quando uma criatura \nentra na área afetada a runa explode, \ncausando 6d6 pontos de dano em to-\ndos os alvos a até 6m. A criatura que \nativa a runa não tem direi­to a teste de \nresistência; outras criatu­ras na área \ntêm direito a um teste de Reflexos \npara reduzir o dano à metade. Quando \nlança a magia, você escolhe o tipo de \ndano, entre ácido, eletricidade, fogo, \nfrio, luz ou trevas.\nVocê pode determinar que a runa se \native apenas em condições específicas \n- por exemplo, apenas por goblins ou \napenas por mortos-vivos. Você tam­\nbém pode criar uma palavra mágica \nque impeça a runa de se ativar.\n204\nMagia\nUm personagem pode encontrar a runa \ncom um teste de Investigação e desar­\nmá-la com um teste de Ladinagem.\nComponente material: pó de diamante no \nvalor de T$ 200, com o qual o conjura­\ndor desenha a runa, que brilha por al­\nguns instantes e depois se torna prati­\ncamente invisível.",
+    "description": "Você escreve uma runa pessoal em uma superfície fixa, como uma parede ou o chão, que protege uma pequena área ao redor. Quando uma criatura entra na área afetada a runa explode, causando 6d6 pontos de dano em todos os alvos a até 6m. A criatura que ativa a runa não tem direi­to a teste de resistência; outras criatu­ras na área têm direito a um teste de Reflexos para reduzir o dano à metade. Quando lança a magia, você escolhe o tipo de dano, entre ácido, eletricidade, fogo, frio, luz ou trevas. Você pode determinar que a runa se ative apenas em condições específicas - por exemplo, apenas por goblins ou apenas por mortos-vivos. Você tam­ bém pode criar uma palavra mágica que impeça a runa de se ativar. 204 Magia Um personagem pode encontrar a runa com um teste de Investigação e desar­ má-la com um teste de Ladinagem. Componente material: pó de diamante no valor de T$ 200, com o qual o conjura­ dor desenha a runa, que brilha por al­ guns instantes e depois se torna prati­ camente invisível.",
     "resistance": "varia (veja o texto)",
     "upgrades": [
       {
@@ -3311,7 +3311,7 @@ export const SPELLS_LIST: Spell[] = [
       },
       {
         "cost": "+1 PM",
-        "description": "muda o alvo para “você” e o \nalcance para “pessoal”. Ao invés do \nnormal, escolha uma magia de 1º cír-\nculo que você conhece e pode lan-\nçar, com tempo de execução de uma \nação padrão ou menor. Você escre-\nve a runa em seu corpo e especifica \numa condição de ativação como, por \nexemplo, “quando eu for alvo de um \nataque” ou “quando for alvo de uma \nmagia”. Quando a condição for cum-\nprida, você pode ativar a runa e lançar \na magia escolhida como uma reação. \nVocê só pode escrever uma runa em \nseu corpo ao mesmo tempo."
+        "description": "muda o alvo para “você” e o alcance para “pessoal”. Ao invés do normal, escolha uma magia de 1º círculo que você conhece e pode lançar, com tempo de execução de uma ação padrão ou menor. Você escreve a runa em seu corpo e especifica uma condição de ativação como, por exemplo, “quando eu for alvo de um ataque” ou “quando for alvo de uma magia”. Quando a condição for cumprida, você pode ativar a runa e lançar a magia escolhida como uma reação. Você só pode escrever uma runa em seu corpo ao mesmo tempo."
       }
     ]
   },
@@ -3325,7 +3325,7 @@ export const SPELLS_LIST: Spell[] = [
     "range": "curto",
     "targetArea": "você",
     "duration": "instantânea",
-    "description": "Esta magia transporta você para outro \nlugar dentro do alcance. Você não pre-\ncisa perceber nem ter linha de efeito \nao seu destino, podendo simplesmen-\nte imaginá-lo. Por exemplo, pode se \ntransportar 3m adiante para ultrapas-\nsar uma porta fechada. Uma vez trans-\nportadas, criaturas não podem agir até \na rodada seguinte. Esta magia não per-\nmite que você apareça dentro de um \ncorpo sólido; se o ponto de chegada \nnão tem espaço livre, você ressurge na \nárea vazia mais próxima.",
+    "description": "Esta magia transporta você para outro lugar dentro do alcance. Você não pre-cisa perceber nem ter linha de efeito ao seu destino, podendo simplesmen-te imaginá-lo. Por exemplo, pode se transportar 3m adiante para ultrapassar uma porta fechada. Uma vez transportadas, criaturas não podem agir até a rodada seguinte. Esta magia não permite que você apareça dentro de um corpo sólido; se o ponto de chegada não tem espaço livre, você ressurge na área vazia mais próxima.",
     "upgrades": [
       {
         "cost": "+1 PM",
@@ -3333,11 +3333,11 @@ export const SPELLS_LIST: Spell[] = [
       },
       {
         "cost": "+1 PM",
-        "description": "muda o alvo para você e uma \ncriatura voluntária. Você pode esco-\nlher este aprimoramento mais vezes \npara aumentar o número de alvos adi-\ncionais em"
+        "description": "muda o alvo para você e uma criatura voluntária. Você pode escolher este aprimoramento mais vezes para aumentar o número de alvos adicionais em"
       },
       {
         "cost": "+2 PM",
-        "description": "muda a execução para reação. \nEm vez do normal, você recebe"
+        "description": "muda a execução para reação. Em vez do normal, você recebe"
       },
       {
         "cost": "+3 PM",
@@ -3355,11 +3355,11 @@ export const SPELLS_LIST: Spell[] = [
     "range": "toque",
     "targetArea": "1 criatura",
     "duration": "cena",
-    "description": "Execução: padrão; Alcance: toque; \nAlvo: 1 criatura; Duração: cena; Re-\nsistência: Vontade anula.\nQualquer criatura que tente fazer uma \nação hostil contra o alvo deve fazer um \nteste de Vontade. Se falhar, não conse-\ngue, perde a ação e não pode tentar no-\nvamente enquanto a magia durar. San-\ntuário não protege o alvo de efeitos de \nárea. Além disso, o próprio alvo tam-\nbém não pode fazer ações hostis (in-\ncluindo forçar outras criaturas a ata-\ncá-lo), ou a magia é dissipada - mas \npode usar habilidades e magias de cura \ne suporte, como Curar Ferimentos e Bên-\nção.",
+    "description": "Execução: padrão; Alcance: toque; Alvo: 1 criatura; Duração: cena; Resistência: Vontade anula. Qualquer criatura que tente fazer uma ação hostil contra o alvo deve fazer um teste de Vontade. Se falhar, não consegue, perde a ação e não pode tentar novamente enquanto a magia durar. Santuário não protege o alvo de efeitos de área. Além disso, o próprio alvo também não pode fazer ações hostis (incluindo forçar outras criaturas a atacá-lo), ou a magia é dissipada - mas pode usar habilidades e magias de cura e suporte, como Curar Ferimentos e Bênção.",
     "upgrades": [
       {
         "cost": "+1 PM",
-        "description": "além do normal, escolha um \ntipo de criatura entre animal, constru-\nto ou morto-vivo. Você não pode ser \npercebido por criaturas não inteligen-\ntes (Int -4 ou menor) do tipo escolhido."
+        "description": "além do normal, escolha um tipo de criatura entre animal, construto ou morto-vivo. Você não pode ser percebido por criaturas não inteligentes (Int -4 ou menor) do tipo escolhido."
       }
     ]
   },
@@ -3373,7 +3373,7 @@ export const SPELLS_LIST: Spell[] = [
     "range": "toque",
     "targetArea": "1 criatura",
     "duration": "instantânea",
-    "description": "Um brilho de luz, na forma de asas de \nfênix, emana do alvo. Ele recupera 200 \npontos de vida e se cura de qualquer \ndas seguintes condições: abalado, apa-\nvorado, alquebrado, atordoado, cego, \nconfuso, debilitado, enjoado, envene-\nnado, esmorecido, exausto, fascinado, \nfatigado, fraco, frustrado, lento, ofus-\ncado, paralisado, pasmo ou surdo.",
+    "description": "Um brilho de luz, na forma de asas de fênix, emana do alvo. Ele recupera 200 pontos de vida e se cura de qualquer das seguintes condições: abalado, apavorado, alquebrado, atordoado, cego, confuso, debilitado, enjoado, envenenado, esmorecido, exausto, fascinado, fatigado, fraco, frustrado, lento, ofuscado, paralisado, pasmo ou surdo.",
     "upgrades": [
       {
         "cost": "+1 PM",
@@ -3381,7 +3381,7 @@ export const SPELLS_LIST: Spell[] = [
       },
       {
         "cost": "+2 PM",
-        "description": "muda o alcance para curto e o \nalvo para até 5 criaturas."
+        "description": "muda o alcance para curto e o alvo para até 5 criaturas."
       }
     ]
   },
@@ -3395,7 +3395,7 @@ export const SPELLS_LIST: Spell[] = [
     "range": "toque",
     "targetArea": "1 criatura",
     "duration": "cena",
-    "description": "Execução: padrão; Alcance: toque; \nAlvo: 1 criatura; Duração: cena; Resis-\ntência: Vontade parcial.\nSeu toque manifesta um selo mágico \nna pele do alvo, que atrapalha o fluxo \nde mana. Pela duração da magia, sem-\npre que o alvo realizar qualquer ação \nque gaste PM, deve fazer um teste de\nVontade; se passar, faz a ação normal-\nmente. Se falhar, a ação não tem efeito \n(mas os PM são gastos mesmo assim)."
+    "description": "Execução: padrão; Alcance: toque; Alvo: 1 criatura; Duração: cena; Resistência: Vontade parcial. Seu toque manifesta um selo mágico na pele do alvo, que atrapalha o fluxo de mana. Pela duração da magia, sempre que o alvo realizar qualquer ação que gaste PM, deve fazer um teste de Vontade; se passar, faz a ação normalmente. Se falhar, a ação não tem efeito (mas os PM são gastos mesmo assim)."
   },
   {
     "id": "semiplano",
@@ -3407,11 +3407,11 @@ export const SPELLS_LIST: Spell[] = [
     "range": "curto",
     "targetArea": "semiplano com 30m de lado",
     "duration": "1 dia",
-    "description": "Você cria uma dimensão particular. \nVocê pode entrar no semiplano gastan-\ndo uma ação padrão e 10 PM, desapa-\nrecendo do plano material como se ti-\nvesse se teletransportado. Você pode \nlevar criaturas voluntárias que esteja \ntocando, ao custo de 1 PM por criatu-\nra extra. Você também pode levar ob-\njetos que esteja tocando, ao custo de 1 \nPM por objeto Médio ou menor, 2 PM \npor objeto Grande, 5 PM por Enorme e \n10 PM por Colossal. Uma vez no semi-\nplano, pode gastar uma ação completa \npara voltar ao plano material, no mes-\nmo local onde estava. Caso conheça a \nmagia Viagem Planar, pode lançá-la para \nvoltar ao plano material em outro local.\nVocê escolhe a forma e a aparência do \nsemiplano - uma caverna, um aste-\nroide que singra o éter, um palacete \nde cristal etc. Ele contém ar, luz e ca-\nlor, mas além disso é vazio. Entretan-\nto, você pode levar itens (mobília, fer-\nramentas etc.) a cada viagem.",
+    "description": "Você cria uma dimensão particular. Você pode entrar no semiplano gastando uma ação padrão e 10 PM, desaparecendo do plano material como se tivesse se teletransportado. Você pode levar criaturas voluntárias que esteja tocando, ao custo de 1 PM por criatura extra. Você também pode levar objetos que esteja tocando, ao custo de 1 PM por objeto Médio ou menor, 2 PM por objeto Grande, 5 PM por Enorme e 10 PM por Colossal. Uma vez no semiplano, pode gastar uma ação completa para voltar ao plano material, no mesmo local onde estava. Caso conheça a magia Viagem Planar, pode lançá-la para voltar ao plano material em outro local. Você escolhe a forma e a aparência do semiplano - uma caverna, um asteroide que singra o éter, um palacete de cristal etc. Ele contém ar, luz e calor, mas além disso é vazio. Entretanto, você pode levar itens (mobília, ferramentas etc.) a cada viagem.",
     "upgrades": [
       {
         "cost": "+2 PM",
-        "description": "adiciona alvo (1 criatura). Você \ncria uma semiplano labiríntico e expulsa \no alvo para ele. A cada rodada, a vítima \ntem direito a um teste de Investigação \nou Sobrevivência, com bônus cumula-\ntivo de"
+        "description": "adiciona alvo (1 criatura). Você cria uma semiplano labiríntico e expulsa o alvo para ele. A cada rodada, a vítima tem direito a um teste de Investigação ou Sobrevivência, com bônus cumulativo de"
       }
     ]
   },
@@ -3425,11 +3425,11 @@ export const SPELLS_LIST: Spell[] = [
     "range": "curto",
     "targetArea": "criatura conjurada",
     "duration": "cena ou até ser descarregada",
-    "description": "Execução: padrão; Alcance: curto; \nEfeito: criatura conjurada; Duração: \ncena ou até ser descarregada.\n205\nCapítulo Quatro\nVocê pede a sua divindade que envie \num espírito para ajudá-lo. Esse espíri-\nto realiza uma tarefa a sua escolha que \npossa ser cumprida em até uma hora \n- desde algo simples como “use suas \nasas para nos levar até o topo da mon-\ntanha” até algo complexo como “es-\ncolte esses camponeses até o castelo”. \nA magia é descarregada quando a cria-\ntura cumpre a tarefa, retornando a seu \nplano natal. O tipo de criatura é esco-\nlhido pelo mestre, de acordo com as \nnecessidades da tarefa.\nComponente material: um pagamento de \nT$ 100 ao espírito. A forma de paga-\nmento varia - doações a um templo, \num item mágico ou mesmo dinheiro.",
+    "description": "Execução: padrão; Alcance: curto; Efeito: criatura conjurada; Duração: cena ou até ser descarregada. 205 Capítulo Quatro Você pede a sua divindade que envie um espírito para ajudá-lo. Esse espírito realiza uma tarefa a sua escolha que possa ser cumprida em até uma hora - desde algo simples como “use suas asas para nos levar até o topo da montanha” até algo complexo como “escolte esses camponeses até o castelo”. A magia é descarregada quando a criatura cumpre a tarefa, retornando a seu plano natal. O tipo de criatura é escolhido pelo mestre, de acordo com as necessidades da tarefa. Componente material: um pagamento de T$ 100 ao espírito. A forma de pagamento varia - doações a um templo, um item mágico ou mesmo dinheiro.",
     "upgrades": [
       {
         "cost": "+4 PM",
-        "description": "muda a duração para um dia \nou até ser descarregada. O espírito reali-\nza uma tarefa a sua escolha que exija até \num dia. O custo do pagamento aumen-\nta para T$ 500. O resto segue normal."
+        "description": "muda a duração para um dia ou até ser descarregada. O espírito realiza uma tarefa a sua escolha que exija até um dia. O custo do pagamento aumenta para T$ 500. O resto segue normal."
       }
     ]
   },
@@ -3443,15 +3443,15 @@ export const SPELLS_LIST: Spell[] = [
     "range": "toque",
     "targetArea": "1 cadáver",
     "duration": "instantânea",
-    "description": "Esta magia transforma o cadáver de \num humanoide, animal ou monstro \nem um esqueleto ou zumbi (conforme \no estado de conservação do corpo). O \nmorto-vivo então obedece a todos os \nseus comandos, mesmo suicidas. Se \nquiser que o morto-vivo o acompanhe, \nele funciona como um parceiro inician-\nte, de um tipo a sua escolha entre aju-\ndante, atirador, combatente, fortão, \nguardião ou montaria.\nUma vez por rodada, quando sofre \ndano, você pode sacrificar um servo \nmorto-vivo e evitar esse dano. O ser-\nvo é destruído no processo e não pode \nser reanimado\nComponente material: um ônix negro \n(T$ 100), inserido na boca ou olho \ndo cadáver.",
+    "description": "Esta magia transforma o cadáver de um humanoide, animal ou monstro em um esqueleto ou zumbi (conforme o estado de conservação do corpo). O morto-vivo então obedece a todos os seus comandos, mesmo suicidas. Se quiser que o morto-vivo o acompanhe, ele funciona como um parceiro inician-te, de um tipo a sua escolha entre ajudante, atirador, combatente, fortão, guardião ou montaria. Uma vez por rodada, quando sofre dano, você pode sacrificar um servo morto-vivo e evitar esse dano. O servo é destruído no processo e não pode ser reanimado Componente material: um ônix negro (T$ 100), inserido na boca ou olho do cadáver.",
     "upgrades": [
       {
         "cost": "+3 PM",
-        "description": "muda o componente material \npara pó de ônix negro (T$ 500). Em \nvez de um zumbi ou esqueleto, cria um \ncarniçal. Ele pode funcionar como um \nparceiro veterano, escolhido entre aju-\ndante, atirador, combatente, fortão ou \nguardião. O resto segue normal."
+        "description": "muda o componente material para pó de ônix negro (T$ 500). Em vez de um zumbi ou esqueleto, cria um carniçal. Ele pode funcionar como um parceiro veterano, escolhido entre ajudante, atirador, combatente, fortão ou guardião. O resto segue normal."
       },
       {
         "cost": "+3 PM",
-        "description": "muda o componente material \npara pó de ônix negro (T$ 500). Em \nvez de um zumbi ou esqueleto, cria\numa sombra. Ela pode funcionar como \num parceiro veterano, escolhido entre \nassassino, combatente ou perseguidor. \nO restante da magia segue normal."
+        "description": "muda o componente material para pó de ônix negro (T$ 500). Em vez de um zumbi ou esqueleto, cria uma sombra. Ela pode funcionar como um parceiro veterano, escolhido entre assassino, combatente ou perseguidor. O restante da magia segue normal."
       }
     ]
   },
@@ -3465,11 +3465,11 @@ export const SPELLS_LIST: Spell[] = [
     "range": "longo",
     "targetArea": "criaturas conjuradas",
     "duration": "Instantânea",
-    "description": "Execução: padrão; Alcance: longo; \nEfeito: criaturas conjuradas; Dura-\nção: 1 cena.\nVocê cria até três servos invisíveis e \nsilenciosos, capazes de realizar tare-\nfas simples como apanhar lenha, co-\nlher frutos, varrer o chão ou alimentar \num cavalo. Os servos podem ser usa-\ndos para manter arrumada e organiza-\nda uma mansão ou pequena torre ou \npara preparar um acampamento nos \nermos para você e seus aliados (veja a \nperícia Sobrevivência, na página 123).\nEles também podem ajudá-lo em tare-\nfas mais complexas, como fazer uma \npesquisa ou preparar uma poção, mas \nisso consome sua energia mágica. Você \npode “gastar” um servo para receber \num bônus não cumulativo de +2 em \num teste de perícia (exceto testes de \nataque e resistência). Os servos não \nsão criaturas reais; não podem lutar, \nnem resistir a qualquer dano ou efei-\nto que exija um teste de resistência ou \nteste oposto - falharão automatica-\nmente no teste e serão destruídos.",
+    "description": "Execução: padrão; Alcance: longo; Efeito: criaturas conjuradas; Duração: 1 cena. Você cria até três servos invisíveis e silenciosos, capazes de realizar tarefas simples como apanhar lenha, colher frutos, varrer o chão ou alimentar um cavalo. Os servos podem ser usados para manter arrumada e organizada uma mansão ou pequena torre ou para preparar um acampamento nos ermos para você e seus aliados (veja a perícia Sobrevivência, na página 123). Eles também podem ajudá-lo em tarefas mais complexas, como fazer uma pesquisa ou preparar uma poção, mas isso consome sua energia mágica. Você pode “gastar” um servo para receber um bônus não cumulativo de +2 em um teste de perícia (exceto testes de ataque e resistência). Os servos não são criaturas reais; não podem lutar, nem resistir a qualquer dano ou efeito que exija um teste de resistência ou teste oposto - falharão automaticamente no teste e serão destruídos.",
     "upgrades": [
       {
         "cost": "+2 PM",
-        "description": "aumenta o número de servos \nconjurados em 1."
+        "description": "aumenta o número de servos conjurados em 1."
       }
     ]
   },
@@ -3483,19 +3483,19 @@ export const SPELLS_LIST: Spell[] = [
     "range": "médio",
     "targetArea": "1 criatura",
     "duration": "instantânea",
-    "description": "Execução: padrão; Alcance: médio; \nAlvos: criaturas escolhidas; Duração: \ninstantânea.\nFavorita entre arcanistas iniciantes, \nesta magia lança duas setas de energia\nque causam 1d4+1 pontos de dano de \nessência cada. Você pode lançar as se-\ntas em alvos diferentes ou concentrá-las \nnum mesmo alvo. Caso você possua um \nbônus no dano de magias, como pelo \npoder Arcano de Batalha, ele é aplicado \nem apenas uma seta (o bônus vale para \na magia, não cada alvo).",
+    "description": "Execução: padrão; Alcance: médio; Alvos: criaturas escolhidas; Duração: instantânea. Favorita entre arcanistas iniciantes, esta magia lança duas setas de energia que causam 1d4+1 pontos de dano de essência cada. Você pode lançar as setas em alvos diferentes ou concentrá-las num mesmo alvo. Caso você possua um bônus no dano de magias, como pelo poder Arcano de Batalha, ele é aplicado em apenas uma seta (o bônus vale para a magia, não cada alvo).",
     "upgrades": [
       {
         "cost": "+2 PM",
-        "description": "muda as setas para lanças de \nenergia que surgem e caem do céu. \nCada lança causa 1d8"
+        "description": "muda as setas para lanças de energia que surgem e caem do céu. Cada lança causa 1d8"
       },
       {
         "cost": "+2 PM",
-        "description": "muda o número de setas/lan-\nças para três."
+        "description": "muda o número de setas/lanças para três."
       },
       {
         "cost": "+4 PM",
-        "description": "muda o número de setas/lan-\nças para cinco. Requer 2º círculo."
+        "description": "muda o número de setas/lanças para cinco. Requer 2º círculo."
       }
     ]
   },
@@ -3509,11 +3509,11 @@ export const SPELLS_LIST: Spell[] = [
     "range": "médio",
     "targetArea": "esfera com 6m de raio",
     "duration": "Instantânea",
-    "description": "Execução: padrão; Alcance: médio; \nÁrea: esfera com 6m de raio; Dura-\nção: sustentada.\nUm silêncio sepulcral recai sobre a \nárea e nenhum som é produzido nela. \nEnquanto estiverem na área, todas as \ncriaturas ficam surdas. Além disso, \ncomo lançar magias exige palavras má-\ngicas, normalmente nenhuma magia \npode ser lançada dentro da área.",
+    "description": "Execução: padrão; Alcance: médio; Área: esfera com 6m de raio; Duração: sustentada. Um silêncio sepulcral recai sobre a área e nenhum som é produzido nela. Enquanto estiverem na área, todas as criaturas ficam surdas. Além disso, como lançar magias exige palavras mágicas, normalmente nenhuma magia pode ser lançada dentro da área.",
     "upgrades": [
       {
         "cost": "+1 PM",
-        "description": "muda a área para alvo de 1 ob-\njeto. Em vez do normal, o alvo emana \numa área de silêncio com 3m de raio. \nSe lançar a magia num objeto de uma \ncriatura involuntária, ela tem direito a \num teste de Vontade para anulá-la."
+        "description": "muda a área para alvo de 1 objeto. Em vez do normal, o alvo emana uma área de silêncio com 3m de raio. Se lançar a magia num objeto de uma criatura involuntária, ela tem direito a um teste de Vontade para anulá-la."
       }
     ]
   },
@@ -3527,12 +3527,12 @@ export const SPELLS_LIST: Spell[] = [
     "range": "médio",
     "targetArea": "1 criatura",
     "duration": "instantânea",
-    "description": "Ninguém sabe se Mestre Arsenal foi \nrealmente o criador desta magia - \nmas ele foi o primeiro a utilizá-la. \nVocê fecha o punho e gesticula como \nse estivesse golpeando o alvo, causan-\ndo dano de impacto igual a 4d6 + sua \nForça. A vítima é empurrada 3m na \ndireção oposta à sua. Passar no teste \nde resistência reduz o dano à metade \ne evita o empurrão.",
+    "description": "Ninguém sabe se Mestre Arsenal foi realmente o criador desta magia - mas ele foi o primeiro a utilizá-la. Você fecha o punho e gesticula como se estivesse golpeando o alvo, causando dano de impacto igual a 4d6 + sua Força. A vítima é empurrada 3m na direção oposta à sua. Passar no teste de resistência reduz o dano à metade e evita o empurrão.",
     "resistance": "Fortitude parcial",
     "upgrades": [
       {
         "cost": "+1 PM",
-        "description": "muda o alcance para pessoal, \no alvo para você, a duração para cena\n206\nMagia\ne a resistência para nenhuma. Em vez \ndo normal, seus ataques corpo a corpo \npassam a acertar inimigos distantes. \nSeu alcance natural aumenta em 3m; \numa criatura Média pode atacar adver-\nsários a até 4,5m, por exemplo."
+        "description": "muda o alcance para pessoal, o alvo para você, a duração para cena 206 Magia e a resistência para nenhuma. Em vez do normal, seus ataques corpo a corpo passam a acertar inimigos distantes. Seu alcance natural aumenta em 3m; uma criatura Média pode atacar adversários a até 4,5m, por exemplo."
       },
       {
         "cost": "+2 PM",
@@ -3554,7 +3554,7 @@ export const SPELLS_LIST: Spell[] = [
     "range": "curto",
     "targetArea": "1 criatura",
     "duration": "cena",
-    "description": "Execução: padrão; Alcance: curto; \nAlvo: 1 criatura; Duração: cena; Re-\nsistência: Vontade parcial.\nEsta magia cria uma duplicata ilusória \ndo alvo na forma de uma silhueta, li-\ngada a ele como se fosse uma manifes-\ntação sólida de sua própria sombra. A \nduplicata de sombras segue automati-\ncamente o alvo. Sempre que o alvo faz \numa ação hostil - fazer um ataque, \nusar uma habilidade, lançar uma ma-\ngia - a sombra imediatamente realiza \na mesma ação contra o alvo, usando as \nmesmas estatísticas e rolagens. A som-\nbra pode ser atacada, tem as mesmas \nestatísticas do alvo e é destruída quan-\ndo chega a 0 PV. Se o alvo passar no \nteste de resistência, a sombra desapa-\nrece no final do turno do alvo, depois \nde copiar sua ação dessa rodada."
+    "description": "Execução: padrão; Alcance: curto; Alvo: 1 criatura; Duração: cena; Resistência: Vontade parcial. Esta magia cria uma duplicata ilusória do alvo na forma de uma silhueta, ligada a ele como se fosse uma manifestação sólida de sua própria sombra. A duplicata de sombras segue automaticamente o alvo. Sempre que o alvo faz uma ação hostil - fazer um ataque, usar uma habilidade, lançar uma magia - a sombra imediatamente realiza a mesma ação contra o alvo, usando as mesmas estatísticas e rolagens. A sombra pode ser atacada, tem as mesmas estatísticas do alvo e é destruída quando chega a 0 PV. Se o alvo passar no teste de resistência, a sombra desaparece no final do turno do alvo, depois de copiar sua ação dessa rodada."
   },
   {
     "id": "sonho",
@@ -3566,11 +3566,11 @@ export const SPELLS_LIST: Spell[] = [
     "range": "ili-\nmitado",
     "targetArea": "1 criatura viva",
     "duration": "Instantânea",
-    "description": "Execução: 10 minutos; Alcance: ili-\nmitado; Alvo: 1 criatura viva; Dura-\nção: veja texto.\nVocê entra nos sonhos de uma criatu-\nra. Uma vez lá, pode conversar com \nela até que ela acorde. Se o alvo não \nestiver dormindo quando você lançar \na magia, você pode permanecer em \ntranse até que ele adormeça. Duran-\nte o transe, você fica indefeso e sem \nconsciência dos arredores. Você pode \nsair do transe quando quiser, mas a \nmagia termina.",
+    "description": "Execução: 10 minutos; Alcance: ilimitado; Alvo: 1 criatura viva; Duração: veja texto. Você entra nos sonhos de uma criatura. Uma vez lá, pode conversar com ela até que ela acorde. Se o alvo não estiver dormindo quando você lançar a magia, você pode permanecer em transe até que ele adormeça. Duran-te o transe, você fica indefeso e sem consciência dos arredores. Você pode sair do transe quando quiser, mas a magia termina.",
     "upgrades": [
       {
         "cost": "+2 PM",
-        "description": "transforma o sonho do alvo \nem um pesadelo. A vítima deve fazer \num teste de Vontade. Se falhar, não \nrecupera PV ou PM pela noite, sofre \n1d10 pontos de dano de trevas e acor-\nda fatigada. A vítima recebe bônus ou \npenalidades em seu teste de resistên-\ncia, dependendo do conhecimento que \nvocê tiver dela. Use os mesmos modi-\nficadores da magia Vidência."
+        "description": "transforma o sonho do alvo em um pesadelo. A vítima deve fazer um teste de Vontade. Se falhar, não recupera PV ou PM pela noite, sofre 1d10 pontos de dano de trevas e acorda fatigada. A vítima recebe bônus ou penalidades em seu teste de resistência, dependendo do conhecimento que você tiver dela. Use os mesmos modificadores da magia Vidência."
       }
     ]
   },
@@ -3584,12 +3584,12 @@ export const SPELLS_LIST: Spell[] = [
     "range": "curto",
     "targetArea": "1 humanoide",
     "duration": "cena",
-    "description": "Um cansaço místico recai sobre o alvo. \nSe falhar na resistência, ele fica incons-\nciente e caído ou, se estiver envolvido \nem combate ou outra situação perigo-\nsa, fica exausto por 1 rodada, depois fa-\ntigado. Em ambos os casos, se passar, \no alvo fica fatigado por 1d4 rodadas.",
+    "description": "Um cansaço místico recai sobre o alvo. Se falhar na resistência, ele fica inconsciente e caído ou, se estiver envolvido em combate ou outra situação perigosa, fica exausto por 1 rodada, depois fatigado. Em ambos os casos, se passar, o alvo fica fatigado por 1d4 rodadas.",
     "resistance": "Vontade parcial",
     "upgrades": [
       {
         "cost": "+2 PM",
-        "description": "alvos que falhem na resistên-\ncia ficam exaustos por 1d4"
+        "description": "alvos que falhem na resistência ficam exaustos por 1d4"
       },
       {
         "cost": "+2 PM",
@@ -3606,8 +3606,8 @@ export const SPELLS_LIST: Spell[] = [
     "execution": "padrão",
     "range": "pessoal",
     "targetArea": "cone de 9m",
-    "duration": "instan-\ntânea",
-    "description": "Execução: padrão; Alcance: pessoal; \nÁrea: cone de 9m; Duração: instan-\ntânea.\nVocê enche seus pulmões de luz e \nenergia positiva e sopra um cone de \npoeira reluzente. O sopro afeta apenas \nseus aliados na área, curando 2d8+4 \npontos de vida e removendo uma das \nseguintes condições de todos os alvos: \nabalado, atordoado, apavorado, alque-\nbrado, cego, confuso, debilitado, enfei-\ntiçado, enjoado, esmorecido, exausto, \nfascinado, fatigado, fraco, frustrado, \nlento, paralisado, pasmo e surdo.",
+    "duration": "instantânea",
+    "description": "Execução: padrão; Alcance: pessoal; Área: cone de 9m; Duração: instantânea. Você enche seus pulmões de luz e energia positiva e sopra um cone de poeira reluzente. O sopro afeta apenas seus aliados na área, curando 2d8+4 pontos de vida e removendo uma das seguintes condições de todos os alvos: abalado, atordoado, apavorado, alquebrado, cego, confuso, debilitado, enfeitiçado, enjoado, esmorecido, exausto, fascinado, fatigado, fraco, frustrado, lento, paralisado, pasmo e surdo.",
     "upgrades": [
       {
         "cost": "+2 PM",
@@ -3615,7 +3615,7 @@ export const SPELLS_LIST: Spell[] = [
       },
       {
         "cost": "+4 PM",
-        "description": "além do normal, se um aliado \nestiver com PV negativos, seus PV são \nlevados a 0 e então a cura é aplicada."
+        "description": "além do normal, se um aliado estiver com PV negativos, seus PV são levados a 0 e então a cura é aplicada."
       }
     ]
   },
@@ -3628,8 +3628,8 @@ export const SPELLS_LIST: Spell[] = [
     "execution": "padrão",
     "range": "pessoal",
     "targetArea": "cone de 9m",
-    "duration": "instan-\ntânea",
-    "description": "Você sopra ar gélido que causa 4d6 \npontos de dano de frio (Fortitude re-\nduz à metade). Criaturas de tamanho \nMédio ou menor que falhem na resis-\ntência ficam caídas e são empurradas \n6m na direção oposta. Se houver uma \nparede ou outro objeto sólido (mas\nnão uma criatura) no caminho, a cria-\ntura para de se mover, mas sofre +2d6 \npontos de dano de impacto.",
+    "duration": "instantânea",
+    "description": "Você sopra ar gélido que causa 4d6 pontos de dano de frio (Fortitude reduz à metade). Criaturas de tamanho Médio ou menor que falhem na resistência ficam caídas e são empurradas 6m na direção oposta. Se houver uma parede ou outro objeto sólido (mas não uma criatura) no caminho, a criatura para de se mover, mas sofre +2d6 pontos de dano de impacto.",
     "resistance": "Fortitude parcial",
     "upgrades": [
       {
@@ -3648,7 +3648,7 @@ export const SPELLS_LIST: Spell[] = [
     "range": "toque",
     "targetArea": "1 criatura",
     "duration": "1 dia",
-    "description": "Esta magia facilita a sobrevivência em \nambientes hostis. O alvo fica imune \naos efeitos de calor e frio extremos, \npode respirar na água se respirar ar \n(ou vice-versa) e não sufoca em fuma-\nça densa."
+    "description": "Esta magia facilita a sobrevivência em ambientes hostis. O alvo fica imune aos efeitos de calor e frio extremos, pode respirar na água se respirar ar (ou vice-versa) e não sufoca em fumaça densa."
   },
   {
     "id": "sussurros_insanos",
@@ -3660,12 +3660,12 @@ export const SPELLS_LIST: Spell[] = [
     "range": "curto",
     "targetArea": "1 humanoide",
     "duration": "cena",
-    "description": "Você murmura palavras desconexas \nque afetam a mente do alvo. O alvo \nfica confuso.",
+    "description": "Você murmura palavras desconexas que afetam a mente do alvo. O alvo fica confuso.",
     "resistance": "Vontade anula",
     "upgrades": [
       {
         "cost": "+2 PM",
-        "description": "aumenta o número de alvos \nem"
+        "description": "aumenta o número de alvos em"
       },
       {
         "cost": "+3 PM",
@@ -3682,8 +3682,8 @@ export const SPELLS_LIST: Spell[] = [
     "execution": "padrão",
     "range": "pessoal",
     "targetArea": "cone de 9m",
-    "duration": "instan-\ntânea",
-    "description": "Esta magia cruel foi desenvolvida pelo \nmago de combate Edauros, quando \nainda era um bípede. Você faz um ges-\nto rápido e dispara uma lâmina de ar \nem alta velocidade. Criaturas na área \nsofrem 10d8 pontos de dano de corte e \nficam sangrando. Alvos que passem no \nteste de resistência sofrem metade do \ndano e não ficam sangrando.",
+    "duration": "instantânea",
+    "description": "Esta magia cruel foi desenvolvida pelo mago de combate Edauros, quando ainda era um bípede. Você faz um gesto rápido e dispara uma lâmina de ar em alta velocidade. Criaturas na área sofrem 10d8 pontos de dano de corte e ficam sangrando. Alvos que passem no teste de resistência sofrem metade do dano e não ficam sangrando.",
     "resistance": "Fortitude parcial",
     "upgrades": [
       {
@@ -3692,7 +3692,7 @@ export const SPELLS_LIST: Spell[] = [
       },
       {
         "cost": "+2 PM",
-        "description": "muda o alvo para você, a dura-\nção para sustentada e o efeito para uma \nvez por rodada, como uma ação de mo-\nvimento, você pode disparar uma lâ-\nmina de ar contra um alvo em alcance \nmédio, causando 6d8 pontos de dano \nde corte (Fortitude reduz à metade).\n207\nCapítulo Quatro"
+        "description": "muda o alvo para você, a duração para sustentada e o efeito para uma vez por rodada, como uma ação de movimento, você pode disparar uma lâmina de ar contra um alvo em alcance médio, causando 6d8 pontos de dano de corte (Fortitude reduz à metade). 207 Capítulo Quatro"
       }
     ]
   },
@@ -3706,16 +3706,16 @@ export const SPELLS_LIST: Spell[] = [
     "range": "curto",
     "targetArea": "cubo com 6m de lado",
     "duration": "cena",
-    "description": "Teia cria várias camadas de fibras entre-\nlaçadas e pegajosas na área. Qualquer \ncriatura na área que falhar na resistên-\ncia fica enredada. Uma vítima pode se \nlibertar com uma ação padrão e um \nteste de Acrobacia ou Atletismo. A \nárea ocupada por Teia é terreno difícil.\nA Teia é inflamável. Qualquer ataque \nque cause dano de fogo destrói as teias \npor onde passar, libertando as criaturas \nenredadas mas deixando-as em chamas.",
+    "description": "Teia cria várias camadas de fibras entrelaçadas e pegajosas na área. Qualquer criatura na área que falhar na resistência fica enredada. Uma vítima pode se libertar com uma ação padrão e um teste de Acrobacia ou Atletismo. A área ocupada por Teia é terreno difícil. A Teia é inflamável. Qualquer ataque que cause dano de fogo destrói as teias por onde passar, libertando as criaturas enredadas mas deixando-as em chamas.",
     "resistance": "Reflexos anula",
     "upgrades": [
       {
         "cost": "+1 PM",
-        "description": "além do normal, criaturas que \nfalhem na resistência também ficam \nimóveis."
+        "description": "além do normal, criaturas que falhem na resistência também ficam imóveis."
       },
       {
         "cost": "+2 PM",
-        "description": "além do normal, no início de \nseus turnos a magia afeta novamen-\nte qualquer criatura na área, exigindo \num novo teste de Reflexos. Requer 2º \ncírculo."
+        "description": "além do normal, no início de seus turnos a magia afeta novamen-te qualquer criatura na área, exigindo um novo teste de Reflexos. Requer 2º círculo."
       }
     ]
   },
@@ -3728,8 +3728,8 @@ export const SPELLS_LIST: Spell[] = [
     "execution": "padrão",
     "range": "médio",
     "targetArea": "veja texto",
-    "duration": "sustentada \nou instantânea (veja texto)",
-    "description": "Empurrão Violento: nesta versão a ener-\ngia mágica é expelida de uma única vez \ne arremessa até 10 objetos (no máximo \n10 espaços). Os objetos devem estar a \naté 3m uns dos outros e podem ser ar-\nremessados até o alcance da magia.\nObjetos arremessados podem atingir \ncriaturas em seu caminho, causando \nde 1 ponto de dano de impacto por es-\npaço (objetos macios, sem pontas ou \nsem fio) até 1d6 pontos de dano por \nespaço (objetos duros, pontudos ou \nafiados). Criaturas atingidas têm direi-\nto a um teste de Reflexos para reduzir \no dano à metade.\nCriaturas Médias ou menores podem \nser arremessadas, mas têm direito a \num teste de Vontade para evitar o efei-\nto (em si mesmas ou em objetos que \nestejam segurando). Uma criatura ar-\nremessada contra uma superfície só-\nlida sofre 1d6 pontos de dano de im-\npacto para cada 3m que “voou” no \ndeslocamento (incluindo outras cria-\nturas; nesse caso, ambas sofrem o \ndano). Duração: instantânea."
+    "duration": "sustentada ou instantânea (veja texto)",
+    "description": "Empurrão Violento: nesta versão a energia mágica é expelida de uma única vez e arremessa até 10 objetos (no máximo 10 espaços). Os objetos devem estar a até 3m uns dos outros e podem ser arremessados até o alcance da magia. Objetos arremessados podem atingir criaturas em seu caminho, causando de 1 ponto de dano de impacto por espaço (objetos macios, sem pontas ou sem fio) até 1d6 pontos de dano por espaço (objetos duros, pontudos ou afiados). Criaturas atingidas têm direito a um teste de Reflexos para reduzir o dano à metade. Criaturas Médias ou menores podem ser arremessadas, mas têm direito a um teste de Vontade para evitar o efeito (em si mesmas ou em objetos que estejam segurando). Uma criatura arremessada contra uma superfície sólida sofre 1d6 pontos de dano de impacto para cada 3m que “voou” no deslocamento (incluindo outras criaturas; nesse caso, ambas sofrem o dano). Duração: instantânea."
   },
   {
     "id": "teletransporte",
@@ -3741,15 +3741,15 @@ export const SPELLS_LIST: Spell[] = [
     "range": "toque",
     "targetArea": "até 5 criaturas voluntárias",
     "duration": "Instantânea",
-    "description": "Execução: padrão; Alcance: toque; \nAlvo: até 5 criaturas voluntárias; Du-\nração: instantânea.\nEsta magia transporta os alvos para um \nlugar a sua escolha a até 1.000km. Você \nprecisa fazer um teste de Misticismo, \ncom dificuldade que depende de seu \nconhecimento sobre o local de destino.\nCD 20. Um lugar familiar, que você \nvisita com frequência.\nCD 30. Um lugar conhecido, que você \njá visitou pelo menos uma vez.\nCD 40. Um lugar que você nunca visi-\ntou e só conhece a partir da descrição \nde outra pessoa que esteve lá.\nVocê não pode se teletransportar para \num lugar que nunca visitou sem a des-\ncrição de alguém. Ou seja, não pode \nse transportar para a “sala de tesouro \ndo rei” se nunca esteve nela nem falou \ncom alguém que esteve.\nSe passar no teste, os alvos chegam ao \nlugar desejado. Se falhar, os alvos sur-\ngem 1d10 x 10km afastados em qual-\nquer direção (se o destino é uma ci-\ndade costeira, você pode surgir em \nalto-mar). Se falhar por 5 ou mais, \nvocê chega em um lugar parecido, mas \nerrado. E se você rolar 1 natural no \nteste a magia falha (mas você gasta os \nPM) e fica atordoado por 1d4 rodadas.",
+    "description": "Execução: padrão; Alcance: toque; Alvo: até 5 criaturas voluntárias; Duração: instantânea. Esta magia transporta os alvos para um lugar a sua escolha a até 1.000km. Você precisa fazer um teste de Misticismo, com dificuldade que depende de seu conhecimento sobre o local de destino. CD 20. Um lugar familiar, que você visita com frequência. CD 30. Um lugar conhecido, que você já visitou pelo menos uma vez. CD 40. Um lugar que você nunca visitou e só conhece a partir da descrição de outra pessoa que esteve lá. Você não pode se teletransportar para um lugar que nunca visitou sem a descrição de alguém. Ou seja, não pode se transportar para a “sala de tesouro do rei” se nunca esteve nela nem falou com alguém que esteve. Se passar no teste, os alvos chegam ao lugar desejado. Se falhar, os alvos surgem 1d10 x 10km afastados em qualquer direção (se o destino é uma cidade costeira, você pode surgir em alto-mar). Se falhar por 5 ou mais, você chega em um lugar parecido, mas errado. E se você rolar 1 natural no teste a magia falha (mas você gasta os PM) e fica atordoado por 1d4 rodadas.",
     "upgrades": [
       {
         "cost": "+2 PM",
-        "description": "aumenta o número de alvos \nem"
+        "description": "aumenta o número de alvos em"
       },
       {
         "cost": "+2 PM",
-        "description": "em vez do normal, a magia te-\nletransporta os alvos para seu santuá-\nrio - um local familiar e previamen-\nte preparado. A magia pode ser usada \nsem limite de distância ou necessidade \nde testes, mas apenas dentro do mes-\nmo plano. Preparar um local como seu \nsantuário exige um ritual de um dia e \no gasto de T$ 1.000. Você só pode ter \num santuário por vez."
+        "description": "em vez do normal, a magia teletransporta os alvos para seu santuário - um local familiar e previamen-te preparado. A magia pode ser usada sem limite de distância ou necessidade de testes, mas apenas dentro do mesmo plano. Preparar um local como seu santuário exige um ritual de um dia e o gasto de T$ 1.000. Você só pode ter um santuário por vez."
       }
     ]
   },
@@ -3761,33 +3761,33 @@ export const SPELLS_LIST: Spell[] = [
     "school": "Evocação",
     "execution": "completa",
     "range": "longo",
-    "targetArea": "cilindro com 15m de raio e 15m \nde altura",
+    "targetArea": "cilindro com 15m de raio e 15m de altura",
     "duration": "sustentada",
-    "description": "Esta magia só pode ser usada em am-\nbientes abertos. A área fica sujeita a \num vendaval - ataques à distância \nsofrem penalidade de -5, chamas são \napagadas e névoas são dissipadas. Você \ntambém pode gerar chuva (-5 em tes-\ntes de Percepção), neve (como chuva, e \na área se torna terreno difícil) ou grani-\nzo (como chuva, mais 1 ponto de dano \nde impacto por rodada, no início de \nseus turnos).",
+    "description": "Esta magia só pode ser usada em ambientes abertos. A área fica sujeita a um vendaval - ataques à distância sofrem penalidade de -5, chamas são apagadas e névoas são dissipadas. Você também pode gerar chuva (-5 em testes de Percepção), neve (como chuva, e a área se torna terreno difícil) ou granizo (como chuva, mais 1 ponto de dano de impacto por rodada, no início de seus turnos).",
     "upgrades": [
       {
         "cost": "+1 PM",
-        "description": "além do normal, uma vez por \nrodada você pode gastar uma ação pa-\ndrão para fazer um raio cair sobre um \nalvo na área, causando 3d8 pontos de \ndano de eletricidade (Reflexos reduz \nà metade)."
+        "description": "além do normal, uma vez por rodada você pode gastar uma ação padrão para fazer um raio cair sobre um alvo na área, causando 3d8 pontos de dano de eletricidade (Reflexos reduz à metade)."
       },
       {
         "cost": "+2 PM",
-        "description": "aumenta o dano de raios (veja \nacima) em"
+        "description": "aumenta o dano de raios (veja acima) em"
       },
       {
         "cost": "+3 PM",
-        "description": "se escolheu causar chuva, ela \nse torna mais grossa, revelando a si-\nlhueta de criaturas invisíveis na área. \nCriaturas Médias ou menores ficam \nlentas e criaturas voadoras precisam \npassar num teste de Atletismo por ro-\ndada ou caem ao solo (mas podem fa-\nzer testes de Acrobacia para reduzir o \ndano de queda, como o normal)."
+        "description": "se escolheu causar chuva, ela se torna mais grossa, revelando a silhueta de criaturas invisíveis na área. Criaturas Médias ou menores ficam lentas e criaturas voadoras precisam passar num teste de Atletismo por rodada ou caem ao solo (mas podem fazer testes de Acrobacia para reduzir o dano de queda, como o normal)."
       },
       {
         "cost": "+3 PM",
-        "description": "se escolheu causar granizo, \nmuda o dano para 2d6 por rodada."
+        "description": "se escolheu causar granizo, muda o dano para 2d6 por rodada."
       },
       {
         "cost": "+3 PM",
-        "description": "se escolheu causar neve, cria-\nturas na área sofrem 2d6 pontos de \ndano de frio no início de seus turnos."
+        "description": "se escolheu causar neve, criaturas na área sofrem 2d6 pontos de dano de frio no início de seus turnos."
       },
       {
         "cost": "+3 PM",
-        "description": "muda a área para cilindro com \n90m de raio e 90m de altura.\n208\nMagia"
+        "description": "muda a área para cilindro com 90m de raio e 90m de altura. 208 Magia"
       }
     ]
   },
@@ -3801,7 +3801,7 @@ export const SPELLS_LIST: Spell[] = [
     "range": "médio",
     "targetArea": "esfera com 6m de raio",
     "duration": "Instantânea",
-    "description": "Execução: padrão; Alcance: médio; \nÁrea: esfera com 6m de raio; Dura-\nção: cena.\nUm círculo de energias sombrias se \nabre no chão, de onde surgem tentácu-\nlos feitos de treva viscosa. Ao lançar a \nmagia e no início de cada um de seus \nturnos, você faz um teste da manobra \nagarrar (usando seu valor de Misticis-\nmo) contra cada criatura na área. Se \nvocê passar, a criatura é agarrada; se \na vítima já está agarrada, é esmagada, \nsofrendo 4d6 pontos de dano de tre-\nvas. A área conta como terreno difícil. \nOs tentáculos são imunes a dano.",
+    "description": "Execução: padrão; Alcance: médio; Área: esfera com 6m de raio; Duração: cena. Um círculo de energias sombrias se abre no chão, de onde surgem tentácu-los feitos de treva viscosa. Ao lançar a magia e no início de cada um de seus turnos, você faz um teste da manobra agarrar (usando seu valor de Misticismo) contra cada criatura na área. Se você passar, a criatura é agarrada; se a vítima já está agarrada, é esmagada, sofrendo 4d6 pontos de dano de trevas. A área conta como terreno difícil. Os tentáculos são imunes a dano.",
     "upgrades": [
       {
         "cost": "+2 PM",
@@ -3819,7 +3819,7 @@ export const SPELLS_LIST: Spell[] = [
     "range": "longo",
     "targetArea": "esfera com 30m de raio",
     "duration": "Instantânea",
-    "description": "Esta magia cria um tremor de terra que \nrasga o solo. O terremoto dura uma ro-\ndada, durante a qual criaturas sobre o \nsolo ficam atordoadas (apenas uma vez \npor cena). Barreiras físicas não inter-\nrompem a área de Terremoto.\nO efeito exato depende do terreno.\nCaverna ou subterrâneo: a magia derru-\nba o teto, causando 12d6 pontos de \ndano de impacto e agarrando todas as \ncriaturas na área. Um teste de Refle-\nxos reduz o dano à metade e evita a \ncondição.\nConstrução: todas as estruturas na área \nsofrem 200 pontos de dano de impac-\nto, o suficiente para derrubar constru-\nções de madeira ou alvenaria simples, \nmas não de alvenaria reforçada. Cria-\nturas em uma construção que desmo-\nrone sofrem o mesmo efeito de criatu-\nras em uma caverna (veja acima).\nEspaço aberto: fendas se abrem no \nchão. Cada criatura na área precisa ro-\nlar um dado; em um resultado ímpar, \numa fenda se abre sob ela e ela precisa \nfazer um teste de Reflexos; se falhar, \ncai na fenda. A criatura pode escapar \ngastando uma ação completa e pas-\nsando em um teste de Atletismo. No \ninício do seu próximo turno as fendas \nse fecham, matando todos que este-\njam dentro delas.\nPenhasco: o penhasco racha, criando um \ndesmoronamento que percorre uma \ndistância horizontal igual à distância da \nqueda. Por exemplo, um penhasco com \n30m de altura desmorona em uma área \nde 30m de comprimento além da base. \nQualquer criatura no caminho sofre \n12d6 pontos de dano de impacto e fica \nagarrada. Um teste de Reflexos reduz o \ndano à metade e evita ficar agarrado.\nRio, lago ou pântano: fissuras se abrem \nsob a água, drenando-a e formando um \nlamaçal. Criaturas na área precisam fa-\nzer um teste de Reflexos para não afun-\ndarem na lama e ficarem agarradas. No \ninício do seu próximo turno as fissuras \nse fecham, possivelmente afogando as \ncriaturas que ficaram agarradas.",
+    "description": "Esta magia cria um tremor de terra que rasga o solo. O terremoto dura uma rodada, durante a qual criaturas sobre o solo ficam atordoadas (apenas uma vez por cena). Barreiras físicas não interrompem a área de Terremoto. O efeito exato depende do terreno. Caverna ou subterrâneo: a magia derruba o teto, causando 12d6 pontos de dano de impacto e agarrando todas as criaturas na área. Um teste de Reflexos reduz o dano à metade e evita a condição. Construção: todas as estruturas na área sofrem 200 pontos de dano de impacto, o suficiente para derrubar construções de madeira ou alvenaria simples, mas não de alvenaria reforçada. Criaturas em uma construção que desmorone sofrem o mesmo efeito de criaturas em uma caverna (veja acima). Espaço aberto: fendas se abrem no chão. Cada criatura na área precisa rolar um dado; em um resultado ímpar, uma fenda se abre sob ela e ela precisa fazer um teste de Reflexos; se falhar, cai na fenda. A criatura pode escapar gastando uma ação completa e passando em um teste de Atletismo. No início do seu próximo turno as fendas se fecham, matando todos que estejam dentro delas. Penhasco: o penhasco racha, criando um desmoronamento que percorre uma distância horizontal igual à distância da queda. Por exemplo, um penhasco com 30m de altura desmorona em uma área de 30m de comprimento além da base. Qualquer criatura no caminho sofre 12d6 pontos de dano de impacto e fica agarrada. Um teste de Reflexos reduz o dano à metade e evita ficar agarrado. Rio, lago ou pântano: fissuras se abrem sob a água, drenando-a e formando um lamaçal. Criaturas na área precisam fazer um teste de Reflexos para não afundarem na lama e ficarem agarradas. No início do seu próximo turno as fissuras se fecham, possivelmente afogando as criaturas que ficaram agarradas.",
     "resistance": "veja texto"
   },
   {
@@ -3831,9 +3831,9 @@ export const SPELLS_LIST: Spell[] = [
     "execution": "padrão",
     "range": "toque",
     "targetArea": "1 criatura",
-    "duration": "instantâ-\nnea",
-    "description": "Execução: padrão; Alcance: toque; \nAlvo: 1 criatura; Duração: instantâ-\nnea; Resistência: Fortitude reduz à \nmetade.\nArcos elétricos envolvem sua mão, \ncausando 2d8+2 pontos de dano de \neletricidade. Se o alvo usa armadura de \nmetal (ou carrega muito metal, a crité-\nrio do mestre), sofre uma penalidade \nde -5 no teste de resistência.",
-    "resistance": "Fortitude reduz à \nmetade",
+    "duration": "instantânea",
+    "description": "Execução: padrão; Alcance: toque; Alvo: 1 criatura; Duração: instantânea; Resistência: Fortitude reduz à metade. Arcos elétricos envolvem sua mão, causando 2d8+2 pontos de dano de eletricidade. Se o alvo usa armadura de metal (ou carrega muito metal, a critério do mestre), sofre uma penalidade de -5 no teste de resistência.",
+    "resistance": "Fortitude reduz à metade",
     "upgrades": [
       {
         "cost": "+1 PM",
@@ -3841,7 +3841,7 @@ export const SPELLS_LIST: Spell[] = [
       },
       {
         "cost": "+2 PM",
-        "description": "muda a resistência para ne-\nnhum. Como parte da execução da ma-\ngia, você faz um ataque corpo a corpo \ncontra o alvo. Se acertar, causa o dano \ndo ataque e da magia."
+        "description": "muda a resistência para nenhum. Como parte da execução da magia, você faz um ataque corpo a corpo contra o alvo. Se acertar, causa o dano do ataque e da magia."
       }
     ]
   },
@@ -3854,13 +3854,13 @@ export const SPELLS_LIST: Spell[] = [
     "execution": "padrão",
     "range": "toque",
     "targetArea": "1 criatura",
-    "duration": "instantâ-\nnea",
-    "description": "Sua mão exala energias letais. A cria-\ntura sofre 10d8+10 pontos de dano de \ntrevas. Se estiver com menos da meta-\nde de seus PV, em vez disso deve fazer \num teste de Fortitude. Se passar, sofre\no dano normal. Se falhar, seus PV são \nreduzidos a -10.",
+    "duration": "instantânea",
+    "description": "Sua mão exala energias letais. A criatura sofre 10d8+10 pontos de dano de trevas. Se estiver com menos da metade de seus PV, em vez disso deve fazer um teste de Fortitude. Se passar, sofre o dano normal. Se falhar, seus PV são reduzidos a -10.",
     "resistance": "veja texto",
     "upgrades": [
       {
         "cost": "+2 PM",
-        "description": "muda o alcance para curto. \nEm vez de tocar no alvo, você dispara \num raio púrpura da ponta de seu dedo \nindicador."
+        "description": "muda o alcance para curto. Em vez de tocar no alvo, você dispara um raio púrpura da ponta de seu dedo indicador."
       }
     ]
   },
@@ -3873,13 +3873,13 @@ export const SPELLS_LIST: Spell[] = [
     "execution": "padrão",
     "range": "toque",
     "targetArea": "1 criatura",
-    "duration": "instantâ-\nnea",
-    "description": "Execução: padrão; Alcance: toque; \nAlvo: 1 criatura; Duração: instantâ-\nnea; Resistência: Fortitude reduz à \nmetade.\nSua mão brilha com energia sombria, \ncausando 6d6 pontos de dano de tre-\nvas. Você recupera pontos de vida \niguais à metade do dano causado (se \ncausou algum dano).",
-    "resistance": "Fortitude reduz à \nmetade",
+    "duration": "instantânea",
+    "description": "Execução: padrão; Alcance: toque; Alvo: 1 criatura; Duração: instantânea; Resistência: Fortitude reduz à metade. Sua mão brilha com energia sombria, causando 6d6 pontos de dano de trevas. Você recupera pontos de vida iguais à metade do dano causado (se causou algum dano).",
+    "resistance": "Fortitude reduz à metade",
     "upgrades": [
       {
         "cost": "+2 PM",
-        "description": "muda a resistência para ne-\nnhum . Como parte da execução da ma-\ngia, você pode fazer um ataque corpo \na corpo contra o alvo. Se acertar, cau-\nsa o dano do ataque e da magia, e recu-\npera pontos de vida iguais à metade do \ndano da magia."
+        "description": "muda a resistência para nenhum. Como parte da execução da magia, você pode fazer um ataque corpo a corpo contra o alvo. Se acertar, causa o dano do ataque e da magia, e recupera pontos de vida iguais à metade do dano da magia."
       },
       {
         "cost": "+2 PM",
@@ -3897,19 +3897,19 @@ export const SPELLS_LIST: Spell[] = [
     "range": "toque",
     "targetArea": "1 objeto Grande ou menor",
     "duration": "Instantânea",
-    "description": "Execução: padrão; Alcance: toque; \nAlvo: 1 objeto Grande ou menor; Du-\nração: permanente.\nEsta magia tranca uma porta ou outro \nitem que possa ser aberto ou fechado \n(como um baú, caixa etc.), aumentan-\ndo a CD de testes de Força ou Ladina-\ngem para abri-lo em +10. Você pode \nabrir livremente sua própria tranca \nsem problemas.\nComponente material: chave de bronze \nno valor de T$ 25.",
+    "description": "Execução: padrão; Alcance: toque; Alvo: 1 objeto Grande ou menor; Duração: permanente. Esta magia tranca uma porta ou outro item que possa ser aberto ou fechado (como um baú, caixa etc.), aumentando a CD de testes de Força ou Ladinagem para abri-lo em +10. Você pode abrir livremente sua própria tranca sem problemas. Componente material: chave de bronze no valor de T$ 25.",
     "upgrades": [
       {
         "cost": "Truque",
-        "description": "muda o alcance para curto. \nEm vez do normal, pode abrir ou fe-\nchar um objeto de tamanho Grande ou \nmenor, como uma porta ou baú. Não \nafeta objetos trancados."
+        "description": "muda o alcance para curto. Em vez do normal, pode abrir ou fechar um objeto de tamanho Grande ou menor, como uma porta ou baú. Não afeta objetos trancados."
       },
       {
         "cost": "+1 PM",
-        "description": "muda o alcance para curto e a \nduração para instantânea. Em vez do\n209\nCapítulo Quatro\nnormal, a magia abre portas, baús e ja-\nnelas trancadas, presas, barradas ou \nprotegidas por Tranca Arcana (o efeito é \ndissipado) a sua escolha. Ela também \nafrouxa grilhões e solta correntes."
+        "description": "muda o alcance para curto e a duração para instantânea. Em vez do 209 Capítulo Quatro normal, a magia abre portas, baús e janelas trancadas, presas, barradas ou protegidas por Tranca Arcana (o efeito é dissipado) a sua escolha. Ela também afrouxa grilhões e solta correntes."
       },
       {
         "cost": "+5 PM",
-        "description": "aumenta a CD para abrir o \nalvo em"
+        "description": "aumenta a CD para abrir o alvo em"
       }
     ]
   },
@@ -3923,7 +3923,7 @@ export const SPELLS_LIST: Spell[] = [
     "range": "curto",
     "targetArea": "1 animal ou humanoide",
     "duration": "Instantânea",
-    "description": "Você emana ondas de serenidade. Se \nfalhar na resistência, o alvo tem sua \natitude mudada para indiferente (veja \na página 259) e não pode atacar ou rea-\nlizar qualquer ação agressiva. Se pas-\nsar, sofre -2 em testes de ataque. Qual-\nquer ação hostil contra o alvo ou seus \naliados dissipa a magia e faz ele retor-\nnar à atitude que tinha antes (ou pior, \nde acordo com o mestre).",
+    "description": "Você emana ondas de serenidade. Se falhar na resistência, o alvo tem sua atitude mudada para indiferente (veja a página 259) e não pode atacar ou realizar qualquer ação agressiva. Se passar, sofre -2 em testes de ataque. Qualquer ação hostil contra o alvo ou seus aliados dissipa a magia e faz ele retornar à atitude que tinha antes (ou pior, de acordo com o mestre).",
     "resistance": "Vontade parcial",
     "upgrades": [
       {
@@ -3932,7 +3932,7 @@ export const SPELLS_LIST: Spell[] = [
       },
       {
         "cost": "+1 PM",
-        "description": "aumenta o número de alvos \nem"
+        "description": "aumenta o número de alvos em"
       }
     ]
   },
@@ -3946,15 +3946,15 @@ export const SPELLS_LIST: Spell[] = [
     "range": "pessoal",
     "targetArea": "você",
     "duration": "sustentada",
-    "description": "Você se torna uma máquina de comba-\nte, ficando mais forte, rápido e resis-\ntente. Você recebe +6 na Defesa, tes-\ntes de ataque e rolagens de dano corpo \na corpo, e 30 PV temporários. Durante \na Transformação de Guerra você não pode \nlançar magias, mas se torna proficiente \nem todas as armas.",
+    "description": "Você se torna uma máquina de comba-te, ficando mais forte, rápido e resistente. Você recebe +6 na Defesa, testes de ataque e rolagens de dano corpo a corpo, e 30 PV temporários. Durante a Transformação de Guerra você não pode lançar magias, mas se torna proficiente em todas as armas.",
     "upgrades": [
       {
         "cost": "+2 PM",
-        "description": "aumenta os bônus na Defe-\nsa, testes de ataque e rolagens de dano \ncorpo a corpo em"
+        "description": "aumenta os bônus na Defesa, testes de ataque e rolagens de dano corpo a corpo em"
       },
       {
         "cost": "+2 PM",
-        "description": "adiciona componente mate-\nrial (barra de adamante no valor de \nT$ 100). Sua forma de combate ganha \num aspecto metálico e sem expressões. \nAlém do normal, você recebe redução \nde dano 10 e imunidade a atordoamen-\nto e efeitos de cansaço, encantamento, \nmetabolismo, trevas e veneno, e não \nprecisa respirar."
+        "description": "adiciona componente material (barra de adamante no valor de T$ 100). Sua forma de combate ganha um aspecto metálico e sem expressões. Além do normal, você recebe redução de dano 10 e imunidade a atordoamento e efeitos de cansaço, encantamento, metabolismo, trevas e veneno, e não precisa respirar."
       }
     ]
   },
@@ -3966,33 +3966,33 @@ export const SPELLS_LIST: Spell[] = [
     "school": "Transmutação",
     "execution": "padrão",
     "range": "toque",
-    "targetArea": "matéria-prima, como madeira, \nrochas, ossos",
+    "targetArea": "matéria-prima, como madeira, rochas, ossos",
     "duration": "cena",
-    "description": "A magia transforma matéria bru-\nta para moldar um novo objeto. Você \npode usar matéria-prima mundana \npara criar um objeto de tamanho Pe-\nqueno ou menor e preço máximo de \nT$ 25, como um balde ou uma espa-\nda. O objeto reverte à matéria-prima \nno final da cena, ou se for tocado por \num objeto feito de chumbo. Esta ma-\ngia não pode ser usada para criar ob-\njetos consumíveis, como alimentos \nou itens alquímicos, nem objetos com \nmecanismos complexos, como bestas \nou armas de fogo. Transmutar Objetos \nanula Despedaçar.",
+    "description": "A magia transforma matéria bruta para moldar um novo objeto. Você pode usar matéria-prima mundana para criar um objeto de tamanho Pequeno ou menor e preço máximo de T$ 25, como um balde ou uma espada. O objeto reverte à matéria-prima no final da cena, ou se for tocado por um objeto feito de chumbo. Esta magia não pode ser usada para criar objetos consumíveis, como alimentos ou itens alquímicos, nem objetos com mecanismos complexos, como bestas ou armas de fogo. Transmutar Objetos anula Despedaçar.",
     "upgrades": [
       {
         "cost": "Truque",
-        "description": "muda o alvo para 1 objeto \nmundano Mínusculo (ou material em \nquantidade equivalente) e a duração \npara instantânea. Em vez do normal, \nvocê pode alterar as propriedades físi-\ncas do alvo, como colorir, limpar ou su-\njar itens pequenos (incluindo peças de \nroupa), aquecer, esfriar e/ou temperar \n(mas não produzir) ou curar 1 PV do \nobjeto, consertando pequenas falhas \ncomo colar um frasco de cerâmica que-\nbrado, unir os elos de uma corrente ou \ncosturar uma roupa rasgada. Um obje-\nto só pode ser afetado por este truque \numa vez por dia."
+        "description": "muda o alvo para 1 objeto mundano Mínusculo (ou material em quantidade equivalente) e a duração para instantânea. Em vez do normal, você pode alterar as propriedades físicas do alvo, como colorir, limpar ou sujar itens pequenos (incluindo peças de roupa), aquecer, esfriar e/ou temperar (mas não produzir) ou curar 1 PV do objeto, consertando pequenas falhas como colar um frasco de cerâmica quebrado, unir os elos de uma corrente ou costurar uma roupa rasgada. Um objeto só pode ser afetado por este truque uma vez por dia."
       },
       {
         "cost": "+1 PM",
-        "description": "muda o alcance para toque, o \nalvo para 1 construto e a duração para \ninstantânea. Em vez do normal, cura \n2d8 PV do alvo. Você pode gastar 2 PM \nadicionais para aumentar a cura em"
+        "description": "muda o alcance para toque, o alvo para 1 construto e a duração para instantânea. Em vez do normal, cura 2d8 PV do alvo. Você pode gastar 2 PM adicionais para aumentar a cura em"
       },
       {
         "cost": "+2 PM",
-        "description": "aumenta o limite de tamanho \ndo objeto em uma categoria."
+        "description": "aumenta o limite de tamanho do objeto em uma categoria."
       },
       {
         "cost": "+3 PM",
-        "description": "aumenta o preço máximo do \nobjeto criado em um fator de x10 ("
+        "description": "aumenta o preço máximo do objeto criado em um fator de x10 ("
       },
       {
         "cost": "+5 PM",
-        "description": "muda o alvo para 1 objeto \nmundano e a duração para instantâ-\nnea. Em vez do normal, você cura to-\ndos os PV do alvo, restaurando o ob-\njeto totalmente. Este aprimoramento \nestá sujeito aos limites de tamanho e \npreço do objeto conforme a magia ori-\nginal e não funciona se o objeto tiver \nsido completamente destruído (quei-\nmado até virar cinzas ou desintegrado, \npor exemplo). Requer 3º círculo."
+        "description": "muda o alvo para 1 objeto mundano e a duração para instantânea. Em vez do normal, você cura todos os PV do alvo, restaurando o objeto totalmente. Este aprimoramento está sujeito aos limites de tamanho e preço do objeto conforme a magia original e não funciona se o objeto tiver sido completamente destruído (queimado até virar cinzas ou desintegrado, por exemplo). Requer 3º círculo."
       },
       {
         "cost": "+9 PM",
-        "description": "como o aprimoramento ante-\nrior, mas passa a afetar itens mágicos."
+        "description": "como o aprimoramento anterior, mas passa a afetar itens mágicos."
       }
     ]
   },
@@ -4006,15 +4006,15 @@ export const SPELLS_LIST: Spell[] = [
     "range": "curto",
     "targetArea": "1 criatura",
     "duration": "sustentada",
-    "description": "O alvo pode realizar uma ação padrão \nou de movimento adicional por turno. \nEsta ação não pode ser usada para lan-\nçar magias e ativar engenhocas.",
+    "description": "O alvo pode realizar uma ação padrão ou de movimento adicional por turno. Esta ação não pode ser usada para lançar magias e ativar engenhocas.",
     "upgrades": [
       {
         "cost": "+0 PM",
-        "description": "muda a duração para cena. \nA ação adicional que você pode fazer \né apenas de movimento. Uma criatu-\nra só pode receber uma ação adicional \npor turno como efeito de Velocidade."
+        "description": "muda a duração para cena. A ação adicional que você pode fazer é apenas de movimento. Uma criatura só pode receber uma ação adicional por turno como efeito de Velocidade."
       },
       {
         "cost": "+7 PM",
-        "description": "muda o alvo para criaturas es-\ncolhidas no alcance. Requer 4º círculo."
+        "description": "muda o alvo para criaturas escolhidas no alcance. Requer 4º círculo."
       }
     ]
   },
@@ -4028,11 +4028,11 @@ export const SPELLS_LIST: Spell[] = [
     "range": "toque",
     "targetArea": "1 armadura, escudo ou vestuário",
     "duration": "1 dia",
-    "description": "Você fortalece um item, aumentando o \nbônus de Defesa de uma armadura ou \nescudo em +2. No caso de um vestuá-\nrio, ele passa a oferecer +2 na Defe-\nsa (não cumulativo com armadura). Os \nefeitos desta magia contam como um \nbônus de encanto.",
+    "description": "Você fortalece um item, aumentando o bônus de Defesa de uma armadura ou escudo em +2. No caso de um vestuário, ele passa a oferecer +2 na Defesa (não cumulativo com armadura). Os efeitos desta magia contam como um bônus de encanto.",
     "upgrades": [
       {
         "cost": "+3 PM",
-        "description": "o objeto oferece o mesmo \nbônus em testes de resistência. Requer \n3º círculo."
+        "description": "o objeto oferece o mesmo bônus em testes de resistência. Requer 3º círculo."
       },
       {
         "cost": "+4 PM",
@@ -4050,7 +4050,7 @@ export const SPELLS_LIST: Spell[] = [
     "range": "pes-\nsoal",
     "targetArea": "você",
     "duration": "cena",
-    "description": "Como parte da execução, você en-\ntra em uma árvore adjacente que seja \nmaior do que você. Você pode perma-\nnecer dentro da árvore, percebendo os \narredores de forma normal (mas sem \npoder fazer ações). Você pode gastar \numa ação de movimento para sair des-\nsa árvore, ou de qualquer outra dentro \nde 1km. Se estiver dentro de uma ár-\nvore que seja destruída, a magia termi-\nna e você sofre 10d6 pontos de dano de \nimpacto. Enquanto a magia durar você \npode gastar uma ação de movimento \ne 1 PM para entrar em outras árvores.\n210\nMagia"
+    "description": "Como parte da execução, você entra em uma árvore adjacente que seja maior do que você. Você pode permanecer dentro da árvore, percebendo os arredores de forma normal (mas sem poder fazer ações). Você pode gastar uma ação de movimento para sair dessa árvore, ou de qualquer outra dentro de 1km. Se estiver dentro de uma árvore que seja destruída, a magia termi-na e você sofre 10d6 pontos de dano de impacto. Enquanto a magia durar você pode gastar uma ação de movimento e 1 PM para entrar em outras árvores. 210 Magia"
   },
   {
     "id": "viagem_planar",
@@ -4062,7 +4062,7 @@ export const SPELLS_LIST: Spell[] = [
     "range": "toque",
     "targetArea": "pessoal",
     "duration": "instantânea",
-    "description": "Você viaja instantaneamente para outro \nplano da Criação. Lá, você chega de 10 \na 1.000km do destino pretendido (role \n1d100 e multiplique por 10km).\nComponente material: um bastão de me-\ntal precioso em forma de forquilha (no \nvalor de T$ 1.000). O tipo de metal de-\ntermina para qual plano de existência \nvocê será enviado. Os metais que le-\nvam a dimensões específicas podem \nser difíceis de encontrar, de acordo \ncom o mestre."
+    "description": "Você viaja instantaneamente para outro plano da Criação. Lá, você chega de 10 a 1.000km do destino pretendido (role 1d100 e multiplique por 10km). Componente material: um bastão de metal precioso em forma de forquilha (no valor de T$ 1.000). O tipo de metal determina para qual plano de existência você será enviado. Os metais que levam a dimensões específicas podem ser difíceis de encontrar, de acordo com o mestre."
   },
   {
     "id": "videncia",
@@ -4073,8 +4073,8 @@ export const SPELLS_LIST: Spell[] = [
     "execution": "completa",
     "range": "ilimita-\ndo",
     "targetArea": "1 criatura",
-    "duration": "susten-\ntada",
-    "description": "Através de uma superfície reflexi-\nva (bacia de água benta para clérigos, \nlago para druidas, bola de cristal para \nmagos, espelho para feiticeiros etc.) \nvocê pode ver e ouvir uma criatura es-\ncolhida e seus arredores (cerca de 6m \nem qualquer direção), mesmo que ela \nse mova. O alvo pode estar a qualquer \ndistância, mas se passar em um teste \nde Vontade, a magia falha. A vítima re-\ncebe bônus ou penalidades em seu tes-\nte de resistência, dependendo do co-\nnhecimento que você tiver dela.\n• Não conhece o alvo: +10.\n• Ouviu falar do alvo: +5.\n• O alvo está em outro plano ou \nmundo: +5.\n• Já encontrou o alvo pessoalmente: +0.\n• Tem uma pintura, escultura ou outra \nrepresentação do alvo: -2.\n• Conhece bem o alvo: -5.\n• Tem um pertence pessoal ou peça de \nroupa do alvo: -5.\n• Tem uma parte do corpo do alvo \n(unhas, cabelos...): -10.",
+    "duration": "sustentada",
+    "description": "Através de uma superfície reflexiva (bacia de água benta para clérigos, lago para druidas, bola de cristal para magos, espelho para feiticeiros etc.) você pode ver e ouvir uma criatura escolhida e seus arredores (cerca de 6m em qualquer direção), mesmo que ela se mova. O alvo pode estar a qualquer distância, mas se passar em um teste de Vontade, a magia falha. A vítima recebe bônus ou penalidades em seu tes-te de resistência, dependendo do conhecimento que você tiver dela. • Não conhece o alvo: +10. • Ouviu falar do alvo: +5. • O alvo está em outro plano ou mundo: +5. • Já encontrou o alvo pessoalmente: +0. • Tem uma pintura, escultura ou outra representação do alvo: -2. • Conhece bem o alvo: -5. • Tem um pertence pessoal ou peça de roupa do alvo: -5. • Tem uma parte do corpo do alvo (unhas, cabelos...): -10.",
     "resistance": "Vontade anula"
   },
   {
@@ -4087,19 +4087,19 @@ export const SPELLS_LIST: Spell[] = [
     "range": "pes-\nsoal",
     "targetArea": "você",
     "duration": "cena",
-    "description": "Você enxerga a forma real das coisas. \nVocê pode ver através de camuflagem e \nescuridão (normais e mágicas), assim \ncomo efeitos de ilusão e transmutação \n(enxergando a verdade como formas \ntranslúcidas ou sobrepostas).",
+    "description": "Você enxerga a forma real das coisas. Você pode ver através de camuflagem e escuridão (normais e mágicas), assim como efeitos de ilusão e transmutação (enxergando a verdade como formas translúcidas ou sobrepostas).",
     "upgrades": [
       {
         "cost": "+1 PM",
-        "description": "muda o alcance para toque e o \nalvo para 1 criatura."
+        "description": "muda o alcance para toque e o alvo para 1 criatura."
       },
       {
         "cost": "+1 PM",
-        "description": "além do normal, o alvo fica \ncom sentidos apurados; ele recebe"
+        "description": "além do normal, o alvo fica com sentidos apurados; ele recebe"
       },
       {
         "cost": "+2 PM",
-        "description": "além do normal, o alvo escuta \nfalsidades; ele recebe"
+        "description": "além do normal, o alvo escuta falsidades; ele recebe"
       }
     ]
   },
@@ -4113,7 +4113,7 @@ export const SPELLS_LIST: Spell[] = [
     "range": "pessoal",
     "targetArea": "você",
     "duration": "cena",
-    "description": "Seus olhos brilham com uma luz azul e \npassam a enxergar auras mágicas. Este \nefeito é similar ao uso de Misticismo \npara detectar magia, mas você detecta \ntodas as auras mágicas em alcance mé-\ndio e recebe todas as informações so-\nbre elas sem gastar ações. Além disso, \nvocê pode gastar uma ação de movi-\nmento para descobrir se uma criatura \nque possa perceber em alcance médio \né capaz de lançar magias e qual a aura \ngerada pelas magias de círculo mais \nalto que ela pode lançar.",
+    "description": "Seus olhos brilham com uma luz azul e passam a enxergar auras mágicas. Este efeito é similar ao uso de Misticismo para detectar magia, mas você detecta todas as auras mágicas em alcance médio e recebe todas as informações sobre elas sem gastar ações. Além disso, você pode gastar uma ação de movimento para descobrir se uma criatura que possa perceber em alcance médio é capaz de lançar magias e qual a aura gerada pelas magias de círculo mais alto que ela pode lançar.",
     "upgrades": [
       {
         "cost": "+1 PM",
@@ -4135,11 +4135,11 @@ export const SPELLS_LIST: Spell[] = [
     "range": "pessoal",
     "targetArea": "você",
     "duration": "instantânea",
-    "description": "Você suga energia vital da terra, rece-\nbendo 2d10 pontos de vida temporá-\nrios. Os PV temporários desaparecem \nao final da cena.",
+    "description": "Você suga energia vital da terra, recebendo 2d10 pontos de vida temporários. Os PV temporários desaparecem ao final da cena.",
     "upgrades": [
       {
         "cost": "+2 PM",
-        "description": "aumenta os PV temporários \nrecebidos em"
+        "description": "aumenta os PV temporários recebidos em"
       }
     ]
   },
@@ -4153,15 +4153,15 @@ export const SPELLS_LIST: Spell[] = [
     "range": "pessoal",
     "targetArea": "você",
     "duration": "cena",
-    "description": "Você recebe deslocamento de voo 12m. \nVoar por meio desta magia é simples \ncomo andar - você pode atacar e lan-\nçar magias normalmente enquanto \nvoa. Quando a magia termina, você \ndesce lentamente até o chão, como se \nestivesse sob efeito de Queda Suave.",
+    "description": "Você recebe deslocamento de voo 12m. Voar por meio desta magia é simples como andar - você pode atacar e lançar magias normalmente enquanto voa. Quando a magia termina, você desce lentamente até o chão, como se estivesse sob efeito de Queda Suave.",
     "upgrades": [
       {
         "cost": "+1 PM",
-        "description": "muda o alcance para toque e o \nalvo para 1 criatura."
+        "description": "muda o alcance para toque e o alvo para 1 criatura."
       },
       {
         "cost": "+4 PM",
-        "description": "muda a duração para um dia. \nRequer 4º círculo."
+        "description": "muda a duração para um dia. Requer 4º círculo."
       }
     ]
   },
@@ -4175,15 +4175,15 @@ export const SPELLS_LIST: Spell[] = [
     "range": "pessoal",
     "targetArea": "você",
     "duration": "cena",
-    "description": "Você pode conversar com criaturas de \nqualquer raça e tipo: animal, constru-\nto, espírito, humanoide, monstro ou \nmorto-vivo. Pode fazer perguntas e en-\ntende suas respostas, mesmo sem um \nidioma em comum ou se a criatura não \nfor capaz de falar, mas respeitando os \nlimites da Inteligência dela. A atitude \ndessas criaturas não é alterada, mas \nvocê pode usar a perícia Diplomacia \npara tentar mudar sua atitude.",
+    "description": "Você pode conversar com criaturas de qualquer raça e tipo: animal, construto, espírito, humanoide, monstro ou morto-vivo. Pode fazer perguntas e entende suas respostas, mesmo sem um idioma em comum ou se a criatura não for capaz de falar, mas respeitando os limites da Inteligência dela. A atitude dessas criaturas não é alterada, mas você pode usar a perícia Diplomacia para tentar mudar sua atitude.",
     "upgrades": [
       {
         "cost": "+1 PM",
-        "description": "você concede um pouco de \nvida a um cadáver, suficiente para \nque ele responda a suas perguntas. \nO conhecimento do corpo é limita-\ndo ao que ele tinha enquanto vivo e \nsuas respostas são curtas e enigmáti-\ncas. Um corpo só pode ser alvo desta \nmagia uma vez. Ela também não fun-\nciona em um corpo cuja cabeça tenha \nsido destruída."
+        "description": "você concede um pouco de vida a um cadáver, suficiente para que ele responda a suas perguntas. O conhecimento do corpo é limitado ao que ele tinha enquanto vivo e suas respostas são curtas e enigmáticas. Um corpo só pode ser alvo desta magia uma vez. Ela também não funciona em um corpo cuja cabeça tenha sido destruída."
       },
       {
         "cost": "+1 PM",
-        "description": "você pode falar com plantas \n(normais ou monstruosas) e rochas. \nPlantas e rochas têm percepção limi-\ntada de seus arredores e normalmente \nfornecem respostas simplórias.\n211"
+        "description": "você pode falar com plantas (normais ou monstruosas) e rochas. Plantas e rochas têm percepção limitada de seus arredores e normalmente fornecem respostas simplórias. 211"
       }
     ]
   }

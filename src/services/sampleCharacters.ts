@@ -322,12 +322,14 @@ export function createSampleCharacters(): CharacterSheet[] {
     };
   });
 
-  // Magias aprendidas de Lyra
+  // Magias aprendidas de Lyra (T20 JDA Cap. 4: Magia)
   const lyraSpells = [
-    { ...SPELLS_LIST.find((s) => s.id === 'armadura_arcana')!, learnedFrom: 'classe' as const },
-    { ...SPELLS_LIST.find((s) => s.id === 'adaga_mental')!, learnedFrom: 'classe' as const },
-    { ...SPELLS_LIST.find((s) => s.id === 'explosao_chamas')!, learnedFrom: 'classe' as const },
-  ];
+    SPELLS_LIST.find((s) => s.id === 'armadura_arcana'),
+    SPELLS_LIST.find((s) => s.id === 'adaga_mental'),
+    SPELLS_LIST.find((s) => s.id === 'explosao_de_chamas'),
+  ]
+    .filter((s): s is (typeof SPELLS_LIST)[number] => Boolean(s))
+    .map((s) => ({ ...s, learnedFrom: 'classe' as const }));
 
   const lyra: CharacterSheet = {
     id: 'char_lyra_02',

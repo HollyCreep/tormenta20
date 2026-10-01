@@ -1,5 +1,37 @@
+import React from 'react';
 import { EquipmentItem } from '../types/rules';
 import { DetailModalData, DetailStat } from '../components/common/DetailModal';
+import {
+  Coins,
+  Weight,
+  Shield,
+  ArrowDown,
+  Sparkles,
+  Sword,
+  Swords,
+  Gavel,
+  BowArrow,
+  Target,
+  Crosshair,
+  Hand,
+  Anvil,
+  Wrench,
+  Compass,
+  Flame,
+  Zap,
+} from 'lucide-react';
+
+export const getEquipmentDamageTypeIcon = (damageType?: string, size = 14): React.ReactNode => {
+  if (!damageType) return React.createElement(Sparkles, { size });
+  const dt = damageType.toLowerCase();
+  if (dt.includes('perfuração') && dt.includes('corte')) return React.createElement(Swords, { size });
+  if (dt.includes('perfuração') || dt.includes('perfuracao')) return React.createElement(BowArrow, { size });
+  if (dt.includes('corte')) return React.createElement(Sword, { size });
+  if (dt.includes('impacto')) return React.createElement(Gavel, { size });
+  if (dt.includes('fogo')) return React.createElement(Flame, { size });
+  if (dt.includes('eletricidade')) return React.createElement(Zap, { size });
+  return React.createElement(Sparkles, { size });
+};
 
 export const getDamageTypeExplanation = (type?: string): string => {
   if (!type) return 'Tipo de dano padrão.';
@@ -140,12 +172,14 @@ export const getEquipmentDetailModalData = (
       value: item.price || 'T$ 0',
       subtext: 'Valor de aquisição em Tibares de Arton (T$)',
       color: '#fbbf24',
+      icon: React.createElement(Coins, { size: 15 }),
     },
     {
       label: 'Espaço no Inventário',
       value: `${item.spaces || 1} ${item.spaces === 1 ? 'espaço' : 'espaços'}`,
       subtext: 'Capacidade de carga ocupada no inventário do aventureiro',
       color: '#cbd5e1',
+      icon: React.createElement(Weight, { size: 15 }),
     },
   ];
 
@@ -156,6 +190,7 @@ export const getEquipmentDetailModalData = (
         value: item.defenseBonus !== undefined ? (item.defenseBonus > 0 ? `+${item.defenseBonus}` : `${item.defenseBonus}`) : '+0',
         subtext: 'Bônus numérico somado à Defesa total do personagem quando equipado',
         color: '#34d399',
+        icon: React.createElement(Shield, { size: 15 }),
       },
       {
         label: 'Penalidade de Armadura',
@@ -165,6 +200,7 @@ export const getEquipmentDetailModalData = (
             ? 'Penalidade aplicada em testes de perícias baseadas em Força e Destreza (Acrobacia, Cavalgar, Furtividade, Ladinagem)'
             : 'Esta proteção não impõe qualquer penalidade em testes de perícias físicas',
         color: item.armorPenalty && item.armorPenalty < 0 ? '#f87171' : '#34d399',
+        icon: React.createElement(ArrowDown, { size: 15 }),
       },
       {
         label: 'Tipo de Proteção',
@@ -176,6 +212,7 @@ export const getEquipmentDetailModalData = (
             ? 'Não permite somar bônus de Destreza na Defesa e reduz o deslocamento em -3 metros'
             : 'Empunhado em uma das mãos; fornece bônus de Defesa cumulativo com armaduras',
         color: '#60a5fa',
+        icon: React.createElement(Shield, { size: 15 }),
       }
     );
   }
@@ -187,6 +224,7 @@ export const getEquipmentDetailModalData = (
         value: `+${item.attackBonus}`,
         subtext: 'Bônus adicional somado a todas as rolagens no teste de ataque',
         color: '#38bdf8',
+        icon: React.createElement(Sparkles, { size: 15 }),
       });
     }
 
@@ -196,24 +234,28 @@ export const getEquipmentDetailModalData = (
         value: item.damage || '1d4',
         subtext: 'Rolagem de dano básica aplicada aos pontos de vida do adversário',
         color: '#ff6b7b',
+        icon: React.createElement(Sparkles, { size: 15 }),
       },
       {
         label: 'Tipo de Dano',
         value: item.damageType || 'Padrão',
         subtext: getDamageTypeExplanation(item.damageType),
         color: '#ff6b7b',
+        icon: getEquipmentDamageTypeIcon(item.damageType, 15),
       },
       {
         label: 'Margem & Crítico',
         value: item.critical || 'x2',
         subtext: getCriticalExplanation(item.critical),
         color: '#fbbf24',
+        icon: React.createElement(Target, { size: 15 }),
       },
       {
         label: 'Alcance do Ataque',
         value: item.range || 'Corpo a Corpo',
         subtext: getRangeExplanation(item.range),
         color: '#c4b5fd',
+        icon: React.createElement(Crosshair, { size: 15 }),
       }
     );
 
@@ -223,6 +265,7 @@ export const getEquipmentDetailModalData = (
         value: item.subcategory === 'uma_mao' ? 'Uma Mão' : item.subcategory === 'duas_maos' ? 'Duas Mãos' : item.subcategory === 'leves' ? 'Arma Leve' : item.subcategory === 'disparo' ? 'Disparo' : item.subcategory,
         subtext: getSubcategoryExplanation(item.subcategory),
         color: '#94a3b8',
+        icon: React.createElement(Hand, { size: 15 }),
       });
     }
   }
@@ -233,6 +276,7 @@ export const getEquipmentDetailModalData = (
       value: specialMaterial,
       subtext: 'Material especial nobre de forja que aprimora as estatísticas da peça',
       color: '#e63946',
+      icon: React.createElement(Anvil, { size: 15 }),
     });
   }
 
@@ -242,6 +286,7 @@ export const getEquipmentDetailModalData = (
       value: `${appliedModifiers.length} melhoria${appliedModifiers.length > 1 ? 's' : ''}`,
       subtext: appliedModifiers.join(' • '),
       color: '#60a5fa',
+      icon: React.createElement(Wrench, { size: 15 }),
     });
   }
 
@@ -251,6 +296,7 @@ export const getEquipmentDetailModalData = (
       value: sourceBadge,
       subtext: 'Item obtido através de benefício inicial ou histórico de personagem',
       color: '#fbbf24',
+      icon: React.createElement(Compass, { size: 15 }),
     });
   }
 
