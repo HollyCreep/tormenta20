@@ -53,7 +53,10 @@ import {
   ShieldAlert,
   Check,
   X,
+  FileText,
 } from 'lucide-react';
+import { CharacterRollHistoryTab } from './CharacterRollHistoryTab';
+import { CharacterAuditTab } from './CharacterAuditTab';
 
 interface CharacterSheetViewProps {
   character: CharacterSheet;
@@ -72,7 +75,7 @@ export const CharacterSheetView: React.FC<CharacterSheetViewProps> = ({
   onExportJson,
   onRollDice,
 }) => {
-  const [activeTab, setActiveTab] = useState<'combate' | 'pericias' | 'poderes' | 'magias' | 'inventario' | 'bio'>('combate');
+  const [activeTab, setActiveTab] = useState<'combate' | 'pericias' | 'poderes' | 'magias' | 'inventario' | 'bio' | 'historico' | 'auditoria'>('combate');
   const [modalDetail, setModalDetail] = useState<DetailModalData | null>(null);
   const [selectedCastSpell, setSelectedCastSpell] = useState<CharacterSpell | null>(null);
   const [isLevelUpModalOpen, setIsLevelUpModalOpen] = useState<boolean>(false);
@@ -482,6 +485,26 @@ export const CharacterSheetView: React.FC<CharacterSheetViewProps> = ({
         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
           <button
             type="button"
+            onClick={() => setActiveTab('historico')}
+            className={`btn ${activeTab === 'historico' ? 'btn-primary' : 'btn-secondary'}`}
+            style={{ gap: '0.4rem' }}
+            title="Ver histórico de rolagens deste personagem"
+          >
+            <Dices size={16} />
+            <span>Histórico</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('auditoria')}
+            className={`btn ${activeTab === 'auditoria' ? 'btn-primary' : 'btn-secondary'}`}
+            style={{ gap: '0.4rem' }}
+            title="Ver logs e auditoria da ficha deste personagem"
+          >
+            <FileText size={16} />
+            <span>Auditoria</span>
+          </button>
+          <button
+            type="button"
             onClick={onEditInWizard}
             className="btn btn-secondary"
             style={{ gap: '0.4rem' }}
@@ -660,15 +683,13 @@ export const CharacterSheetView: React.FC<CharacterSheetViewProps> = ({
         <div
           className="t20-card"
           style={{
-            background: 'rgba(239, 68, 68, 0.08)',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
           }}
         >
           <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.65rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#f87171', fontWeight: 700 }}>
                 <Heart size={18} />
                 <span>Pontos de Vida</span>
@@ -676,46 +697,108 @@ export const CharacterSheetView: React.FC<CharacterSheetViewProps> = ({
               <StatBreakdownBadge label="PV Máximo" breakdown={character.stats.maxHp} variant="ruby" size="sm" />
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem', margin: '0.5rem 0', flexWrap: 'wrap' }}>
-              <span style={{ fontSize: '2.2rem', fontWeight: 900, fontFamily: 'var(--font-mono)', color: character.stats.currentHp <= 5 ? '#ef4444' : '#ffffff' }}>
-                {character.stats.currentHp}
-              </span>
-              <span style={{ color: 'var(--text-muted)', fontSize: '1rem' }}>
-                / {character.stats.maxHp.value} PV
-              </span>
-              {(character.stats.tempHp || 0) > 0 && (
-                <span
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.25rem',
-                    background: 'rgba(56, 189, 248, 0.18)',
-                    border: '1px solid #38bdf8',
-                    color: '#38bdf8',
-                    fontWeight: 800,
-                    fontSize: '0.8rem',
-                    padding: '0.15rem 0.5rem',
-                    borderRadius: '9999px',
-                    marginLeft: '0.2rem',
-                    fontFamily: 'var(--font-mono)',
-                  }}
-                  title="Pontos de Vida Temporários (absorvem dano antes do PV normal)"
-                >
-                  +{character.stats.tempHp} Temp
-                </span>
-              )}
-            </div>
-
-            {/* Barra de Progresso de Vida */}
-            <div style={{ height: 8, background: 'rgba(0,0,0,0.4)', borderRadius: 4, overflow: 'hidden', marginBottom: '0.75rem' }}>
+            {/* Barra de Progresso de Vida com Overheal/Barreira e Valores Internos */}
+            <div
+              style={{
+                position: 'relative',
+                height: 32,
+                background: 'rgba(0, 0, 0, 0.65)',
+                borderRadius: 'var(--radius-md)',
+                overflow: 'hidden',
+                marginBottom: '0.75rem',
+                border: (character.stats.tempHp || 0) > 0 ? '1.5px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.12)',
+                boxShadow: (character.stats.tempHp || 0) > 0
+                  ? '0 0 14px rgba(56, 189, 248, 0.4), inset 0 2px 8px rgba(0,0,0,0.8)'
+                  : 'inset 0 2px 8px rgba(0,0,0,0.8)',
+              }}
+            >
+              {/* Barra Base de Vida (Vermelha) */}
               <div
                 style={{
-                  height: '100%',
+                  position: 'absolute',
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
                   width: `${Math.max(0, Math.min(100, (character.stats.currentHp / character.stats.maxHp.value) * 100))}%`,
-                  background: 'linear-gradient(90deg, #ef4444 0%, #10b981 100%)',
+                  background: 'linear-gradient(90deg, #b91c1c 0%, #ef4444 100%)',
                   transition: 'width 0.3s ease',
+                  zIndex: 1,
                 }}
               />
+
+              {/* Camada de Sobrevida / Barreira / Overheal */}
+              {(character.stats.tempHp || 0) > 0 && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    bottom: 0,
+                    left: `${Math.max(0, Math.min(100, (character.stats.currentHp / character.stats.maxHp.value) * 100))}%`,
+                    width: `${Math.max(0, Math.min(100 - (character.stats.currentHp / character.stats.maxHp.value) * 100, (character.stats.tempHp / character.stats.maxHp.value) * 100))}%`,
+                    background: 'repeating-linear-gradient(135deg, rgba(56, 189, 248, 0.95) 0px, rgba(56, 189, 248, 0.95) 6px, rgba(14, 165, 233, 0.95) 6px, rgba(14, 165, 233, 0.95) 12px)',
+                    boxShadow: '0 0 10px rgba(56, 189, 248, 0.8)',
+                    transition: 'all 0.3s ease',
+                    zIndex: 2,
+                  }}
+                  title={`Sobrevida / Barreira ativa: +${character.stats.tempHp} PV Temporários`}
+                />
+              )}
+
+              {/* Efeito Glow de Overheal Total quando ultrapassa 100% de PV */}
+              {(character.stats.tempHp || 0) > 0 && (character.stats.currentHp + character.stats.tempHp > character.stats.maxHp.value) && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: 'linear-gradient(90deg, transparent 0%, rgba(56, 189, 248, 0.15) 60%, rgba(56, 189, 248, 0.35) 100%)',
+                    boxShadow: 'inset 0 0 10px rgba(56, 189, 248, 0.6)',
+                    pointerEvents: 'none',
+                    zIndex: 3,
+                  }}
+                />
+              )}
+
+              {/* Valor Numérico Centralizado Dentro da Barra */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  zIndex: 4,
+                  pointerEvents: 'none',
+                  fontFamily: 'var(--font-mono)',
+                  fontWeight: 900,
+                  fontSize: '0.95rem',
+                  color: '#ffffff',
+                  textShadow: '0 1px 4px rgba(0,0,0,0.95), 0 0 3px #000',
+                  gap: '0.35rem',
+                }}
+              >
+                <span>{character.stats.currentHp} / {character.stats.maxHp.value} PV</span>
+                {(character.stats.tempHp || 0) > 0 && (
+                  <span
+                    style={{
+                      color: '#7dd3fc',
+                      background: 'rgba(0, 0, 0, 0.55)',
+                      padding: '0.05rem 0.35rem',
+                      borderRadius: '4px',
+                      border: '1px solid rgba(56, 189, 248, 0.6)',
+                      fontSize: '0.85rem',
+                      fontWeight: 900,
+                    }}
+                  >
+                    [+{character.stats.tempHp}]
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 
@@ -759,15 +842,13 @@ export const CharacterSheetView: React.FC<CharacterSheetViewProps> = ({
         <div
           className="t20-card"
           style={{
-            background: 'rgba(59, 130, 246, 0.08)',
-            border: '1px solid rgba(59, 130, 246, 0.3)',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
           }}
         >
           <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.65rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#60a5fa', fontWeight: 700 }}>
                 <Zap size={18} />
                 <span>Pontos de Mana</span>
@@ -775,25 +856,55 @@ export const CharacterSheetView: React.FC<CharacterSheetViewProps> = ({
               <StatBreakdownBadge label="PM Máximo" breakdown={character.stats.maxMp} variant="blue" size="sm" />
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem', margin: '0.5rem 0' }}>
-              <span style={{ fontSize: '2.2rem', fontWeight: 900, fontFamily: 'var(--font-mono)', color: '#60a5fa' }}>
-                {character.stats.currentMp}
-              </span>
-              <span style={{ color: 'var(--text-muted)', fontSize: '1rem' }}>
-                / {character.stats.maxMp.value} PM
-              </span>
-            </div>
-
-            {/* Barra de Progresso de Mana */}
-            <div style={{ height: 8, background: 'rgba(0,0,0,0.4)', borderRadius: 4, overflow: 'hidden', marginBottom: '0.75rem' }}>
+            {/* Barra de Progresso de Mana com Valor Centralizado */}
+            <div
+              style={{
+                position: 'relative',
+                height: 32,
+                background: 'rgba(0, 0, 0, 0.65)',
+                borderRadius: 'var(--radius-md)',
+                overflow: 'hidden',
+                marginBottom: '0.75rem',
+                border: '1px solid rgba(255, 255, 255, 0.12)',
+                boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.8)',
+              }}
+            >
+              {/* Barra de Preenchimento Azul */}
               <div
                 style={{
-                  height: '100%',
+                  position: 'absolute',
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
                   width: `${Math.max(0, Math.min(100, (character.stats.currentMp / character.stats.maxMp.value) * 100))}%`,
-                  background: 'linear-gradient(90deg, #3b82f6 0%, #93c5fd 100%)',
+                  background: 'linear-gradient(90deg, #1d4ed8 0%, #3b82f6 100%)',
                   transition: 'width 0.3s ease',
+                  zIndex: 1,
                 }}
               />
+
+              {/* Valor Numérico Centralizado Dentro da Barra */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  zIndex: 4,
+                  pointerEvents: 'none',
+                  fontFamily: 'var(--font-mono)',
+                  fontWeight: 900,
+                  fontSize: '0.95rem',
+                  color: '#ffffff',
+                  textShadow: '0 1px 4px rgba(0,0,0,0.95), 0 0 3px #000',
+                }}
+              >
+                <span>{character.stats.currentMp} / {character.stats.maxMp.value} PM</span>
+              </div>
             </div>
           </div>
 
@@ -1046,6 +1157,8 @@ export const CharacterSheetView: React.FC<CharacterSheetViewProps> = ({
           ...(character.spells.length > 0 ? [{ id: 'magias', label: `Grimório (${character.spells.length})`, icon: Zap }] : []),
           { id: 'inventario', label: `Inventário (${character.inventory.length})`, icon: Package },
           { id: 'bio', label: 'Biografia & Notas', icon: BookOpen },
+          { id: 'historico', label: 'Histórico', icon: Dices },
+          { id: 'auditoria', label: 'Auditoria', icon: FileText },
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -1620,6 +1733,22 @@ export const CharacterSheetView: React.FC<CharacterSheetViewProps> = ({
             }}
           />
         </div>
+      )}
+
+      {/* 7. ABA DE HISTÓRICO DE ROLAGENS (ESCOPO DO PERSONAGEM) */}
+      {activeTab === 'historico' && (
+        <CharacterRollHistoryTab
+          characterId={character.id}
+          characterName={character.name}
+        />
+      )}
+
+      {/* 8. ABA DE AUDITORIA E LOGS (ESCOPO DO PERSONAGEM) */}
+      {activeTab === 'auditoria' && (
+        <CharacterAuditTab
+          characterId={character.id}
+          characterName={character.name}
+        />
       )}
 
       {/* Modal de Detalhes Canônicos */}

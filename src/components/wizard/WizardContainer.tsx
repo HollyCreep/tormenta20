@@ -376,12 +376,13 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
         .filter((b) => b.type === 'poder')
         .map((b) => {
           const powDef = currentOrigin.powers.find((p) => p.name === b.name);
+          const generalPowDef = GENERAL_POWERS_LIST.find((gp) => gp.name === b.name || gp.id === b.name);
           return {
             id: 'origem_' + b.name.toLowerCase().replace(/\s+/g, '_'),
             name: b.name,
             source: 'origem' as const,
-            description: powDef?.description || 'Poder garantido por sua origem.',
-            type: powDef?.type,
+            description: powDef?.description || generalPowDef?.description || 'Poder garantido por sua origem.',
+            type: powDef?.type || generalPowDef?.category,
           };
         }),
       ...selectedDeityPowers.map((powName) => {
@@ -683,6 +684,7 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
               ...selectedClassSkills,
               ...selectedIntSkills,
             ]}
+            prerequisiteContext={prereqContext}
             onSelectOrigin={setOriginId}
             onSelectOriginBenefits={setSelectedOriginBenefits}
             onOpenDetail={setModalDetail}

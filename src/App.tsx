@@ -156,8 +156,9 @@ export function App() {
     }
 
     const total = rollSum + modifier;
-    const isCrit = sides === 20 && rollSum === 20;
-    const isFumble = sides === 20 && rollSum === 1;
+    // Acerto/Falha Crítica: Em T20, só ocorre em rolagem simples de 1d20 (Cap. 5, pág. 226)
+    const isCrit = sides === 20 && count === 1 && rollsArray[0] === 20;
+    const isFumble = sides === 20 && count === 1 && rollsArray[0] === 1;
 
     // Extrai título amigável e detalhes de fórmulas entre colchetes
     let title = rawTitle.trim();
@@ -284,30 +285,8 @@ export function App() {
             </button>
           </div>
 
-          {/* Seletor de Tema Visual e Acesso a Históricos */}
+          {/* Seletor de Tema Visual */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            <button
-              type="button"
-              onClick={() => setIsRollHistoryOpen(true)}
-              className="btn btn-sm btn-outline"
-              title="Histórico Completo de Rolagens de Dados"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
-            >
-              <Dices size={14} style={{ color: 'var(--artonian-gold, #d97706)' }} />
-              <span className="hidden-mobile">Histórico</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setIsChangeLogOpen(true)}
-              className="btn btn-sm btn-outline"
-              title="Registro de Auditoria e Alterações da Ficha"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
-            >
-              <FileText size={14} style={{ color: 'var(--color-mana, #3b82f6)' }} />
-              <span className="hidden-mobile">Auditoria</span>
-            </button>
-
             <ThemeSelector />
           </div>
         </div>

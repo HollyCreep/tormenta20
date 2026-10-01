@@ -202,6 +202,7 @@ export interface RollHistoryEntry {
   timestamp: string; // ISO 8601
   timeFormatted: string; // HH:mm:ss
   dateFormatted: string; // DD/MM/YYYY
+  annotation?: string; // Anotação personalizada do usuário
 }
 
 export interface CharacterChangeLogEntry {
@@ -220,5 +221,6 @@ export interface CharacterChangeLogEntry {
     from: string | number;
     to: string | number;
   }[];
+  annotation?: string; // Anotação personalizada do usuário
 }
 

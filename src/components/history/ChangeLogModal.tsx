@@ -352,6 +352,22 @@ export const ChangeLogModal: React.FC<ChangeLogModalProps> = ({
                         ))}
                       </div>
                     )}
+
+                    {l.annotation && (
+                      <div
+                        style={{
+                          marginTop: '0.35rem',
+                          background: 'rgba(56, 189, 248, 0.08)',
+                          border: '1px solid rgba(56, 189, 248, 0.25)',
+                          borderRadius: 'var(--radius-sm)',
+                          padding: '0.3rem 0.55rem',
+                          fontSize: '0.75rem',
+                          color: '#7dd3fc',
+                        }}
+                      >
+                        <strong>Nota:</strong> {l.annotation}
+                      </div>
+                    )}
                   </div>
                 </div>
 

@@ -1,0 +1,163 @@
+/* ===================================================== */
+/* 🎨 Design Tokens — Tormenta 20 Mobile App              */
+/* Sistema de design mobile-first com identidade visual    */
+/* inspirada em RPGs premium e interfaces de jogos.        */
+/* ===================================================== */
+
+:root {
+  /* ─── Superfícies & Fundos ─── */
+  --surface-0: #0C0C14;        /* Background principal */
+  --surface-1: #14141E;        /* Cards de primeiro nível */
+  --surface-2: #1C1C28;        /* Cards elevados / hovers */
+  --surface-3: #262632;        /* Inputs, modais internas */
+  --surface-4: #30303E;        /* Elementos interativos */
+  --surface-glass: rgba(20, 20, 30, 0.85);
+  
+  /* ─── Acento Primário: Ouro de Arton ─── */
+  --accent: #E8A838;
+  --accent-light: #F5C04A;
+  --accent-dark: #C4882A;
+  --accent-dim: rgba(232, 168, 56, 0.08);
+  --accent-soft: rgba(232, 168, 56, 0.15);
+  --accent-glow: rgba(232, 168, 56, 0.30);
+
+  /* ─── Cores Semânticas ─── */
+  --hp: #E85D5D;               /* Vida */
+  --hp-dark: #C94444;
+  --hp-bg: rgba(232, 93, 93, 0.10);
+  --hp-glow: rgba(232, 93, 93, 0.30);
+  
+  --mp: #5D9BE8;               /* Mana */
+  --mp-dark: #4480C9;
+  --mp-bg: rgba(93, 155, 232, 0.10);
+  --mp-glow: rgba(93, 155, 232, 0.30);
+  
+  --success: #5DE89F;          /* Sucesso, cura */
+  --success-bg: rgba(93, 232, 159, 0.10);
+  
+  --danger: #E85D5D;           /* Perigo, dano */
+  --danger-bg: rgba(232, 93, 93, 0.10);
+  
+  --info: #5DB8E8;             /* Informação */
+  --info-bg: rgba(93, 184, 232, 0.10);
+  
+  --shield: #38BDF8;           /* PV Temporário / Barreira */
+  --shield-bg: rgba(56, 189, 248, 0.10);
+  
+  --crit: #FFD700;             /* Acerto crítico */
+  --fumble: #FF4444;           /* Falha crítica */
+  
+  /* ─── Texto ─── */
+  --text-primary: #EEEEF2;
+  --text-secondary: #8E8EA0;
+  --text-tertiary: #5A5A6E;
+  --text-inverse: #0C0C14;
+  --text-accent: var(--accent-light);
+  
+  /* ─── Bordas ─── */
+  --border: rgba(255, 255, 255, 0.06);
+  --border-light: rgba(255, 255, 255, 0.10);
+  --border-accent: rgba(232, 168, 56, 0.20);
+  --border-focus: rgba(232, 168, 56, 0.50);
+  
+  /* ─── Tipografia ─── */
+  --font-display: 'Cinzel', serif;
+  --font-body: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  
+  --text-xs: 0.6875rem;    /* 11px */
+  --text-sm: 0.8125rem;    /* 13px */
+  --text-base: 0.9375rem;  /* 15px */
+  --text-lg: 1.0625rem;    /* 17px */
+  --text-xl: 1.25rem;      /* 20px */
+  --text-2xl: 1.5rem;      /* 24px */
+  --text-3xl: 1.875rem;    /* 30px */
+  
+  /* ─── Espaçamento ─── */
+  --space-1: 0.25rem;   /* 4px */
+  --space-2: 0.5rem;    /* 8px */
+  --space-3: 0.75rem;   /* 12px */
+  --space-4: 1rem;      /* 16px */
+  --space-5: 1.25rem;   /* 20px */
+  --space-6: 1.5rem;    /* 24px */
+  --space-8: 2rem;      /* 32px */
+  --space-10: 2.5rem;   /* 40px */
+  --space-12: 3rem;     /* 48px */
+  
+  /* ─── Raios ─── */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 28px;
+  --radius-full: 9999px;
+  
+  /* ─── Sombras ─── */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.6);
+  --shadow-xl: 0 16px 40px rgba(0, 0, 0, 0.7);
+  --shadow-glow-accent: 0 0 20px var(--accent-glow);
+  --shadow-glow-hp: 0 0 16px var(--hp-glow);
+  --shadow-glow-mp: 0 0 16px var(--mp-glow);
+  
+  /* ─── Transições ─── */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 200ms;
+  --duration-slow: 300ms;
+  --transition: all var(--duration-normal) var(--ease-in-out);
+  
+  /* ─── Safe Areas (Mobile) ─── */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  
+  /* ─── Layout ─── */
+  --header-height: 52px;
+  --tab-bar-height: 60px;
+  --content-max-width: 640px;   /* Mobile-optimized */
+  --content-max-width-lg: 960px; /* Tablet */
+  
+  /* ─── Z-Index Scale ─── */
+  --z-base: 1;
+  --z-sticky: 50;
+  --z-header: 100;
+  --z-overlay: 500;
+  --z-modal: 1000;
+  --z-toast: 1500;
+}
+
+/* ─── Tema Claro ─── */
+[data-theme="light"] {
+  --surface-0: #F4F4F8;
+  --surface-1: #FFFFFF;
+  --surface-2: #F0F0F5;
+  --surface-3: #E8E8EE;
+  --surface-4: #DDDDE5;
+  --surface-glass: rgba(255, 255, 255, 0.92);
+  
+  --accent: #C98820;
+  --accent-light: #D9A030;
+  --accent-dark: #A87018;
+  --accent-dim: rgba(201, 136, 32, 0.06);
+  --accent-soft: rgba(201, 136, 32, 0.12);
+  --accent-glow: rgba(201, 136, 32, 0.20);
+  
+  --text-primary: #1A1A24;
+  --text-secondary: #5A5A6E;
+  --text-tertiary: #8E8EA0;
+  --text-inverse: #FFFFFF;
+  
+  --border: rgba(0, 0, 0, 0.06);
+  --border-light: rgba(0, 0, 0, 0.10);
+  --border-accent: rgba(201, 136, 32, 0.25);
+  --border-focus: rgba(201, 136, 32, 0.50);
+  
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.10);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+}

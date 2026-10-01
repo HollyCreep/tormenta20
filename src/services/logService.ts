@@ -31,12 +31,12 @@ export const logService = {
   addRoll(entry: Omit<RollHistoryEntry, 'id' | 'timestamp' | 'timeFormatted' | 'dateFormatted'> & { id?: string; timestamp?: string }): RollHistoryEntry {
     const now = new Date();
     const fullEntry: RollHistoryEntry = {
+      ...entry,
       id: entry.id || `roll_${now.getTime()}_${Math.random().toString(36).substring(2, 7)}`,
       timestamp: entry.timestamp || now.toISOString(),
       timeFormatted: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
       dateFormatted: now.toLocaleDateString(),
       userName: entry.userName || 'Jogador',
-      ...entry,
     };
 
     try {
@@ -59,6 +59,16 @@ export const logService = {
     }
   },
 
+  updateRollAnnotation(rollId: string, annotation: string): void {
+    try {
+      const rolls = this.getRolls();
+      const updated = rolls.map((r) => (r.id === rollId ? { ...r, annotation: annotation.trim() || undefined } : r));
+      localStorage.setItem(ROLLS_STORAGE_KEY, JSON.stringify(updated));
+    } catch (e) {
+      console.error('Erro ao atualizar anotação da rolagem:', e);
+    }
+  },
+
   // === HISTÓRICO DE ALTERAÇÕES DA FICHA (AUDIT LOG) ===
   getChangeLogs(): CharacterChangeLogEntry[] {
     try {
@@ -73,12 +83,12 @@ export const logService = {
   addChangeLog(entry: Omit<CharacterChangeLogEntry, 'id' | 'timestamp' | 'timeFormatted' | 'dateFormatted'> & { id?: string; timestamp?: string }): CharacterChangeLogEntry {
     const now = new Date();
     const fullEntry: CharacterChangeLogEntry = {
+      ...entry,
       id: entry.id || `chg_${now.getTime()}_${Math.random().toString(36).substring(2, 7)}`,
       timestamp: entry.timestamp || now.toISOString(),
       timeFormatted: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
       dateFormatted: now.toLocaleDateString(),
       userName: entry.userName || 'Jogador',
-      ...entry,
     };
 
     try {
@@ -98,6 +108,16 @@ export const logService = {
       localStorage.setItem(CHANGELOG_STORAGE_KEY, JSON.stringify(remaining));
     } else {
       localStorage.removeItem(CHANGELOG_STORAGE_KEY);
+    }
+  },
+
+  updateChangeLogAnnotation(logId: string, annotation: string): void {
+    try {
+      const logs = this.getChangeLogs();
+      const updated = logs.map((l) => (l.id === logId ? { ...l, annotation: annotation.trim() || undefined } : l));
+      localStorage.setItem(CHANGELOG_STORAGE_KEY, JSON.stringify(updated));
+    } catch (e) {
+      console.error('Erro ao atualizar anotação do log de auditoria:', e);
     }
   },
 

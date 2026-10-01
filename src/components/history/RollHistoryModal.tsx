@@ -408,6 +408,22 @@ export const RollHistoryModal: React.FC<RollHistoryModalProps> = ({
                           Origem: {r.components}
                         </div>
                       )}
+
+                      {r.annotation && (
+                        <div
+                          style={{
+                            marginTop: '0.35rem',
+                            background: 'rgba(245, 158, 11, 0.08)',
+                            border: '1px solid rgba(245, 158, 11, 0.25)',
+                            borderRadius: 'var(--radius-sm)',
+                            padding: '0.3rem 0.55rem',
+                            fontSize: '0.75rem',
+                            color: 'var(--t20-gold-light)',
+                          }}
+                        >
+                          <strong>Nota:</strong> {r.annotation}
+                        </div>
+                      )}
                     </div>
                   </div>
 

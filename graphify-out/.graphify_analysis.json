@@ -1,27 +1,47 @@
 {
   "communities": {
     "0": [
-      "package_dependencies_react",
-      "react",
       "scripts_export_all_data",
       "scripts_export_all_data_database",
       "scripts_export_all_data_outputpath",
-      "src_components_wizard_stepclass",
-      "src_components_wizard_stepclass_stepclass",
+      "src_components_common_detailmodal_detailmodaldata",
+      "src_components_wizard_stepattributes",
+      "src_components_wizard_stepattributes_stepattributes",
+      "src_components_wizard_stepattributes_stepattributesprops",
+      "src_components_wizard_stepclass_stepclassprops",
+      "src_components_wizard_stepdeity",
       "src_components_wizard_stepdeity_stepdeity",
+      "src_components_wizard_stepdeity_stepdeityprops",
+      "src_components_wizard_stepequipment",
       "src_components_wizard_stepequipment_stepequipment",
+      "src_components_wizard_stepequipment_stepequipmentprops",
       "src_components_wizard_stepfinal",
       "src_components_wizard_stepfinal_stepfinal",
+      "src_components_wizard_steporigin",
+      "src_components_wizard_steporigin_getgenericpowercategory",
+      "src_components_wizard_steporigin_isgenericoriginpower",
       "src_components_wizard_steporigin_steporigin",
+      "src_components_wizard_steporigin_steporiginprops",
       "src_components_wizard_steprace",
       "src_components_wizard_steprace_steprace",
       "src_components_wizard_steprace_stepraceprops",
-      "src_components_wizard_wizardcontainer",
-      "src_components_wizard_wizardcontainer_wizardcontainer",
+      "src_components_wizard_stepskills",
+      "src_components_wizard_stepskills_stepskills",
+      "src_components_wizard_stepskills_stepskillsprops",
+      "src_data_attributes",
+      "src_data_attributes_attributes_list",
+      "src_data_attributes_point_buy_costs",
+      "src_data_attributes_standard_array",
       "src_data_classes",
       "src_data_classes_classes_list",
+      "src_data_classpowers",
+      "src_data_classpowers_class_powers_list",
+      "src_data_conditions",
+      "src_data_conditions_conditions_list",
       "src_data_deities",
       "src_data_deities_deities_list",
+      "src_data_equipment",
+      "src_data_equipment_equipment_list",
       "src_data_generalpowers",
       "src_data_generalpowers_general_powers_list",
       "src_data_index",
@@ -29,36 +49,174 @@
       "src_data_origins_origins_list",
       "src_data_races",
       "src_data_races_races_list",
-      "src_data_skills",
-      "src_data_skills_skills_list",
-      "src_data_spells",
-      "src_data_spells_spells_list",
-      "src_services_samplecharacters",
-      "src_services_samplecharacters_createsamplecharacters",
+      "src_types_character_characterattributes",
+      "src_types_rules",
+      "src_types_rules_attributedefinition",
+      "src_types_rules_attributekey",
+      "src_types_rules_classability",
       "src_types_rules_classdefinition",
+      "src_types_rules_classpower",
+      "src_types_rules_condition",
+      "src_types_rules_deity",
+      "src_types_rules_deitypower",
+      "src_types_rules_generalpower",
+      "src_types_rules_origin",
+      "src_types_rules_originbenefit",
       "src_types_rules_race",
-      "src_utils_rulesengine",
-      "src_utils_rulesengine_calculatearmorpenalty",
-      "src_utils_rulesengine_calculatedefense",
-      "src_utils_rulesengine_calculatemaxhp",
-      "src_utils_rulesengine_calculatemaxmp",
-      "src_utils_rulesengine_calculatemaxspaces",
-      "src_utils_rulesengine_calculateracialmodifiers",
-      "src_utils_rulesengine_calculateskillbonus",
-      "src_utils_rulesengine_calculatespeed",
-      "src_utils_rulesengine_calculatetotalattributes",
+      "src_types_rules_raceability",
+      "src_types_rules_skill",
       "src_utils_rulesvalidation",
       "src_utils_rulesvalidation_checkpowerprerequisites",
       "src_utils_rulesvalidation_prerequisitecontext",
       "src_utils_rulesvalidation_prerequisiteresult",
       "src_utils_rulesvalidation_stepstatus",
-      "src_utils_rulesvalidation_validateallwizardsteps"
+      "src_utils_rulesvalidation_validateallwizardsteps",
+      "src_utils_rulesvalidation_wizardvalidationinput"
     ],
     "1": [
       "ref_react",
       "src_components_common_detailmodal",
       "src_components_common_detailmodal_detailmodal",
       "src_components_common_detailmodal_detailmodalprops",
+      "src_components_common_detailmodal_getfallbackstaticon",
+      "src_components_common_t20badge",
+      "src_components_common_t20badge_circlebadge",
+      "src_components_common_t20badge_executionbadge",
+      "src_components_common_t20badge_getschoolinfo",
+      "src_components_common_t20badge_powercategorybadge",
+      "src_components_common_t20badge_rangebadge",
+      "src_components_common_t20badge_schoolbadge",
+      "src_components_common_t20badge_schoolbadgeprops",
+      "src_components_common_t20badge_spelltypebadge",
+      "src_components_compendium_powerscompendium",
+      "src_components_compendium_powerscompendium_powerscompendium",
+      "src_components_compendium_spellscompendium",
+      "src_components_compendium_spellscompendium_spellscompendium",
+      "src_components_compendium_spellscompendium_spellscompendiumprops",
+      "src_components_sheet_charactersheetview",
+      "src_components_sheet_charactersheetview_charactersheetview",
+      "src_components_sheet_levelupmodal",
+      "src_components_sheet_levelupmodal_levelupmodal",
+      "src_components_sheet_spellcastmodal",
+      "src_components_sheet_spellcastmodal_spellcastmodal",
+      "src_components_sheet_spellcastmodal_spellcastmodalprops",
+      "src_data_rulescitations",
+      "src_data_rulescitations_rulecitation",
+      "src_data_rulescitations_rules_citations",
+      "src_types_character_characterspell",
+      "src_utils_rulesengine_calculatemaxspellcost",
+      "src_utils_rulesengine_calculatespellcircleunlocked",
+      "src_utils_rulesengine_calculatespellsavedc",
+      "src_utils_rulesengine_getattackconditionpenalty",
+      "src_utils_rulesengine_getspellcastingkeyattribute",
+      "src_utils_spellutils",
+      "src_utils_spellutils_extractspelldamage",
+      "src_utils_spellutils_spelldamagedata",
+      "src_utils_textutils",
+      "src_utils_textutils_class_book_pages",
+      "src_utils_textutils_cleant20text",
+      "src_utils_textutils_enclitic_pronouns",
+      "src_utils_textutils_getclasspowercitation",
+      "src_utils_textutils_getclasspowerrulecitation",
+      "src_utils_textutils_getgeneralpowercitation",
+      "src_utils_textutils_getgeneralpowerrulecitation",
+      "src_utils_textutils_getspellcitation",
+      "src_utils_textutils_getspellrulecitation",
+      "src_utils_textutils_prefixes_with_hyphen"
+    ],
+    "2": [
+      "src_app",
+      "src_app_app",
+      "src_components_common_dicerollerwidget",
+      "src_components_common_dicerollerwidget_dicerollerwidget",
+      "src_components_common_dicerollerwidget_dicerollerwidgetprops",
+      "src_components_common_dicerollerwidget_rollresult",
+      "src_components_common_statbreakdownbadge",
+      "src_components_common_statbreakdownbadge_statbreakdownbadge",
+      "src_components_common_statbreakdownbadge_statbreakdownbadgeprops",
+      "src_components_compendium_powerscompendium_powerscompendiumprops",
+      "src_components_history_changelogmodal",
+      "src_components_history_changelogmodal_changelogmodalprops",
+      "src_components_history_rollhistorymodal",
+      "src_components_history_rollhistorymodal_rollhistorymodalprops",
+      "src_components_hub_characterlist",
+      "src_components_hub_characterlist_characterlist",
+      "src_components_hub_characterlist_characterlistprops",
+      "src_components_sheet_additemmodal",
+      "src_components_sheet_additemmodal_additemmodal",
+      "src_components_sheet_additemmodal_additemmodalprops",
+      "src_components_sheet_characteraudittab",
+      "src_components_sheet_characteraudittab_characteraudittab",
+      "src_components_sheet_characteraudittab_characteraudittabprops",
+      "src_components_sheet_characterrollhistorytab",
+      "src_components_sheet_characterrollhistorytab_characterrollhistorytab",
+      "src_components_sheet_characterrollhistorytab_characterrollhistorytabprops",
+      "src_components_sheet_charactersheetview_charactersheetviewprops",
+      "src_components_sheet_levelupmodal_levelupmodalprops",
+      "src_components_sheet_notebooksection",
+      "src_components_sheet_notebooksection_notebooksection",
+      "src_components_sheet_notebooksection_notebooksectionprops",
+      "src_components_wizard_stepfinal_stepfinalprops",
+      "src_components_wizard_wizardcontainer_wizardcontainerprops",
+      "src_services_logservice",
+      "src_services_logservice_changelogoptions",
+      "src_services_logservice_logservice",
+      "src_services_storage_storageservice",
+      "src_types_character",
+      "src_types_character_breakdowncomponent",
+      "src_types_character_characterchangelogentry",
+      "src_types_character_characterclasslevel",
+      "src_types_character_characternote",
+      "src_types_character_characternoteimage",
+      "src_types_character_characterpower",
+      "src_types_character_charactersheet",
+      "src_types_character_rollhistoryentry",
+      "src_types_character_statbreakdown",
+      "src_types_character_trainedskilldata"
+    ],
+    "3": [
+      "canvas_confetti",
+      "capacitor_android",
+      "capacitor_app",
+      "capacitor_cli",
+      "capacitor_core",
+      "capacitor_haptics",
+      "capacitor_splash_screen",
+      "capacitor_status_bar",
+      "lucide_react",
+      "package",
+      "package_dependencies",
+      "package_dependencies_canvas_confetti",
+      "package_dependencies_capacitor_android",
+      "package_dependencies_capacitor_app",
+      "package_dependencies_capacitor_cli",
+      "package_dependencies_capacitor_core",
+      "package_dependencies_capacitor_haptics",
+      "package_dependencies_capacitor_splash_screen",
+      "package_dependencies_capacitor_status_bar",
+      "package_dependencies_lucide_react",
+      "package_dependencies_react_dom",
+      "package_description",
+      "package_name",
+      "package_private",
+      "package_scripts",
+      "package_scripts_build",
+      "package_scripts_dev",
+      "package_scripts_export_data",
+      "package_scripts_index_pdf",
+      "package_scripts_lint",
+      "package_scripts_mcp_server",
+      "package_scripts_mobile_copy",
+      "package_scripts_mobile_open",
+      "package_scripts_mobile_sync",
+      "package_scripts_preview",
+      "package_type",
+      "package_version",
+      "react_dom"
+    ],
+    "4": [
+      "package_dependencies_react",
+      "react",
       "src_components_common_detailmodal_detailstat",
       "src_components_common_itemcard",
       "src_components_common_itemcard_itemcard",
@@ -71,10 +229,7 @@
       "src_components_compendium_itemscompendium",
       "src_components_compendium_itemscompendium_itemscompendium",
       "src_components_compendium_itemscompendium_itemscompendiumprops",
-      "src_components_wizard_stepequipment",
-      "src_components_wizard_stepequipment_stepequipmentprops",
-      "src_data_equipment",
-      "src_data_equipment_equipment_list",
+      "src_components_history_changelogmodal_changelogmodal",
       "src_data_itemmodifiers",
       "src_data_itemmodifiers_calculatemodifieditem",
       "src_data_itemmodifiers_canapplymodifier",
@@ -86,81 +241,47 @@
       "src_data_itemmodifiers_modifier_dependents",
       "src_data_itemmodifiers_removemodifierwithdependents",
       "src_data_itemmodifiers_sanitizemodifiers",
-      "src_types_character_characterinventoryitem",
       "src_types_rules_equipmentitem",
       "src_types_rules_itemmodifier",
       "src_utils_equipmentdetail",
       "src_utils_equipmentdetail_getcategoryfulllabel",
       "src_utils_equipmentdetail_getcriticalexplanation",
       "src_utils_equipmentdetail_getdamagetypeexplanation",
+      "src_utils_equipmentdetail_getequipmentdamagetypeicon",
       "src_utils_equipmentdetail_getequipmentdetailmodaldata",
       "src_utils_equipmentdetail_getrangeexplanation",
       "src_utils_equipmentdetail_getsubcategoryexplanation"
     ],
-    "2": [
-      "src_app",
-      "src_app_app",
-      "src_components_common_dicerollerwidget",
-      "src_components_common_dicerollerwidget_dicerollerwidget",
-      "src_components_common_dicerollerwidget_dicerollerwidgetprops",
-      "src_components_common_dicerollerwidget_rollresult",
-      "src_components_common_statbreakdownbadge",
-      "src_components_common_statbreakdownbadge_statbreakdownbadge",
-      "src_components_common_statbreakdownbadge_statbreakdownbadgeprops",
-      "src_components_compendium_powerscompendium",
-      "src_components_compendium_powerscompendium_powerscompendium",
-      "src_components_compendium_powerscompendium_powerscompendiumprops",
-      "src_components_compendium_spellscompendium",
-      "src_components_compendium_spellscompendium_spellscompendium",
-      "src_components_compendium_spellscompendium_spellscompendiumprops",
-      "src_components_hub_characterlist",
-      "src_components_hub_characterlist_characterlist",
-      "src_components_hub_characterlist_characterlistprops",
-      "src_components_wizard_stepfinal_stepfinalprops",
-      "src_components_wizard_wizardcontainer_wizardcontainerprops",
+    "5": [
+      "src_components_wizard_stepclass",
+      "src_components_wizard_stepclass_stepclass",
+      "src_components_wizard_stepspells",
+      "src_components_wizard_stepspells_stepspells",
+      "src_components_wizard_stepspells_stepspellsprops",
+      "src_components_wizard_wizardcontainer",
+      "src_components_wizard_wizardcontainer_wizardcontainer",
+      "src_data_skills",
+      "src_data_skills_skills_list",
+      "src_data_spells",
+      "src_data_spells_spells_list",
+      "src_services_samplecharacters",
+      "src_services_samplecharacters_createsamplecharacters",
       "src_services_storage",
-      "src_services_storage_storageservice",
-      "src_types_character",
-      "src_types_character_breakdowncomponent",
-      "src_types_character_characterpower",
-      "src_types_character_charactersheet",
-      "src_types_character_characterspell",
-      "src_types_character_statbreakdown",
-      "src_types_character_trainedskilldata",
-      "src_types_rules_attributekey",
-      "src_types_rules_generalpower",
-      "src_types_rules_spell"
+      "src_types_character_characterinventoryitem",
+      "src_types_rules_spell",
+      "src_utils_rulesengine",
+      "src_utils_rulesengine_calculatearmorpenalty",
+      "src_utils_rulesengine_calculatedefense",
+      "src_utils_rulesengine_calculatemaxhp",
+      "src_utils_rulesengine_calculatemaxmp",
+      "src_utils_rulesengine_calculatemaxspaces",
+      "src_utils_rulesengine_calculateracialmodifiers",
+      "src_utils_rulesengine_calculateskillbonus",
+      "src_utils_rulesengine_calculatespeed",
+      "src_utils_rulesengine_calculatetotalattributes",
+      "src_utils_rulesengine_recalculatefullcharactersheet"
     ],
-    "3": [
-      "src_components_sheet_charactersheetview",
-      "src_components_sheet_charactersheetview_charactersheetview",
-      "src_components_sheet_charactersheetview_charactersheetviewprops",
-      "src_components_wizard_stepattributes",
-      "src_components_wizard_stepattributes_stepattributes",
-      "src_components_wizard_steporigin",
-      "src_data_attributes",
-      "src_data_attributes_attributes_list",
-      "src_data_attributes_point_buy_costs",
-      "src_data_attributes_standard_array",
-      "src_data_classpowers",
-      "src_data_classpowers_class_powers_list",
-      "src_data_conditions",
-      "src_data_conditions_conditions_list",
-      "src_data_rulescitations",
-      "src_data_rulescitations_rulecitation",
-      "src_data_rulescitations_rules_citations",
-      "src_types_rules",
-      "src_types_rules_attributedefinition",
-      "src_types_rules_classability",
-      "src_types_rules_classpower",
-      "src_types_rules_condition",
-      "src_types_rules_deitypower",
-      "src_types_rules_origin",
-      "src_types_rules_originbenefit",
-      "src_types_rules_raceability",
-      "src_types_rules_skill"
-    ],
-    "4": [
+    "6": [
       "oxlint",
       "oxlintrc",
       "oxlintrc_plugins",
@@ -187,7 +308,7 @@
       "vite",
       "vitejs_plugin_react"
     ],
-    "5": [
+    "7": [
       "ref_dom",
       "ref_src",
       "ref_vite_client",
@@ -213,7 +334,7 @@
       "tsconfig_app_include",
       "tsconfig_app_json_ref_es2023"
     ],
-    "6": [
+    "8": [
       "ref_node",
       "ref_vite_config_ts",
       "tsconfig_node",
@@ -235,27 +356,7 @@
       "tsconfig_node_include",
       "tsconfig_node_json_ref_es2023"
     ],
-    "7": [
-      "canvas_confetti",
-      "lucide_react",
-      "package",
-      "package_dependencies",
-      "package_dependencies_canvas_confetti",
-      "package_dependencies_lucide_react",
-      "package_dependencies_react_dom",
-      "package_description",
-      "package_name",
-      "package_private",
-      "package_scripts",
-      "package_scripts_build",
-      "package_scripts_dev",
-      "package_scripts_lint",
-      "package_scripts_preview",
-      "package_type",
-      "package_version",
-      "react_dom"
-    ],
-    "8": [
+    "9": [
       "connection",
       "mcp_server_t20_oracle_server",
       "mcp_server_t20_oracle_server_get_db_connection",
@@ -275,23 +376,6 @@
       "mcp_server_t20_oracle_server_t20_validate_character",
       "tool"
     ],
-    "9": [
-      "src_components_common_detailmodal_detailmodaldata",
-      "src_components_wizard_stepattributes_stepattributesprops",
-      "src_components_wizard_stepclass_stepclassprops",
-      "src_components_wizard_stepdeity",
-      "src_components_wizard_stepdeity_stepdeityprops",
-      "src_components_wizard_steporigin_steporiginprops",
-      "src_components_wizard_stepskills",
-      "src_components_wizard_stepskills_stepskills",
-      "src_components_wizard_stepskills_stepskillsprops",
-      "src_components_wizard_stepspells",
-      "src_components_wizard_stepspells_stepspells",
-      "src_components_wizard_stepspells_stepspellsprops",
-      "src_types_character_characterattributes",
-      "src_types_rules_deity",
-      "src_utils_rulesvalidation_wizardvalidationinput"
-    ],
     "10": [
       "src_components_common_themeselector",
       "src_components_common_themeselector_themeselector",
@@ -304,85 +388,131 @@
       "src_main"
     ],
     "11": [
+      "android_app_src_androidtest_java_com_getcapacitor_myapp_exampleinstrumentedtest",
+      "android_app_src_androidtest_java_com_getcapacitor_myapp_exampleinstrumentedtest_exampleinstrumentedtest",
+      "android_app_src_androidtest_java_com_getcapacitor_myapp_exampleinstrumentedtest_exampleinstrumentedtest_useappcontext",
+      "android_app_src_androidtest_java_com_getcapacitor_myapp_exampleinstrumentedtest_java_test",
+      "runwith"
+    ],
+    "12": [
+      "android_app_src_test_java_com_getcapacitor_myapp_exampleunittest",
+      "android_app_src_test_java_com_getcapacitor_myapp_exampleunittest_exampleunittest",
+      "android_app_src_test_java_com_getcapacitor_myapp_exampleunittest_exampleunittest_addition_iscorrect",
+      "android_app_src_test_java_com_getcapacitor_myapp_exampleunittest_java_test"
+    ],
+    "13": [
+      "android_gradlew",
+      "android_gradlew__entry",
+      "android_gradlew_die",
+      "android_gradlew_warn"
+    ],
+    "14": [
       "scripts_generate_full_spells",
       "scripts_generate_full_spells_clean",
       "scripts_generate_full_spells_normalize_school",
       "scripts_generate_full_spells_slugify"
     ],
-    "12": [
+    "15": [
+      "android_app_src_main_java_com_tormenta20_app_mainactivity",
+      "android_app_src_main_java_com_tormenta20_app_mainactivity_mainactivity",
+      "bridgeactivity"
+    ],
+    "16": [
       "scripts_generate_full_powers",
       "scripts_generate_full_powers_clean",
       "scripts_generate_full_powers_slugify"
     ],
-    "13": [
+    "17": [
       "tsconfig",
       "tsconfig_files",
       "tsconfig_references"
     ],
-    "14": [
+    "18": [
+      "capacitor_config",
+      "capacitor_config_config"
+    ],
+    "19": [
       "scripts_build_database",
       "scripts_build_database_clean_text"
     ],
-    "15": [
+    "20": [
       "scripts_build_full_database",
       "scripts_build_full_database_clean"
     ],
-    "16": [
+    "21": [
       "scripts_generate_origins",
       "scripts_generate_origins_clean"
     ],
-    "17": [
+    "22": [
       "scripts_index_manual_pdf",
       "scripts_index_manual_pdf_build_pdf_index"
     ],
-    "18": [
+    "23": [
       "scripts_test_search",
       "scripts_test_search_search"
     ],
-    "19": [
-      "scripts_extract_all_equipment"
-    ],
-    "20": [
-      "scripts_generate_deities"
-    ],
-    "21": [
-      "scripts_generate_equipment"
-    ],
-    "22": [
-      "scripts_generate_full_equipment"
-    ],
-    "23": [
-      "scripts_generate_general_powers"
-    ],
     "24": [
-      "scripts_generate_spells"
+      "android_app_build"
     ],
     "25": [
-      "scripts_inspect_spells"
+      "android_app_capacitor_build"
     ],
     "26": [
+      "android_build"
+    ],
+    "27": [
+      "android_capacitor_settings"
+    ],
+    "28": [
+      "android_settings"
+    ],
+    "29": [
+      "android_variables"
+    ],
+    "30": [
+      "scripts_extract_all_equipment"
+    ],
+    "31": [
+      "scripts_generate_deities"
+    ],
+    "32": [
+      "scripts_generate_equipment"
+    ],
+    "33": [
+      "scripts_generate_full_equipment"
+    ],
+    "34": [
+      "scripts_generate_general_powers"
+    ],
+    "35": [
+      "scripts_generate_spells"
+    ],
+    "36": [
+      "scripts_inspect_spells"
+    ],
+    "37": [
       "vite_config"
     ]
   },
   "cohesion": {
-    "0": 0.1493212669683258,
-    "1": 0.12439024390243902,
-    "2": 0.11088709677419355,
-    "3": 0.1225071225071225,
-    "4": 0.08,
-    "5": 0.08333333333333333,
-    "6": 0.1,
-    "7": 0.1111111111111111,
-    "8": 0.16339869281045752,
-    "9": 0.18095238095238095,
+    "0": 0.07645875251509054,
+    "1": 0.11649659863945579,
+    "2": 0.07446808510638298,
+    "3": 0.05263157894736842,
+    "4": 0.11746031746031746,
+    "5": 0.25925925925925924,
+    "6": 0.08,
+    "7": 0.08333333333333333,
+    "8": 0.1,
+    "9": 0.16339869281045752,
     "10": 0.3333333333333333,
-    "11": 0.6666666666666666,
+    "11": 0.6,
     "12": 0.6666666666666666,
-    "13": 0.6666666666666666,
-    "14": 1.0,
+    "13": 0.8333333333333334,
+    "14": 0.6666666666666666,
     "15": 1.0,
-    "16": 1.0,
-    "17": 1.0,
+    "16": 0.6666666666666666,
+    "17": 0.6666666666666666,
     "18": 1.0,
     "19": 1.0,
     "20": 1.0,
@@ -391,13 +521,24 @@
     "23": 1.0,
     "24": 1.0,
     "25": 1.0,
-    "26": 1.0
+    "26": 1.0,
+    "27": 1.0,
+    "28": 1.0,
+    "29": 1.0,
+    "30": 1.0,
+    "31": 1.0,
+    "32": 1.0,
+    "33": 1.0,
+    "34": 1.0,
+    "35": 1.0,
+    "36": 1.0,
+    "37": 1.0
   },
   "gods": [
     {
       "id": "ref_react",
       "label": "react",
-      "degree": 25
+      "degree": 35
     },
     {
       "id": "src_components_common_detailmodal_detailmodaldata",
@@ -405,9 +546,9 @@
       "degree": 24
     },
     {
-      "id": "src_components_wizard_wizardcontainer_wizardcontainer",
-      "label": "WizardContainer()",
-      "degree": 19
+      "id": "src_types_character_charactersheet",
+      "label": "CharacterSheet",
+      "degree": 21
     },
     {
       "id": "tsconfig_app_compileroptions",
@@ -415,19 +556,14 @@
       "degree": 18
     },
     {
-      "id": "src_data_skills_skills_list",
-      "label": "SKILLS_LIST",
+      "id": "src_utils_equipmentdetail_getequipmentdetailmodaldata",
+      "label": "getEquipmentDetailModalData()",
       "degree": 16
     },
     {
-      "id": "src_data_classes_classes_list",
-      "label": "CLASSES_LIST",
-      "degree": 15
-    },
-    {
-      "id": "src_types_character_charactersheet",
-      "label": "CharacterSheet",
-      "degree": 15
+      "id": "src_utils_textutils_cleant20text",
+      "label": "cleanT20Text()",
+      "degree": 16
     },
     {
       "id": "tsconfig_node_compileroptions",
@@ -435,17 +571,44 @@
       "degree": 15
     },
     {
-      "id": "src_data_races_races_list",
-      "label": "RACES_LIST",
-      "degree": 13
+      "id": "src_data_classes_classes_list",
+      "label": "CLASSES_LIST",
+      "degree": 14
     },
     {
-      "id": "src_services_samplecharacters_createsamplecharacters",
-      "label": "createSampleCharacters()",
+      "id": "src_utils_rulesengine_recalculatefullcharactersheet",
+      "label": "recalculateFullCharacterSheet()",
+      "degree": 14
+    },
+    {
+      "id": "src_types_rules_equipmentitem",
+      "label": "EquipmentItem",
       "degree": 13
     }
   ],
   "surprises": [
+    {
+      "source": "StepEquipment()",
+      "target": "react",
+      "source_files": [
+        "src/components/wizard/StepEquipment.tsx",
+        "package.json"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "connects across different repos/directories; bridges separate communities"
+    },
+    {
+      "source": "StepRace()",
+      "target": "react",
+      "source_files": [
+        "src/components/wizard/StepRace.tsx",
+        "package.json"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "connects across different repos/directories; bridges separate communities"
+    },
     {
       "source": "plugins",
       "target": "typescript",
@@ -458,85 +621,30 @@
       "why": "connects across different repos/directories"
     },
     {
-      "source": "StepEquipment()",
+      "source": "StepSpellsProps",
+      "target": "DetailModalData",
+      "source_files": [
+        "src/components/wizard/StepSpells.tsx",
+        "src/components/common/DetailModal.tsx"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "bridges separate communities; peripheral node `StepSpellsProps` unexpectedly reaches hub `DetailModalData`"
+    },
+    {
+      "source": "ChangeLogModal()",
       "target": "react",
       "source_files": [
-        "src/components/wizard/StepEquipment.tsx",
+        "src/components/history/ChangeLogModal.tsx",
         "package.json"
       ],
       "confidence": "EXTRACTED",
       "relation": "references",
       "why": "connects across different repos/directories"
-    },
-    {
-      "source": "StepRace()",
-      "target": "react",
-      "source_files": [
-        "src/components/wizard/StepRace.tsx",
-        "package.json"
-      ],
-      "confidence": "EXTRACTED",
-      "relation": "references",
-      "why": "connects across different repos/directories"
-    },
-    {
-      "source": "CharacterSheetViewProps",
-      "target": "CharacterSheet",
-      "source_files": [
-        "src/components/sheet/CharacterSheetView.tsx",
-        "src/types/character.ts"
-      ],
-      "confidence": "EXTRACTED",
-      "relation": "references",
-      "why": "bridges separate communities; peripheral node `CharacterSheetViewProps` unexpectedly reaches hub `CharacterSheet`"
-    },
-    {
-      "source": "DetailModalData",
-      "target": "RuleCitation",
-      "source_files": [
-        "src/components/common/DetailModal.tsx",
-        "src/data/rulesCitations.ts"
-      ],
-      "confidence": "EXTRACTED",
-      "relation": "references",
-      "why": "bridges separate communities"
     }
   ],
-  "questions": [
-    {
-      "type": "bridge_node",
-      "question": "Why does `react` connect `react` to `WizardContainer.tsx`, `character.ts`, `rules.ts`, `devDependencies`, `DetailModalData`, `ThemeContext.tsx`?",
-      "why": "High betweenness centrality (0.118) - this node is a cross-community bridge."
-    },
-    {
-      "type": "bridge_node",
-      "question": "Why does `react` connect `WizardContainer.tsx` to `package.json`?",
-      "why": "High betweenness centrality (0.089) - this node is a cross-community bridge."
-    },
-    {
-      "type": "bridge_node",
-      "question": "Why does `dependencies` connect `package.json` to `WizardContainer.tsx`?",
-      "why": "High betweenness centrality (0.086) - this node is a cross-community bridge."
-    },
-    {
-      "type": "isolated_nodes",
-      "question": "What connects `$schema`, `oxc`, `react/rules-of-hooks` to the rest of the system?",
-      "why": "78 weakly-connected nodes found - possible documentation gaps or missing edges."
-    },
-    {
-      "type": "low_cohesion",
-      "question": "Should `WizardContainer.tsx` be split into smaller, more focused modules?",
-      "why": "Cohesion score 0.1493212669683258 - nodes in this community are weakly interconnected."
-    },
-    {
-      "type": "low_cohesion",
-      "question": "Should `react` be split into smaller, more focused modules?",
-      "why": "Cohesion score 0.12439024390243902 - nodes in this community are weakly interconnected."
-    },
-    {
-      "type": "low_cohesion",
-      "question": "Should `character.ts` be split into smaller, more focused modules?",
-      "why": "Cohesion score 0.11088709677419355 - nodes in this community are weakly interconnected."
-    }
-  ]
+  "tokens": {
+    "input": 0,
+    "output": 0
+  }
 }

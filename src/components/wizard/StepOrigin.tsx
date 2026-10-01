@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { ORIGINS_LIST } from '../../data/origins';
 import { SKILLS_LIST } from '../../data/skills';
 import { RULES_CITATIONS } from '../../data/rulesCitations';
-import { Origin } from '../../types/rules';
-import { Check, Info, Package, Sparkles } from 'lucide-react';
+import { Origin, GeneralPower } from '../../types/rules';
+import { GENERAL_POWERS_LIST } from '../../data/generalPowers';
+import { PrerequisiteContext, checkPowerPrerequisites } from '../../utils/rulesValidation';
+import { Check, Info, Package, Sparkles, Search, X, ChevronRight } from 'lucide-react';
 import { DetailModalData } from '../common/DetailModal';
 
 interface StepOriginProps {
@@ -13,10 +15,35 @@ interface StepOriginProps {
   classSkills?: string[];
   intSkills?: string[];
   alreadyTrainedSkills?: string[];
+  prerequisiteContext?: PrerequisiteContext;
   onSelectOrigin: (originId: string) => void;
   onSelectOriginBenefits: (benefits: { type: 'pericia' | 'poder'; name: string }[]) => void;
   onOpenDetail: (data: DetailModalData) => void;
 }
+
+export const isGenericOriginPower = (powName: string): boolean => {
+  const lower = powName.toLowerCase().trim();
+  return (
+    lower === 'poder de combate' ||
+    lower === 'poder da tormenta' ||
+    lower === 'poder geral' ||
+    lower === 'poder de destino' ||
+    lower.startsWith('poder de ') ||
+    lower.startsWith('poder da ')
+  );
+};
+
+export const getGenericPowerCategory = (
+  powName: string,
+  powType: string
+): 'combate' | 'tormenta' | 'destino' | 'magia' | 'geral' => {
+  const lower = powName.toLowerCase();
+  if (lower.includes('combate') || powType === 'combate') return 'combate';
+  if (lower.includes('tormenta') || powType === 'tormenta') return 'tormenta';
+  if (lower.includes('destino') || powType === 'destino') return 'destino';
+  if (lower.includes('magia') || powType === 'magia') return 'magia';
+  return 'geral';
+};
 
 export const StepOrigin: React.FC<StepOriginProps> = ({
   selectedOriginId,
@@ -25,12 +52,22 @@ export const StepOrigin: React.FC<StepOriginProps> = ({
   classSkills = [],
   intSkills = [],
   alreadyTrainedSkills = [],
+  prerequisiteContext,
   onSelectOrigin,
   onSelectOriginBenefits,
   onOpenDetail,
 }) => {
   const [search, setSearch] = useState('');
   const [showSubstitutions, setShowSubstitutions] = useState(false);
+
+  // Estado para o modal de escolha de poder genérico da origem
+  const [powerPicker, setPowerPicker] = useState<{
+    originPowerName: string;
+    category: 'combate' | 'tormenta' | 'destino' | 'magia' | 'geral';
+    title: string;
+  } | null>(null);
+  const [powerSearch, setPowerSearch] = useState('');
+  const [onlyEligiblePowers, setOnlyEligiblePowers] = useState(false);
 
   const currentOrigin = ORIGINS_LIST.find((o) => o.id === selectedOriginId) || ORIGINS_LIST[0];
 
@@ -55,6 +92,67 @@ export const StepOrigin: React.FC<StepOriginProps> = ({
       onSelectOriginBenefits([...selectedOriginBenefits, { type, name }]);
     }
   };
+
+  const handleSelectGenericPower = (
+    p: GeneralPower,
+    originPowerName: string,
+    category: 'combate' | 'tormenta' | 'destino' | 'magia' | 'geral'
+  ) => {
+    if (prerequisiteContext) {
+      const res = checkPowerPrerequisites(p.id, prerequisiteContext);
+      if (!res.isMet) {
+        const confirmPick = window.confirm(
+          `Atenção: Você não cumpre todos os pré-requisitos deste poder:\n• ${res.unmetRequirements.join('\n• ')}\n\nEm Tormenta 20, para escolher um poder geral você precisa cumprir seus pré-requisitos.\n\nDeseja selecionar mesmo assim?`
+        );
+        if (!confirmPick) return;
+      }
+    }
+
+    // Encontra se já havia uma seleção vinculada a este slot genérico
+    const existingSlotBenefit = selectedOriginBenefits.find((b) => {
+      if (b.type !== 'poder') return false;
+      if (b.name === originPowerName) return true;
+      const isOtherOriginPower = currentOrigin.powers.some(
+        (op) => op.name === b.name && !isGenericOriginPower(op.name)
+      );
+      if (isOtherOriginPower) return false;
+      const genPower = GENERAL_POWERS_LIST.find((gp) => gp.name === b.name || gp.id === b.name);
+      return genPower && (genPower.category === category || category === 'geral');
+    });
+
+    if (existingSlotBenefit) {
+      const next = selectedOriginBenefits.map((b) =>
+        b === existingSlotBenefit ? { type: 'poder' as const, name: p.name } : b
+      );
+      onSelectOriginBenefits(next);
+    } else {
+      if (selectedOriginBenefits.length < 2) {
+        onSelectOriginBenefits([...selectedOriginBenefits, { type: 'poder' as const, name: p.name }]);
+      }
+    }
+
+    setPowerPicker(null);
+    setPowerSearch('');
+  };
+
+  // Poderes filtrados para o modal de escolha genérica
+  const modalPowers = powerPicker
+    ? GENERAL_POWERS_LIST.filter((p) => {
+        if (powerPicker.category !== 'geral' && p.category !== powerPicker.category) return false;
+        const matchesSearch =
+          p.name.toLowerCase().includes(powerSearch.toLowerCase()) ||
+          p.description.toLowerCase().includes(powerSearch.toLowerCase()) ||
+          (p.prerequisites && p.prerequisites.toLowerCase().includes(powerSearch.toLowerCase()));
+        if (!matchesSearch) return false;
+
+        if (onlyEligiblePowers && prerequisiteContext) {
+          const res = checkPowerPrerequisites(p.id, prerequisiteContext);
+          if (!res.isMet) return false;
+        }
+
+        return true;
+      })
+    : [];
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -362,6 +460,189 @@ export const StepOrigin: React.FC<StepOriginProps> = ({
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
                 {currentOrigin.powers.map((pow, idx) => {
+                  const isGeneric = isGenericOriginPower(pow.name);
+                  const genericCategory = isGeneric ? getGenericPowerCategory(pow.name, pow.type) : 'geral';
+
+                  if (isGeneric) {
+                    // Verifica se já há um benefício de poder escolhido para este slot genérico
+                    const selectedGenericBenefit = selectedOriginBenefits.find((b) => {
+                      if (b.type !== 'poder') return false;
+                      if (b.name === pow.name) return true;
+                      const isOtherOriginPower = currentOrigin.powers.some(
+                        (op) => op.name === b.name && !isGenericOriginPower(op.name)
+                      );
+                      if (isOtherOriginPower) return false;
+                      const genPower = GENERAL_POWERS_LIST.find((gp) => gp.name === b.name || gp.id === b.name);
+                      return genPower && (genPower.category === genericCategory || genericCategory === 'geral');
+                    });
+
+                    const chosenPowerDef = selectedGenericBenefit && selectedGenericBenefit.name !== pow.name
+                      ? GENERAL_POWERS_LIST.find((gp) => gp.name === selectedGenericBenefit.name || gp.id === selectedGenericBenefit.name)
+                      : null;
+
+                    if (selectedGenericBenefit) {
+                      const isPendingSelection = selectedGenericBenefit.name === pow.name;
+
+                      return (
+                        <div
+                          key={idx}
+                          className="t20-card"
+                          style={{
+                            padding: '0.85rem 1rem',
+                            borderColor: 'var(--t20-gold)',
+                            background: 'rgba(245, 158, 11, 0.12)',
+                            boxShadow: '0 0 12px rgba(245, 158, 11, 0.25)',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '0.5rem',
+                          }}
+                        >
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                              <Check size={16} style={{ color: 'var(--t20-gold)' }} />
+                              <span style={{ fontWeight: 700, color: 'var(--t20-gold-light)', fontSize: '0.95rem' }}>
+                                {pow.name}:{' '}
+                                <span style={{ color: '#ffffff', textDecoration: isPendingSelection ? 'none' : 'underline' }}>
+                                  {isPendingSelection ? '(Poder ainda não escolhido)' : (chosenPowerDef?.name || selectedGenericBenefit.name)}
+                                </span>
+                              </span>
+                              <span className={`badge ${isPendingSelection ? 'badge-ruby' : 'badge-gold'}`} style={{ fontSize: '0.65rem' }}>
+                                {isPendingSelection ? 'Escolha Pendente' : (chosenPowerDef?.category || pow.type)}
+                              </span>
+                            </div>
+
+                            <div style={{ display: 'flex', gap: '0.35rem', alignItems: 'center' }}>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setPowerPicker({
+                                    originPowerName: pow.name,
+                                    category: genericCategory,
+                                    title: `Escolher ${pow.name}`,
+                                  })
+                                }
+                                className="btn btn-gold"
+                                style={{ padding: '0.25rem 0.65rem', fontSize: '0.75rem', gap: '0.3rem' }}
+                              >
+                                <Sparkles size={13} />
+                                {isPendingSelection ? 'Selecionar Poder Agora' : 'Trocar Poder'}
+                              </button>
+
+                              {chosenPowerDef && (
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    onOpenDetail({
+                                      title: chosenPowerDef.name,
+                                      category: `Poder Geral (${chosenPowerDef.category}) • Origem`,
+                                      subtitle: chosenPowerDef.prerequisites ? `Pré-requisitos: ${chosenPowerDef.prerequisites}` : 'Sem pré-requisitos',
+                                      description: chosenPowerDef.description,
+                                      prerequisites: chosenPowerDef.prerequisites,
+                                      ruleCitation: RULES_CITATIONS.GENERAL_POWER_PREREQUISITES,
+                                    })
+                                  }
+                                  className="btn btn-ghost"
+                                  style={{ padding: '0.2rem 0.4rem', fontSize: '0.75rem', gap: '0.25rem' }}
+                                >
+                                  <Info size={14} />
+                                  Ver Detalhes
+                                </button>
+                              )}
+
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  onSelectOriginBenefits(selectedOriginBenefits.filter((b) => b !== selectedGenericBenefit))
+                                }
+                                className="btn btn-ghost"
+                                style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem', color: '#f87171' }}
+                                title="Desmarcar este benefício"
+                              >
+                                ✕ Desmarcar
+                              </button>
+                            </div>
+                          </div>
+
+                          <p style={{ margin: 0, fontSize: '0.85rem', color: '#cbd5e1' }}>
+                            {chosenPowerDef?.description || pow.description}
+                          </p>
+
+                          {chosenPowerDef?.prerequisites && (
+                            <div style={{ fontSize: '0.75rem', color: 'var(--t20-gold-light)', fontStyle: 'italic' }}>
+                              Pré-requisitos: {chosenPowerDef.prerequisites}
+                            </div>
+                          )}
+
+                          {isPendingSelection && (
+                            <div style={{ fontSize: '0.8rem', color: '#fca5a5', fontWeight: 600 }}>
+                              ⚠️ Atenção: Clique em &quot;Selecionar Poder Agora&quot; acima para escolher seu poder de {genericCategory}.
+                            </div>
+                          )}
+                        </div>
+                      );
+                    }
+
+                    // Se não está selecionado
+                    return (
+                      <div
+                        key={idx}
+                        className="t20-card"
+                        onClick={() => {
+                          if (selectedOriginBenefits.length < 2) {
+                            setPowerPicker({
+                              originPowerName: pow.name,
+                              category: genericCategory,
+                              title: `Escolher ${pow.name}`,
+                            });
+                          }
+                        }}
+                        style={{
+                          cursor: selectedOriginBenefits.length < 2 ? 'pointer' : 'default',
+                          padding: '0.85rem 1rem',
+                          borderColor: 'var(--border-color)',
+                          background: 'rgba(255, 255, 255, 0.02)',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '0.35rem',
+                          opacity: selectedOriginBenefits.length >= 2 ? 0.75 : 1,
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <span style={{ fontWeight: 700, color: '#ffffff' }}>
+                              {pow.name}
+                            </span>
+                            <span className="badge badge-slate" style={{ fontSize: '0.65rem' }}>
+                              {pow.type}
+                            </span>
+                          </div>
+
+                          <button
+                            type="button"
+                            disabled={selectedOriginBenefits.length >= 2}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setPowerPicker({
+                                originPowerName: pow.name,
+                                category: genericCategory,
+                                title: `Escolher ${pow.name}`,
+                              });
+                            }}
+                            className="btn btn-gold"
+                            style={{ padding: '0.25rem 0.65rem', fontSize: '0.75rem', gap: '0.3rem' }}
+                          >
+                            <Sparkles size={13} />
+                            Escolher {pow.name}
+                          </button>
+                        </div>
+                        <p style={{ margin: 0, fontSize: '0.85rem', color: '#cbd5e1' }}>
+                          {pow.description}
+                        </p>
+                      </div>
+                    );
+                  }
+
+                  // Poderes específicos tradicionais da origem (ex: Confissão, Sangue Azul, Medicina, etc.)
                   const isChecked = selectedOriginBenefits.some((b) => b.type === 'poder' && b.name === pow.name);
                   return (
                     <div
@@ -412,6 +693,282 @@ export const StepOrigin: React.FC<StepOriginProps> = ({
                   );
                 })}
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Escolha de Poder Genérico */}
+      {powerPicker && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 1000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'rgba(0, 0, 0, 0.85)',
+            backdropFilter: 'blur(8px)',
+            padding: '1rem',
+          }}
+          onClick={() => {
+            setPowerPicker(null);
+            setPowerSearch('');
+          }}
+        >
+          <div
+            className="t20-card t20-card-gold"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              width: '100%',
+              maxWidth: '820px',
+              maxHeight: '90vh',
+              display: 'flex',
+              flexDirection: 'column',
+              padding: 0,
+              overflow: 'hidden',
+              boxShadow: '0 20px 45px rgba(0, 0, 0, 0.85), 0 0 25px rgba(245, 158, 11, 0.3)',
+            }}
+          >
+            {/* Modal Header */}
+            <div
+              style={{
+                padding: '1rem 1.25rem',
+                borderBottom: '1px solid var(--border-color)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                background: 'rgba(0, 0, 0, 0.4)',
+              }}
+            >
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.25rem', color: 'var(--t20-gold-light)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <Sparkles size={20} style={{ color: 'var(--t20-gold)' }} />
+                  {powerPicker.title}
+                </h3>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-dim)', marginTop: '0.2rem' }}>
+                  Origem: <strong style={{ color: '#ffffff' }}>{currentOrigin.name}</strong> • Categoria Oficial: <span className="badge badge-gold" style={{ fontSize: '0.65rem' }}>{powerPicker.category}</span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setPowerPicker(null);
+                  setPowerSearch('');
+                }}
+                className="btn btn-ghost"
+                style={{ padding: '0.35rem', borderRadius: '50%', color: 'var(--text-muted)' }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Modal Filters */}
+            <div
+              style={{
+                padding: '0.85rem 1.25rem',
+                borderBottom: '1px solid var(--border-color)',
+                background: 'rgba(0, 0, 0, 0.2)',
+                display: 'flex',
+                gap: '0.75rem',
+                flexWrap: 'wrap',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+              }}
+            >
+              <div style={{ position: 'relative', flex: 1, minWidth: '220px' }}>
+                <Search
+                  size={16}
+                  style={{
+                    position: 'absolute',
+                    left: '0.75rem',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    color: 'var(--text-dim)',
+                  }}
+                />
+                <input
+                  type="text"
+                  placeholder="Buscar por nome, efeito ou pré-requisito..."
+                  value={powerSearch}
+                  onChange={(e) => setPowerSearch(e.target.value)}
+                  style={{
+                    paddingLeft: '2.25rem',
+                    paddingRight: powerSearch ? '2rem' : '0.8rem',
+                    fontSize: '0.85rem',
+                    width: '100%',
+                  }}
+                />
+                {powerSearch && (
+                  <button
+                    type="button"
+                    onClick={() => setPowerSearch('')}
+                    style={{
+                      position: 'absolute',
+                      right: '0.5rem',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'transparent',
+                      border: 'none',
+                      color: 'var(--text-dim)',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <X size={14} />
+                  </button>
+                )}
+              </div>
+
+              {prerequisiteContext && (
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', fontSize: '0.8rem', color: '#cbd5e1', cursor: 'pointer', userSelect: 'none' }}>
+                  <input
+                    type="checkbox"
+                    checked={onlyEligiblePowers}
+                    onChange={(e) => setOnlyEligiblePowers(e.target.checked)}
+                  />
+                  <span>Apenas poderes com pré-requisitos cumpridos</span>
+                </label>
+              )}
+            </div>
+
+            {/* Modal Powers List */}
+            <div
+              style={{
+                padding: '1rem 1.25rem',
+                overflowY: 'auto',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.65rem',
+                maxHeight: '55vh',
+              }}
+            >
+              {modalPowers.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '2.5rem 1rem', color: 'var(--text-dim)' }}>
+                  Nenhum poder encontrado com os filtros atuais.
+                </div>
+              ) : (
+                modalPowers.map((p) => {
+                  const prereqResult = prerequisiteContext
+                    ? checkPowerPrerequisites(p.id, prerequisiteContext)
+                    : { isMet: true, unmetRequirements: [] };
+                  const isCurrentChosen = selectedOriginBenefits.some(
+                    (b) => b.type === 'poder' && (b.name === p.name || b.name === p.id)
+                  );
+
+                  return (
+                    <div
+                      key={p.id}
+                      className="t20-card"
+                      style={{
+                        padding: '0.85rem 1rem',
+                        borderColor: isCurrentChosen ? 'var(--t20-gold)' : 'var(--border-color)',
+                        background: isCurrentChosen ? 'rgba(245, 158, 11, 0.12)' : 'rgba(255, 255, 255, 0.02)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '0.4rem',
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                          <span style={{ fontWeight: 700, fontSize: '0.95rem', color: isCurrentChosen ? 'var(--t20-gold-light)' : '#ffffff' }}>
+                            {p.name}
+                          </span>
+                          <span className="badge badge-slate" style={{ fontSize: '0.65rem' }}>
+                            {p.category}
+                          </span>
+                          {p.prerequisites ? (
+                            prereqResult.isMet ? (
+                              <span className="badge badge-green" style={{ fontSize: '0.65rem' }}>
+                                ✓ Pré-requisito atendido
+                              </span>
+                            ) : (
+                              <span className="badge badge-ruby" style={{ fontSize: '0.65rem' }}>
+                                ✕ Requer: {prereqResult.unmetRequirements.join(', ')}
+                              </span>
+                            )
+                          ) : (
+                            <span className="badge badge-blue" style={{ fontSize: '0.65rem' }}>
+                              Sem pré-requisitos
+                            </span>
+                          )}
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '0.4rem' }}>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              onOpenDetail({
+                                title: p.name,
+                                category: `Poder Geral (${p.category})`,
+                                subtitle: p.prerequisites ? `Pré-requisitos: ${p.prerequisites}` : 'Sem pré-requisitos',
+                                description: p.description,
+                                prerequisites: p.prerequisites,
+                                ruleCitation: RULES_CITATIONS.GENERAL_POWER_PREREQUISITES,
+                              })
+                            }
+                            className="btn btn-ghost"
+                            style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem', gap: '0.25rem' }}
+                          >
+                            <Info size={14} />
+                            Regras
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleSelectGenericPower(p, powerPicker.originPowerName, powerPicker.category)}
+                            className={`btn ${isCurrentChosen ? 'btn-secondary' : 'btn-gold'}`}
+                            style={{ padding: '0.3rem 0.75rem', fontSize: '0.8rem', gap: '0.3rem' }}
+                          >
+                            {isCurrentChosen ? (
+                              <>
+                                <Check size={14} /> Selecionado
+                              </>
+                            ) : (
+                              'Selecionar Este Poder'
+                            )}
+                          </button>
+                        </div>
+                      </div>
+
+                      <p style={{ margin: 0, fontSize: '0.85rem', color: '#cbd5e1' }}>
+                        {p.description}
+                      </p>
+                      {p.prerequisites && (
+                        <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>
+                          <strong>Pré-requisitos oficiais:</strong> {p.prerequisites}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div
+              style={{
+                padding: '0.75rem 1.25rem',
+                borderTop: '1px solid var(--border-color)',
+                background: 'rgba(0, 0, 0, 0.4)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}
+            >
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)' }}>
+                Mostrando {modalPowers.length} poderes disponíveis
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  setPowerPicker(null);
+                  setPowerSearch('');
+                }}
+                className="btn btn-secondary"
+                style={{ padding: '0.4rem 0.85rem', fontSize: '0.825rem' }}
+              >
+                Fechar
+              </button>
             </div>
           </div>
         </div>
