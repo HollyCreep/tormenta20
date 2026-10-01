@@ -54,9 +54,21 @@ jobs:
         run: npx cap sync android
 
       - name: Build Debug APK with Gradle
+        id: gradle_build
         run: |
           cd android
-          ./gradlew assembleDebug --no-daemon --stacktrace
+          ./gradlew assembleDebug -PcompileSdkVersion=35 -PtargetSdkVersion=35 -PminSdkVersion=24 --no-daemon --stacktrace 2>&1 | tee ../gradle.log
+        continue-on-error: true
+
+      - name: Report Gradle Failure
+        if: steps.gradle_build.outcome == 'failure'
+        run: |
+          echo "## ❌ Gradle Build Error Log" >> $GITHUB_STEP_SUMMARY
+          echo '```text' >> $GITHUB_STEP_SUMMARY
+          tail -n 120 gradle.log >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat gradle.log
+          exit 1
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
