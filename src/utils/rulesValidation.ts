@@ -159,6 +159,73 @@ export function checkPowerPrerequisites(
   };
 }
 
+/**
+ * Poderes que o livro permite escolher mais de uma vez (sempre com alvos diferentes).
+ * Regra geral: "A menos que especificado o contrário, você não pode escolher um mesmo
+ * poder mais de uma vez" — T20 JdA, Cap. 1, pág. 33.
+ */
+export const REPEATABLE_POWER_NAMES = new Set([
+  'Foco em Arma',
+  'Foco em Magia',
+  'Foco em Perícia',
+  'Proficiência',
+  'Treinamento em Perícia',
+]);
+
+/** Nome canônico de um poder geral a partir do id ou do nome. */
+export const resolvePowerName = (idOrName: string): string =>
+  GENERAL_POWERS_LIST.find((p) => p.id === idOrName || p.name === idOrName)?.name ?? idOrName;
+
+export const isRepeatablePower = (idOrName: string): boolean => REPEATABLE_POWER_NAMES.has(resolvePowerName(idOrName));
+
+/** Fontes de poderes escolhidos no criador (raça, origem, divindade). */
+export interface PowerSource {
+  source: string;
+  powers: string[];
+}
+
+/**
+ * Mapa nome do poder → fonte que já o escolheu, ignorando a fonte informada.
+ * Usado para bloquear o mesmo poder em dois benefícios diferentes (Cap. 1, pág. 33).
+ */
+export function takenPowersExcept(sources: PowerSource[], except: string): Map<string, string> {
+  const taken = new Map<string, string>();
+  sources
+    .filter((s) => s.source !== except)
+    .forEach((s) =>
+      s.powers.forEach((p) => {
+        const name = resolvePowerName(p);
+        if (!isRepeatablePower(name) && !taken.has(name)) taken.set(name, s.source);
+      })
+    );
+  return taken;
+}
+
+/** Poderes não repetíveis escolhidos por mais de uma fonte. */
+export function findDuplicatePowers(sources: PowerSource[]): { name: string; sources: string[] }[] {
+  const seen = new Map<string, string[]>();
+  sources.forEach((s) =>
+    s.powers.forEach((p) => {
+      const name = resolvePowerName(p);
+      seen.set(name, [...(seen.get(name) || []), s.source]);
+    })
+  );
+  return [...seen.entries()]
+    .filter(([name, srcs]) => srcs.length > 1 && !isRepeatablePower(name))
+    .map(([name, srcs]) => ({ name, sources: srcs }));
+}
+
+/** Poderes gerais selecionados que deixaram de cumprir os pré-requisitos (Cap. 1, pág. 85). */
+export function powersWithUnmetPrerequisites(
+  powers: string[],
+  context: PrerequisiteContext
+): { name: string; unmet: string[] }[] {
+  return powers
+    .filter((p) => GENERAL_POWERS_LIST.some((g) => g.id === p || g.name === p))
+    .map((p) => ({ name: resolvePowerName(p), unmet: checkPowerPrerequisites(p, context).unmetRequirements }))
+    .filter((r) => r.unmet.length > 0);
+}
+
 export interface StepStatus {
   step: number;
   isValid: boolean;
@@ -187,6 +254,8 @@ export interface WizardValidationInput {
   currentSpaces: number;
   maxSpaces: number;
   characterName: string;
+  /** Escolhas do equipamento inicial ainda não feitas (rótulos dos espaços). */
+  pendingKitChoices?: string[];
 }
 
 /**
@@ -213,6 +282,12 @@ export function validateAllWizardSteps(input: WizardValidationInput): Record<num
     proficiencies: currentClass.proficiencies,
     isSpellcaster,
   };
+
+  const powerSources: PowerSource[] = [
+    { source: 'raça', powers: input.selectedRacialPower ? [input.selectedRacialPower] : [] },
+    { source: 'origem', powers: input.selectedOriginBenefits.filter((b) => b.type === 'poder').map((b) => b.name) },
+    { source: 'divindade', powers: input.selectedDeityPowers },
+  ];
 
   const results: Record<number, StepStatus> = {};
 
@@ -326,6 +401,14 @@ export function validateAllWizardSteps(input: WizardValidationInput): Record<num
         }
       });
 
+    const originPowers = input.selectedOriginBenefits.filter((b) => b.type === 'poder').map((b) => b.name);
+    powersWithUnmetPrerequisites(originPowers, prereqContext).forEach((r) => {
+      errors.push(`Pré-requisito não atendido para ${r.name}: ${r.unmet.join(', ')}.`);
+    });
+    findDuplicatePowers(powerSources.filter((s) => s.source !== 'divindade')).forEach((d) => {
+      errors.push(`O poder "${d.name}" já foi escolhido como benefício de raça (um poder não pode ser escolhido duas vezes).`);
+    });
+
     results[3] = {
       step: 3,
       isValid: errors.length === 0,
@@ -346,6 +429,12 @@ export function validateAllWizardSteps(input: WizardValidationInput): Record<num
         errors.push('Escolha pelo menos 1 poder concedido pela sua divindade.');
       }
     }
+
+    findDuplicatePowers(powerSources)
+      .filter((d) => d.sources.includes('divindade'))
+      .forEach((d) => {
+        errors.push(`O poder "${d.name}" já foi escolhido em outro benefício (um poder não pode ser escolhido duas vezes).`);
+      });
 
     results[4] = {
       step: 4,
@@ -433,6 +522,9 @@ export function validateAllWizardSteps(input: WizardValidationInput): Record<num
 
     if (input.currentSpaces > input.maxSpaces) {
       errors.push(`Carga excedida: você está carregando ${input.currentSpaces} espaços de ${input.maxSpaces} permitidos.`);
+    }
+    if (input.pendingKitChoices?.length) {
+      warnings.push(`Equipamento inicial sem escolha: ${input.pendingKitChoices.join(', ')}.`);
     }
 
     results[8] = {

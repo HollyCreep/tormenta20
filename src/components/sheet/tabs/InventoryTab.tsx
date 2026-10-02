@@ -79,7 +79,7 @@ export const InventoryTab: React.FC<InventoryTabProps> = ({
     const mods = item.appliedModifiers?.length || 0;
     return (
       <div key={item.id} className={`row inv-row${item.isEquipped ? ' is-equipped' : ''}`}>
-        <button type="button" className="inv-main" onClick={() => openDetail(item)}>
+        <button type="button" className="inv-main has-detail" onClick={() => openDetail(item)}>
           <span className="inv-icon">{categoryIcon(item.category)}</span>
           <span className="row-main">
             <span className="row-title">

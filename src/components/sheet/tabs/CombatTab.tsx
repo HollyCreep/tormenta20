@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Backpack, Crosshair, Dices, Flame, Sword, Target, Zap } from 'lucide-react';
+import { Backpack, Crosshair, Dices, Flame, Info, Sword, Target, Zap } from 'lucide-react';
 import type { CharacterInventoryItem, CharacterSheet } from '../../../types/character';
 import { calculateWeaponAttack, calculateWeaponDamage } from '../../../utils/rulesEngine';
 import { RULES_CITATIONS } from '../../../data/rulesCitations';
@@ -86,6 +86,7 @@ export const CombatTab: React.FC<CombatTabProps> = ({
                 })
               }
             >
+              <Info size={14} />
               Regras
             </button>
           }

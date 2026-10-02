@@ -56,7 +56,7 @@ export const ORIGINS_LIST: Origin[] = [
     "name": "Amnésico",
     "description": "Você não se lembra do seu passado, acordando com memórias fragmentadas e habilidades instintivas que você mal compreende.",
     "items": [
-      "Um ou mais itens somando até T$ 500"
+      "Um ou mais itens (somando até T$ 500), aprovados pelo mestre"
     ],
     "skills": [
       "vontade"
@@ -75,7 +75,7 @@ export const ORIGINS_LIST: Origin[] = [
     "description": "Você nasceu em berço de ouro na nobreza ou alta aristocracia de Arton, acostumado ao luxo, etiqueta e intrigas da corte.",
     "items": [
       "Joia de família no valor de T$ 300",
-      "Traje de gala"
+      "Traje da corte"
     ],
     "skills": [
       "diplomacia",
@@ -101,7 +101,7 @@ export const ORIGINS_LIST: Origin[] = [
     "description": "Você aprendeu a trabalhar com ferramentas manuais, forjando armas, moldando madeira, tecendo tecidos ou soprando vidro.",
     "items": [
       "Instrumentos de ofício (qualquer)",
-      "Um item que você mesmo fabricou"
+      "Um item que você possa fabricar de até T$ 50"
     ],
     "skills": [
       "oficio",
@@ -125,7 +125,7 @@ export const ORIGINS_LIST: Origin[] = [
     "name": "Artista",
     "description": "Você viajou pelas cidades cantando, atuando em peças, dançando ou pintando obras que encantam os corações do público.",
     "items": [
-      "Estojo de disfarces ou instrumento musical à escolha"
+      "Estojo de disfarces ou um instrumento musical a sua escolha"
     ],
     "skills": [
       "atuacao",
@@ -189,7 +189,8 @@ export const ORIGINS_LIST: Origin[] = [
     "description": "Você marchou na vanguarda de expedições e patrulhas, reconhecendo terrenos desconhecidos e evitando armadilhas para seus aliados.",
     "items": [
       "Barraca",
-      "Equipamento de viagem"
+      "Equipamento de viagem",
+      "Uma arma simples ou marcial de ataque à distância"
     ],
     "skills": [
       "furtividade",
@@ -219,7 +220,8 @@ export const ORIGINS_LIST: Origin[] = [
     "name": "Capanga",
     "description": "Você trabalhou como guarda-costas violento, cobrador de dívidas para criminosos ou leão de chácara em tavernas perigosas.",
     "items": [
-      "Tatuagem ou outro adereço de sua gangue"
+      "Tatuagem ou outro adereço de sua gangue (+1 em Intimidação)",
+      "Uma arma simples corpo a corpo"
     ],
     "skills": [
       "luta",
@@ -244,7 +246,7 @@ export const ORIGINS_LIST: Origin[] = [
     "description": "Você viveu de pequenos golpes, vendendo elixires falsos da juventude e contando lorotas para separar os tolos de seu dinheiro.",
     "items": [
       "Estojo de disfarces",
-      "Frascos falsos de poções"
+      "Joia falsificada (valor aparente de T$ 100, sem valor real)"
     ],
     "skills": [
       "enganacao",
@@ -273,8 +275,7 @@ export const ORIGINS_LIST: Origin[] = [
     "name": "Circense",
     "description": "Você viajou com uma trupe de acrobatas, ilusionistas, cuspidores de fogo e contorcionistas debaixo das lonas coloridas.",
     "items": [
-      "Três bolas coloridas para malabarismo",
-      "Traje espalhafatoso"
+      "Três bolas coloridas para malabarismo (+1 em Atuação)"
     ],
     "skills": [
       "acrobacia",
@@ -304,8 +305,7 @@ export const ORIGINS_LIST: Origin[] = [
     "name": "Criminoso",
     "description": "Você viveu à margem da lei como ladrão, contrabandista ou membro de uma guilda secreta de assassinos.",
     "items": [
-      "Gazua",
-      "Estojo de disfarces"
+      "Estojo de disfarces ou gazua"
     ],
     "skills": [
       "enganacao",
@@ -386,8 +386,8 @@ export const ORIGINS_LIST: Origin[] = [
     "name": "Escravo",
     "description": "Você suportou a dor, humilhação e correntes da escravidão em reinos implacáveis como Tapista ou nos subterrâneos de Doherimm antes de conquistar a liberdade.",
     "items": [
-      "Algemas quebradas",
-      "Ferramenta pesada (estatísticas de maça ou lança)"
+      "Algemas",
+      "Uma ferramenta pesada (mesmas estatísticas de uma maça)"
     ],
     "skills": [
       "atletismo",
@@ -412,8 +412,7 @@ export const ORIGINS_LIST: Origin[] = [
     "name": "Estudioso",
     "description": "Você passou anos lendo tomos antigos, mapas empoeirados e tratados filosóficos na Grande Academia Real ou bibliotecas monásticas.",
     "items": [
-      "Coleção de livros (+1 em Conhecimento)",
-      "Pena e tinteiro"
+      "Coleção de livros (+1 em Conhecimento, Guerra, Misticismo ou Nobreza, a sua escolha)"
     ],
     "skills": [
       "conhecimento",
@@ -439,7 +438,9 @@ export const ORIGINS_LIST: Origin[] = [
     "description": "Você lavrou a terra, cuidou do gado e protegeu suas plantações contra o clima e invasores em terras rurais.",
     "items": [
       "Carroça",
-      "Ferramenta agrícola"
+      "Uma ferramenta agrícola (mesmas estatísticas de uma lança)",
+      "10 rações de viagem",
+      "Um animal não combativo (como uma galinha, porco ou ovelha)"
     ],
     "skills": [
       "adestramento",
@@ -466,7 +467,8 @@ export const ORIGINS_LIST: Origin[] = [
     "description": "Você veio de além das fronteiras do Reinado, de terras misteriosas como as ilhas de Tamu-ra, o Império de Tauron ou os desertos do sul.",
     "items": [
       "Equipamento de viagem",
-      "Instrumento musical ou vestimenta típica de sua terra natal"
+      "Instrumento musical exótico (+1 em uma perícia de Carisma aprovada pelo mestre)",
+      "Traje estrangeiro"
     ],
     "skills": [
       "cavalgar",
@@ -491,8 +493,8 @@ export const ORIGINS_LIST: Origin[] = [
     "name": "Gladiador",
     "description": "Você lutou nas grandes arenas de Tiberus, Valkaria ou Zakharov sob aplausos de multidões sedentas por sangue e glória.",
     "items": [
-      "Arma marcial ou exótica à escolha",
-      "Item cosmético de combate"
+      "Uma arma marcial ou exótica",
+      "Um item sem valor recebido de um admirador"
     ],
     "skills": [
       "atuacao",
@@ -526,9 +528,9 @@ export const ORIGINS_LIST: Origin[] = [
     "name": "Guarda",
     "description": "Você patrulhou ruas, fez rondas nas muralhas da cidade e manteve a ordem da milícia urbana contra criminosos e monstros.",
     "items": [
-      "Apito de guarda",
+      "Apito",
       "Insígnia da milícia",
-      "Arma marcial à escolha"
+      "Uma arma marcial"
     ],
     "skills": [
       "investigacao",
@@ -558,8 +560,7 @@ export const ORIGINS_LIST: Origin[] = [
     "name": "Herdeiro",
     "description": "Você é o sucessor de uma grande linhagem ou família abastada, destinado a herdar riquezas e relíquias de prestígio.",
     "items": [
-      "Símbolo de sua linhagem nobre",
-      "Herança valiosa"
+      "Um símbolo de sua herança, como um anel de sinete ou manto cerimonial"
     ],
     "skills": [
       "misticismo",
@@ -584,8 +585,8 @@ export const ORIGINS_LIST: Origin[] = [
     "name": "Herói Camponês",
     "description": "Você era um plebeu comum que se levantou corajosamente contra monstros ou tiranos para salvar sua aldeia natal da destruição.",
     "items": [
-      "Arma improvisada ou ferramenta de trabalho",
-      "Amuleto de boa sorte"
+      "Instrumentos de ofício ou uma arma simples",
+      "Traje de plebeu"
     ],
     "skills": [
       "adestramento",
@@ -619,9 +620,8 @@ export const ORIGINS_LIST: Origin[] = [
     "name": "Marujo",
     "description": "Você enfrentou tempestades marinhas, monstros marinhos e piratas nos mares tempestuosos de Arton a bordo de navios veleiros.",
     "items": [
-      "T$ 2d6 (seu último soldo)",
-      "Corda de 15m",
-      "Pederneira"
+      "T$ 2d6 (seu último salário)",
+      "Corda"
     ],
     "skills": [
       "atletismo",
@@ -646,9 +646,10 @@ export const ORIGINS_LIST: Origin[] = [
     "name": "Mateiro",
     "description": "Você viveu de caçar peles preciosas e ervas raras nas matas fechadas e colinas inexploradas longe da civilização.",
     "items": [
-      "Arco curto ou machadinha",
+      "Arco curto",
       "Barraca",
-      "Equipamento de viagem"
+      "Equipamento de viagem",
+      "20 flechas"
     ],
     "skills": [
       "atletismo",
@@ -678,8 +679,7 @@ export const ORIGINS_LIST: Origin[] = [
     "name": "Membro de Guilda",
     "description": "Você pertence a uma respeitada ou clandestina guilda de mercadores, ladrões, artesãos ou conjuradores com contatos em várias cidades.",
     "items": [
-      "Gazua ou instrumentos de ofício",
-      "Símbolo secreto da guilda"
+      "Gazua ou instrumentos de ofício"
     ],
     "skills": [
       "diplomacia",
@@ -705,8 +705,9 @@ export const ORIGINS_LIST: Origin[] = [
     "name": "Mercador",
     "description": "Você viajou em caravanas vendendo especiarias, tecidos finos e armas, acumulando faro afiado para bons negócios e lucros.",
     "items": [
-      "Carroça ou trobo",
-      "Mercadorias para comércio no valor de T$ 100"
+      "Carroça",
+      "Trobo",
+      "Mercadorias para vender no valor de T$ 100"
     ],
     "skills": [
       "diplomacia",
@@ -736,9 +737,8 @@ export const ORIGINS_LIST: Origin[] = [
     "name": "Minerador",
     "description": "Você escavou túneis profundos à procura de ouro, pedras preciosas e aço-rubi nas entranhas montanhosas de Arton.",
     "items": [
-      "Picareta",
       "Gemas preciosas no valor de T$ 100",
-      "Lampião"
+      "Picareta"
     ],
     "skills": [
       "atletismo",
@@ -768,9 +768,8 @@ export const ORIGINS_LIST: Origin[] = [
     "name": "Nômade",
     "description": "Você nunca teve um lar fixo, cavalgando livre pelas estepes, savanas ou deserto sob as estrelas cintilantes de Arton.",
     "items": [
-      "Bordão ou lança",
-      "Equipamento de viagem",
-      "Montaria (cavalo ou trobo)"
+      "Bordão",
+      "Equipamento de viagem"
     ],
     "skills": [
       "cavalgar",
@@ -802,7 +801,7 @@ export const ORIGINS_LIST: Origin[] = [
     "items": [
       "Gazua",
       "Traje de plebeu",
-      "Um pequeno animal urbano de estimação (rato ou pássaro)"
+      "Um animal urbano (como um cão, gato, rato ou pombo)"
     ],
     "skills": [
       "furtividade",
@@ -832,7 +831,7 @@ export const ORIGINS_LIST: Origin[] = [
     "name": "Refugiado",
     "description": "Sua terra natal foi destruída por guerras cruéis, áreas de Tormenta ou monstros, forçando-o a fugir apenas com a roupa do corpo.",
     "items": [
-      "Um item estrangeiro de valor sentimental no valor de até T$ 100"
+      "Um item estrangeiro de até T$ 100"
     ],
     "skills": [
       "fortitude",
@@ -857,7 +856,7 @@ export const ORIGINS_LIST: Origin[] = [
     "name": "Seguidor",
     "description": "Você foi escudeiro, pajem ou servo dedicado de um grande herói lendário, aprendendo com seu exemplo brilhante.",
     "items": [
-      "Um item recebido de seu mestre no valor de até T$ 100"
+      "Um item recebido de seu mestre de até T$ 100"
     ],
     "skills": [
       "adestramento",
@@ -887,8 +886,7 @@ export const ORIGINS_LIST: Origin[] = [
     "description": "Você viveu em tribos isoladas nos confins mais remotos do continente, caçando feras com lanças de pedra e venerando os espíritos da terra.",
     "items": [
       "Uma arma simples",
-      "Pequeno animal de estimação selvagem",
-      "Vestimentas de peles"
+      "Um pequeno animal de estimação como um pássaro ou esquilo"
     ],
     "skills": [
       "percepcao",
@@ -918,9 +916,9 @@ export const ORIGINS_LIST: Origin[] = [
     "name": "Soldado",
     "description": "Você serviu no exército de um dos reinos de Arton, marchando em formação sob estandartes e participando de batalhas campais épicas.",
     "items": [
-      "Uma arma marcial à escolha",
-      "Uniforme militar oficial",
-      "Insígnia de seu regimento"
+      "Uma arma marcial",
+      "Um uniforme militar",
+      "Uma insígnia de seu exército"
     ],
     "skills": [
       "fortitude",
@@ -946,9 +944,8 @@ export const ORIGINS_LIST: Origin[] = [
     "name": "Taverneiro",
     "description": "Você serviu canecas de hidromel espumante, ensopados de javali e ouviu conversas de viajantes e aventureiros atrás do balcão.",
     "items": [
-      "Rolo de macarrão ou martelo de carne (maça leve)",
-      "Avental de taverneiro",
-      "Caneca de cerâmica"
+      "Rolo de macarrão ou martelo de carne (mesmas estatísticas de uma clava)",
+      "Uma panela, um avental, uma caneca e um pano sujo"
     ],
     "skills": [
       "diplomacia",
@@ -978,7 +975,7 @@ export const ORIGINS_LIST: Origin[] = [
     "name": "Trabalhador",
     "description": "Você realizou trabalho braçal pesado como carregador de docas, carvoeiro ou estivador, fortalecendo seus músculos com o suor do rosto.",
     "items": [
-      "Ferramenta pesada de trabalho (estatísticas de maça ou lança à escolha)"
+      "Uma ferramenta pesada (mesmas estatísticas de uma maça ou lança, a sua escolha)"
     ],
     "skills": [
       "atletismo",

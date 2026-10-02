@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { CharacterSheet, CharacterAttributes, CharacterInventoryItem, CharacterPower } from '../../types/character';
 import { AttributeKey } from '../../types/rules';
 import { RACES_LIST } from '../../data/races';
@@ -8,7 +8,16 @@ import { DEITIES_LIST } from '../../data/deities';
 import { SKILLS_LIST } from '../../data/skills';
 import { SPELLS_LIST } from '../../data/spells';
 import { GENERAL_POWERS_LIST } from '../../data/generalPowers';
-import { validateAllWizardSteps, PrerequisiteContext } from '../../utils/rulesValidation';
+import { getStartingKit, getStartingMoney } from '../../data/startingKit';
+import { averageRoll, pendingKitSlots, priceValue, reconcileKit } from '../../utils/startingKitUtils';
+import {
+  powersWithUnmetPrerequisites,
+  resolvePowerName,
+  takenPowersExcept,
+  validateAllWizardSteps,
+  type PowerSource,
+  type PrerequisiteContext,
+} from '../../utils/rulesValidation';
 import {
   calculateRacialModifiers,
   calculateTotalAttributes,
@@ -52,7 +61,7 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
   const [modalDetail, setModalDetail] = useState<DetailModalData | null>(null);
   const [visited, setVisited] = useState<Set<number>>(() => new Set(initialCharacter ? [1, 2, 3, 4, 5, 6, 7, 8, 9] : []));
   const [stepsOpen, setStepsOpen] = useState(false);
-  const { confirm } = useFeedback();
+  const { confirm, toast } = useFeedback();
 
   // Estados da Ficha
   const [name, setName] = useState(initialCharacter?.name || '');
@@ -154,57 +163,39 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
   );
 
   // Equipamento & Inventário
-  const [inventory, setInventory] = useState<CharacterInventoryItem[]>(
-    initialCharacter?.inventory || [
-      {
-        id: 'inv_init_1',
-        equipmentId: 'espada_longa',
-        name: 'Espada longa',
-        category: 'arma_marcial',
-        spaces: 1,
-        quantity: 1,
-        isEquipped: true,
-        damage: '1d8',
-        critical: '19',
-        price: 'T$ 15',
-        isFree: true,
-        source: 'inicial',
-      },
-      {
-        id: 'inv_init_2',
-        equipmentId: 'armadura_couro',
-        name: 'Armadura de couro',
-        category: 'armadura_leve',
-        spaces: 2,
-        quantity: 1,
-        isEquipped: true,
-        defenseBonus: 2,
-        armorPenalty: 0,
-        price: 'T$ 20',
-        isFree: true,
-        source: 'inicial',
-      },
-      {
-        id: 'inv_init_3',
-        equipmentId: 'mochila',
-        name: 'Mochila de Aventureiro',
-        category: 'item_geral',
-        spaces: 0,
-        quantity: 1,
-        isEquipped: true,
-        price: 'T$ 2',
-        isFree: true,
-        source: 'inicial',
-      },
-    ]
-  );
-  const [tibares, setTibares] = useState<number>(initialCharacter?.tibares || (classId === 'nobre' ? 200 : 100));
+  // Equipamento: o kit inicial (Cap. 3, pág. 140) e os itens da origem entram pela etapa 8
+  const [inventory, setInventory] = useState<CharacterInventoryItem[]>(initialCharacter?.inventory || []);
+  // Fichas antigas não marcam os itens do kit; nelas o kit não é adicionado sozinho (evita duplicar)
+  const [autoKit] = useState(() => !initialCharacter || initialCharacter.inventory.some((it) => it.kitSlot));
+  const [moneyRolls, setMoneyRolls] = useState<Record<string, number>>((): Record<string, number> => {
+    if (!initialCharacter) return {};
+    const paid = initialCharacter.inventory.reduce((sum, it) => (it.isFree ? sum : sum + priceValue(it.price) * (it.quantity || 1)), 0);
+    return { 'Dinheiro inicial': initialCharacter.tibares + paid };
+  });
 
   // Entidades e Cálculos Dinâmicos
   const currentRace = RACES_LIST.find((r) => r.id === raceId) || RACES_LIST[0];
   const currentClass = CLASSES_LIST.find((c) => c.id === classId) || CLASSES_LIST[0];
   const currentOrigin = ORIGINS_LIST.find((o) => o.id === originId) || ORIGINS_LIST[0];
   const currentDeity = DEITIES_LIST.find((d) => d.id === deityId);
+
+  // Kit inicial + itens da origem + poder Herança
+  const originPowerNames = selectedOriginBenefits.filter((b) => b.type === 'poder').map((b) => b.name);
+  const kitGroups = useMemo(
+    () => getStartingKit(currentClass, originId, originPowerNames),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [currentClass, originId, originPowerNames.join('|')]
+  );
+  useEffect(() => {
+    setInventory((prev) => reconcileKit(prev, kitGroups, autoKit) ?? prev);
+  }, [kitGroups, autoKit]);
+  const pendingKitChoices = pendingKitSlots(inventory, kitGroups);
+
+  // Dinheiro: T$ 4d6 (+ dinheiro da origem, ex.: Marujo) menos as compras
+  const moneySources = getStartingMoney(originId).map((m) => ({ ...m, value: moneyRolls[m.label] ?? averageRoll(m) }));
+  const startingMoney = moneySources.reduce((sum, m) => sum + m.value, 0);
+  const spentMoney = inventory.reduce((sum, it) => (it.isFree ? sum : sum + priceValue(it.price) * (it.quantity || 1)), 0);
+  const tibares = Math.max(0, startingMoney - spentMoney);
 
   // Modificadores raciais e Atributos totais
   const racialModifiers = calculateRacialModifiers(raceId, subraceId, selectedRacialAttributes);
@@ -252,6 +243,39 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
     isSpellcaster,
   };
 
+  // Ao mudar perícias ou atributos, poderes que deixam de cumprir os pré-requisitos saem
+  // da ficha — o personagem precisa cumpri-los para ter o poder (Cap. 1, págs. 33 e 85).
+  const prereqKey = JSON.stringify([totalAttributes, [...trainedSkillIds].sort(), isSpellcaster, classId]);
+  useEffect(() => {
+    const lost: string[] = [];
+    if (selectedRacialPower) {
+      const [bad] = powersWithUnmetPrerequisites([selectedRacialPower], prereqContext);
+      if (bad) {
+        lost.push(`${bad.name} (falta ${bad.unmet.join(', ')})`);
+        setSelectedRacialPower(undefined);
+      }
+    }
+    const originPowers = selectedOriginBenefits.filter((b) => b.type === 'poder').map((b) => b.name);
+    const badOrigin = powersWithUnmetPrerequisites(originPowers, prereqContext);
+    if (badOrigin.length > 0) {
+      const badNames = new Set(badOrigin.map((b) => b.name));
+      setSelectedOriginBenefits((prev) => prev.filter((b) => !(b.type === 'poder' && badNames.has(resolvePowerName(b.name)))));
+      badOrigin.forEach((b) => lost.push(`${b.name} (falta ${b.unmet.join(', ')})`));
+    }
+    if (lost.length > 0) {
+      toast(`Poder removido por requisito não cumprido: ${lost.join('; ')}.`, { tone: 'warning', duration: 6000 });
+    }
+    // Reage só a mudanças nos requisitos; a escolha do poder já é validada no picker
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prereqKey]);
+
+  // Poderes por fonte: o mesmo poder não pode vir de dois benefícios (Cap. 1, pág. 33)
+  const powerSources: PowerSource[] = [
+    { source: 'raça', powers: selectedRacialPower ? [selectedRacialPower] : [] },
+    { source: 'origem', powers: selectedOriginBenefits.filter((b) => b.type === 'poder').map((b) => b.name) },
+    { source: 'divindade', powers: selectedDeityPowers },
+  ];
+
   // Mapa reativo de validação de todas as etapas (Anexo 3)
   const validationMap = validateAllWizardSteps({
     raceId,
@@ -272,6 +296,7 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
     currentSpaces,
     maxSpaces: maxSpaces.value,
     characterName: name,
+    pendingKitChoices,
   });
 
   const currentStepStatus = validationMap[currentStep] || {
@@ -587,6 +612,7 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
               onSelectRacialAttributes={setSelectedRacialAttributes}
               onSelectRacialSkills={setSelectedRacialSkills}
               onSelectRacialPower={setSelectedRacialPower}
+              takenPowers={takenPowersExcept(powerSources, 'raça')}
               onOpenDetail={setModalDetail}
             />
           )}
@@ -615,6 +641,7 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
               prerequisiteContext={prereqContext}
               onSelectOrigin={setOriginId}
               onSelectOriginBenefits={setSelectedOriginBenefits}
+              takenPowers={takenPowersExcept(powerSources, 'origem')}
               onOpenDetail={setModalDetail}
             />
           )}
@@ -626,6 +653,7 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
               characterRaceId={raceId}
               onSelectDeity={setDeityId}
               onSelectDeityPowers={setSelectedDeityPowers}
+              takenPowers={takenPowersExcept(powerSources, 'divindade')}
               onOpenDetail={setModalDetail}
             />
           )}
@@ -664,12 +692,13 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
             <StepEquipment
               inventory={inventory}
               tibares={tibares}
+              startingMoney={startingMoney}
+              moneySources={moneySources}
+              kitGroups={kitGroups}
               maxSpaces={maxSpaces.value}
               currentSpaces={currentSpaces}
-              classId={classId}
-              originId={originId}
               onUpdateInventory={setInventory}
-              onUpdateTibares={setTibares}
+              onSetMoney={(label, value) => setMoneyRolls((prev) => ({ ...prev, [label]: value }))}
               onOpenDetail={setModalDetail}
             />
           )}
@@ -714,6 +743,16 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
           <button type="button" className="btn btn-secondary" onClick={handlePrevStep} disabled={stepIndex === 0} aria-label="Passo anterior">
             <ArrowLeft size={18} />
             <span className="hide-xs">Voltar</span>
+          </button>
+          <button
+            type="button"
+            className={`btn btn-secondary action-bar-summary${errorSteps.length ? ' has-pending' : ''}`}
+            onClick={() => setStepsOpen(true)}
+            aria-label={`Resumo da ficha${errorSteps.length ? ` (${errorSteps.length} etapas pendentes)` : ''}`}
+          >
+            <ListChecks size={20} />
+            <span>Resumo</span>
+            {errorSteps.length > 0 && <span className="action-bar-dot">{errorSteps.length}</span>}
           </button>
           {isLastStep ? (
             <button type="button" className="btn btn-primary btn-lg grow" onClick={hasAnyErrors ? () => setStepsOpen(true) : handleSaveCharacter}>

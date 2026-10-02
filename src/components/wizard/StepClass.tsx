@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Heart, Shield, Sparkles } from 'lucide-react';
+import { Heart, Info, Shield, Sparkles } from 'lucide-react';
 import { CLASSES_LIST } from '../../data/classes';
 import { SKILLS_LIST } from '../../data/skills';
 import { RULES_CITATIONS } from '../../data/rulesCitations';
@@ -141,6 +141,7 @@ export const StepClass: React.FC<StepClassProps> = ({
               })
             }
           >
+            <Info size={14} />
             Regra
           </button>
         }
@@ -166,7 +167,7 @@ export const StepClass: React.FC<StepClassProps> = ({
             <button
               key={ab.id}
               type="button"
-              className="row items-start"
+              className="row items-start has-detail"
               onClick={() => onOpenDetail({ title: ab.name, category: `Habilidade de ${cls.name}`, cost: ab.cost, description: ab.description })}
             >
               <span className="row-main">

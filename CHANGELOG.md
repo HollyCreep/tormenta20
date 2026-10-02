@@ -4,6 +4,25 @@ Todas as alterações notáveis deste projeto serão documentadas neste arquivo.
 
 ---
 
+## [0.5.1] - 2026-10-02 — Correções pós-0.5
+
+### 🐛 Correções
+- Bottom sheets não ficam mais sob a barra de navegação do Android (usa as áreas seguras injetadas pelo Capacitor).
+- "Ler mais" só aparece quando o texto está cortado; a origem ganhou "Ver detalhes" com itens, perícias e poderes.
+- O mesmo poder não pode ser escolhido em dois benefícios (raça, origem, divindade) — Cap. 1, pág. 33; poderes repetíveis respeitados.
+- Poderes que deixam de cumprir pré-requisitos (ao desmarcar perícia ou mudar atributo) são removidos com aviso; a origem não aceita mais poder sem requisito — Cap. 1, pág. 85.
+- Equipamento inicial conforme o livro (Cap. 3, pág. 140): kit de aventureiro por proficiência, itens de cada origem (págs. 85–95, ex.: arma marcial do Guarda), poder Herança com item de até T$ 1.000 (pág. 91) e T$ 4d6 (+2d6 do Marujo); bônus de dinheiro não canônicos removidos.
+
+### 🎨 Interface
+- Compra de pontos com a Tabela 1-1 (custo e rolagem) e botão "i" com as regras completas, incluindo o único atributo em −1 (Cap. 1, pág. 17).
+- Ícone "i" padronizado em tudo que abre detalhes.
+- Botão "Resumo" no centro da barra inferior do criador.
+
+### 📦 Android
+- APK assinado sempre com a mesma chave (`android/app/tormenta20-debug.keystore`): novas versões instalam por cima sem desinstalar. A primeira atualização para a 0.5.1 ainda exige desinstalar uma última vez.
+
+---
+
 ## [0.5.0] - 2026-10-02 — Redesign mobile-first e novos temas
 
 ### 🎨 Interface

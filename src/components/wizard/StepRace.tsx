@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Info } from 'lucide-react';
 import { RACES_LIST } from '../../data/races';
 import type { AttributeKey } from '../../types/rules';
 import { ATTRIBUTES_LIST } from '../../data/attributes';
@@ -25,6 +26,8 @@ interface StepRaceProps {
   onSelectRacialAttributes: (attrs: AttributeKey[]) => void;
   onSelectRacialSkills: (skills: string[]) => void;
   onSelectRacialPower: (powerId: string) => void;
+  /** Poderes já escolhidos em outros benefícios (nome → fonte). */
+  takenPowers?: Map<string, string>;
   onOpenDetail: (data: DetailModalData) => void;
 }
 
@@ -62,6 +65,7 @@ export const StepRace: React.FC<StepRaceProps> = ({
   onSelectRacialAttributes,
   onSelectRacialSkills,
   onSelectRacialPower,
+  takenPowers,
   onOpenDetail,
 }) => {
   const [filter, setFilter] = useState<'todas' | 'padrao' | 'rara'>('todas');
@@ -135,13 +139,14 @@ export const StepRace: React.FC<StepRaceProps> = ({
     return powerCategory === 'todas' || p.category === powerCategory;
   }).map((p) => {
     const prereq = prerequisiteContext ? checkPowerPrerequisites(p.id, prerequisiteContext) : { isMet: true, unmetRequirements: [] };
+    const takenBy = takenPowers?.get(p.name);
     return {
       id: p.id,
       title: p.name,
       subtitle: p.description,
       meta: <span className="badge">{POWER_CATEGORY_META[p.category]?.label || p.category}</span>,
-      disabled: !prereq.isMet,
-      disabledReason: `Falta: ${prereq.unmetRequirements.join(', ')}`,
+      disabled: !prereq.isMet || !!takenBy,
+      disabledReason: takenBy ? `Já escolhido como benefício de ${takenBy}` : `Falta: ${prereq.unmetRequirements.join(', ')}`,
       searchText: p.prerequisites,
     };
   });
@@ -238,6 +243,7 @@ export const StepRace: React.FC<StepRaceProps> = ({
                   })
                 }
               >
+                <Info size={14} />
                 Regra
               </button>
             ) : undefined
@@ -297,7 +303,7 @@ export const StepRace: React.FC<StepRaceProps> = ({
             <button
               key={ab.id}
               type="button"
-              className="row items-start"
+              className="row items-start has-detail"
               onClick={() => onOpenDetail({ title: ab.name, category: `Habilidade de ${race.name}`, cost: ab.cost, description: ab.description })}
             >
               <span className="row-main">

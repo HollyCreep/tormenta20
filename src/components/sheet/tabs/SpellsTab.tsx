@@ -125,7 +125,7 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({ character, onCastStandardS
                 const canCast = character.stats.currentMp >= baseCost;
                 return (
                   <div key={sp.id || `${sp.name}-${idx}`} className="row spell-row">
-                    <button type="button" className="spell-main" onClick={() => openDetail(sp)}>
+                    <button type="button" className="spell-main has-detail" onClick={() => openDetail(sp)}>
                       <span className="row-title">{cleanT20Text(sp.name)}</span>
                       <span className="hstack-xs wrap">
                         <SchoolBadge school={sp.school} />

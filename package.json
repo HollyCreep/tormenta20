@@ -1,7 +1,7 @@
 {
   "name": "app-tormenta20",
   "private": true,
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Criador de Personagens e Ficha Interativa para Tormenta 20 - Edição Jogo do Ano (v1.3)",
   "type": "module",
   "scripts": {

@@ -52,6 +52,10 @@ export interface CharacterInventoryItem {
   isFree?: boolean;
   appliedModifiers?: string[];
   specialMaterial?: string;
+  /** Espaço do equipamento inicial que este item preenche (ver data/startingKit.ts). */
+  kitSlot?: string;
+  /** Opção escolhida dentro do espaço do equipamento inicial. */
+  kitOption?: string;
 }
 
 export interface CharacterPower {
