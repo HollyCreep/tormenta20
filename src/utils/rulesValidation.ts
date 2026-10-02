@@ -254,6 +254,8 @@ export interface WizardValidationInput {
   currentSpaces: number;
   maxSpaces: number;
   characterName: string;
+  /** Escolhas do equipamento inicial ainda não feitas (rótulos dos espaços). */
+  pendingKitChoices?: string[];
 }
 
 /**
@@ -520,6 +522,9 @@ export function validateAllWizardSteps(input: WizardValidationInput): Record<num
 
     if (input.currentSpaces > input.maxSpaces) {
       errors.push(`Carga excedida: você está carregando ${input.currentSpaces} espaços de ${input.maxSpaces} permitidos.`);
+    }
+    if (input.pendingKitChoices?.length) {
+      warnings.push(`Equipamento inicial sem escolha: ${input.pendingKitChoices.join(', ')}.`);
     }
 
     results[8] = {
