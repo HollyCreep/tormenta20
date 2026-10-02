@@ -12,6 +12,8 @@ interface StepDeityProps {
   characterRaceId?: string;
   onSelectDeity: (deityId: string) => void;
   onSelectDeityPowers: (powers: string[]) => void;
+  /** Poderes já escolhidos em outros benefícios (nome → fonte). */
+  takenPowers?: Map<string, string>;
   onOpenDetail: (data: DetailModalData) => void;
 }
 
@@ -22,6 +24,7 @@ export const StepDeity: React.FC<StepDeityProps> = ({
   onSelectDeity,
   onSelectDeityPowers,
   onOpenDetail,
+  takenPowers,
 }) => {
   const [pickerOpen, setPickerOpen] = useState(false);
   const deity = DEITIES_LIST.find((d) => d.id === selectedDeityId);
@@ -134,19 +137,25 @@ export const StepDeity: React.FC<StepDeityProps> = ({
             <div className="list">
               {deity.grantedPowers.map((p) => {
                 const on = selectedDeityPowers.includes(p.name);
+                const takenBy = takenPowers?.get(p.name);
                 return (
-                  <div key={p.id} className={`row pick-row${on ? ' is-selected' : ''}`}>
+                  <div key={p.id} className={`row pick-row${on ? ' is-selected' : ''}${takenBy ? (on ? ' is-conflict' : ' is-disabled') : ''}`}>
                     <button
                       type="button"
                       role={powerLimit === 1 ? 'radio' : 'checkbox'}
                       aria-checked={on}
                       className="pick-main"
+                      disabled={!!takenBy && !on}
                       onClick={() => togglePower(p.name)}
                     >
                       <span className={`mark${powerLimit === 1 ? ' mark-radio' : ''}${on ? ' is-on' : ''}`}>{on && <Check size={14} strokeWidth={3} />}</span>
                       <span className="row-main">
                         <span className="row-title">{p.name}</span>
-                        <span className="row-sub clamp-3">{p.description}</span>
+                        {takenBy ? (
+                          <span className="t-xs t-warning">Já escolhido como benefício de {takenBy}</span>
+                        ) : (
+                          <span className="row-sub clamp-3">{p.description}</span>
+                        )}
                       </span>
                     </button>
                     <button

@@ -8,7 +8,6 @@ import type { GeneralPower } from '../../types/rules';
 import { checkPowerPrerequisites, type PrerequisiteContext } from '../../utils/rulesValidation';
 import type { DetailModalData } from '../common/DetailModal';
 import { POWER_CATEGORY_META } from '../common/T20Badge';
-import { useFeedback } from '../ui/Feedback';
 import { ChoiceCard, ChoiceSection, OptionPickerSheet, StepIntro, type PickerOption } from './wizardUi';
 import { skillName } from '../../utils/displayNames';
 
@@ -23,6 +22,8 @@ interface StepOriginProps {
   onSelectOrigin: (originId: string) => void;
   onSelectOriginBenefits: (benefits: { type: 'pericia' | 'poder'; name: string }[]) => void;
   onOpenDetail: (data: DetailModalData) => void;
+  /** Poderes já escolhidos em outros benefícios (nome → fonte). */
+  takenPowers?: Map<string, string>;
 }
 
 type Category = 'combate' | 'tormenta' | 'destino' | 'magia' | 'geral';
@@ -52,8 +53,8 @@ export const StepOrigin: React.FC<StepOriginProps> = ({
   onSelectOrigin,
   onSelectOriginBenefits,
   onOpenDetail,
+  takenPowers,
 }) => {
-  const { confirm } = useFeedback();
   const [picker, setPicker] = useState<'origin' | 'swap' | null>(null);
   const [powerSlot, setPowerSlot] = useState<{ name: string; category: Category } | null>(null);
 
@@ -83,19 +84,11 @@ export const StepOrigin: React.FC<StepOriginProps> = ({
       return !!gp && (gp.category === category || category === 'geral');
     });
 
-  const pickGenericPower = async (p: GeneralPower) => {
+  const pickGenericPower = (p: GeneralPower) => {
     if (!powerSlot) return;
-    if (prerequisiteContext) {
-      const res = checkPowerPrerequisites(p.id, prerequisiteContext);
-      if (!res.isMet) {
-        const ok = await confirm({
-          title: 'Requisitos não atendidos',
-          message: `Falta: ${res.unmetRequirements.join(', ')}. Em Tormenta 20 é preciso cumprir os pré-requisitos de um poder geral. Escolher mesmo assim (com aval do mestre)?`,
-          confirmLabel: 'Escolher mesmo assim',
-        });
-        if (!ok) return;
-      }
-    }
+    // "Você recebe o poder escolhido, mas ainda precisa cumprir seus pré-requisitos" (Cap. 1, pág. 85)
+    if (prerequisiteContext && !checkPowerPrerequisites(p.id, prerequisiteContext).isMet) return;
+    if (takenPowers?.has(p.name)) return;
     const existing = slotBenefit(powerSlot.name, powerSlot.category);
     if (existing) onSelectOriginBenefits(selectedOriginBenefits.map((b) => (b === existing ? { type: 'poder' as const, name: p.name } : b)));
     else if (!full) onSelectOriginBenefits([...selectedOriginBenefits, { type: 'poder' as const, name: p.name }]);
@@ -119,10 +112,13 @@ export const StepOrigin: React.FC<StepOriginProps> = ({
   const slotOptions: PickerOption[] = powerSlot
     ? GENERAL_POWERS_LIST.filter((p) => p.category !== 'concedido' && (powerSlot.category === 'geral' || p.category === powerSlot.category)).map((p) => {
         const res = prerequisiteContext ? checkPowerPrerequisites(p.id, prerequisiteContext) : { isMet: true, unmetRequirements: [] };
+        const takenBy = takenPowers?.get(p.name);
         return {
           id: p.id,
           title: p.name,
           subtitle: p.description,
+          disabled: !res.isMet || !!takenBy,
+          disabledReason: takenBy ? `Já escolhido como benefício de ${takenBy}` : `Falta: ${res.unmetRequirements.join(', ')}`,
           meta: (
             <>
               <span className="badge">{POWER_CATEGORY_META[p.category]?.label}</span>
@@ -316,20 +312,31 @@ export const StepOrigin: React.FC<StepOriginProps> = ({
               );
             }
             const checked = selectedOriginBenefits.some((b) => b.type === 'poder' && b.name === pow.name);
+            const takenBy = takenPowers?.get(pow.name);
+            const prereq = prerequisiteContext && GENERAL_POWERS_LIST.some((g) => g.name === pow.name)
+              ? checkPowerPrerequisites(pow.name, prerequisiteContext)
+              : { isMet: true, unmetRequirements: [] as string[] };
+            const blocked = !!takenBy || !prereq.isMet;
             return (
-              <div key={idx} className={`row pick-row${checked ? ' is-selected' : ''}`}>
+              <div key={idx} className={`row pick-row${checked ? ' is-selected' : ''}${blocked ? (checked ? ' is-conflict' : ' is-disabled') : ''}`}>
                 <button
                   type="button"
                   role="checkbox"
                   aria-checked={checked}
                   className="pick-main"
-                  disabled={!checked && full}
+                  disabled={!checked && (full || blocked)}
                   onClick={() => toggleBenefit('poder', pow.name)}
                 >
                   <span className={`mark${checked ? ' is-on' : ''}`}>{checked && <Check size={14} strokeWidth={3} />}</span>
                   <span className="row-main">
                     <span className="row-title">{pow.name}</span>
-                    <span className="row-sub clamp-2">{pow.description}</span>
+                    {takenBy ? (
+                      <span className="t-xs t-warning">Já escolhido como benefício de {takenBy}</span>
+                    ) : !prereq.isMet ? (
+                      <span className="t-xs t-warning">Falta: {prereq.unmetRequirements.join(', ')}</span>
+                    ) : (
+                      <span className="row-sub clamp-2">{pow.description}</span>
+                    )}
                   </span>
                 </button>
                 <button
@@ -375,7 +382,7 @@ export const StepOrigin: React.FC<StepOriginProps> = ({
         open={!!powerSlot}
         onClose={() => setPowerSlot(null)}
         title={powerSlot ? `Escolher ${powerSlot.name}` : ''}
-        subtitle="Requisitos não atendidos pedem confirmação"
+        subtitle="Só aparecem liberados os poderes cujos requisitos você cumpre"
         options={slotOptions}
         value={[]}
         onChange={([id]) => {

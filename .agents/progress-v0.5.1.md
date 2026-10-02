@@ -6,7 +6,7 @@ veja a primeira etapa sem `[x]` e o `git log` da branch.
 ## Etapas
 
 - [x] 1. Bottom sheet sobreposto pela barra de navegação do Android (safe-area) + "Ler mais" da origem sem efeito
-- [ ] 2. Poder duplicado entre raça/origem/divindade (mesmo poder escolhido em dois benefícios)
+- [x] 2. Poder duplicado entre raça/origem/divindade (mesmo poder escolhido em dois benefícios)
 - [ ] 3. Revalidar pré-requisitos de poderes ao mudar perícias/atributos (remover poderes que deixam de ser válidos)
 - [ ] 4. Benefícios de origem na etapa de equipamento (itens da origem, Herdeiro, Guarda etc.)
 - [ ] 5. Compra de pontos: tabela de custo (Tabela 1-1) + botão "i" com as regras (Cap. 1, pág. 17)

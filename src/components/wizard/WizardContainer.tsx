@@ -8,7 +8,12 @@ import { DEITIES_LIST } from '../../data/deities';
 import { SKILLS_LIST } from '../../data/skills';
 import { SPELLS_LIST } from '../../data/spells';
 import { GENERAL_POWERS_LIST } from '../../data/generalPowers';
-import { validateAllWizardSteps, PrerequisiteContext } from '../../utils/rulesValidation';
+import {
+  takenPowersExcept,
+  validateAllWizardSteps,
+  type PowerSource,
+  type PrerequisiteContext,
+} from '../../utils/rulesValidation';
 import {
   calculateRacialModifiers,
   calculateTotalAttributes,
@@ -251,6 +256,13 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
     proficiencies: currentClass.proficiencies,
     isSpellcaster,
   };
+
+  // Poderes por fonte: o mesmo poder não pode vir de dois benefícios (Cap. 1, pág. 33)
+  const powerSources: PowerSource[] = [
+    { source: 'raça', powers: selectedRacialPower ? [selectedRacialPower] : [] },
+    { source: 'origem', powers: selectedOriginBenefits.filter((b) => b.type === 'poder').map((b) => b.name) },
+    { source: 'divindade', powers: selectedDeityPowers },
+  ];
 
   // Mapa reativo de validação de todas as etapas (Anexo 3)
   const validationMap = validateAllWizardSteps({
@@ -587,6 +599,7 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
               onSelectRacialAttributes={setSelectedRacialAttributes}
               onSelectRacialSkills={setSelectedRacialSkills}
               onSelectRacialPower={setSelectedRacialPower}
+              takenPowers={takenPowersExcept(powerSources, 'raça')}
               onOpenDetail={setModalDetail}
             />
           )}
@@ -615,6 +628,7 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
               prerequisiteContext={prereqContext}
               onSelectOrigin={setOriginId}
               onSelectOriginBenefits={setSelectedOriginBenefits}
+              takenPowers={takenPowersExcept(powerSources, 'origem')}
               onOpenDetail={setModalDetail}
             />
           )}
@@ -626,6 +640,7 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
               characterRaceId={raceId}
               onSelectDeity={setDeityId}
               onSelectDeityPowers={setSelectedDeityPowers}
+              takenPowers={takenPowersExcept(powerSources, 'divindade')}
               onOpenDetail={setModalDetail}
             />
           )}
