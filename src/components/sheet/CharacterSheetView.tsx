@@ -1,12 +1,27 @@
-import React, { useState, lazy, Suspense } from 'react';
-import type { CharacterSheet, CharacterSpell, CharacterInventoryItem } from '../../types/character';
+import React, { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import {
+  Backpack,
+  BookOpen,
+  ChevronsUp,
+  Dices,
+  Download,
+  FileText,
+  MoreVertical,
+  Pencil,
+  Printer,
+  ScrollText,
+  Sparkles,
+  Sword,
+  Zap,
+} from 'lucide-react';
+import type { CharacterInventoryItem, CharacterSheet, CharacterSpell } from '../../types/character';
+import type { EquipmentItem } from '../../types/rules';
+import type { ChangeLogOptions } from '../../services/logService';
 import { DetailModal, type DetailModalData } from '../common/DetailModal';
-import { MoneyModal } from './modals/MoneyModal';
-import { TempHpModal } from './modals/TempHpModal';
-
-const SpellCastModal = lazy(() => import('./SpellCastModal').then(m => ({ default: m.SpellCastModal })));
-const LevelUpModal = lazy(() => import('./LevelUpModal').then(m => ({ default: m.LevelUpModal })));
-const AddItemModal = lazy(() => import('./AddItemModal').then(m => ({ default: m.AddItemModal })));
+import { AppBar } from '../ui/AppBar';
+import { MenuSheet } from '../ui/MenuSheet';
+import { useFeedback } from '../ui/Feedback';
+import { useDice } from '../../contexts/DiceContext';
 import { CharacterHeader } from './CharacterHeader';
 import { CharacterResourceBars } from './CharacterResourceBars';
 import { CharacterConditions } from './CharacterConditions';
@@ -18,25 +33,27 @@ import { SpellsTab, BASE_SPELL_COST_BY_CIRCLE } from './tabs/SpellsTab';
 import { InventoryTab } from './tabs/InventoryTab';
 import { BioTab } from './tabs/BioTab';
 import { LogsTab } from './LogsTab';
-import { recalculateFullCharacterSheet, getAttackConditionPenalty } from '../../utils/rulesEngine';
+import { MoneySheet, type MoneyOperation } from './modals/MoneySheet';
+import { VitalAdjustSheet, type HpMode, type MpMode, type VitalKind } from './modals/VitalAdjustSheet';
+import {
+  calculateWeaponAttack,
+  calculateWeaponDamage,
+  recalculateFullCharacterSheet,
+} from '../../utils/rulesEngine';
 import { RACES_LIST } from '../../data/races';
 import { CLASSES_LIST } from '../../data/classes';
 import { ORIGINS_LIST } from '../../data/origins';
 import { DEITIES_LIST } from '../../data/deities';
 import { RULES_CITATIONS } from '../../data/rulesCitations';
 import { EQUIPMENT_LIST } from '../../data/equipment';
-import type { ChangeLogOptions } from '../../services/logService';
-import type { EquipmentItem } from '../../types/rules';
-const ItemModifierModal = lazy(() => import('../compendium/ItemModifierModal').then(m => ({ default: m.ItemModifierModal })));
-import {
-  Sword,
-  Dices,
-  Sparkles,
-  Zap,
-  Package,
-  BookOpen,
-  FileText,
-} from 'lucide-react';
+import { heroLine, skillName } from '../../utils/displayNames';
+
+const SpellCastModal = lazy(() => import('./SpellCastModal').then((m) => ({ default: m.SpellCastModal })));
+const LevelUpModal = lazy(() => import('./LevelUpModal').then((m) => ({ default: m.LevelUpModal })));
+const AddItemModal = lazy(() => import('./AddItemModal').then((m) => ({ default: m.AddItemModal })));
+const ItemModifierModal = lazy(() =>
+  import('../compendium/ItemModifierModal').then((m) => ({ default: m.ItemModifierModal }))
+);
 
 interface CharacterSheetViewProps {
   character: CharacterSheet;
@@ -48,6 +65,8 @@ interface CharacterSheetViewProps {
   onNavigateToCompendium?: (tab: 'magias' | 'poderes' | 'itens', subTab?: 'gerais' | 'classe') => void;
 }
 
+type SheetTab = 'combate' | 'pericias' | 'poderes' | 'magias' | 'inventario' | 'notas' | 'registro';
+
 export const CharacterSheetView: React.FC<CharacterSheetViewProps> = ({
   character,
   onUpdateCharacter,
@@ -57,294 +76,259 @@ export const CharacterSheetView: React.FC<CharacterSheetViewProps> = ({
   onRollDice,
   onNavigateToCompendium,
 }) => {
-  const [activeTab, setActiveTab] = useState<'combate' | 'pericias' | 'poderes' | 'magias' | 'inventario' | 'bio' | 'logs'>('combate');
+  const { toast, confirm } = useFeedback();
+  const { recentRolls } = useDice();
+  const [activeTab, setActiveTab] = useState<SheetTab>('combate');
   const [modalDetail, setModalDetail] = useState<DetailModalData | null>(null);
   const [selectedCastSpell, setSelectedCastSpell] = useState<CharacterSpell | null>(null);
-  const [isLevelUpModalOpen, setIsLevelUpModalOpen] = useState<boolean>(false);
-  const [isAddItemModalOpen, setIsAddItemModalOpen] = useState<boolean>(false);
-  const [customizingInventoryItem, setCustomizingInventoryItem] = useState<CharacterInventoryItem | null>(null);
-  const [isMoneyModalOpen, setIsMoneyModalOpen] = useState<boolean>(false);
-  const [moneyOperation, setMoneyOperation] = useState<'add' | 'remove' | 'set'>('add');
-  const [moneyAmount, setMoneyAmount] = useState<number>(10);
-  const [moneyReason, setMoneyReason] = useState<string>('');
-  const [isTempHpModalOpen, setIsTempHpModalOpen] = useState<boolean>(false);
-  const [tempHpAmount, setTempHpAmount] = useState<number>(5);
-  const [tempHpReason, setTempHpReason] = useState<string>('');
+  const [isLevelUpOpen, setIsLevelUpOpen] = useState(false);
+  const [isAddItemOpen, setIsAddItemOpen] = useState(false);
+  const [customizingItem, setCustomizingItem] = useState<CharacterInventoryItem | null>(null);
+  const [isMoneyOpen, setIsMoneyOpen] = useState(false);
+  const [adjustKind, setAdjustKind] = useState<VitalKind | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const tabsRef = useRef<HTMLDivElement>(null);
+  const heroSentinelRef = useRef<HTMLDivElement>(null);
+  const [heroVisible, setHeroVisible] = useState(true);
 
-  // Ajustes de Vida com consumo prioritário de PV Temporários (auditável)
-  const handleModifyHp = (delta: number) => {
+  // O nome aparece na app bar só depois que o cartão do herói sai da tela
+  useEffect(() => {
+    const el = heroSentinelRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const io = new IntersectionObserver(([entry]) => setHeroVisible(entry.isIntersecting), {
+      rootMargin: '-64px 0px 0px 0px',
+    });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  const hasSpells = (character.spells || []).length > 0;
+  const currentTab: SheetTab = activeTab === 'magias' && !hasSpells ? 'combate' : activeTab;
+
+  const selectTab = (tab: SheetTab) => {
+    setActiveTab(tab);
+    // Se a barra de abas já está "grudada", leva o conteúdo novo para o topo
+    const el = tabsRef.current;
+    if (el) {
+      const stickyTop = parseFloat(getComputedStyle(el).top) || 0;
+      const docTop = el.getBoundingClientRect().top + window.scrollY - stickyTop;
+      if (window.scrollY > docTop) window.scrollTo({ top: docTop });
+    }
+  };
+
+  /* ------------------------------------------------------------------------
+     Vida, mana e temporários (auditáveis)
+     ------------------------------------------------------------------------ */
+  const handleModifyHp = (delta: number, customReason?: string) => {
     const currentHp = character.stats.currentHp;
     const currentTemp = character.stats.tempHp || 0;
+    const suffix = customReason ? ` — ${customReason}` : '';
 
     if (delta < 0) {
-      // Dano: em Tormenta 20 JDA, PV temporários são consumidos primeiro
+      // Dano: PV temporários são consumidos primeiro
       const damage = Math.abs(delta);
       const absorbed = Math.min(currentTemp, damage);
       const remainingDamage = damage - absorbed;
       const newTempHp = currentTemp - absorbed;
       const newHp = Math.max(0, currentHp - remainingDamage);
-
-      const actionReason = absorbed > 0
-        ? `Sofreu ${damage} de dano: ${absorbed} absorvido por PV Temporário (${newTempHp} temp restante), ${remainingDamage} no PV normal.`
-        : `Sofreu ${damage} de dano direto aos Pontos de Vida.`;
-
+      const actionReason =
+        absorbed > 0
+          ? `Sofreu ${damage} de dano: ${absorbed} absorvido por PV temporário (${newTempHp} temp restante), ${remainingDamage} no PV normal.${suffix}`
+          : `Sofreu ${damage} de dano direto aos Pontos de Vida.${suffix}`;
       onUpdateCharacter(
-        {
-          ...character,
-          stats: {
-            ...character.stats,
-            currentHp: newHp,
-            tempHp: newTempHp,
-          },
-        },
+        { ...character, stats: { ...character.stats, currentHp: newHp, tempHp: newTempHp } },
         { actionReason }
       );
-    } else {
-      // Cura: recupera PV normal (não ultrapassa maxHp)
-      const newHp = Math.min(character.stats.maxHp.value, Math.max(0, currentHp + delta));
-      onUpdateCharacter(
-        {
-          ...character,
-          stats: {
-            ...character.stats,
-            currentHp: newHp,
-          },
-        },
-        { actionReason: `Recuperou +${delta} Pontos de Vida.` }
-      );
+      return;
     }
+
+    const newHp = Math.min(character.stats.maxHp.value, Math.max(0, currentHp + delta));
+    onUpdateCharacter(
+      { ...character, stats: { ...character.stats, currentHp: newHp } },
+      { actionReason: `Recuperou +${delta} Pontos de Vida.${suffix}` }
+    );
   };
 
-  // Gerenciamento direto de PV Temporários (auditável)
   const handleApplyTempHp = (amount: number, operation: 'add' | 'set', reason?: string) => {
     const currentTemp = character.stats.tempHp || 0;
     const newTemp = operation === 'add' ? currentTemp + amount : Math.max(0, amount);
     onUpdateCharacter(
-      {
-        ...character,
-        stats: {
-          ...character.stats,
-          tempHp: newTemp,
-        },
-      },
+      { ...character, stats: { ...character.stats, tempHp: newTemp } },
       {
         actionReason:
           reason ||
-          (operation === 'add'
-            ? `Recebeu +${amount} PV temporários (Total: ${newTemp}).`
-            : `PV Temporários ajustados para ${newTemp}.`),
+          (operation === 'add' ? `Recebeu +${amount} PV temporários (Total: ${newTemp}).` : `PV temporários ajustados para ${newTemp}.`),
       }
     );
-    setIsTempHpModalOpen(false);
-    setTempHpReason('');
   };
 
   const handleModifyMp = (delta: number, logOptions?: ChangeLogOptions) => {
     const newMp = Math.min(character.stats.maxMp.value, Math.max(0, character.stats.currentMp + delta));
-    onUpdateCharacter(
-      {
-        ...character,
-        stats: {
-          ...character.stats,
-          currentMp: newMp,
-        },
-      },
-      logOptions
-    );
+    onUpdateCharacter({ ...character, stats: { ...character.stats, currentMp: newMp } }, logOptions);
   };
 
-  // Lançar Magia via Modal Completo de Conjuração com Aprimoramentos
+  const handleApplyHpSheet = (mode: HpMode, amount: number, reason: string, tempOp: 'add' | 'set') => {
+    if (mode === 'dano') handleModifyHp(-amount, reason);
+    else if (mode === 'cura') handleModifyHp(amount, reason);
+    else handleApplyTempHp(amount, tempOp, reason || undefined);
+  };
+
+  const handleApplyMpSheet = (mode: MpMode, amount: number, reason: string) => {
+    const delta = mode === 'gastar' ? -amount : amount;
+    const base = mode === 'gastar' ? `Gastou ${amount} PM.` : `Recuperou ${amount} PM.`;
+    handleModifyMp(delta, { actionReason: reason ? `${base} — ${reason}` : base });
+  };
+
+  /* ------------------------------------------------------------------------
+     Magias
+     ------------------------------------------------------------------------ */
   const handleCastSpellFromModal = (
     spellName: string,
     pmCost: number,
     rollInfo?: { title: string; sides: number; count: number; modifier: number }
   ) => {
-    handleModifyMp(-pmCost, {
-      spellCast: {
-        spellName,
-        pmCost,
-        circle: selectedCastSpell?.circle,
-      },
-    });
-    if (rollInfo) {
-      onRollDice(rollInfo.title, rollInfo.sides, rollInfo.modifier, rollInfo.count);
-    } else {
-      onRollDice(`Lançamento da magia ${spellName} (Custo: ${pmCost} PM)`, 20, 0, 1);
-    }
+    handleModifyMp(-pmCost, { spellCast: { spellName, pmCost, circle: selectedCastSpell?.circle } });
+    if (rollInfo) onRollDice(rollInfo.title, rollInfo.sides, rollInfo.modifier, rollInfo.count);
+    else onRollDice(`Lançamento da magia ${spellName} (Custo: ${pmCost} PM)`, 20, 0, 1);
   };
 
-  // Lançar Magia no Estado Padrão (direto, sem aprimoramentos adicionais)
   const handleCastStandardSpell = (sp: CharacterSpell) => {
     const baseCost = BASE_SPELL_COST_BY_CIRCLE[sp.circle || 1] || 1;
-
     if (character.stats.currentMp < baseCost) {
-      alert(`Pontos de Mana insuficientes para lançar ${sp.name}! Custo: ${baseCost} PM, Disponível: ${character.stats.currentMp} PM.`);
+      toast(`PM insuficientes para ${sp.name}: custa ${baseCost} PM, você tem ${character.stats.currentMp}.`, { tone: 'warning' });
       return;
     }
+    handleModifyMp(-baseCost, { spellCast: { spellName: sp.name, pmCost: baseCost, circle: sp.circle } });
 
-    handleModifyMp(-baseCost, {
-      spellCast: {
-        spellName: sp.name,
-        pmCost: baseCost,
-        circle: sp.circle,
-      },
-    });
-
-    // Detecta dados de dano ou cura padrão no texto canônico da magia
+    // Detecta o dado de dano/efeito padrão no texto canônico da magia
     const match = (sp.description || '').match(/(\d+)d(\d+)(?:\s*\+\s*(\d+))?/i);
     if (match) {
       const count = parseInt(match[1], 10);
       const sides = parseInt(match[2], 10);
       const mod = match[3] ? parseInt(match[3], 10) : 0;
-      onRollDice(`Lançamento da magia ${sp.name} [Dano/Efeito - ${count}d${sides}${mod > 0 ? `+${mod}` : ''} (${baseCost} PM)]`, sides, mod, count);
+      onRollDice(
+        `Lançamento da magia ${sp.name} [Dano/Efeito - ${count}d${sides}${mod > 0 ? `+${mod}` : ''} (${baseCost} PM)]`,
+        sides,
+        mod,
+        count
+      );
     } else {
       onRollDice(`Lançamento da magia ${sp.name} [Padrão - ${baseCost} PM]`, 20, 0, 1);
     }
   };
 
-  // Alternar Equipamento Equipado/Desequipado com recálculo automático de estatísticas
+  /* ------------------------------------------------------------------------
+     Inventário, condições e rolagens
+     ------------------------------------------------------------------------ */
   const handleToggleEquip = (itemId: string) => {
-    const updatedInventory = character.inventory.map((item) => {
-      if (item.id === itemId) {
-        return { ...item, isEquipped: !item.isEquipped };
-      }
-      return item;
-    });
-    const updatedSheet = recalculateFullCharacterSheet({
-      ...character,
-      inventory: updatedInventory,
-    });
-    onUpdateCharacter(updatedSheet);
+    const updatedInventory = character.inventory.map((item) =>
+      item.id === itemId ? { ...item, isEquipped: !item.isEquipped } : item
+    );
+    onUpdateCharacter(recalculateFullCharacterSheet({ ...character, inventory: updatedInventory }));
   };
 
-  // Alternar Condição Ativa com recálculo canônico integral imediato
+  const handleRemoveItem = async (item: CharacterInventoryItem) => {
+    const ok = await confirm({
+      title: `Remover ${item.name}?`,
+      message: 'O item sai da mochila. A remoção fica registrada na auditoria.',
+      confirmLabel: 'Remover',
+      tone: 'danger',
+    });
+    if (!ok) return;
+    const updated = recalculateFullCharacterSheet({
+      ...character,
+      inventory: character.inventory.filter((i) => i.id !== item.id),
+    });
+    onUpdateCharacter(updated, { actionReason: `Removeu ${item.name} do inventário.` });
+    toast(`${item.name} removido da mochila.`);
+  };
+
   const handleToggleCondition = (condId: string) => {
     const isPresent = character.activeConditions.includes(condId);
     const updated = isPresent
       ? character.activeConditions.filter((c) => c !== condId)
       : [...character.activeConditions, condId];
-    const updatedSheet = recalculateFullCharacterSheet({
-      ...character,
-      activeConditions: updated,
-    });
-    onUpdateCharacter(updatedSheet);
+    onUpdateCharacter(recalculateFullCharacterSheet({ ...character, activeConditions: updated }));
   };
 
-  // Rolar Perícia (bônus já com cálculo de condições canônicas)
-  const handleRollSkill = (skillName: string, totalMod: number, formula: string) => {
-    onRollDice(`Teste de ${skillName} [${formula}]`, 20, totalMod);
+  const handleRollSkill = (name: string, totalMod: number, formula: string) => {
+    onRollDice(`Teste de ${name} [${formula}]`, 20, totalMod);
   };
 
-  // Rolar Ataque (com verificação e aplicação de condições ativas)
-  const handleRollAttack = (weaponName: string, attackMod: number, isMelee: boolean = true) => {
-    const { penalty, reasons } = getAttackConditionPenalty(character.activeConditions, isMelee);
-    const totalAttack = attackMod + penalty;
-    const condNote = reasons.length > 0 ? ` [${reasons.join(', ')}]` : '';
-    onRollDice(`Ataque com ${weaponName}${condNote}`, 20, totalAttack);
+  // Ataque: Luta/Pontaria + bônus da arma + condições exclusivas de ataque (Cap. 5, pág. 230)
+  const handleRollAttack = (weapon: CharacterInventoryItem) => {
+    const attack = calculateWeaponAttack(character, weapon);
+    const condNote = attack.conditionReasons.length > 0 ? ` [${attack.conditionReasons.join(', ')}]` : '';
+    onRollDice(`Ataque com ${weapon.name}${condNote}`, 20, attack.value);
   };
 
-  // Rolar Dano
-  const handleRollDamage = (weaponName: string, damageStr: string = '1d8') => {
-    const match = damageStr.match(/(\d+)d(\d+)/);
-    if (match) {
-      const count = parseInt(match[1], 10);
-      const sides = parseInt(match[2], 10);
-      onRollDice(`Dano de ${weaponName} (${damageStr})`, sides, 0, count);
-    } else {
-      onRollDice(`Dano de ${weaponName}`, 8, 0, 1);
+  // Dano: dado da arma + Força (corpo a corpo/arremesso) + bônus de melhorias (Cap. 5, pág. 230)
+  const handleRollDamage = (weapon: CharacterInventoryItem) => {
+    const dmg = calculateWeaponDamage(character, weapon);
+    if (!dmg) {
+      toast(`${weapon.name} não causa dano direto.`);
+      return;
     }
+    const parts = dmg.components
+      .slice(1)
+      .map((c) => `${c.label} ${typeof c.value === 'number' && c.value >= 0 ? '+' : ''}${c.value}`)
+      .join(', ');
+    onRollDice(`Dano de ${weapon.name} [${dmg.count}d${dmg.sides}${parts ? ` + ${parts}` : ''}]`, dmg.sides, dmg.modifier, dmg.count);
   };
 
-  // Gerenciamento e Edição de Dinheiro (Tibares T$)
-  const handleSaveMoney = () => {
+  const handleConfirmMoney = (operation: MoneyOperation, amount: number, reason: string) => {
     const current = character.tibares ?? 0;
-    let newAmount = current;
-    if (moneyOperation === 'add') {
-      newAmount = current + Math.max(0, moneyAmount);
-    } else if (moneyOperation === 'remove') {
-      newAmount = Math.max(0, current - Math.max(0, moneyAmount));
-    } else {
-      newAmount = Math.max(0, moneyAmount);
-    }
-
-    const defaultReason = moneyOperation === 'add'
-      ? `Ganho de T$ ${moneyAmount}`
-      : moneyOperation === 'remove'
-        ? `Gasto de T$ ${moneyAmount}`
-        : `Saldo ajustado para T$ ${newAmount}`;
-
-    const reasonText = moneyReason.trim() ? `${defaultReason} - ${moneyReason.trim()}` : defaultReason;
-
-    onUpdateCharacter(
-      {
-        ...character,
-        tibares: newAmount,
-      },
-      {
-        actionReason: reasonText,
-      }
-    );
-    setIsMoneyModalOpen(false);
-    setMoneyReason('');
+    const newAmount =
+      operation === 'add' ? current + amount : operation === 'remove' ? Math.max(0, current - amount) : Math.max(0, amount);
+    const base =
+      operation === 'add' ? `Ganho de T$ ${amount}` : operation === 'remove' ? `Gasto de T$ ${amount}` : `Saldo ajustado para T$ ${newAmount}`;
+    onUpdateCharacter({ ...character, tibares: newAmount }, { actionReason: reason ? `${base} - ${reason}` : base });
   };
 
-  // Salvamento de Item Customizado na Oficina / Forja (auditável)
-  const handleSaveCustomizedItem = (
-    customizedItem: EquipmentItem,
-    appliedModifierIds: string[],
-    totalCost: number
-  ) => {
-    if (!customizingInventoryItem) return;
-
-    const currentTibares = character.tibares ?? 0;
-    const newTibares = Math.max(0, currentTibares - totalCost);
-
-    const updatedInventory = character.inventory.map((item) => {
-      if (item.id === customizingInventoryItem.id) {
-        return {
-          ...item,
-          name: customizedItem.name,
-          appliedModifiers: appliedModifierIds,
-          specialMaterial: customizedItem.specialMaterial,
-          defenseBonus: customizedItem.defenseBonus,
-          damage: customizedItem.damage,
-          critical: customizedItem.critical,
-          spaces: customizedItem.spaces,
-          price: customizedItem.price,
-        };
-      }
-      return item;
-    });
-
-    const updatedSheet = recalculateFullCharacterSheet({
-      ...character,
-      tibares: newTibares,
-      inventory: updatedInventory,
-    });
-
+  // Oficina / forja (auditável)
+  const handleSaveCustomizedItem = (customizedItem: EquipmentItem, appliedModifierIds: string[], totalCost: number) => {
+    if (!customizingItem) return;
+    const newTibares = Math.max(0, (character.tibares ?? 0) - totalCost);
+    const updatedInventory = character.inventory.map((item) =>
+      item.id === customizingItem.id
+        ? {
+            ...item,
+            name: customizedItem.name,
+            appliedModifiers: appliedModifierIds,
+            specialMaterial: customizedItem.specialMaterial,
+            defenseBonus: customizedItem.defenseBonus,
+            armorPenalty: customizedItem.armorPenalty,
+            attackBonus: customizedItem.attackBonus,
+            damage: customizedItem.damage,
+            critical: customizedItem.critical,
+            spaces: customizedItem.spaces,
+            price: customizedItem.price,
+          }
+        : item
+    );
+    const updatedSheet = recalculateFullCharacterSheet({ ...character, tibares: newTibares, inventory: updatedInventory });
     const modsText = appliedModifierIds.length > 0 ? ` [Modificações: ${appliedModifierIds.join(', ')}]` : '';
     const matText = customizedItem.specialMaterial ? ` [Material: ${customizedItem.specialMaterial}]` : '';
     const costText = totalCost > 0 ? ` (Custo de forja: T$ ${totalCost})` : '';
-
     onUpdateCharacter(updatedSheet, {
       actionReason: `Modificação de equipamento na Oficina/Forja: ${customizedItem.name}${modsText}${matText}${costText}`,
     });
-
-    setCustomizingInventoryItem(null);
+    setCustomizingItem(null);
+    toast(`${customizedItem.name} saiu da forja.`, { tone: 'success' });
   };
 
-  // Handlers para abrir detalhes de Raça, Classe, Origem, Divindade e Condições
+  /* ------------------------------------------------------------------------
+     Detalhes de raça, classe, origem, divindade e condições
+     ------------------------------------------------------------------------ */
   const handleOpenRaceDetail = () => {
     const race = RACES_LIST.find((r) => r.id === character.raceId);
     if (!race) return;
     setModalDetail({
       title: race.name,
-      category: 'Raça Canônica • Tormenta 20 JDA',
-      subtitle: `Tamanho: ${race.size} • Deslocamento: ${race.speed}m`,
+      category: 'Raça',
+      subtitle: `Tamanho ${race.size} · Deslocamento ${race.speed}m`,
       description:
-        race.description +
-        '\n\n' +
-        race.abilities.map((a) => `• ${a.name} (${a.type}): ${a.description}`).join('\n\n'),
+        race.description + '\n\n' + race.abilities.map((a) => `• ${a.name} (${a.type}): ${a.description}`).join('\n\n'),
       ruleCitation: {
         id: `RACE_${race.id.toUpperCase()}`,
         title: `Raça: ${race.name}`,
@@ -363,11 +347,11 @@ export const CharacterSheetView: React.FC<CharacterSheetViewProps> = ({
     if (!cls) return;
     setModalDetail({
       title: cls.name,
-      category: 'Classe Canônica • Tormenta 20 JDA',
-      subtitle: `Função: ${cls.role} • PV Inicial: ${cls.hpInitial} (+${cls.hpPerLevel}/nível) • PM: ${cls.mpInitial} (+${cls.mpPerLevel}/nível)`,
+      category: 'Classe',
+      subtitle: `${cls.role} · PV ${cls.hpInitial} (+${cls.hpPerLevel}/nível) · PM ${cls.mpInitial} (+${cls.mpPerLevel}/nível)`,
       description:
         cls.description +
-        `\n\nPerícias obrigatórias: ${cls.mandatorySkills.join(', ')}.\nPerícias adicionais de classe: ${cls.skillChoicesCount} à escolha da lista da classe.`,
+        `\n\nPerícias obrigatórias: ${cls.mandatorySkills.map(skillName).join(', ')}.\nPerícias adicionais: ${cls.skillChoicesCount} à escolha da lista da classe.`,
       ruleCitation: {
         id: `CLASS_${cls.id.toUpperCase()}`,
         title: `Classe: ${cls.name}`,
@@ -386,23 +370,14 @@ export const CharacterSheetView: React.FC<CharacterSheetViewProps> = ({
     if (!origin) return;
     setModalDetail({
       title: origin.name,
-      category: 'Origem • Tormenta 20 JDA',
-      subtitle: `Itens Iniciais: ${origin.items.join(', ')}`,
+      category: 'Origem',
+      subtitle: `Itens iniciais: ${origin.items.join(', ')}`,
       description:
         origin.description +
         '\n\n' +
-        `Perícias concedidas: ${origin.skills.join(', ')}.\n\n` +
-        `Poderes da Origem:\n${origin.powers.map((p) => `• ${p.name} (${p.type}): ${p.description}`).join('\n')}`,
-      ruleCitation: RULES_CITATIONS.ORIGIN_SKILL_REPLACEMENT || {
-        id: `ORIGIN_${origin.id.toUpperCase()}`,
-        title: `Origem: ${origin.name}`,
-        book: 'Tormenta 20: Edição Jogo do Ano (v1.3)',
-        chapter: 'Capítulo 1: Construção de Personagem',
-        section: 'Origens',
-        page: 'Página 94 a 101',
-        quote: origin.description,
-        explanation: 'Origens concedem 2 benefícios (perícias ou poderes) e itens iniciais característicos.',
-      },
+        `Perícias concedidas: ${origin.skills.map(skillName).join(', ')}.\n\n` +
+        `Poderes da origem:\n${origin.powers.map((p) => `• ${p.name} (${p.type}): ${p.description}`).join('\n')}`,
+      ruleCitation: RULES_CITATIONS.ORIGIN_SKILL_REPLACEMENT,
     });
   };
 
@@ -411,12 +386,12 @@ export const CharacterSheetView: React.FC<CharacterSheetViewProps> = ({
     if (!deity) return;
     setModalDetail({
       title: `${deity.name}, ${deity.title}`,
-      category: 'Divindade do Panteão • Tormenta 20 JDA',
-      subtitle: `Símbolo Sagrado: ${deity.symbol} • Canalização: Energia ${deity.energyChannel}`,
+      category: 'Divindade',
+      subtitle: `Símbolo: ${deity.symbol} · Energia ${deity.energyChannel}`,
       description:
         deity.description +
-        (deity.obligations ? `\n\nObrigações e Restrições:\n${deity.obligations}` : '') +
-        `\n\nPoderes Concedidos:\n` +
+        (deity.obligations ? `\n\nObrigações e restrições:\n${deity.obligations}` : '') +
+        `\n\nPoderes concedidos:\n` +
         deity.grantedPowers.map((p) => `• ${p.name}: ${p.description}`).join('\n\n'),
       ruleCitation: {
         id: `DEITY_${deity.id.toUpperCase()}`,
@@ -433,175 +408,213 @@ export const CharacterSheetView: React.FC<CharacterSheetViewProps> = ({
 
   const handleOpenConditionRules = () => {
     setModalDetail({
-      title: 'Regras de Condições • Tormenta 20',
-      category: 'Regras Oficiais • Tormenta 20 JDA',
-      subtitle: 'Capítulo 5: Jogando — Condições (pág. 394)',
+      title: 'Condições',
+      category: 'Regra oficial',
+      subtitle: 'Apêndice: Lista de Condições (págs. 394–395)',
       description:
         'Condições alteram as capacidades do personagem de forma temporária ou contínua. Elas podem impor penalidades em testes, impedir ações ou conceder vulnerabilidades.\n\nCondições iguais não se acumulam; apenas seus efeitos mais severos se aplicam.',
       ruleCitation: {
         id: 'RULES_CONDITIONS',
         title: 'Condições do Sistema',
         book: 'Tormenta 20: Edição Jogo do Ano (v1.3)',
-        chapter: 'Capítulo 5: Jogando',
-        section: 'Condições',
-        page: 'Página 394 a 397 (Apêndice)',
+        chapter: 'Apêndice',
+        section: 'Lista de Condições',
+        page: 'Páginas 394 a 395',
         quote: '“Uma condição é um estado passageiro que afeta o personagem...”',
-        explanation: 'Clique nas condições abaixo para ativar ou desativar o efeito em tempo real na ficha.',
+        explanation: 'Ative ou desative uma condição para recalcular perícias, Defesa e ataques em tempo real.',
       },
+      initialTab: 'rules',
     });
   };
 
+  const customizingEquipment: EquipmentItem | null = customizingItem
+    ? EQUIPMENT_LIST.find((e) => e.id === (customizingItem.equipmentId || customizingItem.id)) || {
+        id: customizingItem.equipmentId || customizingItem.id,
+        name: customizingItem.name,
+        category: customizingItem.category as EquipmentItem['category'],
+        subcategory: customizingItem.subcategory,
+        spaces: customizingItem.spaces,
+        price: customizingItem.price || 'T$ 0',
+        damage: customizingItem.damage,
+        critical: customizingItem.critical,
+        damageType: customizingItem.damageType,
+        range: customizingItem.range,
+        defenseBonus: customizingItem.defenseBonus,
+        armorPenalty: customizingItem.armorPenalty,
+        attackBonus: customizingItem.attackBonus,
+        description: customizingItem.description || '',
+      }
+    : null;
+
+  const tabs: { id: SheetTab; label: string; icon: React.ReactNode; hidden?: boolean }[] = [
+    { id: 'combate', label: 'Combate', icon: <Sword size={17} /> },
+    { id: 'pericias', label: 'Perícias', icon: <Dices size={17} /> },
+    { id: 'poderes', label: 'Poderes', icon: <Sparkles size={17} /> },
+    { id: 'magias', label: 'Magias', icon: <Zap size={17} />, hidden: !hasSpells },
+    { id: 'inventario', label: 'Mochila', icon: <Backpack size={17} /> },
+    { id: 'notas', label: 'Notas', icon: <BookOpen size={17} /> },
+    { id: 'registro', label: 'Registro', icon: <ScrollText size={17} /> },
+  ];
+
   return (
-    <div className="container" style={{ padding: '1.5rem 1.5rem 6rem 1.5rem', maxWidth: '1280px' }}>
-      {/* Cabeçalho e Barra Superior */}
-      <CharacterHeader
-        character={character}
-        activeTab={activeTab}
-        onBackToList={onBackToList}
-        onSelectTab={setActiveTab}
-        onEditInWizard={onEditInWizard}
-        onExportJson={onExportJson}
-        onOpenLevelUp={() => setIsLevelUpModalOpen(true)}
-        onOpenRaceDetail={handleOpenRaceDetail}
-        onOpenClassDetail={handleOpenClassDetail}
-        onOpenOriginDetail={handleOpenOriginDetail}
-        onOpenDeityDetail={handleOpenDeityDetail}
+    <>
+      <AppBar
+        onBack={onBackToList}
+        backLabel="Voltar aos heróis"
+        title={character.name}
+        subtitle={heroLine(character)}
+        headingHidden={heroVisible}
+        actions={
+          <button type="button" className="icon-btn" onClick={() => setMenuOpen(true)} aria-label="Mais ações da ficha">
+            <MoreVertical size={22} />
+          </button>
+        }
       />
 
-      {/* Vitais: PV, PM, Defesa, Deslocamento e Carga */}
-      <CharacterResourceBars
-        character={character}
-        onModifyHp={handleModifyHp}
-        onModifyMp={handleModifyMp}
-        onOpenTempHpModal={() => {
-          setTempHpAmount((character.stats.tempHp || 0) > 0 ? character.stats.tempHp : 5);
-          setTempHpReason('');
-          setIsTempHpModalOpen(true);
-        }}
+      <main className="page page-wide sheet-page">
+        <div className="sheet-layout">
+          <div className="sheet-side stack-lg">
+            <CharacterHeader
+              character={character}
+              onOpenLevelUp={() => setIsLevelUpOpen(true)}
+              onOpenRaceDetail={handleOpenRaceDetail}
+              onOpenClassDetail={handleOpenClassDetail}
+              onOpenOriginDetail={handleOpenOriginDetail}
+              onOpenDeityDetail={handleOpenDeityDetail}
+            />
+            <div ref={heroSentinelRef} aria-hidden="true" />
+            <CharacterResourceBars
+              character={character}
+              onModifyHp={(d) => handleModifyHp(d)}
+              onModifyMp={(d) => handleModifyMp(d)}
+              onOpenAdjust={setAdjustKind}
+            />
+            <CharacterConditions
+              activeConditions={character.activeConditions}
+              onToggleCondition={handleToggleCondition}
+              onOpenConditionRules={handleOpenConditionRules}
+            />
+            <CharacterAttributes character={character} onRollDice={onRollDice} onSetModalDetail={setModalDetail} />
+          </div>
+
+          <div className="sheet-main">
+            <div className="subbar subbar-tabs no-print" ref={tabsRef}>
+              <div className="tabs" role="tablist" aria-label="Seções da ficha">
+                {tabs
+                  .filter((t) => !t.hidden)
+                  .map((tab) => (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      role="tab"
+                      aria-selected={currentTab === tab.id}
+                      className="tab"
+                      onClick={() => selectTab(tab.id)}
+                    >
+                      {tab.icon}
+                      {tab.label}
+                    </button>
+                  ))}
+              </div>
+            </div>
+
+            <div className="sheet-tab-panel animate-in" key={currentTab} role="tabpanel">
+              {currentTab === 'combate' && (
+                <CombatTab
+                  character={character}
+                  onRollAttack={handleRollAttack}
+                  onRollDamage={handleRollDamage}
+                  onRollSkill={handleRollSkill}
+                  onGoToInventory={() => selectTab('inventario')}
+                  onSetModalDetail={setModalDetail}
+                />
+              )}
+              {currentTab === 'pericias' && (
+                <SkillsTab character={character} onRollSkill={handleRollSkill} onSetModalDetail={setModalDetail} />
+              )}
+              {currentTab === 'poderes' && (
+                <PowersTab character={character} onSetModalDetail={setModalDetail} onNavigateToCompendium={onNavigateToCompendium} />
+              )}
+              {currentTab === 'magias' && (
+                <SpellsTab
+                  character={character}
+                  onCastStandardSpell={handleCastStandardSpell}
+                  onSelectCastSpell={setSelectedCastSpell}
+                  onSetModalDetail={setModalDetail}
+                />
+              )}
+              {currentTab === 'inventario' && (
+                <InventoryTab
+                  character={character}
+                  onOpenAddItemModal={() => setIsAddItemOpen(true)}
+                  onOpenMoneyModal={() => setIsMoneyOpen(true)}
+                  onCustomizeItem={setCustomizingItem}
+                  onToggleEquip={handleToggleEquip}
+                  onRemoveItem={handleRemoveItem}
+                  onSetModalDetail={setModalDetail}
+                />
+              )}
+              {currentTab === 'notas' && (
+                <BioTab character={character} onUpdateCharacter={(updated) => onUpdateCharacter(updated)} />
+              )}
+              {currentTab === 'registro' && (
+                <LogsTab
+                  characterId={character.id}
+                  characterName={character.name}
+                  revision={`${character.updatedAt}-${recentRolls.length}-${recentRolls[0]?.id || ''}`}
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <MenuSheet
+        open={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        title={character.name}
+        subtitle={heroLine(character)}
+        items={[
+          {
+            id: 'levelup',
+            label: `Subir para o nível ${character.level + 1}`,
+            icon: <ChevronsUp size={20} />,
+            hidden: character.level >= 20,
+            onSelect: () => setIsLevelUpOpen(true),
+          },
+          {
+            id: 'edit',
+            label: 'Editar no criador',
+            description: 'Refaz as escolhas de 1º nível',
+            icon: <Pencil size={20} />,
+            onSelect: onEditInWizard,
+          },
+          { id: 'export', label: 'Exportar JSON', icon: <Download size={20} />, onSelect: onExportJson },
+          { id: 'print', label: 'Imprimir / salvar PDF', icon: <Printer size={20} />, onSelect: () => window.print() },
+          { id: 'logs', label: 'Ver registro', icon: <FileText size={20} />, onSelect: () => selectTab('registro') },
+        ]}
       />
 
-      {/* Condições Ativas Rápidas */}
-      <CharacterConditions
-        activeConditions={character.activeConditions}
-        onToggleCondition={handleToggleCondition}
-        onOpenConditionRules={handleOpenConditionRules}
-      />
-
-      {/* Atributos (6 caixas com roll button e breakdown) */}
-      <CharacterAttributes
-        character={character}
-        onRollDice={onRollDice}
-        onSetModalDetail={setModalDetail}
-      />
-
-      {/* Abas de Navegação Interna da Ficha */}
-      <div
-        className="no-print"
-        style={{
-          display: 'flex',
-          gap: '0.5rem',
-          marginBottom: '1.5rem',
-          borderBottom: '1px solid var(--border-color)',
-          paddingBottom: '0.75rem',
-          overflowX: 'auto',
-        }}
-      >
-        {[
-          { id: 'combate', label: 'Combate', icon: Sword },
-          { id: 'pericias', label: 'Perícias', icon: Dices },
-          { id: 'poderes', label: 'Poderes & Habilidades', icon: Sparkles },
-          ...(character.spells && character.spells.length > 0
-            ? [{ id: 'magias', label: 'Grimório & Magias', icon: Zap }]
-            : []),
-          { id: 'inventario', label: 'Inventário & Carga', icon: Package },
-          { id: 'bio', label: 'Biografia & Notas', icon: BookOpen },
-          { id: 'logs', label: 'Logs', icon: FileText },
-        ].map((tab) => {
-          const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`btn ${isActive ? 'btn-primary' : 'btn-secondary'}`}
-              style={{ gap: '0.4rem', whiteSpace: 'nowrap' }}
-            >
-              <Icon size={16} />
-              {tab.label}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Conteúdo das Abas */}
-      {activeTab === 'combate' && (
-        <CombatTab
-          character={character}
-          onRollAttack={handleRollAttack}
-          onRollDamage={handleRollDamage}
-        />
-      )}
-
-      {activeTab === 'pericias' && (
-        <SkillsTab
-          character={character}
-          onRollSkill={handleRollSkill}
-          onSetModalDetail={setModalDetail}
-        />
-      )}
-
-      {activeTab === 'poderes' && (
-        <PowersTab
-          character={character}
-          onSetModalDetail={setModalDetail}
-          onNavigateToCompendium={onNavigateToCompendium}
-        />
-      )}
-
-      {activeTab === 'magias' && (
-        <SpellsTab
-          character={character}
-          onCastStandardSpell={handleCastStandardSpell}
-          onSelectCastSpell={setSelectedCastSpell}
-          onSetModalDetail={setModalDetail}
-        />
-      )}
-
-      {activeTab === 'inventario' && (
-        <InventoryTab
-          character={character}
-          onOpenAddItemModal={() => setIsAddItemModalOpen(true)}
-          onOpenMoneyModal={() => {
-            setMoneyAmount(10);
-            setMoneyReason('');
-            setMoneyOperation('add');
-            setIsMoneyModalOpen(true);
-          }}
-          onCustomizeItem={setCustomizingInventoryItem}
-          onToggleEquip={handleToggleEquip}
-          onSetModalDetail={setModalDetail}
-        />
-      )}
-
-      {activeTab === 'bio' && (
-        <BioTab
-          character={character}
-          onUpdateCharacter={(updatedChar) => onUpdateCharacter(updatedChar)}
-        />
-      )}
-
-      {activeTab === 'logs' && (
-        <LogsTab
-          characterId={character.id}
-          characterName={character.name}
-        />
-      )}
-
-      {/* Modais */}
       <DetailModal data={modalDetail} onClose={() => setModalDetail(null)} />
 
-      {/* Modais com Lazy Loading */}
+      <VitalAdjustSheet
+        open={!!adjustKind}
+        kind={adjustKind || 'hp'}
+        current={adjustKind === 'mp' ? character.stats.currentMp : character.stats.currentHp}
+        max={adjustKind === 'mp' ? character.stats.maxMp.value : character.stats.maxHp.value}
+        temp={character.stats.tempHp || 0}
+        onClose={() => setAdjustKind(null)}
+        onApplyHp={handleApplyHpSheet}
+        onApplyMp={handleApplyMpSheet}
+      />
+
+      <MoneySheet
+        open={isMoneyOpen}
+        currentTibares={character.tibares ?? 0}
+        onClose={() => setIsMoneyOpen(false)}
+        onConfirm={handleConfirmMoney}
+      />
+
       <Suspense fallback={null}>
         {selectedCastSpell && (
           <SpellCastModal
@@ -613,78 +626,40 @@ export const CharacterSheetView: React.FC<CharacterSheetViewProps> = ({
           />
         )}
 
-        <LevelUpModal
-          character={character}
-          isOpen={isLevelUpModalOpen}
-          onClose={() => setIsLevelUpModalOpen(false)}
-          onSaveLevelUp={(updated) => onUpdateCharacter(updated)}
-        />
+        {isLevelUpOpen && (
+          <LevelUpModal
+            character={character}
+            isOpen={isLevelUpOpen}
+            onClose={() => setIsLevelUpOpen(false)}
+            onSaveLevelUp={(updated) => {
+              onUpdateCharacter(updated);
+              toast(`${updated.name} alcançou o nível ${updated.level}!`, { tone: 'success' });
+            }}
+          />
+        )}
 
-        <AddItemModal
-          character={character}
-          isOpen={isAddItemModalOpen}
-          onClose={() => setIsAddItemModalOpen(false)}
-          onSaveCharacter={(updated) => onUpdateCharacter(updated)}
-        />
+        {isAddItemOpen && (
+          <AddItemModal
+            character={character}
+            isOpen={isAddItemOpen}
+            onClose={() => setIsAddItemOpen(false)}
+            onSaveCharacter={(updated) => onUpdateCharacter(updated)}
+          />
+        )}
 
-        {customizingInventoryItem && (
+        {customizingItem && customizingEquipment && (
           <ItemModifierModal
-            key={customizingInventoryItem.id}
-            item={(() => {
-              const match = EQUIPMENT_LIST.find(
-                (e) => e.id === (customizingInventoryItem.equipmentId || customizingInventoryItem.id)
-              );
-              if (match) return match;
-              return {
-                id: customizingInventoryItem.equipmentId || customizingInventoryItem.id,
-                name: customizingInventoryItem.name,
-                category: customizingInventoryItem.category as EquipmentItem['category'],
-                subcategory: customizingInventoryItem.subcategory,
-                spaces: customizingInventoryItem.spaces,
-                price: customizingInventoryItem.price || 'T$ 0',
-                damage: customizingInventoryItem.damage,
-                critical: customizingInventoryItem.critical,
-                damageType: customizingInventoryItem.damageType,
-                range: customizingInventoryItem.range,
-                defenseBonus: customizingInventoryItem.defenseBonus,
-                armorPenalty: customizingInventoryItem.armorPenalty,
-                attackBonus: customizingInventoryItem.attackBonus,
-                description: customizingInventoryItem.description || '',
-              };
-            })()}
-            initialModifiers={customizingInventoryItem.appliedModifiers || []}
-            initialMaterial={customizingInventoryItem.specialMaterial}
+            key={customizingItem.id}
+            item={customizingEquipment}
+            initialModifiers={customizingItem.appliedModifiers || []}
+            initialMaterial={customizingItem.specialMaterial}
             characterTibares={character.tibares ?? 0}
-            isOpen={Boolean(customizingInventoryItem)}
-            onClose={() => setCustomizingInventoryItem(null)}
+            isOpen={Boolean(customizingItem)}
+            onClose={() => setCustomizingItem(null)}
             onApply={handleSaveCustomizedItem}
           />
         )}
       </Suspense>
-
-      <MoneyModal
-        isOpen={isMoneyModalOpen}
-        currentTibares={character.tibares ?? 0}
-        moneyOperation={moneyOperation}
-        moneyAmount={moneyAmount}
-        moneyReason={moneyReason}
-        onSetOperation={setMoneyOperation}
-        onSetAmount={setMoneyAmount}
-        onSetReason={setMoneyReason}
-        onConfirm={handleSaveMoney}
-        onClose={() => setIsMoneyModalOpen(false)}
-      />
-
-      <TempHpModal
-        isOpen={isTempHpModalOpen}
-        currentTempHp={character.stats.tempHp || 0}
-        tempHpAmount={tempHpAmount}
-        tempHpReason={tempHpReason}
-        onSetAmount={setTempHpAmount}
-        onSetReason={setTempHpReason}
-        onApply={handleApplyTempHp}
-        onClose={() => setIsTempHpModalOpen(false)}
-      />
-    </div>
+    </>
   );
 };

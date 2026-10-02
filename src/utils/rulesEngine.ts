@@ -864,3 +864,135 @@ export function recalculateFullCharacterSheet(character: any): any {
     updatedAt: new Date().toISOString(),
   };
 }
+
+/**
+ * Penalidades de condições que afetam SOMENTE testes de ataque (e não as perícias Luta/Pontaria).
+ * As condições físicas (Debilitado/Exausto/Fraco/Fatigado) e de medo (Apavorado/Abalado) já são
+ * aplicadas no valor das perícias por calculateSkillBonus — aplicá-las de novo dobraria a penalidade.
+ * Referência: Tormenta 20 JDA (v1.3), Apêndice: Condições, págs. 394–395.
+ */
+export function getAttackOnlyConditionPenalty(
+  activeConditions: string[] = [],
+  isMelee: boolean = true
+): { penalty: number; reasons: string[] } {
+  const reasons: string[] = [];
+  let penalty = 0;
+
+  if (activeConditions.includes('enredado')) {
+    penalty -= 2;
+    reasons.push('Enredado (-2)');
+  }
+  if (activeConditions.includes('ofuscado')) {
+    penalty -= 2;
+    reasons.push('Ofuscado (-2)');
+  }
+  if (activeConditions.includes('agarrado')) {
+    penalty -= 2;
+    reasons.push('Agarrado (-2)');
+  }
+  if (isMelee && activeConditions.includes('caido')) {
+    penalty -= 5;
+    reasons.push('Caído (-5 corpo a corpo)');
+  }
+
+  return { penalty, reasons };
+}
+
+/** Arma de ataque à distância (Pontaria)? */
+export function isRangedWeapon(weapon: Pick<CharacterInventoryItem, 'subcategory'>): boolean {
+  return weapon.subcategory === 'distancia';
+}
+
+/**
+ * Armas corpo a corpo e de arremesso somam Força no dano; armas de disparo não.
+ * Armas à distância que somam Força (arremesso, funda, arco longo) são identificadas pela descrição canônica.
+ * Referência: Tormenta 20 JDA (v1.3), Capítulo 5: Jogando — Dano, pág. 230 (PDF pág. 236).
+ */
+export function weaponAddsStrengthToDamage(
+  weapon: Pick<CharacterInventoryItem, 'subcategory' | 'description'>
+): boolean {
+  if (!isRangedWeapon(weapon)) return true;
+  return /arremess|for[çc]a/i.test(weapon.description || '');
+}
+
+/**
+ * Teste de ataque com arma = perícia (Luta corpo a corpo / Pontaria à distância)
+ * + bônus de ataque da arma (melhorias como Certeira/Pungente, encantos, materiais)
+ * + penalidades de condições exclusivas de ataque.
+ * Referência: Tormenta 20 JDA (v1.3), Capítulo 5: Jogando — Teste de Ataque, pág. 230 (PDF pág. 236);
+ * Capítulo 3: Equipamento — Melhorias, págs. 164–165 (PDF págs. 170–171).
+ */
+export function calculateWeaponAttack(
+  character: { skills: Record<string, TrainedSkillData>; activeConditions?: string[] },
+  weapon: Pick<CharacterInventoryItem, 'subcategory' | 'attackBonus' | 'name'>
+): StatBreakdown & { isMelee: boolean; conditionReasons: string[] } {
+  const isMelee = !isRangedWeapon(weapon);
+  const skillKey = isMelee ? 'luta' : 'pontaria';
+  const skill = character.skills?.[skillKey];
+  const skillTotal = skill ? skill.total : 0;
+  const itemBonus = weapon.attackBonus || 0;
+  const { penalty, reasons } = getAttackOnlyConditionPenalty(character.activeConditions || [], isMelee);
+
+  const components: StatBreakdown['components'] = [
+    { label: isMelee ? 'Perícia Luta' : 'Perícia Pontaria', value: skillTotal },
+  ];
+  if (itemBonus) components.push({ label: 'Bônus da arma (melhorias)', value: itemBonus });
+  reasons.forEach((r) => {
+    const m = r.match(/\((-?\d+)/);
+    components.push({ label: `Condição: ${r.replace(/\s*\(.*\)$/, '')}`, value: m ? parseInt(m[1], 10) : 0 });
+  });
+
+  const value = skillTotal + itemBonus + penalty;
+  const signed = (n: number) => (n >= 0 ? `+${n}` : `${n}`);
+  const formula = `1d20 + ${isMelee ? 'Luta' : 'Pontaria'} (${signed(skillTotal)})${
+    itemBonus ? ` + Arma (${signed(itemBonus)})` : ''
+  }${penalty ? ` + Condições (${penalty})` : ''}`;
+
+  return { value, formula, components, isMelee, conditionReasons: reasons };
+}
+
+export interface WeaponDamageRoll {
+  /** Quantidade e faces do dado principal (ex.: 1d8). */
+  count: number;
+  sides: number;
+  /** Modificador fixo total (bônus da arma + Força, quando aplicável). */
+  modifier: number;
+  /** Texto pronto para exibir: "1d8+3". */
+  formula: string;
+  components: StatBreakdown['components'];
+  addsStrength: boolean;
+}
+
+/**
+ * Rolagem de dano com arma.
+ * Dano corpo a corpo ou de arremesso = dano da arma + Força; dano com arma de disparo = dano da arma.
+ * Para armas versáteis/duplas ("1d10/1d12", "1d6/1d6") usa o primeiro valor.
+ * Retorna null quando a arma não causa dano (ex.: rede).
+ * Referência: Tormenta 20 JDA (v1.3), Capítulo 5: Jogando — Dano, pág. 230 (PDF pág. 236).
+ */
+export function calculateWeaponDamage(
+  character: { totalAttributes: CharacterAttributes },
+  weapon: Pick<CharacterInventoryItem, 'damage' | 'subcategory' | 'description'>
+): WeaponDamageRoll | null {
+  const raw = (weapon.damage || '').split('/')[0].trim();
+  const dice = raw.match(/(\d+)\s*d\s*(\d+)/i);
+  if (!dice) return null;
+
+  const count = parseInt(dice[1], 10);
+  const sides = parseInt(dice[2], 10);
+  const rest = raw.slice((dice.index || 0) + dice[0].length);
+  const flatMatch = rest.match(/([+-])\s*(\d+)/);
+  const flat = flatMatch ? (flatMatch[1] === '-' ? -1 : 1) * parseInt(flatMatch[2], 10) : 0;
+
+  const addsStrength = weaponAddsStrengthToDamage(weapon);
+  const strength = addsStrength ? character.totalAttributes?.for || 0 : 0;
+
+  const components: StatBreakdown['components'] = [{ label: 'Dado da arma', value: `${count}d${sides}` }];
+  if (flat) components.push({ label: 'Bônus da arma (melhorias)', value: flat });
+  if (addsStrength) components.push({ label: 'Força', value: strength });
+
+  const modifier = flat + strength;
+  const formula = `${count}d${sides}${modifier > 0 ? `+${modifier}` : modifier < 0 ? `${modifier}` : ''}`;
+
+  return { count, sides, modifier, formula, components, addsStrength };
+}

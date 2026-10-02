@@ -1,10 +1,20 @@
-import React, { useState, useEffect, useRef, lazy, Suspense } from 'react';
+import React, { useState, useEffect, useRef, lazy, Suspense, useCallback } from 'react';
+import { BookOpen, Home, Settings2, Users } from 'lucide-react';
+import { App as CapApp } from '@capacitor/app';
+import { SplashScreen } from '@capacitor/splash-screen';
+import { Capacitor } from '@capacitor/core';
 import type { CharacterSheet } from './types/character';
 import { useCharacter } from './contexts/CharacterContext';
 import { useDice } from './contexts/DiceContext';
 import { CharacterList } from './components/hub/CharacterList';
 import { HomeView } from './components/hub/HomeView';
 import type { CompendiumTabType, PowersSubTabType } from './components/compendium/CompendiumView';
+import { DiceRollerWidget } from './components/common/DiceRollerWidget';
+import { SettingsSheet } from './components/settings/SettingsSheet';
+import { Brand } from './components/ui/AppBar';
+import { D20Icon } from './components/ui/Icons';
+import { handleBack } from './components/ui/backStack';
+import { useFeedback } from './components/ui/Feedback';
 
 const WizardContainer = lazy(() =>
   import('./components/wizard/WizardContainer').then((m) => ({ default: m.WizardContainer }))
@@ -15,19 +25,37 @@ const CharacterSheetView = lazy(() =>
 const CompendiumView = lazy(() =>
   import('./components/compendium/CompendiumView').then((m) => ({ default: m.CompendiumView }))
 );
-import { ThemeSelector } from './components/common/ThemeSelector';
-import { DiceRollerWidget } from './components/common/DiceRollerWidget';
-import { Shield, Users, BookOpen, Home } from 'lucide-react';
-import { App as CapApp } from '@capacitor/app';
-import { StatusBar, Style } from '@capacitor/status-bar';
-import { SplashScreen } from '@capacitor/splash-screen';
-import { Capacitor } from '@capacitor/core';
+
+type View = 'home' | 'characters' | 'character-sheet' | 'compendium' | 'wizard';
+type NavId = 'home' | 'heroes' | 'compendium' | 'settings';
+
+interface NavDef {
+  id: NavId;
+  label: string;
+  icon: React.ReactNode;
+}
+
+const NAV_ITEMS: NavDef[] = [
+  { id: 'home', label: 'Início', icon: <Home size={22} /> },
+  { id: 'heroes', label: 'Heróis', icon: <Users size={22} /> },
+  { id: 'compendium', label: 'Compêndio', icon: <BookOpen size={22} /> },
+  { id: 'settings', label: 'Ajustes', icon: <Settings2 size={22} /> },
+];
+
+const ViewLoader: React.FC = () => (
+  <div className="loader" role="status">
+    <D20Icon className="loader-mark" size={44} />
+    <span className="t-sm">Consultando os pergaminhos…</span>
+  </div>
+);
 
 export function App() {
-  const [view, setView] = useState<'home' | 'characters' | 'character-sheet' | 'compendium' | 'wizard'>('home');
+  const [view, setView] = useState<View>('home');
   const [compendiumTab, setCompendiumTab] = useState<CompendiumTabType>('magias');
   const [powersSubTab, setPowersSubTab] = useState<PowersSubTabType>('gerais');
   const [wizardCharacter, setWizardCharacter] = useState<CharacterSheet | null>(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [fabSpin, setFabSpin] = useState(false);
 
   const {
     characters,
@@ -42,33 +70,36 @@ export function App() {
     importCharacter,
   } = useCharacter();
 
-  const { recentRolls, rollDice, clearRecentRolls } = useDice();
+  const { recentRolls, rollDice, clearRecentRolls, isTrayOpen, openTray, closeTray } = useDice();
+  const { toast } = useFeedback();
 
-  // Refs para evitar stale closures no listener do botão voltar nativo
+  const navigate = useCallback((next: View) => {
+    setView(next);
+    window.scrollTo({ top: 0 });
+  }, []);
+
+  // Refs para o listener nativo (evita closures obsoletas)
   const viewRef = useRef(view);
-  const activeCharacterIdRef = useRef(activeCharacterId);
   viewRef.current = view;
-  activeCharacterIdRef.current = activeCharacterId;
 
-  // Integração com Recursos Nativos do Mobile (Status Bar, Splash Screen e Botão Voltar)
+  // O criador é um fluxo em tela cheia: some a navegação e os toasts sobem
+  useEffect(() => {
+    document.documentElement.dataset.flow = view === 'wizard' ? 'true' : 'false';
+  }, [view]);
+
+  // Recursos nativos: splash e botão voltar (sheets/fluxos consomem o voltar primeiro)
   useEffect(() => {
     if (Capacitor.isNativePlatform()) {
-      StatusBar.setStyle({ style: Style.Dark }).catch(() => {});
-      StatusBar.setBackgroundColor({ color: '#090d16' }).catch(() => {});
       SplashScreen.hide().catch(() => {});
     }
 
     const backListener = CapApp.addListener('backButton', () => {
-      if (viewRef.current === 'character-sheet') {
-        setView('characters');
-      } else if (viewRef.current === 'wizard') {
-        if (activeCharacterIdRef.current) {
-          setView('character-sheet');
-        } else {
-          setView('characters');
-        }
-      } else if (viewRef.current !== 'home') {
-        setView('home');
+      if (handleBack()) return;
+      const current = viewRef.current;
+      if (current === 'character-sheet' || current === 'wizard') {
+        navigate('characters');
+      } else if (current !== 'home') {
+        navigate('home');
       } else {
         CapApp.exitApp();
       }
@@ -77,286 +108,211 @@ export function App() {
     return () => {
       backListener.then((sub) => sub.remove()).catch(() => {});
     };
-  }, []);
+  }, [navigate]);
 
-  // Ações de Navegação e Fichas
+  // Ações de navegação e fichas
   const handleOpenCharacter = (char: CharacterSheet) => {
     setActiveCharacterId(char.id);
-    setView('character-sheet');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    navigate('character-sheet');
   };
 
   const handleCreateNew = () => {
     setWizardCharacter(null);
-    setView('wizard');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    navigate('wizard');
   };
 
   const handleEditInWizard = (char?: CharacterSheet) => {
     setWizardCharacter(char || activeCharacter);
-    setView('wizard');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    navigate('wizard');
   };
 
   const handleSaveWizardCharacter = (char: CharacterSheet) => {
     saveCharacter(char);
-    setView('character-sheet');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    navigate('character-sheet');
+    toast(`${char.name} está pronto para a aventura!`, { tone: 'success' });
   };
 
   const handleDeleteCharacter = (id: string) => {
+    const name = characters.find((c) => c.id === id)?.name;
     deleteCharacter(id);
-    setView('characters');
+    navigate('characters');
+    if (name) toast(`${name} foi removido.`, { tone: 'info' });
   };
 
   const handleDuplicateCharacter = (char: CharacterSheet) => {
     duplicateCharacter(char);
-    setView('character-sheet');
+    navigate('character-sheet');
+    toast('Cópia criada.', { tone: 'success' });
   };
 
   const handleImportFile = async (file: File) => {
     try {
-      await importCharacter(file);
-      setView('character-sheet');
-    } catch (err: any) {
-      alert(err.message || 'Erro ao importar arquivo JSON de personagem.');
+      const imported = await importCharacter(file);
+      navigate('character-sheet');
+      toast(`${imported.name} importado com sucesso.`, { tone: 'success' });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : '';
+      toast(message || 'Não foi possível importar o arquivo JSON.', { tone: 'danger' });
     }
   };
 
   const handleNavigateToCompendium = (tab: CompendiumTabType, subTab?: PowersSubTabType) => {
     setCompendiumTab(tab);
     if (subTab) setPowersSubTab(subTab);
-    setView('compendium');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    navigate('compendium');
   };
 
   const handleRoll = (title: string, sides: number, modifier: number, count?: number) => {
     rollDice(title, sides, modifier, count || 1, activeCharacter);
   };
 
+  const handleOpenDice = () => {
+    setFabSpin(true);
+    window.setTimeout(() => setFabSpin(false), 650);
+    openTray();
+  };
+
+  const activeNav: NavId | null = settingsOpen
+    ? 'settings'
+    : view === 'home'
+      ? 'home'
+      : view === 'compendium'
+        ? 'compendium'
+        : view === 'characters' || view === 'character-sheet'
+          ? 'heroes'
+          : null;
+
+  const onNav = (id: NavId) => {
+    if (id === 'settings') {
+      setSettingsOpen(true);
+      return;
+    }
+    setSettingsOpen(false);
+    if (id === 'home') navigate('home');
+    if (id === 'heroes') navigate('characters');
+    if (id === 'compendium') navigate('compendium');
+  };
+
+  const renderNavItem = (item: NavDef) => (
+    <button
+      key={item.id}
+      type="button"
+      className="nav-item"
+      aria-current={activeNav === item.id ? 'page' : undefined}
+      onClick={() => onNav(item.id)}
+    >
+      <span className="nav-pill">{item.icon}</span>
+      <span>{item.label}</span>
+    </button>
+  );
+
+  const diceFab = (
+    <button
+      type="button"
+      className={`dice-fab${fabSpin ? ' is-rolling' : ''}`}
+      onClick={handleOpenDice}
+      aria-label="Abrir bandeja de dados"
+      title="Rolar dados"
+    >
+      <D20Icon />
+    </button>
+  );
+
+  const isFlow = view === 'wizard';
+
   return (
-    <div className="app-layout">
-      {/* Barra de Navegação Superior Global */}
-      <header className="app-topbar no-print">
-        <div className="app-topbar-inner">
-          {/* Logo / Marca */}
-          <div
-            className="app-brand"
-            onClick={() => {
-              setView('home');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-            title="Ir para a página inicial"
-            style={{ cursor: 'pointer' }}
-          >
-            <Shield size={24} style={{ color: 'var(--t20-ruby)' }} />
-            <span className="app-brand-title">Tormenta 20</span>
-          </div>
+    <div className="app" data-flow={isFlow ? 'true' : 'false'}>
+      {/* Nav rail (desktop) */}
+      <nav className="rail no-print" aria-label="Navegação principal">
+        <Brand onClick={() => onNav('home')} compact />
+        {diceFab}
+        {NAV_ITEMS.filter((i) => i.id !== 'settings').map(renderNavItem)}
+        <span className="rail-spacer" />
+        {renderNavItem(NAV_ITEMS[3])}
+      </nav>
 
-          {/* Navegação Desktop (3 Grupos de Navegação) */}
-          <div className="btn-group desktop-nav-group">
-            <button
-              type="button"
-              onClick={() => {
-                setView('home');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
-              className={`btn ${view === 'home' ? 'active' : ''}`}
-            >
-              <Home size={15} />
-              <span>Home</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                if (view === 'character-sheet') {
-                  setView('characters');
-                } else if (activeCharacterId) {
-                  setView('character-sheet');
-                } else {
-                  setView('characters');
-                }
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
-              className={`btn ${view === 'characters' || view === 'character-sheet' || view === 'wizard' ? 'active' : ''}`}
-            >
-              <Users size={15} />
-              <span>{view === 'character-sheet' && activeCharacter ? `Ficha (${activeCharacter.name})` : 'Personagens'}</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                setView('compendium');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
-              className={`btn ${view === 'compendium' ? 'active' : ''}`}
-            >
-              <BookOpen size={15} />
-              <span>Compêndio</span>
-            </button>
-          </div>
-
-          {/* Seletor de Tema Visual */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            <ThemeSelector />
-          </div>
-        </div>
-      </header>
-
-      {/* Visualização: Home */}
-      {view === 'home' && (
-        <HomeView
-          characters={characters}
-          activeCharacter={activeCharacter}
-          onNavigateToCharacters={() => {
-            setView('characters');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
-          onOpenCharacterSheet={handleOpenCharacter}
-          onCreateNewCharacter={handleCreateNew}
-          onNavigateToCompendium={handleNavigateToCompendium}
-        />
-      )}
-
-      {/* Visualização: Lista de Personagens */}
-      {view === 'characters' && (
-        <CharacterList
-          characters={characters}
-          onOpenCharacter={handleOpenCharacter}
-          onEditCharacter={handleEditInWizard}
-          onCreateNew={handleCreateNew}
-          onDuplicateCharacter={handleDuplicateCharacter}
-          onDeleteCharacter={handleDeleteCharacter}
-          onExportCharacter={exportCharacter}
-          onImportCharacter={handleImportFile}
-        />
-      )}
-
-      {/* Visualizações Dinâmicas com Suspense */}
-      <Suspense
-        fallback={
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              minHeight: '60vh',
-              color: 'var(--t20-gold)',
-            }}
-          >
-            <div style={{ textAlign: 'center' }}>
-              <Shield
-                size={36}
-                style={{
-                  color: 'var(--t20-ruby)',
-                  marginBottom: '0.75rem',
-                  filter: 'drop-shadow(0 0 10px rgba(239, 68, 68, 0.5))',
-                }}
-              />
-              <div style={{ fontFamily: 'var(--font-fantasy)', fontSize: '1.15rem', color: '#ffffff' }}>
-                Carregando...
-              </div>
-            </div>
-          </div>
-        }
-      >
-        {/* Visualização: Wizard Passo a Passo */}
-        {view === 'wizard' && (
-          <WizardContainer
-            initialCharacter={wizardCharacter}
-            onSave={handleSaveWizardCharacter}
-            onCancel={() => {
-              if (activeCharacterId) {
-                setView('character-sheet');
-              } else {
-                setView('characters');
-              }
-            }}
-          />
-        )}
-
-        {/* Visualização: Ficha Interativa do Personagem */}
-        {view === 'character-sheet' && activeCharacter && (
-          <CharacterSheetView
-            character={activeCharacter}
-            onUpdateCharacter={updateCharacter}
-            onEditInWizard={() => handleEditInWizard(activeCharacter)}
-            onBackToList={() => {
-              setView('characters');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-            onExportJson={() => exportCharacter(activeCharacter)}
-            onRollDice={handleRoll}
-            onNavigateToCompendium={handleNavigateToCompendium}
-          />
-        )}
-
-        {/* Visualização: Compêndio Unificado (Magias, Poderes, Itens) */}
-        {view === 'compendium' && (
-          <CompendiumView
-            activeTab={compendiumTab}
-            onTabChange={setCompendiumTab}
-            activeCharacter={activeCharacter}
+      <div className="app-main">
+        {view === 'home' && (
+          <HomeView
             characters={characters}
-            initialPowersSubTab={powersSubTab}
-            onBack={() => setView('home')}
+            activeCharacter={activeCharacter}
+            onNavigateToCharacters={() => navigate('characters')}
+            onOpenCharacterSheet={handleOpenCharacter}
+            onCreateNewCharacter={handleCreateNew}
+            onNavigateToCompendium={handleNavigateToCompendium}
+            onOpenDice={handleOpenDice}
+            onOpenSettings={() => setSettingsOpen(true)}
           />
         )}
-      </Suspense>
 
-      {/* Rolador de Dados Flutuante em Todas as Telas */}
+        {view === 'characters' && (
+          <CharacterList
+            characters={characters}
+            activeCharacterId={activeCharacterId}
+            onOpenCharacter={handleOpenCharacter}
+            onEditCharacter={handleEditInWizard}
+            onCreateNew={handleCreateNew}
+            onDuplicateCharacter={handleDuplicateCharacter}
+            onDeleteCharacter={handleDeleteCharacter}
+            onExportCharacter={exportCharacter}
+            onImportCharacter={handleImportFile}
+          />
+        )}
+
+        <Suspense fallback={<ViewLoader />}>
+          {view === 'wizard' && (
+            <WizardContainer
+              initialCharacter={wizardCharacter}
+              onSave={handleSaveWizardCharacter}
+              onCancel={() => navigate(wizardCharacter && activeCharacterId ? 'character-sheet' : 'characters')}
+            />
+          )}
+
+          {view === 'character-sheet' && activeCharacter && (
+            <CharacterSheetView
+              character={activeCharacter}
+              onUpdateCharacter={updateCharacter}
+              onEditInWizard={() => handleEditInWizard(activeCharacter)}
+              onBackToList={() => navigate('characters')}
+              onExportJson={() => exportCharacter(activeCharacter)}
+              onRollDice={handleRoll}
+              onNavigateToCompendium={handleNavigateToCompendium}
+            />
+          )}
+
+          {view === 'compendium' && (
+            <CompendiumView
+              activeTab={compendiumTab}
+              onTabChange={setCompendiumTab}
+              activeCharacter={activeCharacter}
+              characters={characters}
+              initialPowersSubTab={powersSubTab}
+            />
+          )}
+        </Suspense>
+      </div>
+
+      {/* Navegação inferior (mobile) */}
+      {!isFlow && (
+        <nav className="bottom-nav no-print" aria-label="Navegação principal">
+          {renderNavItem(NAV_ITEMS[0])}
+          {renderNavItem(NAV_ITEMS[1])}
+          <div className="nav-fab-slot">{diceFab}</div>
+          {renderNavItem(NAV_ITEMS[2])}
+          {renderNavItem(NAV_ITEMS[3])}
+        </nav>
+      )}
+
       <DiceRollerWidget
         rolls={recentRolls}
-        onRoll={(title, sides, mod) => handleRoll(title, sides, mod)}
+        onRoll={(title, sides, mod, count) => handleRoll(title, sides, mod, count)}
         onClearHistory={clearRecentRolls}
+        isOpen={isTrayOpen}
+        onOpen={openTray}
+        onClose={closeTray}
       />
 
-      {/* Barra de Navegação Inferior Nativa / Mobile (3 Botões Conforme Wireframe) */}
-      <nav className="app-bottom-nav no-print" aria-label="Navegação Mobile">
-        <button
-          type="button"
-          onClick={() => {
-            setView('home');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
-          className={`app-bottom-nav-item ${view === 'home' ? 'active' : ''}`}
-        >
-          <Home size={20} />
-          <span>Home</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => {
-            if (view === 'character-sheet') {
-              setView('characters');
-            } else if (activeCharacterId) {
-              setView('character-sheet');
-            } else {
-              setView('characters');
-            }
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
-          className={`app-bottom-nav-item ${view === 'characters' || view === 'character-sheet' || view === 'wizard' ? 'active' : ''}`}
-        >
-          {view === 'character-sheet' && activeCharacter ? <Shield size={20} /> : <Users size={20} />}
-          <span>{view === 'character-sheet' && activeCharacter ? 'Ficha' : 'Personagens'}</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => {
-            setView('compendium');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
-          className={`app-bottom-nav-item ${view === 'compendium' ? 'active' : ''}`}
-        >
-          <BookOpen size={20} />
-          <span>Compêndio</span>
-        </button>
-      </nav>
+      <SettingsSheet open={settingsOpen} onClose={() => setSettingsOpen(false)} heroCount={characters.length} />
     </div>
   );
 }

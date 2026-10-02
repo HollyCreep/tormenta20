@@ -1,24 +1,26 @@
-import React, { useState, useMemo } from 'react';
+import React, { lazy, Suspense, useEffect, useMemo, useState } from 'react';
+import { Backpack, Coins, Info, MoreVertical, Plus, ShoppingBag, Trash2, Wrench } from 'lucide-react';
 import { EQUIPMENT_LIST } from '../../data/equipment';
-import { EquipmentItem } from '../../types/rules';
-import { CharacterInventoryItem } from '../../types/character';
-import { CLASSES_LIST } from '../../data/classes';
+import type { EquipmentItem } from '../../types/rules';
+import type { CharacterInventoryItem } from '../../types/character';
 import { ORIGINS_LIST } from '../../data/origins';
-import { DetailModalData } from '../common/DetailModal';
-import { ItemCard } from '../common/ItemCard';
-import { ItemModifierModal } from '../compendium/ItemModifierModal';
-import {
-  Coins,
-  Package,
-  Info,
-  Search,
-  ShoppingBag,
-} from 'lucide-react';
+import { RULES_CITATIONS } from '../../data/rulesCitations';
+import type { DetailModalData } from '../common/DetailModal';
 import { getEquipmentDetailModalData } from '../../utils/equipmentDetail';
+import { EmptyState, SearchField, Segmented, SelectField } from '../ui/controls';
+import { MenuSheet } from '../ui/MenuSheet';
+import { Sheet } from '../ui/Sheet';
+import { useFeedback } from '../ui/Feedback';
+import { categoryIcon } from '../sheet/tabs/InventoryTab';
+import { parsePrice } from '../sheet/AddItemModal';
+import { StepIntro } from './wizardUi';
+import { percent } from '../../utils/displayNames';
+
+const ItemModifierModal = lazy(() => import('../compendium/ItemModifierModal').then((m) => ({ default: m.ItemModifierModal })));
 
 interface StepEquipmentProps {
   inventory: CharacterInventoryItem[];
-  tibares: number;
+  tibares?: number;
   maxSpaces: number;
   currentSpaces: number;
   classId?: string;
@@ -28,9 +30,43 @@ interface StepEquipmentProps {
   onOpenDetail: (data: DetailModalData) => void;
 }
 
+const CATEGORIES = [
+  { value: 'todas', label: 'Todas' },
+  { value: 'armas', label: 'Armas' },
+  { value: 'armaduras', label: 'Armaduras' },
+  { value: 'escudos', label: 'Escudos' },
+  { value: 'esotericos', label: 'Esotéricos' },
+  { value: 'alquimia', label: 'Alquimia' },
+  { value: 'itens', label: 'Itens gerais' },
+  { value: 'outros', label: 'Ferramentas e outros' },
+];
+
+const isModifiable = (cat: string) => cat.startsWith('arma') || cat === 'escudo' || cat === 'esoterico';
+const toInventoryItem = (eq: EquipmentItem, extra: Partial<CharacterInventoryItem> = {}): CharacterInventoryItem => ({
+  id: 'inv_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+  equipmentId: eq.id,
+  name: eq.name,
+  category: eq.category,
+  subcategory: eq.subcategory,
+  spaces: eq.spaces,
+  quantity: 1,
+  isEquipped: eq.category.startsWith('arma') || eq.category === 'escudo',
+  damage: eq.damage,
+  attackBonus: eq.attackBonus,
+  critical: eq.critical,
+  damageType: eq.damageType,
+  range: eq.range,
+  defenseBonus: eq.defenseBonus,
+  armorPenalty: eq.armorPenalty,
+  description: eq.description,
+  price: eq.price,
+  isFree: false,
+  source: 'compra',
+  ...extra,
+});
+
 export const StepEquipment: React.FC<StepEquipmentProps> = ({
   inventory,
-  tibares,
   maxSpaces,
   currentSpaces,
   classId,
@@ -39,567 +75,339 @@ export const StepEquipment: React.FC<StepEquipmentProps> = ({
   onUpdateTibares,
   onOpenDetail,
 }) => {
-  const [activeTab, setActiveTab] = useState<'inventario' | 'loja'>('loja');
-  const [activeCategory, setActiveCategory] = useState<string>('todas');
+  const { toast } = useFeedback();
+  const [tab, setTab] = useState<'loja' | 'mochila'>('loja');
+  const [category, setCategory] = useState('todas');
   const [search, setSearch] = useState('');
-  const [customizingItem, setCustomizingItem] = useState<{ item: CharacterInventoryItem; isNew?: boolean } | null>(null);
-  const [showMoneyModal, setShowMoneyModal] = useState(false);
+  const [moneyOpen, setMoneyOpen] = useState(false);
+  const [menuFor, setMenuFor] = useState<CharacterInventoryItem | null>(null);
+  const [forging, setForging] = useState<{ item: EquipmentItem; target?: CharacterInventoryItem } | null>(null);
 
-  // Informações de Classe e Origem
-  const currentClass = CLASSES_LIST.find((c) => c.id === classId);
-  const currentOrigin = ORIGINS_LIST.find((o) => o.id === originId);
+  const origin = ORIGINS_LIST.find((o) => o.id === originId);
 
-  // Cálculo Reativo do Dinheiro Inicial
-  const moneyBreakdown = useMemo(() => {
-    let base = 14; // Média de 4d6 (T$ 4d6)
-    let classBonus = 0;
-    let originBonus = 0;
-    const originsNotes: string[] = [];
-    const classNotes: string[] = [];
-
-    // Bônus de Classe
+  // Dinheiro inicial (mantém a regra já usada pelo app)
+  const money = useMemo(() => {
+    const base = 14; // média de 4d6
+    const notes: string[] = [];
+    let bonus = 0;
     if (classId === 'nobre') {
-      classBonus += 100;
-      classNotes.push('Nobre: Herança abastada e riqueza da corte (+T$ 100)');
+      bonus += 100;
+      notes.push('Nobre: herança abastada (+T$ 100)');
     } else if (classId === 'inventor') {
-      classBonus += 50;
-      classNotes.push('Inventor: Orçamento inicial para protótipos e matérias-primas (+T$ 50)');
+      bonus += 50;
+      notes.push('Inventor: orçamento para protótipos (+T$ 50)');
     }
-
-    // Bônus de Origem
     if (originId === 'aristocrata') {
-      originBonus += 300;
-      originsNotes.push('Aristocrata: Joia de família e dote nobre (+T$ 300)');
+      bonus += 300;
+      notes.push('Aristocrata: joia de família (+T$ 300)');
     } else if (originId === 'membro_guilda' || originId === 'mercador') {
-      originBonus += 100;
-      originsNotes.push('Comerciante/Membro de Guilda: Capital inicial e gemas valiosas (+T$ 100)');
+      bonus += 100;
+      notes.push('Capital de comércio (+T$ 100)');
     } else if (originId === 'marujo') {
-      originBonus += 7; // Média de 2d6
-      originsNotes.push('Marujo: Último soldo e pagamento da tripulação (+T$ 7 [2d6])');
+      bonus += 7;
+      notes.push('Marujo: último soldo, média de 2d6 (+T$ 7)');
     } else if (originId === 'amnesico') {
-      originBonus += 50;
-      originsNotes.push('Amnésico: Moedas misteriosas encontradas em seus pertences (+T$ 50)');
+      bonus += 50;
+      notes.push('Amnésico: moedas misteriosas (+T$ 50)');
     } else if (originId === 'forasteiro' || originId === 'artesao') {
-      originBonus += 50;
-      originsNotes.push('Bens de ofício e mercadorias estrangeiras (+T$ 50)');
+      bonus += 50;
+      notes.push('Bens de ofício (+T$ 50)');
     }
-
-    const totalInitial = base + classBonus + originBonus;
-    return {
-      base,
-      classBonus,
-      classNotes,
-      originBonus,
-      originsNotes,
-      totalInitial,
-    };
+    return { base, notes, total: base + bonus };
   }, [classId, originId]);
 
-  // Converte string de preço (ex: "T$ 25") para número
-  const parsePrice = (priceStr?: string): number => {
-    if (!priceStr) return 0;
-    const cleanStr = priceStr.replace(/[^\d.,]/g, '').replace(',', '.');
-    return parseFloat(cleanStr) || 0;
-  };
+  const spent = inventory.reduce((sum, it) => (it.isFree ? sum : sum + parsePrice(it.price) * (it.quantity || 1)), 0);
+  const remaining = Math.max(0, money.total - spent);
 
-  // Cálculo de gastos com itens comprados
-  const totalSpent = useMemo(() => {
-    return inventory.reduce((sum, it) => {
-      if (it.isFree) return sum;
-      return sum + parsePrice(it.price) * (it.quantity || 1);
-    }, 0);
-  }, [inventory]);
+  useEffect(() => {
+    onUpdateTibares(remaining);
+  }, [remaining, onUpdateTibares]);
 
-  const remainingMoney = Math.max(0, moneyBreakdown.totalInitial - totalSpent);
-
-  // Atualiza o saldo de dinheiro sempre que as compras/saldo mudarem
-  React.useEffect(() => {
-    onUpdateTibares(remainingMoney);
-  }, [remainingMoney, onUpdateTibares]);
-
-  // Filtros da Loja de Equipamentos
-  const filteredEquipment = EQUIPMENT_LIST.filter((eq) => {
-    const matchesCategory =
-      activeCategory === 'todas' ||
-      (activeCategory === 'armas' && eq.category.startsWith('arma')) ||
-      (activeCategory === 'armaduras' && eq.category.startsWith('armadura')) ||
-      (activeCategory === 'escudos' && eq.category === 'escudo') ||
-      (activeCategory === 'esotericos' && eq.category === 'esoterico') ||
-      (activeCategory === 'alquimia' && eq.category === 'alquimia') ||
-      (activeCategory === 'itens' && eq.category === 'item_geral');
-    const matchesSearch =
-      eq.name.toLowerCase().includes(search.toLowerCase()) ||
-      (eq.description && eq.description.toLowerCase().includes(search.toLowerCase()));
-    return matchesCategory && matchesSearch;
+  const shop = EQUIPMENT_LIST.filter((eq) => {
+    const c = eq.category;
+    const okCat =
+      category === 'todas' ||
+      (category === 'armas' && c.startsWith('arma')) ||
+      (category === 'armaduras' && c.startsWith('armadura')) ||
+      (category === 'escudos' && c === 'escudo') ||
+      (category === 'esotericos' && c === 'esoterico') ||
+      (category === 'alquimia' && c === 'alquimia') ||
+      (category === 'itens' && c === 'item_geral') ||
+      (category === 'outros' && ['ferramenta', 'vestuario', 'alimentacao', 'animal', 'veiculo', 'servico'].includes(c));
+    const q = search.trim().toLowerCase();
+    return okCat && (!q || eq.name.toLowerCase().includes(q) || (eq.description || '').toLowerCase().includes(q));
   });
 
-  // Adicionar item da loja ao inventário
-  const handleAddItem = (eq: EquipmentItem) => {
+  const buy = (eq: EquipmentItem) => {
     const cost = parsePrice(eq.price);
-    if (remainingMoney < cost) {
-      alert(`Você não possui Tibares suficientes para comprar ${eq.name} (Custa: ${eq.price}, Saldo Restante: T$ ${remainingMoney}).`);
+    if (remaining < cost) {
+      toast(`Faltam T$ ${cost - remaining} para ${eq.name}.`, { tone: 'warning' });
       return;
     }
-
-    const newItem: CharacterInventoryItem = {
-      id: 'inv_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
-      equipmentId: eq.id,
-      name: eq.name,
-      category: eq.category,
-      subcategory: eq.subcategory,
-      spaces: eq.spaces,
-      quantity: 1,
-      isEquipped: eq.category.startsWith('armadura') || eq.category === 'escudo' || eq.category.startsWith('arma'),
-      damage: eq.damage,
-      critical: eq.critical,
-      damageType: eq.damageType,
-      range: eq.range,
-      defenseBonus: eq.defenseBonus,
-      armorPenalty: eq.armorPenalty,
-      description: eq.description,
-      price: eq.price,
-      isFree: false,
-      source: 'compra',
-    };
-
-    onUpdateInventory([...inventory, newItem]);
+    onUpdateInventory([...inventory, toInventoryItem(eq)]);
+    toast(`${eq.name} na mochila · T$ ${remaining - cost} restantes`, { tone: 'success', duration: 2200 });
   };
 
-  // Remover item do inventário
-  const handleRemoveItem = (id: string) => {
-    onUpdateInventory(inventory.filter((it) => it.id !== id));
-  };
-
-  // Equipar / Desequipar
-  const handleToggleEquipped = (id: string) => {
+  const toggleEquip = (id: string) => {
+    const target = inventory.find((t) => t.id === id);
     onUpdateInventory(
       inventory.map((it) => {
-        if (it.id === id) {
-          return { ...it, isEquipped: !it.isEquipped };
-        }
-        if (
-          (it.category === 'armadura_leve' || it.category === 'armadura_pesada') &&
-          inventory.find((target) => target.id === id)?.category.startsWith('armadura')
-        ) {
-          return { ...it, isEquipped: false };
-        }
+        if (it.id === id) return { ...it, isEquipped: !it.isEquipped };
+        // Apenas uma armadura vestida por vez
+        if (target?.category.startsWith('armadura') && it.category.startsWith('armadura')) return { ...it, isEquipped: false };
         return it;
       })
     );
   };
 
-  // Abrir Modal de Customização
-  const handleOpenCustomize = (it: CharacterInventoryItem) => {
-    setCustomizingItem({ item: it, isNew: false });
-  };
-
-  const handleOpenCustomizeFromShop = (eq: EquipmentItem) => {
-    const dummyItem: CharacterInventoryItem = {
-      id: 'new_' + Date.now(),
-      equipmentId: eq.id,
-      name: eq.name,
-      category: eq.category,
-      subcategory: eq.subcategory,
-      spaces: eq.spaces,
-      quantity: 1,
-      isEquipped: true,
-      damage: eq.damage,
-      critical: eq.critical,
-      damageType: eq.damageType,
-      defenseBonus: eq.defenseBonus,
-      armorPenalty: eq.armorPenalty,
-      description: eq.description,
-      price: eq.price,
-    };
-    setCustomizingItem({ item: dummyItem, isNew: true });
-  };
-
-  // Salvar Customização
-  const handleSaveCustomization = (customized: EquipmentItem, appliedModifierIds: string[], totalCost: number) => {
-    if (!customizingItem) return;
-
-    if (customizingItem.isNew) {
-      if (remainingMoney < totalCost) {
-        alert('Você não tem Tibares suficientes para pagar por este item superior.');
+  const saveForge = (customized: EquipmentItem, modIds: string[], totalCost: number) => {
+    if (!forging) return;
+    if (!forging.target) {
+      if (remaining < totalCost) {
+        toast('Tibares insuficientes para este item superior.', { tone: 'warning' });
         return;
       }
-      const newItem: CharacterInventoryItem = {
-        id: 'inv_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
-        equipmentId: customized.id,
-        name: customized.name,
-        category: customized.category,
-        subcategory: customized.subcategory,
-        spaces: customized.spaces,
-        quantity: 1,
-        isEquipped: true,
-        damage: customized.damage,
-        attackBonus: customized.attackBonus,
-        critical: customized.critical,
-        damageType: customized.damageType,
-        defenseBonus: customized.defenseBonus,
-        armorPenalty: customized.armorPenalty,
-        description: customized.description,
-        price: customized.price,
-        appliedModifiers: appliedModifierIds,
-        source: 'compra',
-        isFree: false,
-      };
-      onUpdateInventory([...inventory, newItem]);
+      onUpdateInventory([
+        ...inventory,
+        toInventoryItem(customized, { appliedModifiers: modIds, isEquipped: true, price: customized.price, equipmentId: forging.item.id }),
+      ]);
     } else {
-      // Atualiza item existente
-      const updated = inventory.map((it) => {
-        if (it.id === customizingItem.item.id) {
-          return {
-            ...it,
-            name: customized.name,
-            price: customized.price,
-            spaces: customized.spaces,
-            defenseBonus: customized.defenseBonus,
-            armorPenalty: customized.armorPenalty,
-            damage: customized.damage,
-            attackBonus: customized.attackBonus,
-            critical: customized.critical,
-            appliedModifiers: appliedModifierIds,
-          };
-        }
-        return it;
-      });
-      onUpdateInventory(updated);
+      onUpdateInventory(
+        inventory.map((it) =>
+          it.id === forging.target!.id
+            ? {
+                ...it,
+                name: customized.name,
+                price: customized.price,
+                spaces: customized.spaces,
+                defenseBonus: customized.defenseBonus,
+                armorPenalty: customized.armorPenalty,
+                damage: customized.damage,
+                attackBonus: customized.attackBonus,
+                critical: customized.critical,
+                appliedModifiers: modIds,
+                isFree: false,
+              }
+            : it
+        )
+      );
     }
+    setForging(null);
   };
 
+  const overloaded = currentSpaces > maxSpaces;
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      {/* Cabeçalho da Etapa com Painel de Dinheiro e Carga */}
-      <div
-        className="t20-card t20-card-gold"
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: '1.25rem',
-          padding: '1.5rem',
-          background: 'radial-gradient(ellipse at top right, rgba(245, 158, 11, 0.15) 0%, rgba(20, 23, 38, 0.95) 75%)',
-        }}
-      >
-        <div>
-          <h2>Passo 8: Equipamento & Dinheiro</h2>
-          <p style={{ margin: '0.25rem 0 0 0', maxWidth: '650px' }}>
-            Adquira armas, armaduras e suprimentos para sobreviver aos perigos de Arton. Seus itens concedidos pela origem e classe são gratuitos, e os demais são custeados por seus Tibares iniciais.
-          </p>
-        </div>
+    <div className="stack-lg">
+      <StepIntro title="Equipamento" description="Compre armas, armaduras e suprimentos com seus Tibares iniciais. Itens da origem são gratuitos." />
 
-        {/* Dashboard de Tibares e Espaços */}
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
-          {/* Caixa de Dinheiro */}
-          <div
-            style={{
-              background: 'rgba(0, 0, 0, 0.4)',
-              border: '1px solid var(--border-gold)',
-              borderRadius: 'var(--radius-md)',
-              padding: '0.65rem 1rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.75rem',
-            }}
-          >
-            <Coins size={28} style={{ color: '#f59e0b' }} />
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)', textTransform: 'uppercase', fontWeight: 700 }}>
-                  Dinheiro Restante
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setShowMoneyModal(true)}
-                  className="btn btn-ghost"
-                  style={{ padding: '0.1rem', color: 'var(--t20-gold)' }}
-                  title="Ver origem e cálculo do dinheiro inicial"
-                >
-                  <Info size={14} />
-                </button>
-              </div>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '1.35rem', fontWeight: 800, color: 'var(--t20-gold-light)' }}>
-                T$ {remainingMoney.toLocaleString('pt-BR')}
-              </div>
-              <div style={{ fontSize: '0.7rem', color: '#cbd5e1' }}>
-                Inicial: T$ {moneyBreakdown.totalInitial} • Gasto: T$ {totalSpent}
-              </div>
-            </div>
-          </div>
-
-          {/* Caixa de Carga / Espaços */}
-          <div
-            style={{
-              background: 'rgba(0, 0, 0, 0.4)',
-              border: currentSpaces > maxSpaces ? '1px solid #ef4444' : '1px solid var(--border-color)',
-              borderRadius: 'var(--radius-md)',
-              padding: '0.65rem 1rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.75rem',
-            }}
-          >
-            <Package size={28} style={{ color: currentSpaces > maxSpaces ? '#f87171' : '#60a5fa' }} />
-            <div>
-              <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)', textTransform: 'uppercase', fontWeight: 700 }}>
-                Capacidade de Carga
-              </span>
-              <div
-                style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '1.35rem',
-                  fontWeight: 800,
-                  color: currentSpaces > maxSpaces ? '#f87171' : '#ffffff',
-                }}
-              >
-                {currentSpaces} / {maxSpaces} espaços
-              </div>
-              {currentSpaces > maxSpaces && (
-                <div style={{ fontSize: '0.7rem', color: '#f87171', fontWeight: 700 }}>
-                  Sobrecarga! (-2 em perícias)
-                </div>
-              )}
-            </div>
-          </div>
+      <div className="grid-2">
+        <button type="button" className="wallet-card" onClick={() => setMoneyOpen(true)}>
+          <span className="stat-label">
+            <Coins size={14} />
+            Tibares
+          </span>
+          <span className="wallet-value t-num">
+            <small>T$</small> {remaining.toLocaleString('pt-BR')}
+          </span>
+          <span className="t-xs t-3">de T$ {money.total} iniciais</span>
+        </button>
+        <div className={`load-card${overloaded ? ' is-danger' : ''}`}>
+          <span className="stat-label">
+            <Backpack size={14} />
+            Carga
+          </span>
+          <span className="wallet-value t-num">
+            {currentSpaces}
+            <small> / {maxSpaces}</small>
+          </span>
+          <span className={`meter meter-sm ${overloaded ? 'meter-danger' : 'meter-gold'}`} style={{ '--pct': percent(currentSpaces, maxSpaces) } as React.CSSProperties}>
+            <span className="meter-fill" />
+          </span>
         </div>
       </div>
 
-      {/* Navegação entre Loja e Inventário */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-        <div className="btn-group">
-          <button
-            type="button"
-            onClick={() => setActiveTab('loja')}
-            className={`btn ${activeTab === 'loja' ? 'active' : ''}`}
-            style={{ gap: '0.4rem', fontSize: '0.9rem', padding: '0.5rem 1rem' }}
-          >
-            <ShoppingBag size={16} />
-            Mercado de Arton (Comprar Itens)
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('inventario')}
-            className={`btn ${activeTab === 'inventario' ? 'active' : ''}`}
-            style={{ gap: '0.4rem', fontSize: '0.9rem', padding: '0.5rem 1rem' }}
-          >
-            <Package size={16} />
-            Meu Inventário ({inventory.length} itens)
-          </button>
-        </div>
-
-        {activeTab === 'loja' && (
-          <div style={{ position: 'relative', minWidth: '260px', flex: '1', maxWidth: '350px' }}>
-            <input
-              type="text"
-              placeholder="Buscar item no mercado..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              style={{ width: '100%', padding: '0.45rem 0.85rem 0.45rem 2.2rem', fontSize: '0.85rem' }}
-            />
-            <Search size={14} style={{ position: 'absolute', left: '0.8rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-dim)' }} />
-          </div>
-        )}
-      </div>
-
-      {/* ABA 1: MERCADO DE ARTON (COMPRAR ITENS) */}
-      {activeTab === 'loja' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          {/* Filtros de Categoria da Loja */}
-          <div className="btn-group" style={{ flexWrap: 'wrap' }}>
-            {[
-              { id: 'todas', label: 'Todos os Itens' },
-              { id: 'armas', label: 'Armas' },
-              { id: 'armaduras', label: 'Armaduras' },
-              { id: 'escudos', label: 'Escudos' },
-              { id: 'esotericos', label: 'Esotéricos' },
-              { id: 'alquimia', label: 'Alquimia & Poções' },
-              { id: 'itens', label: 'Itens Gerais' },
-            ].map((cat) => (
-              <button
-                key={cat.id}
-                type="button"
-                onClick={() => setActiveCategory(cat.id)}
-                className={`btn ${activeCategory === cat.id ? 'active' : ''}`}
-              >
-                {cat.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Grade com ItemCard idêntico à imagem de referência */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(330px, 1fr))', gap: '1.25rem' }}>
-            {filteredEquipment.map((eq) => (
-              <ItemCard
-                key={eq.id}
-                item={eq}
-                onAdd={() => handleAddItem(eq)}
-                onCustomize={() => handleOpenCustomizeFromShop(eq)}
-                onOpenDetail={() => onOpenDetail(getEquipmentDetailModalData(eq))}
-                actionType="add"
-              />
-            ))}
-          </div>
+      {origin && origin.items.length > 0 && (
+        <div className="callout callout-gold">
+          <Backpack size={18} />
+          <span>
+            <strong>Da origem {origin.name}:</strong> {origin.items.join(', ')}.
+          </span>
         </div>
       )}
 
-      {/* ABA 2: MEU INVENTÁRIO (ITENS ATUAIS & CUSTOMIZAÇÃO) */}
-      {activeTab === 'inventario' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          {inventory.length === 0 ? (
-            <div className="t20-card" style={{ padding: '3rem', textAlign: 'center' }}>
-              <Package size={48} style={{ color: 'var(--text-dim)', marginBottom: '0.75rem' }} />
-              <h3 style={{ fontSize: '1.2rem', color: '#ffffff' }}>Seu inventário está vazio</h3>
-              <p style={{ margin: '0.35rem 0 1rem 0' }}>
-                Acesse a aba <strong>Mercado de Arton</strong> para adquirir suas armas, armaduras e suprimentos.
-              </p>
-              <button type="button" onClick={() => setActiveTab('loja')} className="btn btn-primary">
-                Ir às Compras
-              </button>
-            </div>
+      <Segmented<'loja' | 'mochila'>
+        value={tab}
+        onChange={setTab}
+        ariaLabel="Loja ou mochila"
+        size="lg"
+        options={[
+          { value: 'loja', label: 'Mercado', icon: <ShoppingBag size={16} /> },
+          { value: 'mochila', label: 'Mochila', icon: <Backpack size={16} />, count: inventory.length },
+        ]}
+      />
+
+      {tab === 'loja' ? (
+        <>
+          <div className="filter-row">
+            <SearchField value={search} onChange={setSearch} placeholder="Buscar item…" />
+            <SelectField value={category} onChange={setCategory} ariaLabel="Categoria" options={CATEGORIES} />
+          </div>
+          {shop.length === 0 ? (
+            <EmptyState title="Nenhum item encontrado" />
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(330px, 1fr))', gap: '1.25rem' }}>
-              {inventory.map((it) => {
-                const asEquipItem: EquipmentItem = {
-                  id: it.equipmentId || it.id,
-                  name: it.name,
-                  category: it.category,
-                  subcategory: it.subcategory,
-                  spaces: it.spaces,
-                  price: it.price || 'T$ 0',
-                  damage: it.damage,
-                  critical: it.critical,
-                  damageType: it.damageType,
-                  range: it.range,
-                  defenseBonus: it.defenseBonus,
-                  armorPenalty: it.armorPenalty,
-                  description: it.description,
-                };
-
-                const sourceLabel = it.source === 'origem' ? `Origem: ${currentOrigin?.name || 'Origem'}` : it.source === 'inicial' ? 'Kit Inicial' : undefined;
-
+            <div className="list">
+              {shop.map((eq) => {
+                const affordable = parsePrice(eq.price) <= remaining;
                 return (
-                  <ItemCard
-                    key={it.id}
-                    item={asEquipItem}
-                    appliedModifiers={it.appliedModifiers}
-                    isEquipped={it.isEquipped}
-                    isFree={it.isFree}
-                    sourceBadge={sourceLabel}
-                    onToggleEquipped={() => handleToggleEquipped(it.id)}
-                    onCustomize={() => handleOpenCustomize(it)}
-                    onRemove={() => handleRemoveItem(it.id)}
-                    onOpenDetail={() =>
-                      onOpenDetail(
-                        getEquipmentDetailModalData(
-                          asEquipItem,
-                          sourceLabel,
-                          it.appliedModifiers,
-                          it.specialMaterial
-                        )
-                      )
-                    }
-                    actionType="inventory"
-                  />
+                  <div key={eq.id} className="row pick-row">
+                    <button type="button" className="pick-main" onClick={() => onOpenDetail(getEquipmentDetailModalData(eq))}>
+                      <span className="inv-icon">{categoryIcon(eq.category)}</span>
+                      <span className="row-main">
+                        <span className="row-title">{eq.name}</span>
+                        <span className="row-sub truncate">
+                          {eq.damage && eq.damage !== '-' ? `${eq.damage} · ` : ''}
+                          {eq.defenseBonus ? `Def +${eq.defenseBonus} · ` : ''}
+                          {eq.spaces} esp. · <span className={affordable ? 't-gold' : 't-danger'}>{eq.price}</span>
+                        </span>
+                      </span>
+                    </button>
+                    {isModifiable(eq.category) && (
+                      <button type="button" className="icon-btn icon-btn-sm" onClick={() => setForging({ item: eq })} aria-label={`Comprar ${eq.name} com melhorias`}>
+                        <Wrench size={17} />
+                      </button>
+                    )}
+                    <button type="button" className="icon-btn icon-btn-sm icon-btn-tonal" onClick={() => buy(eq)} aria-label={`Comprar ${eq.name}`} disabled={!affordable}>
+                      <Plus size={18} />
+                    </button>
+                  </div>
                 );
               })}
             </div>
           )}
-        </div>
-      )}
-
-      {/* Modal de Detalhamento e Somatória do Dinheiro Inicial */}
-      {showMoneyModal && (
-        <div className="modal-overlay" onClick={() => setShowMoneyModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '520px', padding: '1.5rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '1rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem' }}>
-              <Coins size={22} style={{ color: 'var(--t20-gold)' }} />
-              <div>
-                <h3 style={{ fontSize: '1.3rem', margin: 0, color: '#ffffff' }}>
-                  Cálculo do Dinheiro Inicial (T$)
-                </h3>
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>
-                  Tormenta 20: Edição Jogo do Ano (v1.3) • pág. 146
+        </>
+      ) : inventory.length === 0 ? (
+        <EmptyState
+          icon={<Backpack size={24} />}
+          title="Mochila vazia"
+          action={
+            <button type="button" className="btn btn-secondary" onClick={() => setTab('loja')}>
+              Ir ao mercado
+            </button>
+          }
+        />
+      ) : (
+        <div className="list">
+          {inventory.map((it) => (
+            <div key={it.id} className={`row inv-row${it.isEquipped ? ' is-equipped' : ''}`}>
+              <button type="button" className="inv-main" onClick={() => onOpenDetail(getEquipmentDetailModalData(it as unknown as EquipmentItem, it.isFree ? 'Gratuito' : undefined, it.appliedModifiers))}>
+                <span className="inv-icon">{categoryIcon(it.category)}</span>
+                <span className="row-main">
+                  <span className="row-title">{it.name}</span>
+                  <span className="row-sub">
+                    {it.spaces} esp. · {it.isFree ? 'gratuito' : it.price}
+                    {it.appliedModifiers?.length ? ` · ${it.appliedModifiers.length} melhoria(s)` : ''}
+                  </span>
                 </span>
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.25rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.5rem 0', borderBottom: '1px dashed var(--border-color)', fontSize: '0.9rem' }}>
-                <span>Base Padrão (4d6):</span>
-                <strong style={{ color: 'var(--t20-gold-light)', fontFamily: 'var(--font-mono)' }}>T$ {moneyBreakdown.base}</strong>
-              </div>
-
-              {moneyBreakdown.classBonus > 0 && (
-                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.5rem 0', borderBottom: '1px dashed var(--border-color)', fontSize: '0.9rem' }}>
-                  <span>Bônus da Classe ({currentClass?.name}):</span>
-                  <strong style={{ color: 'var(--t20-gold-light)', fontFamily: 'var(--font-mono)' }}>+T$ {moneyBreakdown.classBonus}</strong>
-                </div>
+              </button>
+              {(it.category.startsWith('arma') || it.category.startsWith('armadura') || it.category === 'escudo') && (
+                <button type="button" className={`chip chip-sm${it.isEquipped ? ' is-active' : ''}`} aria-pressed={it.isEquipped} onClick={() => toggleEquip(it.id)}>
+                  {it.isEquipped ? 'Equipado' : 'Equipar'}
+                </button>
               )}
-
-              {moneyBreakdown.originBonus > 0 && (
-                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.5rem 0', borderBottom: '1px dashed var(--border-color)', fontSize: '0.9rem' }}>
-                  <span>Bônus da Origem ({currentOrigin?.name}):</span>
-                  <strong style={{ color: 'var(--t20-gold-light)', fontFamily: 'var(--font-mono)' }}>+T$ {moneyBreakdown.originBonus}</strong>
-                </div>
-              )}
-
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.65rem 0', fontWeight: 800, fontSize: '1.1rem', color: '#ffffff' }}>
-                <span>Total Inicial Disponível:</span>
-                <span style={{ color: 'var(--t20-gold-light)', fontFamily: 'var(--font-mono)' }}>T$ {moneyBreakdown.totalInitial}</span>
-              </div>
-
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.5rem 0', color: '#f87171', fontSize: '0.9rem' }}>
-                <span>Total Gasto em Compras:</span>
-                <span style={{ fontFamily: 'var(--font-mono)' }}>-T$ {totalSpent}</span>
-              </div>
-
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.65rem 0', borderTop: '2px solid var(--border-gold)', fontWeight: 800, fontSize: '1.15rem', color: '#ffffff' }}>
-                <span>Saldo Restante:</span>
-                <span style={{ color: '#34d399', fontFamily: 'var(--font-mono)' }}>T$ {remainingMoney}</span>
-              </div>
-            </div>
-
-            <p style={{ fontSize: '0.8rem', color: '#cbd5e1', lineHeight: 1.45, fontStyle: 'italic', background: 'rgba(0,0,0,0.25)', padding: '0.65rem', borderRadius: 'var(--radius-sm)' }}>
-              “Personagens de 1º nível começam com T$ 4d6, além dos itens fornecidos por sua origem e classe. O dinheiro pode ser usado para adquirir equipamentos adicionais ou guardado para a aventura.” — Manual pág. 146.
-            </p>
-
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1rem' }}>
-              <button type="button" onClick={() => setShowMoneyModal(false)} className="btn btn-secondary">
-                Fechar
+              <button type="button" className="icon-btn icon-btn-sm" onClick={() => setMenuFor(it)} aria-label={`Ações de ${it.name}`}>
+                <MoreVertical size={18} />
               </button>
             </div>
-          </div>
+          ))}
         </div>
       )}
 
-      {/* Modal Interativo de Modificadores (The Bazaar) */}
-      {customizingItem && (
-        <ItemModifierModal
-          key={customizingItem.item.id}
-          item={{
-            id: customizingItem.item.equipmentId || customizingItem.item.id,
-            name: customizingItem.item.name,
-            category: customizingItem.item.category,
-            subcategory: customizingItem.item.subcategory,
-            spaces: customizingItem.item.spaces,
-            price: customizingItem.item.price || 'T$ 0',
-            damage: customizingItem.item.damage,
-            critical: customizingItem.item.critical,
-            damageType: customizingItem.item.damageType,
-            defenseBonus: customizingItem.item.defenseBonus,
-            armorPenalty: customizingItem.item.armorPenalty,
-            attackBonus: customizingItem.item.attackBonus,
-            description: customizingItem.item.description,
-          }}
-          initialModifiers={customizingItem.item.appliedModifiers || []}
-          characterTibares={remainingMoney}
-          isOpen={Boolean(customizingItem)}
-          onClose={() => setCustomizingItem(null)}
-          onApply={handleSaveCustomization}
-        />
-      )}
+      <MenuSheet
+        open={!!menuFor}
+        onClose={() => setMenuFor(null)}
+        title={menuFor?.name}
+        items={
+          menuFor
+            ? [
+                {
+                  id: 'detail',
+                  label: 'Detalhes',
+                  icon: <Info size={20} />,
+                  onSelect: () => onOpenDetail(getEquipmentDetailModalData(menuFor as unknown as EquipmentItem, undefined, menuFor.appliedModifiers)),
+                },
+                {
+                  id: 'forge',
+                  label: 'Oficina',
+                  icon: <Wrench size={20} />,
+                  hidden: !isModifiable(menuFor.category),
+                  onSelect: () => {
+                    const base = EQUIPMENT_LIST.find((e) => e.id === menuFor.equipmentId);
+                    if (base) setForging({ item: base, target: menuFor });
+                  },
+                },
+                {
+                  id: 'remove',
+                  label: menuFor.isFree ? 'Remover' : 'Devolver (reembolsa)',
+                  icon: <Trash2 size={20} />,
+                  danger: true,
+                  onSelect: () => onUpdateInventory(inventory.filter((x) => x.id !== menuFor.id)),
+                },
+              ]
+            : []
+        }
+      />
+
+      <Sheet open={moneyOpen} onClose={() => setMoneyOpen(false)} title="Dinheiro inicial" icon={<Coins size={22} />} size="sm">
+        <div className="stack">
+          <div className="forge-breakdown">
+            <span>Base (média de 4d6)</span>
+            <span>T$ {money.base}</span>
+            {money.notes.map((n) => (
+              <React.Fragment key={n}>
+                <span>{n.replace(/\s*\(\+T\$.*\)$/, '')}</span>
+                <span>{n.match(/\+T\$ \d+/)?.[0]}</span>
+              </React.Fragment>
+            ))}
+            <span className="t-bold t-1">Total inicial</span>
+            <span className="t-bold">T$ {money.total}</span>
+            <span>Gasto em compras</span>
+            <span>−T$ {spent.toLocaleString('pt-BR')}</span>
+            <span className="t-bold t-1">Restante</span>
+            <span className="t-bold t-gold">T$ {remaining.toLocaleString('pt-BR')}</span>
+          </div>
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            onClick={() =>
+              onOpenDetail({
+                title: RULES_CITATIONS.EQUIPMENT_RULES.title,
+                category: 'Regra oficial',
+                description: RULES_CITATIONS.EQUIPMENT_RULES.explanation,
+                ruleCitation: RULES_CITATIONS.EQUIPMENT_RULES,
+                initialTab: 'rules',
+              })
+            }
+          >
+            Regras de equipamento
+          </button>
+        </div>
+      </Sheet>
+
+      <Suspense fallback={null}>
+        {forging && (
+          <ItemModifierModal
+            key={forging.target?.id || forging.item.id}
+            item={forging.item}
+            initialModifiers={forging.target?.appliedModifiers || []}
+            characterTibares={remaining + (forging.target && !forging.target.isFree ? parsePrice(forging.target.price) : 0)}
+            isOpen={!!forging}
+            chargeMode="full"
+            onClose={() => setForging(null)}
+            onApply={saveForge}
+          />
+        )}
+      </Suspense>
     </div>
   );
 };

@@ -171,14 +171,14 @@ export const getEquipmentDetailModalData = (
       label: 'Preço de Mercado',
       value: item.price || 'T$ 0',
       subtext: 'Valor de aquisição em Tibares de Arton (T$)',
-      color: '#fbbf24',
+      color: 'var(--gold-ink)',
       icon: React.createElement(Coins, { size: 15 }),
     },
     {
       label: 'Espaço no Inventário',
       value: `${item.spaces || 1} ${item.spaces === 1 ? 'espaço' : 'espaços'}`,
       subtext: 'Capacidade de carga ocupada no inventário do aventureiro',
-      color: '#cbd5e1',
+      color: 'var(--text-2)',
       icon: React.createElement(Weight, { size: 15 }),
     },
   ];
@@ -189,7 +189,7 @@ export const getEquipmentDetailModalData = (
         label: 'Bônus na Defesa',
         value: item.defenseBonus !== undefined ? (item.defenseBonus > 0 ? `+${item.defenseBonus}` : `${item.defenseBonus}`) : '+0',
         subtext: 'Bônus numérico somado à Defesa total do personagem quando equipado',
-        color: '#34d399',
+        color: 'var(--success-ink)',
         icon: React.createElement(Shield, { size: 15 }),
       },
       {
@@ -199,7 +199,7 @@ export const getEquipmentDetailModalData = (
           item.armorPenalty && item.armorPenalty < 0
             ? 'Penalidade aplicada em testes de perícias baseadas em Força e Destreza (Acrobacia, Cavalgar, Furtividade, Ladinagem)'
             : 'Esta proteção não impõe qualquer penalidade em testes de perícias físicas',
-        color: item.armorPenalty && item.armorPenalty < 0 ? '#f87171' : '#34d399',
+        color: item.armorPenalty && item.armorPenalty < 0 ? 'var(--danger-ink)' : 'var(--success-ink)',
         icon: React.createElement(ArrowDown, { size: 15 }),
       },
       {
@@ -211,7 +211,7 @@ export const getEquipmentDetailModalData = (
             : item.category === 'armadura_pesada'
             ? 'Não permite somar bônus de Destreza na Defesa e reduz o deslocamento em -3 metros'
             : 'Empunhado em uma das mãos; fornece bônus de Defesa cumulativo com armaduras',
-        color: '#60a5fa',
+        color: 'var(--info-ink)',
         icon: React.createElement(Shield, { size: 15 }),
       }
     );
@@ -223,7 +223,7 @@ export const getEquipmentDetailModalData = (
         label: 'Bônus de Ataque',
         value: `+${item.attackBonus}`,
         subtext: 'Bônus adicional somado a todas as rolagens no teste de ataque',
-        color: '#38bdf8',
+        color: 'var(--info-ink)',
         icon: React.createElement(Sparkles, { size: 15 }),
       });
     }
@@ -233,28 +233,28 @@ export const getEquipmentDetailModalData = (
         label: 'Dano Base',
         value: item.damage || '1d4',
         subtext: 'Rolagem de dano básica aplicada aos pontos de vida do adversário',
-        color: '#ff6b7b',
+        color: 'var(--danger-ink)',
         icon: React.createElement(Sparkles, { size: 15 }),
       },
       {
         label: 'Tipo de Dano',
         value: item.damageType || 'Padrão',
         subtext: getDamageTypeExplanation(item.damageType),
-        color: '#ff6b7b',
+        color: 'var(--danger-ink)',
         icon: getEquipmentDamageTypeIcon(item.damageType, 15),
       },
       {
         label: 'Margem & Crítico',
         value: item.critical || 'x2',
         subtext: getCriticalExplanation(item.critical),
-        color: '#fbbf24',
+        color: 'var(--gold-ink)',
         icon: React.createElement(Target, { size: 15 }),
       },
       {
         label: 'Alcance do Ataque',
         value: item.range || 'Corpo a Corpo',
         subtext: getRangeExplanation(item.range),
-        color: '#c4b5fd',
+        color: 'var(--mp-ink)',
         icon: React.createElement(Crosshair, { size: 15 }),
       }
     );
@@ -264,7 +264,7 @@ export const getEquipmentDetailModalData = (
         label: 'Empunhadura & Uso',
         value: item.subcategory === 'uma_mao' ? 'Uma Mão' : item.subcategory === 'duas_maos' ? 'Duas Mãos' : item.subcategory === 'leves' ? 'Arma Leve' : item.subcategory === 'disparo' ? 'Disparo' : item.subcategory,
         subtext: getSubcategoryExplanation(item.subcategory),
-        color: '#94a3b8',
+        color: 'var(--text-2)',
         icon: React.createElement(Hand, { size: 15 }),
       });
     }
@@ -275,7 +275,7 @@ export const getEquipmentDetailModalData = (
       label: 'Material Especial',
       value: specialMaterial,
       subtext: 'Material especial nobre de forja que aprimora as estatísticas da peça',
-      color: '#e63946',
+      color: 'var(--accent-ink)',
       icon: React.createElement(Anvil, { size: 15 }),
     });
   }
@@ -285,7 +285,7 @@ export const getEquipmentDetailModalData = (
       label: 'Melhorias Aplicadas',
       value: `${appliedModifiers.length} melhoria${appliedModifiers.length > 1 ? 's' : ''}`,
       subtext: appliedModifiers.join(' • '),
-      color: '#60a5fa',
+      color: 'var(--info-ink)',
       icon: React.createElement(Wrench, { size: 15 }),
     });
   }
@@ -295,7 +295,7 @@ export const getEquipmentDetailModalData = (
       label: 'Origem do Item',
       value: sourceBadge,
       subtext: 'Item obtido através de benefício inicial ou histórico de personagem',
-      color: '#fbbf24',
+      color: 'var(--gold-ink)',
       icon: React.createElement(Compass, { size: 15 }),
     });
   }

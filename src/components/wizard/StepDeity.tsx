@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
+import { AlertTriangle, Check, Info, Sun, UserX } from 'lucide-react';
 import { DEITIES_LIST } from '../../data/deities';
-import { Deity } from '../../types/rules';
-import { Check, Info, Shield, Sparkles, AlertCircle } from 'lucide-react';
-import { DetailModalData } from '../common/DetailModal';
+import type { DetailModalData } from '../common/DetailModal';
+import { Segmented } from '../ui/controls';
+import { ChoiceCard, ChoiceSection, OptionPickerSheet, StepIntro, type PickerOption } from './wizardUi';
 
 interface StepDeityProps {
   selectedDeityId: string;
   selectedDeityPowers: string[];
   characterClassId: string;
-  characterRaceId: string;
+  characterRaceId?: string;
   onSelectDeity: (deityId: string) => void;
   onSelectDeityPowers: (powers: string[]) => void;
   onOpenDetail: (data: DetailModalData) => void;
@@ -18,240 +19,169 @@ export const StepDeity: React.FC<StepDeityProps> = ({
   selectedDeityId,
   selectedDeityPowers,
   characterClassId,
-  characterRaceId,
   onSelectDeity,
   onSelectDeityPowers,
   onOpenDetail,
 }) => {
-  const [search, setSearch] = useState('');
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const deity = DEITIES_LIST.find((d) => d.id === selectedDeityId);
+  const isDevout = !!deity;
+  const isCleric = characterClassId === 'clerigo';
+  const powerLimit = isCleric ? deity?.grantedPowers.length || 1 : 1;
 
-  const currentDeity = DEITIES_LIST.find((d) => d.id === selectedDeityId);
-  const isNoDeity = selectedDeityId === 'nenhum' || !selectedDeityId;
-
-  // Clérigo recebe todos os poderes concedidos de sua divindade (ou 2), Paladino recebe poderes concedidos, etc.
-  const powerLimit = characterClassId === 'clerigo' ? (currentDeity?.grantedPowers.length || 1) : 1;
-
-  const filteredDeities = DEITIES_LIST.filter(
-    (d) =>
-      d.name.toLowerCase().includes(search.toLowerCase()) ||
-      d.title.toLowerCase().includes(search.toLowerCase())
-  );
-
-  const handleToggleDeityPower = (powerName: string) => {
-    if (selectedDeityPowers.includes(powerName)) {
-      onSelectDeityPowers(selectedDeityPowers.filter((p) => p !== powerName));
-    } else {
-      if (selectedDeityPowers.length < powerLimit) {
-        onSelectDeityPowers([...selectedDeityPowers, powerName]);
-      }
-    }
+  const chooseDeity = (id: string) => {
+    const d = DEITIES_LIST.find((x) => x.id === id);
+    onSelectDeity(id);
+    // Clérigos recebem todos os poderes concedidos; demais devotos começam com o primeiro
+    onSelectDeityPowers(d ? (isCleric ? d.grantedPowers.map((p) => p.name) : [d.grantedPowers[0]?.name].filter(Boolean)) : []);
   };
 
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      {/* Cabeçalho */}
-      <div>
-        <h2>Passo 4: Escolha sua Divindade (Opcional)</h2>
-        <p>
-          Em Arton, os vinte deuses do Panteão são forças reais que moldam o destino dos povos. Devotar-se a um deus concede poderes concedidos milagrosos, mas exige respeitar suas obrigações e crenças sagradas.
-        </p>
-      </div>
+  const togglePower = (name: string) => {
+    const on = selectedDeityPowers.includes(name);
+    if (powerLimit === 1) {
+      onSelectDeityPowers(on ? [] : [name]);
+      return;
+    }
+    if (on) onSelectDeityPowers(selectedDeityPowers.filter((p) => p !== name));
+    else if (selectedDeityPowers.length < powerLimit) onSelectDeityPowers([...selectedDeityPowers, name]);
+  };
 
-      {/* Busca */}
-      <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }}>
-        <button
-          type="button"
-          onClick={() => {
+  const options: PickerOption[] = DEITIES_LIST.map((d) => ({
+    id: d.id,
+    title: d.name,
+    subtitle: d.title,
+    meta: <span className="badge">Energia {d.energyChannel}</span>,
+    searchText: d.description,
+  }));
+
+  return (
+    <div className="stack-lg">
+      <StepIntro
+        title="Divindade"
+        description="Opcional. Devotos recebem poderes concedidos, mas devem seguir as obrigações do seu deus."
+      />
+
+      <Segmented<'devoto' | 'nenhum'>
+        value={isDevout ? 'devoto' : 'nenhum'}
+        onChange={(v) => {
+          if (v === 'nenhum') {
             onSelectDeity('nenhum');
             onSelectDeityPowers([]);
-          }}
-          className={`btn ${isNoDeity ? 'btn-gold' : 'btn-secondary'}`}
-          style={{ padding: '0.45rem 1rem' }}
-        >
-          {isNoDeity ? '✓ ' : ''}Sem Divindade (Não Devoto)
-        </button>
-
-        <div style={{ maxWidth: '280px', width: '100%' }}>
-          <input
-            type="text"
-            placeholder="Buscar deus do Panteão..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            style={{ padding: '0.45rem 0.8rem', fontSize: '0.9rem' }}
-          />
-        </div>
-      </div>
-
-      {/* Grade de Deuses */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
-          gap: '0.75rem',
-          maxHeight: '260px',
-          overflowY: 'auto',
-          padding: '0.25rem',
+          } else if (!isDevout) {
+            setPickerOpen(true);
+          }
         }}
-      >
-        {filteredDeities.map((deity) => {
-          const isSelected = deity.id === selectedDeityId;
-          return (
-            <div
-              key={deity.id}
-              onClick={() => {
-                onSelectDeity(deity.id);
-                // Se for clérigo, seleciona todos os poderes concedidos por padrão
-                if (characterClassId === 'clerigo') {
-                  onSelectDeityPowers(deity.grantedPowers.map((p) => p.name));
-                } else {
-                  onSelectDeityPowers([deity.grantedPowers[0]?.name || '']);
-                }
-              }}
-              className="t20-card"
-              style={{
-                cursor: 'pointer',
-                borderColor: isSelected ? 'var(--t20-ruby)' : 'var(--border-color)',
-                background: isSelected ? 'rgba(230, 57, 70, 0.12)' : 'var(--bg-card)',
-                boxShadow: isSelected ? '0 0 15px rgba(230, 57, 70, 0.35)' : 'none',
-                padding: '0.85rem',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}
-            >
-              <div>
-                <div style={{ fontWeight: 700, fontSize: '0.95rem', color: isSelected ? 'var(--t20-gold-light)' : '#ffffff' }}>
-                  {deity.name}
-                </div>
-                <div style={{ fontSize: '0.7rem', color: 'var(--text-dim)' }}>{deity.title}</div>
+        ariaLabel="Devoção"
+        size="lg"
+        options={[
+          { value: 'devoto', label: 'Devoto', icon: <Sun size={16} /> },
+          { value: 'nenhum', label: 'Sem divindade', icon: <UserX size={16} /> },
+        ]}
+      />
+
+      {!deity ? (
+        <div className="card stack-sm">
+          <span className="eyebrow">Não devoto</span>
+          <p className="t-sm t-2">
+            Seu herói não segue nenhum deus do Panteão. Não recebe poderes concedidos, mas também não tem obrigações sagradas.
+          </p>
+          <button type="button" className="btn btn-secondary" onClick={() => setPickerOpen(true)}>
+            Escolher uma divindade
+          </button>
+        </div>
+      ) : (
+        <>
+          <ChoiceCard
+            eyebrow="Seu deus"
+            title={deity.name}
+            subtitle={deity.title}
+            description={deity.description}
+            onChange={() => setPickerOpen(true)}
+            badges={
+              <>
+                <span className="badge">Energia {deity.energyChannel}</span>
+                <span className="badge">Arma: {deity.favoredWeapon}</span>
+              </>
+            }
+          />
+
+          <div className="kv card-inset">
+            <div className="kv-item">
+              <span className="kv-key">Símbolo</span>
+              <span className="kv-value">{deity.symbol}</span>
+            </div>
+            <div className="kv-item">
+              <span className="kv-key">Devotos</span>
+              <span className="kv-value">{deity.allowedDevoteesText}</span>
+            </div>
+          </div>
+
+          {deity.obligations && (
+            <div className="callout callout-danger">
+              <AlertTriangle size={18} />
+              <div className="stack-xs">
+                <span className="callout-title">Obrigações e restrições</span>
+                <span>{deity.obligations}</span>
               </div>
-              {isSelected && <Check size={16} style={{ color: 'var(--t20-ruby)' }} />}
             </div>
-          );
-        })}
-      </div>
+          )}
 
-      {/* Detalhes do Deus Selecionado */}
-      {currentDeity && !isNoDeity && (
-        <div className="t20-card t20-card-gold" style={{ marginTop: '0.5rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem', marginBottom: '1rem' }}>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <h3 style={{ fontSize: '1.4rem', color: 'var(--t20-gold-light)', margin: 0 }}>
-                  {currentDeity.name}
-                </h3>
-                <span className="badge badge-ruby">{currentDeity.title}</span>
-                <span className="badge badge-blue">Energia {currentDeity.energyChannel}</span>
-              </div>
-              <p style={{ marginTop: '0.35rem', fontSize: '0.925rem', color: '#cbd5e1' }}>
-                {currentDeity.description}
-              </p>
-            </div>
-          </div>
-
-          {/* Símbolo Sagrado, Arma e Devotos */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.85rem', marginBottom: '1.25rem' }}>
-            <div style={{ background: 'rgba(0,0,0,0.3)', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', fontSize: '0.85rem' }}>
-              <span style={{ color: 'var(--text-dim)', display: 'block' }}>Símbolo Sagrado:</span>
-              <strong style={{ color: 'var(--text-main)' }}>{currentDeity.symbol}</strong>
-            </div>
-            <div style={{ background: 'rgba(0,0,0,0.3)', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', fontSize: '0.85rem' }}>
-              <span style={{ color: 'var(--text-dim)', display: 'block' }}>Arma Preferida:</span>
-              <strong style={{ color: 'var(--t20-gold)' }}>{currentDeity.favoredWeapon}</strong>
-            </div>
-            <div style={{ background: 'rgba(0,0,0,0.3)', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', fontSize: '0.85rem' }}>
-              <span style={{ color: 'var(--text-dim)', display: 'block' }}>Devotos Típicos:</span>
-              <span style={{ color: '#cbd5e1' }}>{currentDeity.allowedDevoteesText}</span>
-            </div>
-          </div>
-
-          {/* Obrigações e Restrições */}
-          <div style={{ marginBottom: '1.5rem', background: 'rgba(239, 68, 68, 0.08)', padding: '0.85rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(239, 68, 68, 0.25)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#f87171', fontWeight: 700, marginBottom: '0.25rem', fontSize: '0.875rem' }}>
-              <AlertCircle size={16} />
-              <span>Obrigações & Restrições:</span>
-            </div>
-            <p style={{ margin: 0, fontSize: '0.85rem', color: '#fca5a5' }}>
-              {currentDeity.obligations}
-            </p>
-          </div>
-
-          {/* Seleção de Poderes Concedidos */}
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-              <span style={{ fontWeight: 700, color: 'var(--t20-gold-light)', fontSize: '1rem' }}>
-                {characterClassId === 'clerigo'
-                  ? 'Poderes Concedidos (Clérigos fiéis recebem todos os poderes):'
-                  : 'Escolha 1 Poder Concedido por sua devoção:'}
-              </span>
-              <span className="badge badge-gold">
-                {selectedDeityPowers.length} de {powerLimit} escolhido(s)
-              </span>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
-              {currentDeity.grantedPowers.map((pow) => {
-                const isChecked = selectedDeityPowers.includes(pow.name);
+          <ChoiceSection
+            title="Poderes concedidos"
+            description={isCleric ? 'Clérigos recebem os poderes concedidos do seu deus.' : 'Escolha 1 poder concedido.'}
+            count={{ value: selectedDeityPowers.length, total: powerLimit }}
+          >
+            <div className="list">
+              {deity.grantedPowers.map((p) => {
+                const on = selectedDeityPowers.includes(p.name);
                 return (
-                  <div
-                    key={pow.id}
-                    onClick={() => handleToggleDeityPower(pow.name)}
-                    className="t20-card"
-                    style={{
-                      cursor: 'pointer',
-                      padding: '0.85rem 1rem',
-                      borderColor: isChecked ? 'var(--t20-gold)' : 'var(--border-color)',
-                      background: isChecked ? 'rgba(245, 158, 11, 0.12)' : 'rgba(255, 255, 255, 0.02)',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '0.35rem',
-                    }}
-                  >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <span style={{ fontWeight: 700, color: isChecked ? 'var(--t20-gold-light)' : '#ffffff' }}>
-                          {pow.name}
-                        </span>
-                        {isChecked && <Check size={16} style={{ color: 'var(--t20-gold)' }} />}
-                      </div>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onOpenDetail({
-                            title: pow.name,
-                            category: `Poder Concedido (${currentDeity.name})`,
-                            prerequisites: pow.prerequisites,
-                            description: pow.description,
-                          });
-                        }}
-                        className="btn btn-ghost"
-                        style={{ padding: '0.2rem 0.4rem', fontSize: '0.75rem', gap: '0.25rem' }}
-                      >
-                        <Info size={14} />
-                        Ver Detalhes
-                      </button>
-                    </div>
-                    <p style={{ margin: 0, fontSize: '0.85rem', color: '#cbd5e1' }}>
-                      {pow.description}
-                    </p>
+                  <div key={p.id} className={`row pick-row${on ? ' is-selected' : ''}`}>
+                    <button
+                      type="button"
+                      role={powerLimit === 1 ? 'radio' : 'checkbox'}
+                      aria-checked={on}
+                      className="pick-main"
+                      onClick={() => togglePower(p.name)}
+                    >
+                      <span className={`mark${powerLimit === 1 ? ' mark-radio' : ''}${on ? ' is-on' : ''}`}>{on && <Check size={14} strokeWidth={3} />}</span>
+                      <span className="row-main">
+                        <span className="row-title">{p.name}</span>
+                        <span className="row-sub clamp-3">{p.description}</span>
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      className="icon-btn icon-btn-sm"
+                      aria-label={`Detalhes de ${p.name}`}
+                      onClick={() =>
+                        onOpenDetail({
+                          title: p.name,
+                          category: `Poder concedido · ${deity.name}`,
+                          prerequisites: p.prerequisites,
+                          description: p.description,
+                        })
+                      }
+                    >
+                      <Info size={17} />
+                    </button>
                   </div>
                 );
               })}
             </div>
-          </div>
-        </div>
+          </ChoiceSection>
+        </>
       )}
 
-      {isNoDeity && (
-        <div className="t20-card" style={{ padding: '1.5rem', textAlign: 'center', color: 'var(--text-muted)' }}>
-          <Sparkles size={32} style={{ color: 'var(--text-dim)', marginBottom: '0.5rem' }} />
-          <h3>Personagem Sem Divindade</h3>
-          <p style={{ maxWidth: '500px', margin: '0.5rem auto 0 auto' }}>
-            Seu herói não é devoto fervoroso de nenhuma divindade específica do Panteão. Ele não recebe poderes concedidos, mas também não precisa obedecer a obrigações e restrições religiosas estritas.
-          </p>
-        </div>
-      )}
+      <OptionPickerSheet
+        open={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        title="Panteão de Arton"
+        subtitle="20 divindades maiores"
+        options={options}
+        value={deity ? [deity.id] : []}
+        onChange={([id]) => id && chooseDeity(id)}
+        searchPlaceholder="Buscar deus ou domínio…"
+      />
     </div>
   );
 };

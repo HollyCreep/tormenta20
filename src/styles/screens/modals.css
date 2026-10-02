@@ -1,0 +1,129 @@
+/* ==========================================================================
+   Sheets compostos: conjuração, subida de nível, adicionar item, pickers
+   ========================================================================== */
+
+/* Linhas selecionáveis com "i" à direita (pickers) */
+.pick-row { padding: 0 var(--sp-2) 0 0; gap: 0; align-items: stretch; }
+.pick-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  padding: 12px var(--sp-2) 12px var(--sp-4);
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.pick-main .mark { margin-top: 2px; }
+.pick-main .row-main { gap: 4px; }
+.pick-row > .icon-btn { align-self: center; }
+.pick-row.is-selected { background: var(--accent-soft); }
+.pick-row.is-disabled .pick-main { cursor: not-allowed; opacity: 0.55; }
+
+/* Mini stepper (etapas dentro de um sheet) */
+.mini-stepper {
+  display: flex;
+  gap: var(--sp-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.mini-stepper li { flex: 1 1 0; min-width: max-content; }
+.mini-step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: var(--r-full);
+  border: 1px solid var(--line-2);
+  background: var(--surface-2);
+  color: var(--text-3);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+.mini-step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--surface-3);
+  font-size: var(--fs-2xs);
+}
+.mini-step.is-current { border-color: var(--accent-line); color: var(--accent-ink); background: var(--accent-soft); }
+.mini-step.is-current .mini-step-num { background: var(--accent); color: var(--text-on-accent); }
+.mini-step.is-done { color: var(--success-ink); }
+.mini-step.is-done .mini-step-num { background: var(--success); color: #fff; }
+
+/* Subida de nível */
+.levelup-footer { flex: 1 1 auto; display: flex; flex-direction: column; gap: var(--sp-2); min-width: 0; }
+.levelup-picks { display: flex; flex-wrap: wrap; gap: 6px; }
+.levelup-picks .badge { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+.gain-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-2); }
+.gain {
+  --gain-tone: var(--text-3);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--sp-3);
+  border-radius: var(--r-md);
+  background: color-mix(in srgb, var(--gain-tone) 10%, var(--surface-2));
+  border: 1px solid color-mix(in srgb, var(--gain-tone) 28%, var(--line));
+}
+.gain > svg { color: color-mix(in oklab, var(--gain-tone) 70%, var(--text-1)); margin-bottom: 4px; }
+.gain-value { font-weight: 800; font-size: var(--fs-lg); color: var(--text-1); }
+.gain-sub { font-size: var(--fs-xs); color: var(--text-3); line-height: 1.35; }
+.gain-hp { --gain-tone: var(--hp); }
+.gain-mp { --gain-tone: var(--mp); }
+.gain.is-up { --gain-tone: var(--success); }
+
+/* Conjuração */
+.cast-summary { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: var(--sp-2); }
+.cast-cost {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  padding: var(--sp-4);
+  border-radius: var(--r-md);
+  background:
+    radial-gradient(120% 100% at 0% 0%, var(--mp-soft), transparent 70%),
+    var(--surface-2);
+  border: 1px solid color-mix(in srgb, var(--mp) 35%, var(--line));
+}
+.cast-cost-value {
+  font-family: var(--font-display);
+  font-size: 2.6rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--mp-ink);
+}
+.cast-cost-value small { font-size: var(--fs-md); color: var(--text-3); font-family: var(--font-body); }
+.cast-side { display: flex; flex-direction: column; gap: var(--sp-2); }
+.cast-side .stat { padding: 8px 10px; flex-direction: row; align-items: center; justify-content: space-between; }
+.cast-side .stat-value { font-size: var(--fs-md); }
+.upgrade-row { align-items: center; padding-top: 12px; padding-bottom: 12px; }
+.upgrade-row .row-main { gap: 6px; }
+.upgrade-row.is-selected { background: var(--mp-soft); }
+.spell-text summary {
+  cursor: pointer;
+  padding: var(--sp-2) 0;
+  color: var(--accent-ink);
+  font-weight: 600;
+  font-size: var(--fs-sm);
+}
+.spell-text p { padding-top: var(--sp-2); }
+
+/* Adicionar item */
+.add-item-footer { flex: 1 1 auto; display: flex; flex-direction: column; gap: var(--sp-2); min-width: 0; }
+.add-item-footer .seg-btn { font-size: var(--fs-xs); }

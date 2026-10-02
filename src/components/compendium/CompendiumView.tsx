@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { BookOpen, Package, Sparkles, Swords } from 'lucide-react';
 import type { CharacterSheet } from '../../types/character';
+import { AppBar } from '../ui/AppBar';
+import { Segmented } from '../ui/controls';
 import { SpellsCompendium } from './SpellsCompendium';
 import { PowersCompendium } from './PowersCompendium';
 import { ClassPowersCompendium } from './ClassPowersCompendium';
 import { ItemsCompendium } from './ItemsCompendium';
-import { BookOpen, Sparkles, Package, Sword } from 'lucide-react';
 
 export type CompendiumTabType = 'magias' | 'poderes' | 'itens';
 export type PowersSubTabType = 'gerais' | 'classe';
@@ -24,84 +26,61 @@ export const CompendiumView: React.FC<CompendiumViewProps> = ({
   activeCharacter,
   characters,
   initialPowersSubTab = 'gerais',
-  onBack,
 }) => {
   const [powersSubTab, setPowersSubTab] = useState<PowersSubTabType>(initialPowersSubTab);
 
-  return (
-    <div className="container" style={{ padding: '1.5rem 1.5rem 6rem 1.5rem', maxWidth: '1280px' }}>
-      {/* Sub-abas do Compêndio (Nível 2) */}
-      <div className="sub-tabs" style={{ marginBottom: '1.5rem' }}>
-        <button
-          type="button"
-          className={activeTab === 'magias' ? 'active' : ''}
-          onClick={() => onTabChange('magias')}
-        >
-          <BookOpen size={16} />
-          <span>Magias</span>
-        </button>
-        <button
-          type="button"
-          className={activeTab === 'poderes' ? 'active' : ''}
-          onClick={() => onTabChange('poderes')}
-        >
-          <Sparkles size={16} />
-          <span>Poderes</span>
-        </button>
-        <button
-          type="button"
-          className={activeTab === 'itens' ? 'active' : ''}
-          onClick={() => onTabChange('itens')}
-        >
-          <Package size={16} />
-          <span>Itens & Equipamentos</span>
-        </button>
-      </div>
-
-      {/* Conteúdo da Sub-Aba Ativa */}
-      {activeTab === 'magias' && <SpellsCompendium onBack={onBack || (() => {})} />}
-
+  const switcher = (
+    <div className="stack-sm">
+      <Segmented<CompendiumTabType>
+        value={activeTab}
+        onChange={(t) => {
+          onTabChange(t);
+          window.scrollTo({ top: 0 });
+        }}
+        ariaLabel="Seção do compêndio"
+        accent
+        options={[
+          { value: 'magias', label: 'Magias', icon: <Sparkles size={16} /> },
+          { value: 'poderes', label: 'Poderes', icon: <Swords size={16} /> },
+          { value: 'itens', label: 'Itens', icon: <Package size={16} /> },
+        ]}
+      />
       {activeTab === 'poderes' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-          {/* Sub-sub-abas de Poderes: Gerais | Por Classe (Nível 3) */}
-          <div className="sub-tabs sub-tabs-nested">
-            <button
-              type="button"
-              className={powersSubTab === 'gerais' ? 'active' : ''}
-              onClick={() => setPowersSubTab('gerais')}
-            >
-              <Sparkles size={15} />
-              <span>Poderes Gerais</span>
-            </button>
-            <button
-              type="button"
-              className={powersSubTab === 'classe' ? 'active' : ''}
-              onClick={() => setPowersSubTab('classe')}
-            >
-              <Sword size={15} />
-              <span>Poderes Por Classe</span>
-            </button>
-          </div>
-
-          {powersSubTab === 'gerais' && (
-            <PowersCompendium
-              activeCharacter={activeCharacter}
-              characters={characters}
-              onBack={onBack || (() => {})}
-            />
-          )}
-
-          {powersSubTab === 'classe' && (
-            <ClassPowersCompendium
-              activeCharacter={activeCharacter}
-              characters={characters}
-              onBack={onBack || (() => {})}
-            />
-          )}
-        </div>
+        <Segmented<PowersSubTabType>
+          value={powersSubTab}
+          onChange={setPowersSubTab}
+          ariaLabel="Tipo de poder"
+          options={[
+            { value: 'gerais', label: 'Gerais' },
+            { value: 'classe', label: 'De classe' },
+          ]}
+        />
       )}
-
-      {activeTab === 'itens' && <ItemsCompendium onBack={onBack || (() => {})} />}
     </div>
+  );
+
+  const subtitle =
+    activeTab === 'magias'
+      ? 'Grimório · Capítulo 4'
+      : activeTab === 'itens'
+        ? 'Equipamento · Capítulo 3'
+        : powersSubTab === 'gerais'
+          ? 'Poderes gerais · Capítulo 2'
+          : 'Poderes de classe · Capítulo 1';
+
+  return (
+    <>
+      <AppBar title="Compêndio" subtitle={subtitle} leading={<span className="appbar-icon"><BookOpen size={20} /></span>} />
+      <main className="page page-wide stack compendium-page">
+        {activeTab === 'magias' && <SpellsCompendium switcher={switcher} />}
+        {activeTab === 'poderes' && powersSubTab === 'gerais' && (
+          <PowersCompendium switcher={switcher} activeCharacter={activeCharacter} characters={characters} />
+        )}
+        {activeTab === 'poderes' && powersSubTab === 'classe' && (
+          <ClassPowersCompendium switcher={switcher} activeCharacter={activeCharacter} />
+        )}
+        {activeTab === 'itens' && <ItemsCompendium switcher={switcher} />}
+      </main>
+    </>
   );
 };

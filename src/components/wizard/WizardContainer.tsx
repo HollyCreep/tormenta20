@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import confetti from 'canvas-confetti';
+import React, { useEffect, useState } from 'react';
 import { CharacterSheet, CharacterAttributes, CharacterInventoryItem, CharacterPower } from '../../types/character';
 import { AttributeKey } from '../../types/rules';
 import { RACES_LIST } from '../../data/races';
@@ -32,8 +31,11 @@ import { StepSpells } from './StepSpells';
 import { StepEquipment } from './StepEquipment';
 import { StepFinal } from './StepFinal';
 import { DetailModal, DetailModalData } from '../common/DetailModal';
-
-import { ChevronLeft, ChevronRight, Save, X, AlertCircle } from 'lucide-react';
+import { AlertCircle, ArrowLeft, ArrowRight, Check, ListChecks, Save, X } from 'lucide-react';
+import { AppBar } from '../ui/AppBar';
+import { Sheet } from '../ui/Sheet';
+import { useBackHandler } from '../ui/backStack';
+import { useFeedback } from '../ui/Feedback';
 
 interface WizardContainerProps {
   initialCharacter?: CharacterSheet | null;
@@ -48,6 +50,9 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
 }) => {
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [modalDetail, setModalDetail] = useState<DetailModalData | null>(null);
+  const [visited, setVisited] = useState<Set<number>>(() => new Set(initialCharacter ? [1, 2, 3, 4, 5, 6, 7, 8, 9] : []));
+  const [stepsOpen, setStepsOpen] = useState(false);
+  const { confirm } = useFeedback();
 
   // Estados da Ficha
   const [name, setName] = useState(initialCharacter?.name || '');
@@ -105,6 +110,16 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
     initialCharacter?.selectedClassSkills || []
   );
 
+  // Trocar de classe invalida perícias de classe, magias e subclasse escolhidas
+  const handleSelectClass = (newClassId: string) => {
+    if (newClassId === classId) return;
+    const def = CLASSES_LIST.find((c) => c.id === newClassId);
+    setClassId(newClassId);
+    setSelectedClassSkills([]);
+    setSelectedSpells([]);
+    setClassSubclass(def?.subclasses?.options[0]?.id);
+  };
+
   // Origem
   const [originId, setOriginId] = useState(initialCharacter?.originId || 'soldado');
   const [selectedOriginBenefits, setSelectedOriginBenefits] = useState<{ type: 'pericia' | 'poder'; name: string }[]>(
@@ -135,7 +150,7 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
 
   // Magias
   const [selectedSpells, setSelectedSpells] = useState<string[]>(
-    initialCharacter?.spells.map((s) => s.id) || ['armadura_arcana', 'adaga_mental', 'explosao_chamas']
+    initialCharacter?.spells.map((s) => s.id) || []
   );
 
   // Equipamento & Inventário
@@ -283,35 +298,26 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
     { num: 9, title: 'Toques Finais' },
   ];
 
-  // Validação de Avanço - Permite navegação fluida entre passos, bloqueando apenas o salvamento final se houver erros
-  const canProceed = () => {
-    if (currentStep === 9) {
-      return !hasAnyErrors;
-    }
-    return true;
+  const stepIndex = Math.max(0, steps.findIndex((st) => st.num === currentStep));
+  const isLastStep = stepIndex === steps.length - 1;
+
+  // Se a classe deixar de ser conjuradora estando no passo de magias, avança
+  useEffect(() => {
+    if (!steps.some((st) => st.num === currentStep)) setCurrentStep(8);
+  }, [isSpellcaster]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const goToStep = (num: number) => {
+    setVisited((prev) => new Set(prev).add(currentStep));
+    setCurrentStep(num);
+    window.scrollTo({ top: 0 });
   };
 
   const handleNextStep = () => {
-    let next = currentStep + 1;
-    // Se não for conjurador e próximo for 7 (Magias), pula para 8
-    if (!isSpellcaster && next === 7) {
-      next = 8;
-    }
-    if (next <= 9) {
-      setCurrentStep(next);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    if (!isLastStep) goToStep(steps[stepIndex + 1].num);
   };
 
   const handlePrevStep = () => {
-    let prev = currentStep - 1;
-    if (!isSpellcaster && prev === 7) {
-      prev = 6;
-    }
-    if (prev >= 1) {
-      setCurrentStep(prev);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    if (stepIndex > 0) goToStep(steps[stepIndex - 1].num);
   };
 
   // Salvar Personagem
@@ -451,411 +457,329 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
       tibares,
       activeConditions: [],
       bio,
+      notes: initialCharacter?.notes,
       createdAt: initialCharacter?.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
 
-    // Confetti de celebração épica!
-    try {
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 },
-        colors: ['#e63946', '#fbbf24', '#3b82f6', '#10b981'],
-      });
-    } catch (e) {
-      // Ignora se confetti não carregar
-    }
+    // Confete de celebração (carregado sob demanda)
+    import('canvas-confetti')
+      .then(({ default: confetti }) => {
+        const css = getComputedStyle(document.documentElement);
+        confetti({
+          particleCount: 120,
+          spread: 80,
+          origin: { y: 0.7 },
+          zIndex: 1000,
+          colors: [css.getPropertyValue('--accent').trim(), css.getPropertyValue('--gold').trim(), '#ffffff'].filter(Boolean),
+        });
+      })
+      .catch(() => {});
 
     onSave(newCharacter);
   };
 
+  const requestCancel = async () => {
+    const ok = await confirm({
+      title: initialCharacter ? 'Descartar alterações?' : 'Descartar este herói?',
+      message: 'As escolhas feitas no criador serão perdidas.',
+      confirmLabel: 'Descartar',
+      cancelLabel: 'Continuar criando',
+      tone: 'danger',
+    });
+    if (ok) onCancel();
+  };
+
+  // Botão voltar (Android): volta um passo; no primeiro, pergunta se descarta
+  useBackHandler(true, () => (stepIndex > 0 ? handlePrevStep() : requestCancel()), 'flow');
+
+  const stepState = (num: number) => {
+    const st = validationMap[num];
+    if (num === currentStep) return 'current';
+    if (st?.hasError && visited.has(num)) return 'error';
+    if (visited.has(num) && st?.isValid) return 'done';
+    return 'todo';
+  };
+
+  const errorSteps = steps.filter((st) => validationMap[st.num]?.hasError);
+  const showErrors = currentStepStatus.errors.length > 0 && (visited.has(currentStep) || isLastStep);
+
   return (
-    <div className="container" style={{ padding: '2rem 1.5rem 6rem 1.5rem', maxWidth: '1200px' }}>
-      {/* Barra Superior com Título e Fechar */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-        <div>
-          <h1 style={{ fontSize: '1.75rem', margin: 0 }}>
-            {initialCharacter ? 'Editar Personagem' : 'Criador de Personagem'}
-          </h1>
-          <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.9rem' }}>
-            Tormenta 20: Edição Jogo do Ano (v1.3)
-          </p>
-        </div>
+    <>
+      <AppBar
+        leading={
+          <button type="button" className="icon-btn" onClick={requestCancel} aria-label="Fechar criador">
+            <X size={22} />
+          </button>
+        }
+        title={initialCharacter ? 'Editar herói' : 'Novo herói'}
+        subtitle={`Passo ${stepIndex + 1} de ${steps.length} · ${steps[stepIndex]?.title}`}
+        actions={
+          <button type="button" className="wiz-summary-chip" onClick={() => setStepsOpen(true)} aria-label="Resumo e etapas">
+            <span>PV {maxHp.value}</span>
+            <span>PM {maxMp.value}</span>
+            <span>Def {defense.value}</span>
+          </button>
+        }
+      />
 
-        <button
-          type="button"
-          onClick={onCancel}
-          className="btn btn-secondary"
-          style={{ gap: '0.4rem' }}
-        >
-          <X size={16} />
-          Cancelar
-        </button>
-      </div>
-
-      {/* Navegador Visual de Passos */}
-      <div
-        style={{
-          display: 'flex',
-          gap: '0.5rem',
-          overflowX: 'auto',
-          paddingBottom: '0.75rem',
-          marginBottom: '2rem',
-          borderBottom: '1px solid var(--border-color)',
-        }}
-      >
-        {steps.map((st) => {
-          const isActive = st.num === currentStep;
-          const status = validationMap[st.num];
-          const hasError = status?.hasError;
-          const isValid = status?.isValid;
-
-          let badgeBg = 'rgba(255, 255, 255, 0.1)';
-          let badgeText = `${st.num}`;
-          let borderCol = 'var(--border-color)';
-          let btnBg = 'rgba(255, 255, 255, 0.04)';
-          let textColor = 'var(--text-muted)';
-
-          if (hasError) {
-            borderCol = '#ef4444';
-            btnBg = isActive ? 'rgba(239, 68, 68, 0.28)' : 'rgba(239, 68, 68, 0.12)';
-            textColor = '#f87171';
-            badgeBg = '#ef4444';
-            badgeText = '!';
-          } else if (isActive) {
-            borderCol = 'var(--t20-ruby-hover)';
-            btnBg = 'var(--t20-ruby)';
-            textColor = '#ffffff';
-            badgeBg = 'rgba(0,0,0,0.3)';
-            badgeText = `${st.num}`;
-          } else if (isValid) {
-            borderCol = 'rgba(16, 185, 129, 0.5)';
-            btnBg = 'rgba(16, 185, 129, 0.08)';
-            textColor = 'var(--t20-gold-light)';
-            badgeBg = 'rgba(16, 185, 129, 0.3)';
-            badgeText = '✓';
-          }
-
-          return (
-            <button
-              key={st.num}
-              type="button"
-              onClick={() => {
-                setCurrentStep(st.num);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
-              style={{
-                background: btnBg,
-                color: textColor,
-                border: `1px solid ${borderCol}`,
-                borderRadius: 'var(--radius-md)',
-                padding: '0.5rem 0.85rem',
-                fontSize: '0.85rem',
-                fontWeight: 600,
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.4rem',
-                cursor: 'pointer',
-                whiteSpace: 'nowrap',
-                transition: 'var(--transition)',
-              }}
-              title={hasError ? `Erros/Pendências: ${status.errors.join('; ')}` : undefined}
-            >
-              <span
-                style={{
-                  width: 20,
-                  height: 20,
-                  borderRadius: '50%',
-                  background: badgeBg,
-                  color: hasError ? '#ffffff' : undefined,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '0.75rem',
-                  fontWeight: 800,
-                }}
-              >
-                {badgeText}
-              </span>
-              <span>{st.title}</span>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Conteúdo da Etapa Atual */}
-      <div style={{ minHeight: '520px', paddingBottom: '3rem' }}>
-        {/* Banner Reativo de Alerta/Erro na Etapa Atual (Anexo 3) */}
-        {currentStepStatus.hasError && (
-          <div
-            style={{
-              background: 'rgba(239, 68, 68, 0.12)',
-              border: '1px solid #ef4444',
-              borderRadius: 'var(--radius-md)',
-              padding: '0.85rem 1.25rem',
-              marginBottom: '1.5rem',
-              display: 'flex',
-              alignItems: 'flex-start',
-              gap: '0.75rem',
-              animation: 'popoverFadeIn 0.2s ease-out',
-            }}
+      <div className="wiz-progress no-print" role="list" aria-label="Etapas do criador">
+        {steps.map((st) => (
+          <button
+            key={st.num}
+            type="button"
+            role="listitem"
+            className={`wiz-seg is-${stepState(st.num)}`}
+            onClick={() => goToStep(st.num)}
+            aria-label={`${st.title}${validationMap[st.num]?.hasError ? ' (pendente)' : ''}`}
+            aria-current={st.num === currentStep ? 'step' : undefined}
           >
-            <AlertCircle size={22} style={{ color: '#ef4444', marginTop: '2px', flexShrink: 0 }} />
-            <div>
-              <div style={{ fontWeight: 700, color: '#f87171', fontSize: '0.95rem' }}>
-                Atenção: Pendências ou pré-requisitos não atendidos nesta etapa:
-              </div>
-              <ul style={{ margin: '0.35rem 0 0 0', paddingLeft: '1.25rem', color: '#fca5a5', fontSize: '0.85rem' }}>
-                {currentStepStatus.errors.map((err, i) => (
-                  <li key={i}>{err}</li>
-                ))}
-              </ul>
+            <span className="wiz-seg-bar" />
+            <span className="wiz-seg-label">{st.title}</span>
+          </button>
+        ))}
+      </div>
+
+      <main className="page page-flow wizard-page">
+        {initialCharacter && initialCharacter.level > 1 && currentStep === 1 && (
+          <div className="callout callout-warning" style={{ marginBottom: 16 }}>
+            <AlertCircle size={18} />
+            <span>
+              O criador refaz as escolhas de 1º nível. Ao salvar, {initialCharacter.name} volta ao nível 1 (as anotações são mantidas).
+            </span>
+          </div>
+        )}
+
+        {showErrors && (
+          <div className="callout callout-danger animate-in" style={{ marginBottom: 16 }}>
+            <AlertCircle size={18} />
+            <div className="stack-xs">
+              <span className="callout-title">Pendências deste passo</span>
+              {currentStepStatus.errors.map((e, i) => (
+                <span key={i}>• {e}</span>
+              ))}
+            </div>
+          </div>
+        )}
+        {currentStepStatus.warnings.length > 0 && (
+          <div className="callout callout-warning" style={{ marginBottom: 16 }}>
+            <AlertCircle size={18} />
+            <div className="stack-xs">
+              {currentStepStatus.warnings.map((w, i) => (
+                <span key={i}>{w}</span>
+              ))}
             </div>
           </div>
         )}
 
-        {currentStepStatus.warnings.length > 0 && !currentStepStatus.hasError && (
-          <div
-            style={{
-              background: 'rgba(245, 158, 11, 0.1)',
-              border: '1px solid var(--t20-gold)',
-              borderRadius: 'var(--radius-md)',
-              padding: '0.75rem 1.25rem',
-              marginBottom: '1.5rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.75rem',
-            }}
-          >
-            <AlertCircle size={20} style={{ color: 'var(--t20-gold)', flexShrink: 0 }} />
-            <div style={{ color: '#fef3c7', fontSize: '0.85rem' }}>
-              {currentStepStatus.warnings.join(' ')}
-            </div>
-          </div>
-        )}
-
-        {currentStep === 1 && (
-          <StepRace
-            selectedRaceId={raceId}
-            selectedSubraceId={subraceId}
-            selectedRacialAttributes={selectedRacialAttributes}
-            selectedRacialSkills={selectedRacialSkills}
-            selectedRacialPower={selectedRacialPower}
-            prerequisiteContext={prereqContext}
-            classMandatorySkills={currentClass.mandatorySkills}
-            onSelectRace={handleSelectRace}
-            onSelectSubrace={setSubraceId}
-            onSelectRacialAttributes={setSelectedRacialAttributes}
-            onSelectRacialSkills={setSelectedRacialSkills}
-            onSelectRacialPower={setSelectedRacialPower}
-            onOpenDetail={setModalDetail}
-          />
-        )}
-
-        {currentStep === 2 && (
-          <StepClass
-            selectedClassId={classId}
-            selectedSubclass={classSubclass}
-            selectedClassSkills={selectedClassSkills}
-            raceSkills={selectedRacialSkills}
-            intSkills={selectedIntSkills}
-            alreadyTrainedSkills={[...selectedRacialSkills, ...selectedIntSkills]}
-            onSelectClass={setClassId}
-            onSelectSubclass={setClassSubclass}
-            onSelectClassSkills={setSelectedClassSkills}
-            onOpenDetail={setModalDetail}
-          />
-        )}
-
-        {currentStep === 3 && (
-          <StepOrigin
-            selectedOriginId={originId}
-            selectedOriginBenefits={selectedOriginBenefits}
-            raceSkills={selectedRacialSkills}
-            classSkills={[
-              ...currentClass.mandatorySkills,
-              ...selectedClassSkills,
-            ]}
-            intSkills={selectedIntSkills}
-            alreadyTrainedSkills={[
-              ...selectedRacialSkills,
-              ...currentClass.mandatorySkills,
-              ...selectedClassSkills,
-              ...selectedIntSkills,
-            ]}
-            prerequisiteContext={prereqContext}
-            onSelectOrigin={setOriginId}
-            onSelectOriginBenefits={setSelectedOriginBenefits}
-            onOpenDetail={setModalDetail}
-          />
-        )}
-
-        {currentStep === 4 && (
-          <StepDeity
-            selectedDeityId={deityId}
-            selectedDeityPowers={selectedDeityPowers}
-            characterClassId={classId}
-            characterRaceId={raceId}
-            onSelectDeity={setDeityId}
-            onSelectDeityPowers={setSelectedDeityPowers}
-            onOpenDetail={setModalDetail}
-          />
-        )}
-
-        {currentStep === 5 && (
-          <StepAttributes
-            method={attributeMethod}
-            baseAttributes={baseAttributes}
-            racialModifiers={racialModifiers}
-            onSelectMethod={setAttributeMethod}
-            onChangeBaseAttributes={setBaseAttributes}
-            onOpenDetail={setModalDetail}
-          />
-        )}
-
-        {currentStep === 6 && (
-          <StepSkills
-            totalAttributes={totalAttributes}
-            raceSkills={raceId === 'humano' || raceId === 'osteon' ? selectedRacialSkills : []}
-            classSkills={[...currentClass.mandatorySkills, ...selectedClassSkills]}
-            originSkills={selectedOriginBenefits.filter((b) => b.type === 'pericia').map((b) => b.name)}
-            selectedIntSkills={selectedIntSkills}
-            onSelectIntSkills={setSelectedIntSkills}
-            onOpenDetail={setModalDetail}
-          />
-        )}
-
-        {currentStep === 7 && isSpellcaster && (
-          <StepSpells
-            isSpellcaster={isSpellcaster}
-            spellcasterType={currentClass.spellcaster?.type}
-            allowedCount={allowedSpellsCount}
-            selectedSpells={selectedSpells}
-            onSelectSpells={setSelectedSpells}
-            onOpenDetail={setModalDetail}
-          />
-        )}
-
-        {currentStep === 8 && (
-          <StepEquipment
-            inventory={inventory}
-            tibares={tibares}
-            maxSpaces={maxSpaces.value}
-            currentSpaces={currentSpaces}
-            classId={classId}
-            originId={originId}
-            onUpdateInventory={setInventory}
-            onUpdateTibares={setTibares}
-            onOpenDetail={setModalDetail}
-          />
-        )}
-
-        {currentStep === 9 && (
-          <StepFinal
-            name={name}
-            playerName={playerName}
-            concept={concept}
-            bio={bio}
-            raceId={raceId}
-            classId={classId}
-            originId={originId}
-            deityId={deityId}
-            totalAttributes={totalAttributes}
-            stats={{
-              maxHp,
-              currentHp: maxHp.value,
-              tempHp: 0,
-              maxMp,
-              currentMp: maxMp.value,
-              tempMp: 0,
-              defense,
-              speed,
-              armorPenalty,
-              maxSpaces,
-              currentSpaces,
-            }}
-            trainedSkillsCount={trainedSkillIds.size}
-            powersCount={powerNames.length}
-            spellsCount={isSpellcaster ? selectedSpells.length : 0}
-            onChangeName={setName}
-            onChangePlayerName={setPlayerName}
-            onChangeConcept={setConcept}
-            onChangeBio={setBio}
-          />
-        )}
-      </div>
-
-      {/* Barra Inferior Fixa de Navegação */}
-      <div
-        style={{
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          background: 'rgba(12, 14, 23, 0.95)',
-          backdropFilter: 'blur(16px)',
-          borderTop: '1px solid var(--border-color)',
-          padding: '1rem 2rem',
-          zIndex: 800,
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          boxShadow: '0 -4px 20px rgba(0,0,0,0.5)',
-        }}
-      >
-        <button
-          type="button"
-          disabled={currentStep === 1}
-          onClick={handlePrevStep}
-          className="btn btn-secondary"
-          style={{ gap: '0.4rem' }}
-        >
-          <ChevronLeft size={18} />
-          Voltar
-        </button>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          {currentStep === 9 && hasAnyErrors && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#f87171', fontSize: '0.85rem' }}>
-              <AlertCircle size={16} />
-              <span>Corrija as etapas com pendências antes de salvar o personagem</span>
-            </div>
+        <div key={currentStep} className="animate-in">
+          {currentStep === 1 && (
+            <StepRace
+              selectedRaceId={raceId}
+              selectedSubraceId={subraceId}
+              selectedRacialAttributes={selectedRacialAttributes}
+              selectedRacialSkills={selectedRacialSkills}
+              selectedRacialPower={selectedRacialPower}
+              prerequisiteContext={prereqContext}
+              classMandatorySkills={currentClass.mandatorySkills}
+              onSelectRace={handleSelectRace}
+              onSelectSubrace={setSubraceId}
+              onSelectRacialAttributes={setSelectedRacialAttributes}
+              onSelectRacialSkills={setSelectedRacialSkills}
+              onSelectRacialPower={setSelectedRacialPower}
+              onOpenDetail={setModalDetail}
+            />
           )}
-
-          {currentStep === 9 ? (
-            <button
-              type="button"
-              disabled={hasAnyErrors}
-              onClick={handleSaveCharacter}
-              className="btn btn-gold"
-              style={{
-                padding: '0.75rem 1.75rem',
-                fontSize: '1rem',
-                gap: '0.5rem',
-                opacity: hasAnyErrors ? 0.5 : 1,
-                cursor: hasAnyErrors ? 'not-allowed' : 'pointer',
+          {currentStep === 2 && (
+            <StepClass
+              selectedClassId={classId}
+              selectedSubclass={classSubclass}
+              selectedClassSkills={selectedClassSkills}
+              raceSkills={selectedRacialSkills}
+              intSkills={selectedIntSkills}
+              alreadyTrainedSkills={[...selectedRacialSkills, ...selectedIntSkills]}
+              onSelectClass={handleSelectClass}
+              onSelectSubclass={setClassSubclass}
+              onSelectClassSkills={setSelectedClassSkills}
+              onOpenDetail={setModalDetail}
+            />
+          )}
+          {currentStep === 3 && (
+            <StepOrigin
+              selectedOriginId={originId}
+              selectedOriginBenefits={selectedOriginBenefits}
+              raceSkills={selectedRacialSkills}
+              classSkills={[...currentClass.mandatorySkills, ...selectedClassSkills]}
+              intSkills={selectedIntSkills}
+              alreadyTrainedSkills={[...selectedRacialSkills, ...currentClass.mandatorySkills, ...selectedClassSkills, ...selectedIntSkills]}
+              prerequisiteContext={prereqContext}
+              onSelectOrigin={setOriginId}
+              onSelectOriginBenefits={setSelectedOriginBenefits}
+              onOpenDetail={setModalDetail}
+            />
+          )}
+          {currentStep === 4 && (
+            <StepDeity
+              selectedDeityId={deityId}
+              selectedDeityPowers={selectedDeityPowers}
+              characterClassId={classId}
+              characterRaceId={raceId}
+              onSelectDeity={setDeityId}
+              onSelectDeityPowers={setSelectedDeityPowers}
+              onOpenDetail={setModalDetail}
+            />
+          )}
+          {currentStep === 5 && (
+            <StepAttributes
+              method={attributeMethod}
+              baseAttributes={baseAttributes}
+              racialModifiers={racialModifiers}
+              onSelectMethod={setAttributeMethod}
+              onChangeBaseAttributes={setBaseAttributes}
+              onOpenDetail={setModalDetail}
+            />
+          )}
+          {currentStep === 6 && (
+            <StepSkills
+              totalAttributes={totalAttributes}
+              raceSkills={raceId === 'humano' || raceId === 'osteon' ? selectedRacialSkills : []}
+              classSkills={[...currentClass.mandatorySkills, ...selectedClassSkills]}
+              originSkills={selectedOriginBenefits.filter((b) => b.type === 'pericia').map((b) => b.name)}
+              selectedIntSkills={selectedIntSkills}
+              onSelectIntSkills={setSelectedIntSkills}
+              onOpenDetail={setModalDetail}
+            />
+          )}
+          {currentStep === 7 && isSpellcaster && (
+            <StepSpells
+              isSpellcaster={isSpellcaster}
+              spellcasterType={currentClass.spellcaster?.type}
+              allowedCount={allowedSpellsCount}
+              selectedSpells={selectedSpells}
+              onSelectSpells={setSelectedSpells}
+              onOpenDetail={setModalDetail}
+            />
+          )}
+          {currentStep === 8 && (
+            <StepEquipment
+              inventory={inventory}
+              tibares={tibares}
+              maxSpaces={maxSpaces.value}
+              currentSpaces={currentSpaces}
+              classId={classId}
+              originId={originId}
+              onUpdateInventory={setInventory}
+              onUpdateTibares={setTibares}
+              onOpenDetail={setModalDetail}
+            />
+          )}
+          {currentStep === 9 && (
+            <StepFinal
+              name={name}
+              playerName={playerName}
+              concept={concept}
+              bio={bio}
+              raceId={raceId}
+              classId={classId}
+              originId={originId}
+              deityId={deityId}
+              totalAttributes={totalAttributes}
+              stats={{
+                maxHp,
+                currentHp: maxHp.value,
+                tempHp: 0,
+                maxMp,
+                currentMp: maxMp.value,
+                tempMp: 0,
+                defense,
+                speed,
+                armorPenalty,
+                maxSpaces,
+                currentSpaces,
               }}
-            >
-              <Save size={18} />
-              Salvar Personagem
+              trainedSkillsCount={trainedSkillIds.size}
+              powersCount={powerNames.length}
+              spellsCount={isSpellcaster ? selectedSpells.length : 0}
+              onChangeName={setName}
+              onChangePlayerName={setPlayerName}
+              onChangeConcept={setConcept}
+              onChangeBio={setBio}
+            />
+          )}
+        </div>
+      </main>
+
+      <div className="action-bar no-print">
+        <div className="action-bar-inner">
+          <button type="button" className="btn btn-secondary" onClick={handlePrevStep} disabled={stepIndex === 0} aria-label="Passo anterior">
+            <ArrowLeft size={18} />
+            <span className="hide-xs">Voltar</span>
+          </button>
+          {isLastStep ? (
+            <button type="button" className="btn btn-primary btn-lg grow" onClick={hasAnyErrors ? () => setStepsOpen(true) : handleSaveCharacter}>
+              {hasAnyErrors ? (
+                <>
+                  <AlertCircle size={18} />
+                  {errorSteps.length} {errorSteps.length === 1 ? 'etapa pendente' : 'etapas pendentes'}
+                </>
+              ) : (
+                <>
+                  <Save size={18} />
+                  {initialCharacter ? 'Salvar alterações' : 'Criar herói'}
+                </>
+              )}
             </button>
           ) : (
-            <button
-              type="button"
-              onClick={handleNextStep}
-              className="btn btn-primary"
-              style={{ padding: '0.75rem 1.5rem', gap: '0.5rem' }}
-            >
-              Próximo Passo
-              <ChevronRight size={18} />
+            <button type="button" className="btn btn-primary btn-lg grow" onClick={handleNextStep}>
+              {steps[stepIndex + 1]?.title}
+              <ArrowRight size={18} />
             </button>
           )}
         </div>
       </div>
 
-      {/* Modal de Detalhes Globais */}
+      <Sheet open={stepsOpen} onClose={() => setStepsOpen(false)} title="Resumo do herói" icon={<ListChecks size={22} />} size="sm" flush>
+        <div className="wiz-summary grid-3">
+          <div className="stat">
+            <span className="stat-label">PV</span>
+            <span className="stat-value t-hp">{maxHp.value}</span>
+          </div>
+          <div className="stat">
+            <span className="stat-label">PM</span>
+            <span className="stat-value t-mp">{maxMp.value}</span>
+          </div>
+          <div className="stat">
+            <span className="stat-label">Defesa</span>
+            <span className="stat-value">{defense.value}</span>
+          </div>
+        </div>
+        <div className="list list-plain">
+          {steps.map((st, i) => {
+            const status = validationMap[st.num];
+            return (
+              <button
+                key={st.num}
+                type="button"
+                className={`row${st.num === currentStep ? ' is-selected' : ''}`}
+                onClick={() => {
+                  setStepsOpen(false);
+                  goToStep(st.num);
+                }}
+              >
+                <span className={`step-dot${status?.hasError ? ' is-error' : status?.isValid ? ' is-ok' : ''}`}>
+                  {status?.hasError ? '!' : status?.isValid ? <Check size={13} strokeWidth={3} /> : i + 1}
+                </span>
+                <span className="row-main">
+                  <span className="row-title">{st.title}</span>
+                  {status?.hasError && <span className="row-sub t-danger">{status.errors.join(' · ')}</span>}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </Sheet>
+
       <DetailModal data={modalDetail} onClose={() => setModalDetail(null)} />
-    </div>
+    </>
   );
 };

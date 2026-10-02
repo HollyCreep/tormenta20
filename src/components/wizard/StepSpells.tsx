@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
+import { Check, Info, Sparkles } from 'lucide-react';
 import { SPELLS_LIST } from '../../data/spells';
-import { Spell } from '../../types/rules';
-import { Check, Info, Sparkles, Zap, BookOpen } from 'lucide-react';
-import { DetailModalData } from '../common/DetailModal';
+import type { DetailModalData } from '../common/DetailModal';
+import { SchoolBadge } from '../common/T20Badge';
+import { cleanT20Text, getSpellRuleCitation } from '../../utils/textUtils';
+import { Counter, EmptyState, SearchField, SelectField } from '../ui/controls';
+import { StepIntro } from './wizardUi';
 
 interface StepSpellsProps {
   isSpellcaster: boolean;
@@ -13,6 +16,9 @@ interface StepSpellsProps {
   onOpenDetail: (data: DetailModalData) => void;
 }
 
+const SCHOOLS = ['Abjuração', 'Adivinhação', 'Convocação', 'Encantamento', 'Evocação', 'Ilusão', 'Necromancia', 'Transmutação'];
+
+/** Magias iniciais: no 1º nível o conjurador só conhece magias de 1º círculo (Cap. 4). */
 export const StepSpells: React.FC<StepSpellsProps> = ({
   isSpellcaster,
   spellcasterType = 'arcana',
@@ -21,162 +27,118 @@ export const StepSpells: React.FC<StepSpellsProps> = ({
   onSelectSpells,
   onOpenDetail,
 }) => {
-  const [schoolFilter, setSchoolFilter] = useState<string>('todas');
+  const [school, setSchool] = useState('todas');
   const [search, setSearch] = useState('');
+
+  const available = useMemo(
+    () =>
+      SPELLS_LIST.filter((s) => s.circle === 1 && (s.type === 'universal' || s.type === spellcasterType)).sort((a, b) =>
+        a.name.localeCompare(b.name, 'pt-BR')
+      ),
+    [spellcasterType]
+  );
+
+  const visible = available.filter((s) => {
+    if (school !== 'todas' && s.school !== school) return false;
+    const q = search.trim().toLowerCase();
+    return !q || s.name.toLowerCase().includes(q) || s.description.toLowerCase().includes(q);
+  });
 
   if (!isSpellcaster || allowedCount <= 0) {
     return (
-      <div className="t20-card" style={{ padding: '2.5rem', textAlign: 'center' }}>
-        <Sparkles size={40} style={{ color: 'var(--text-dim)', marginBottom: '0.75rem' }} />
-        <h3>Sem Conjuração de Magias no 1º Nível</h3>
-        <p style={{ maxWidth: '500px', margin: '0.5rem auto 0 auto', color: 'var(--text-muted)' }}>
-          Sua classe atual foca em perícias mundanas, técnicas marciais ou poderes de combate físicos. Você não precisa escolher magias neste passo!
-        </p>
-      </div>
+      <EmptyState
+        icon={<Sparkles size={24} />}
+        title="Sem magias no 1º nível"
+        description="Sua classe não conjura magias no início da carreira. Pode seguir para o próximo passo."
+      />
     );
   }
 
-  // Filtra magias disponíveis pelo tipo do conjurador (Arcana ou Divina ou Universal)
-  const availableSpells = SPELLS_LIST.filter((s) => {
-    const matchesType = s.type === 'universal' || s.type === spellcasterType;
-    const matchesSchool = schoolFilter === 'todas' || s.school.toLowerCase() === schoolFilter.toLowerCase();
-    const matchesSearch = s.name.toLowerCase().includes(search.toLowerCase());
-    return matchesType && matchesSchool && matchesSearch;
-  });
-
-  const handleToggleSpell = (spellId: string) => {
-    if (selectedSpells.includes(spellId)) {
-      onSelectSpells(selectedSpells.filter((id) => id !== spellId));
-    } else {
-      if (selectedSpells.length < allowedCount) {
-        onSelectSpells([...selectedSpells, spellId]);
-      }
-    }
+  const toggle = (id: string) => {
+    if (selectedSpells.includes(id)) onSelectSpells(selectedSpells.filter((x) => x !== id));
+    else if (selectedSpells.length < allowedCount) onSelectSpells([...selectedSpells, id]);
   };
 
-  const schools = ['todas', 'Abjuração', 'Adivinhação', 'Convocação', 'Encantamento', 'Evocação', 'Ilusão', 'Necromancia', 'Transmutação'];
+  const chosen = selectedSpells.map((id) => SPELLS_LIST.find((s) => s.id === id)).filter(Boolean);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      {/* Cabeçalho */}
-      <div>
-        <h2>Passo 7: Escolha suas Magias Iniciais</h2>
-        <p>
-          Como conjurador de magias {spellcasterType === 'arcana' ? 'arcanas' : 'divinas'}, você começa o jogo conhecendo <strong>{allowedCount} magias de 1º círculo</strong>. Em Tormenta 20, magias de 1º círculo têm custo base de 1 PM e podem ser enriquecidas com aprimoramentos.
-        </p>
+    <div className="stack-lg">
+      <StepIntro
+        title="Magias"
+        description={`Escolha ${allowedCount} magias ${spellcasterType === 'divina' ? 'divinas' : 'arcanas'} (ou universais) de 1º círculo. Cada uma custa 1 PM.`}
+      />
+
+      <div className="card stack-sm spell-tray">
+        <div className="hstack between">
+          <span className="t-semibold">Seu grimório</span>
+          <Counter value={selectedSpells.length} total={allowedCount} />
+        </div>
+        {chosen.length === 0 ? (
+          <span className="t-sm t-3">Nenhuma magia escolhida ainda.</span>
+        ) : (
+          <div className="chip-wrap">
+            {chosen.map((s) => (
+              <button key={s!.id} type="button" className="chip chip-sm is-active" onClick={() => toggle(s!.id)} aria-label={`Remover ${s!.name}`}>
+                {cleanT20Text(s!.name)} ×
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Controles de Filtro e Progresso */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-        <div style={{ display: 'flex', gap: '0.35rem', overflowX: 'auto', paddingBottom: '0.25rem', maxWidth: '700px' }}>
-          {schools.map((sch) => (
-            <button
-              key={sch}
-              type="button"
-              onClick={() => setSchoolFilter(sch)}
-              className={`btn ${schoolFilter === sch ? 'btn-gold' : 'btn-secondary'}`}
-              style={{ padding: '0.3rem 0.65rem', fontSize: '0.75rem', whiteSpace: 'nowrap' }}
-            >
-              {sch.charAt(0).toUpperCase() + sch.slice(1)}
-            </button>
-          ))}
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <span className={`badge ${selectedSpells.length === allowedCount ? 'badge-green' : 'badge-gold'}`}>
-            {selectedSpells.length} de {allowedCount} magias escolhidas
-          </span>
-          <input
-            type="text"
-            placeholder="Buscar magia..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            style={{ width: '180px', padding: '0.35rem 0.6rem', fontSize: '0.85rem' }}
-          />
-        </div>
+      <div className="filter-row">
+        <SearchField value={search} onChange={setSearch} placeholder="Buscar magia…" />
+        <SelectField
+          value={school}
+          onChange={setSchool}
+          ariaLabel="Escola"
+          options={[{ value: 'todas', label: 'Escolas' }, ...SCHOOLS.map((s) => ({ value: s, label: s }))]}
+        />
       </div>
 
-      {/* Grade de Magias */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-          gap: '0.85rem',
-        }}
-      >
-        {availableSpells.map((spell) => {
-          const isSelected = selectedSpells.includes(spell.id);
+      <span className="t-sm t-3">{visible.length} magias de 1º círculo</span>
+
+      <div className="list">
+        {visible.map((sp) => {
+          const on = selectedSpells.includes(sp.id);
+          const blocked = !on && selectedSpells.length >= allowedCount;
           return (
-            <div
-              key={spell.id}
-              onClick={() => handleToggleSpell(spell.id)}
-              className="t20-card"
-              style={{
-                cursor: 'pointer',
-                borderColor: isSelected ? 'var(--t20-gold)' : 'var(--border-color)',
-                background: isSelected ? 'rgba(245, 158, 11, 0.12)' : 'var(--bg-card)',
-                boxShadow: isSelected ? '0 0 15px rgba(245, 158, 11, 0.25)' : 'none',
-                padding: '1rem',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-                gap: '0.5rem',
-              }}
-            >
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                    <h3 style={{ fontSize: '1.05rem', color: isSelected ? 'var(--t20-gold-light)' : '#ffffff', margin: 0 }}>
-                      {spell.name}
-                    </h3>
-                  </div>
-                  {isSelected && <Check size={18} style={{ color: 'var(--t20-gold)' }} />}
-                </div>
-
-                <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap', margin: '0.4rem 0' }}>
-                  <span className="badge badge-blue" style={{ fontSize: '0.65rem' }}>
-                    1 PM
+            <div key={sp.id} className={`row pick-row${on ? ' is-selected' : ''}`}>
+              <button type="button" role="checkbox" aria-checked={on} className="pick-main" disabled={blocked} onClick={() => toggle(sp.id)}>
+                <span className={`mark${on ? ' is-on' : ''}`}>{on && <Check size={14} strokeWidth={3} />}</span>
+                <span className="row-main">
+                  <span className="row-title">{cleanT20Text(sp.name)}</span>
+                  <span className="row-sub clamp-2">{cleanT20Text(sp.description)}</span>
+                  <span className="hstack-xs wrap">
+                    <SchoolBadge school={sp.school} />
+                    <span className="badge">{cleanT20Text(sp.execution)}</span>
+                    <span className="badge">{cleanT20Text(sp.range)}</span>
                   </span>
-                  <span className="badge badge-slate" style={{ fontSize: '0.65rem' }}>
-                    {spell.school}
-                  </span>
-                  <span className="badge badge-slate" style={{ fontSize: '0.65rem' }}>
-                    {spell.execution}
-                  </span>
-                </div>
-
-                <p style={{ margin: 0, fontSize: '0.825rem', color: '#cbd5e1', lineHeight: 1.4 }}>
-                  {spell.description.length > 120 ? `${spell.description.substring(0, 120)}...` : spell.description}
-                </p>
-              </div>
-
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '0.5rem', marginTop: '0.25rem' }}>
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>
-                  Alcance: {spell.range} • {spell.duration}
                 </span>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onOpenDetail({
-                      title: spell.name,
-                      category: `Magia ${spell.type} (1º Círculo)`,
-                      subtitle: `${spell.school} • Execução: ${spell.execution}`,
-                      cost: '1 PM',
-                      range: spell.range,
-                      targetArea: spell.targetArea,
-                      duration: spell.duration,
-                      resistance: spell.resistance,
-                      description: spell.description,
-                      upgrades: spell.upgrades,
-                    });
-                  }}
-                  className="btn btn-ghost"
-                  style={{ padding: '0.2rem 0.4rem', fontSize: '0.75rem', gap: '0.2rem' }}
-                >
-                  <Info size={14} /> Detalhes
-                </button>
-              </div>
+              </button>
+              <button
+                type="button"
+                className="icon-btn icon-btn-sm"
+                aria-label={`Detalhes de ${sp.name}`}
+                onClick={() =>
+                  onOpenDetail({
+                    title: cleanT20Text(sp.name),
+                    category: `Magia ${sp.type} · 1º círculo`,
+                    subtitle: sp.school,
+                    cost: '1 PM',
+                    execution: cleanT20Text(sp.execution),
+                    range: cleanT20Text(sp.range),
+                    targetArea: cleanT20Text(sp.targetArea),
+                    duration: cleanT20Text(sp.duration),
+                    resistance: sp.resistance,
+                    description: cleanT20Text(sp.description),
+                    upgrades: sp.upgrades,
+                    ruleCitation: getSpellRuleCitation(sp),
+                  })
+                }
+              >
+                <Info size={17} />
+              </button>
             </div>
           );
         })}

@@ -13,12 +13,21 @@ interface DiceContextValue {
     activeCharacter?: CharacterSheet | null
   ) => RollResult;
   clearRecentRolls: () => void;
+  /** Bandeja de dados (bottom sheet) */
+  isTrayOpen: boolean;
+  openTray: () => void;
+  closeTray: () => void;
 }
+
+const ATTRIBUTE_WORDS = ['força', 'destreza', 'constituição', 'inteligência', 'sabedoria', 'carisma'];
 
 const DiceContext = createContext<DiceContextValue | undefined>(undefined);
 
 export const DiceProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [recentRolls, setRecentRolls] = useState<RollResult[]>([]);
+  const [isTrayOpen, setIsTrayOpen] = useState(false);
+  const openTray = useCallback(() => setIsTrayOpen(true), []);
+  const closeTray = useCallback(() => setIsTrayOpen(false), []);
 
   const rollDice = useCallback(
     (
@@ -50,11 +59,14 @@ export const DiceProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       let category: 'ataque' | 'dano' | 'pericia' | 'atributo' | 'magia' | 'livre' = 'livre';
       const low = title.toLowerCase();
+      // "Teste de Força" é teste de atributo — precisa ser verificado antes de "teste de" (perícia)
+      const isAttributeTest = ATTRIBUTE_WORDS.some((w) => low === `teste de ${w}` || low.startsWith(`teste de ${w} `));
       if (low.includes('ataque')) category = 'ataque';
       else if (low.includes('dano')) category = 'dano';
+      else if (isAttributeTest) category = 'atributo';
       else if (low.includes('teste de') || low.includes('perícia') || low.includes('pericia')) category = 'pericia';
       else if (low.includes('magia') || low.includes('lançar')) category = 'magia';
-      else if (low.includes('força') || low.includes('destreza') || low.includes('constituição') || low.includes('inteligência') || low.includes('sabedoria') || low.includes('carisma')) category = 'atributo';
+      else if (ATTRIBUTE_WORDS.some((w) => low.includes(w))) category = 'atributo';
 
       const rollType = sides === 20 ? 'd20' : sides === 6 ? 'd6' : sides === 8 ? 'd8' : sides === 10 ? 'd10' : sides === 12 ? 'd12' : sides === 4 ? 'd4' : sides === 100 ? 'd100' : 'multiplo';
 
@@ -105,7 +117,7 @@ export const DiceProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   return (
-    <DiceContext.Provider value={{ recentRolls, rollDice, clearRecentRolls }}>
+    <DiceContext.Provider value={{ recentRolls, rollDice, clearRecentRolls, isTrayOpen, openTray, closeTray }}>
       {children}
     </DiceContext.Provider>
   );

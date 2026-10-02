@@ -1,163 +1,366 @@
-/* ===================================================== */
-/* 🎨 Design Tokens — Tormenta 20 Mobile App              */
-/* Sistema de design mobile-first com identidade visual    */
-/* inspirada em RPGs premium e interfaces de jogos.        */
-/* ===================================================== */
+/* ==========================================================================
+   Tormenta 20 — Design Tokens & Temas (v0.5)
+   --------------------------------------------------------------------------
+   Três temas com personalidades distintas. Os ids são persistidos em
+   localStorage ('t20_app_theme') e por isso NÃO devem ser renomeados.
+
+   • t20-classic  "Clássico — Tomo de Arton"  couro escuro, ouro e carmesim
+   • modern-dark  "Escuro — Obsidiana"        grafite OLED, plano, carmesim vivo
+   • light        "Claro — Pergaminho"        papel quente, tinta, rubricas
+
+   Os seletores usam [data-theme] (e não só :root) para que um elemento
+   qualquer possa "vestir" outro tema — é assim que as prévias da tela de
+   Ajustes mostram as cores reais de cada tema.
+   ========================================================================== */
 
 :root {
-  /* ─── Superfícies & Fundos ─── */
-  --surface-0: #0C0C14;        /* Background principal */
-  --surface-1: #14141E;        /* Cards de primeiro nível */
-  --surface-2: #1C1C28;        /* Cards elevados / hovers */
-  --surface-3: #262632;        /* Inputs, modais internas */
-  --surface-4: #30303E;        /* Elementos interativos */
-  --surface-glass: rgba(20, 20, 30, 0.85);
-  
-  /* ─── Acento Primário: Ouro de Arton ─── */
-  --accent: #E8A838;
-  --accent-light: #F5C04A;
-  --accent-dark: #C4882A;
-  --accent-dim: rgba(232, 168, 56, 0.08);
-  --accent-soft: rgba(232, 168, 56, 0.15);
-  --accent-glow: rgba(232, 168, 56, 0.30);
+  /* ---------- Tipografia ---------- */
+  --font-display: 'Cinzel', 'Trajan Pro', 'Cormorant SC', 'Times New Roman', serif;
+  --font-body: 'Outfit', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  --font-mono: 'Fira Code', ui-monospace, 'Cascadia Code', 'SFMono-Regular', Consolas, monospace;
 
-  /* ─── Cores Semânticas ─── */
-  --hp: #E85D5D;               /* Vida */
-  --hp-dark: #C94444;
-  --hp-bg: rgba(232, 93, 93, 0.10);
-  --hp-glow: rgba(232, 93, 93, 0.30);
-  
-  --mp: #5D9BE8;               /* Mana */
-  --mp-dark: #4480C9;
-  --mp-bg: rgba(93, 155, 232, 0.10);
-  --mp-glow: rgba(93, 155, 232, 0.30);
-  
-  --success: #5DE89F;          /* Sucesso, cura */
-  --success-bg: rgba(93, 232, 159, 0.10);
-  
-  --danger: #E85D5D;           /* Perigo, dano */
-  --danger-bg: rgba(232, 93, 93, 0.10);
-  
-  --info: #5DB8E8;             /* Informação */
-  --info-bg: rgba(93, 184, 232, 0.10);
-  
-  --shield: #38BDF8;           /* PV Temporário / Barreira */
-  --shield-bg: rgba(56, 189, 248, 0.10);
-  
-  --crit: #FFD700;             /* Acerto crítico */
-  --fumble: #FF4444;           /* Falha crítica */
-  
-  /* ─── Texto ─── */
-  --text-primary: #EEEEF2;
-  --text-secondary: #8E8EA0;
-  --text-tertiary: #5A5A6E;
-  --text-inverse: #0C0C14;
-  --text-accent: var(--accent-light);
-  
-  /* ─── Bordas ─── */
-  --border: rgba(255, 255, 255, 0.06);
-  --border-light: rgba(255, 255, 255, 0.10);
-  --border-accent: rgba(232, 168, 56, 0.20);
-  --border-focus: rgba(232, 168, 56, 0.50);
-  
-  /* ─── Tipografia ─── */
-  --font-display: 'Cinzel', serif;
-  --font-body: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
-  
-  --text-xs: 0.6875rem;    /* 11px */
-  --text-sm: 0.8125rem;    /* 13px */
-  --text-base: 0.9375rem;  /* 15px */
-  --text-lg: 1.0625rem;    /* 17px */
-  --text-xl: 1.25rem;      /* 20px */
-  --text-2xl: 1.5rem;      /* 24px */
-  --text-3xl: 1.875rem;    /* 30px */
-  
-  /* ─── Espaçamento ─── */
-  --space-1: 0.25rem;   /* 4px */
-  --space-2: 0.5rem;    /* 8px */
-  --space-3: 0.75rem;   /* 12px */
-  --space-4: 1rem;      /* 16px */
-  --space-5: 1.25rem;   /* 20px */
-  --space-6: 1.5rem;    /* 24px */
-  --space-8: 2rem;      /* 32px */
-  --space-10: 2.5rem;   /* 40px */
-  --space-12: 3rem;     /* 48px */
-  
-  /* ─── Raios ─── */
-  --radius-xs: 4px;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
-  --radius-2xl: 28px;
-  --radius-full: 9999px;
-  
-  /* ─── Sombras ─── */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.6);
-  --shadow-xl: 0 16px 40px rgba(0, 0, 0, 0.7);
-  --shadow-glow-accent: 0 0 20px var(--accent-glow);
-  --shadow-glow-hp: 0 0 16px var(--hp-glow);
-  --shadow-glow-mp: 0 0 16px var(--mp-glow);
-  
-  /* ─── Transições ─── */
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
-  --duration-fast: 150ms;
-  --duration-normal: 200ms;
-  --duration-slow: 300ms;
-  --transition: all var(--duration-normal) var(--ease-in-out);
-  
-  /* ─── Safe Areas (Mobile) ─── */
+  --fs-2xs: 0.6875rem;  /* 11px */
+  --fs-xs: 0.75rem;     /* 12px */
+  --fs-sm: 0.8125rem;   /* 13px */
+  --fs-md: 0.9375rem;   /* 15px */
+  --fs-lg: 1.0625rem;   /* 17px */
+  --fs-xl: 1.25rem;     /* 20px */
+  --fs-2xl: 1.5rem;     /* 24px */
+  --fs-3xl: 1.875rem;   /* 30px */
+  --fs-4xl: 2.375rem;   /* 38px */
+
+  /* ---------- Espaçamento (grade de 4px) ---------- */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+
+  /* ---------- Raios ---------- */
+  --r-xs: 6px;
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 18px;
+  --r-xl: 24px;
+  --r-full: 999px;
+
+  /* ---------- Movimento ---------- */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-1: 120ms;
+  --dur-2: 200ms;
+  --dur-3: 320ms;
+
+  /* ---------- Layout ---------- */
+  --appbar-h: 56px;
+  --nav-h: 64px;
+  --rail-w: 92px;
+  --content-max: 760px;
+  --content-wide: 1180px;
+  --gutter: 16px;
+
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left: env(safe-area-inset-left, 0px);
   --safe-right: env(safe-area-inset-right, 0px);
-  
-  /* ─── Layout ─── */
-  --header-height: 52px;
-  --tab-bar-height: 60px;
-  --content-max-width: 640px;   /* Mobile-optimized */
-  --content-max-width-lg: 960px; /* Tablet */
-  
-  /* ─── Z-Index Scale ─── */
-  --z-base: 1;
-  --z-sticky: 50;
-  --z-header: 100;
-  --z-overlay: 500;
-  --z-modal: 1000;
-  --z-toast: 1500;
+
+  /* ---------- Camadas ---------- */
+  --z-sticky: 20;
+  --z-appbar: 40;
+  --z-nav: 50;
+  --z-fab: 60;
+  --z-toast: 300;
+  --z-sheet: 200;
+  --z-popover: 400;
 }
 
-/* ─── Tema Claro ─── */
-[data-theme="light"] {
-  --surface-0: #F4F4F8;
-  --surface-1: #FFFFFF;
-  --surface-2: #F0F0F5;
-  --surface-3: #E8E8EE;
-  --surface-4: #DDDDE5;
-  --surface-glass: rgba(255, 255, 255, 0.92);
-  
-  --accent: #C98820;
-  --accent-light: #D9A030;
-  --accent-dark: #A87018;
-  --accent-dim: rgba(201, 136, 32, 0.06);
-  --accent-soft: rgba(201, 136, 32, 0.12);
-  --accent-glow: rgba(201, 136, 32, 0.20);
-  
-  --text-primary: #1A1A24;
-  --text-secondary: #5A5A6E;
-  --text-tertiary: #8E8EA0;
-  --text-inverse: #FFFFFF;
-  
-  --border: rgba(0, 0, 0, 0.06);
-  --border-light: rgba(0, 0, 0, 0.10);
-  --border-accent: rgba(201, 136, 32, 0.25);
-  --border-focus: rgba(201, 136, 32, 0.50);
-  
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.10);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+/* ==========================================================================
+   CLÁSSICO — "Tomo de Arton" (padrão)
+   ========================================================================== */
+:root,
+[data-theme='t20-classic'] {
+  color-scheme: dark;
+
+  --font-heading: var(--font-display);
+  --heading-weight: 700;
+  --heading-tracking: 0.02em;
+
+  --bg: #110d0a;
+  --bg-image:
+    radial-gradient(120% 60% at 50% -12%, rgba(196, 140, 60, 0.16) 0%, transparent 60%),
+    radial-gradient(80% 50% at 100% 110%, rgba(150, 30, 34, 0.12) 0%, transparent 60%);
+  --surface-1: #1a1410;
+  --surface-2: #221a14;
+  --surface-3: #2e241c;
+  --surface-sheet: #1c1612;
+  --surface-glass: rgba(26, 20, 16, 0.86);
+  --surface-inverse: #f4eadb;
+
+  --line: rgba(236, 205, 150, 0.1);
+  --line-2: rgba(236, 205, 150, 0.17);
+  --line-3: rgba(236, 205, 150, 0.3);
+
+  --text-1: #f4eadb;
+  --text-2: #cdbda4;
+  --text-3: #a08e74;
+  --text-on-accent: #1b1309;
+
+  --accent: #d9a441;
+  --accent-2: #f2c766;
+  --accent-ink: #e8bc62;
+  --accent-soft: rgba(217, 164, 65, 0.14);
+  --accent-line: rgba(217, 164, 65, 0.42);
+  --accent-glow: rgba(217, 164, 65, 0.3);
+
+  --brand: #c7353b;
+  --brand-ink: #f07a7e;
+  --brand-soft: rgba(199, 53, 59, 0.16);
+
+  --gold: #d9a441;
+  --gold-ink: #e8bc62;
+  --gold-soft: rgba(217, 164, 65, 0.14);
+  --gold-line: rgba(217, 164, 65, 0.4);
+
+  --danger: #d6463e;
+  --danger-ink: #f2857d;
+  --success: #5fae6b;
+  --success-ink: #8fd49a;
+  --warning: #e0a43a;
+  --warning-ink: #f1c26b;
+  --info: #5b9be0;
+  --info-ink: #96c0f0;
+
+  --hp: #d6463e;
+  --hp-deep: #7c1a16;
+  --mp: #4c86e0;
+  --mp-deep: #1f3b85;
+  --temp: #3ec1c9;
+  --def: #d9a441;
+
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.45);
+  --shadow-2: 0 8px 22px rgba(0, 0, 0, 0.45);
+  --shadow-3: 0 22px 60px rgba(0, 0, 0, 0.65);
+  --shadow-accent: 0 6px 20px rgba(217, 164, 65, 0.22);
+  --scrim: rgba(8, 5, 3, 0.66);
+  --focus-ring: 0 0 0 3px rgba(217, 164, 65, 0.45);
+  --grain-opacity: 0.05;
+  --hairline-ornament: linear-gradient(90deg, transparent, rgba(217, 164, 65, 0.5), transparent);
+
+  --theme-meta: #110d0a;
+}
+
+/* ==========================================================================
+   ESCURO — "Obsidiana"
+   ========================================================================== */
+[data-theme='modern-dark'] {
+  color-scheme: dark;
+
+  --font-heading: var(--font-body);
+  --heading-weight: 700;
+  --heading-tracking: -0.01em;
+
+  --bg: #09090b;
+  --bg-image: linear-gradient(180deg, #101014 0%, rgba(9, 9, 11, 0) 340px);
+  --surface-1: #131316;
+  --surface-2: #1a1a1f;
+  --surface-3: #24242b;
+  --surface-sheet: #141417;
+  --surface-glass: rgba(19, 19, 22, 0.86);
+  --surface-inverse: #f2f2f5;
+
+  --line: rgba(255, 255, 255, 0.07);
+  --line-2: rgba(255, 255, 255, 0.11);
+  --line-3: rgba(255, 255, 255, 0.2);
+
+  --text-1: #f2f2f5;
+  --text-2: #b4b4bf;
+  --text-3: #868691;
+  --text-on-accent: #ffffff;
+
+  --accent: #d93a40;
+  --accent-2: #f0525a;
+  --accent-ink: #ff7b80;
+  --accent-soft: rgba(229, 72, 77, 0.14);
+  --accent-line: rgba(229, 72, 77, 0.5);
+  --accent-glow: rgba(229, 72, 77, 0.32);
+
+  --brand: #e5484d;
+  --brand-ink: #ff7b80;
+  --brand-soft: rgba(229, 72, 77, 0.14);
+
+  --gold: #e9b24c;
+  --gold-ink: #f3c56f;
+  --gold-soft: rgba(233, 178, 76, 0.13);
+  --gold-line: rgba(233, 178, 76, 0.38);
+
+  --danger: #e5484d;
+  --danger-ink: #ff8a8e;
+  --success: #3fb67a;
+  --success-ink: #6fd6a0;
+  --warning: #e9b24c;
+  --warning-ink: #f3c56f;
+  --info: #4f8ff7;
+  --info-ink: #8db6fb;
+
+  --hp: #e5484d;
+  --hp-deep: #7a1519;
+  --mp: #4f8ff7;
+  --mp-deep: #1b3b8f;
+  --temp: #2fc6d0;
+  --def: #e9b24c;
+
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-2: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-3: 0 24px 64px rgba(0, 0, 0, 0.7);
+  --shadow-accent: 0 6px 22px rgba(229, 72, 77, 0.28);
+  --scrim: rgba(0, 0, 0, 0.66);
+  --focus-ring: 0 0 0 3px rgba(229, 72, 77, 0.45);
+  --grain-opacity: 0;
+  --hairline-ornament: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.14), transparent);
+
+  --theme-meta: #09090b;
+}
+
+/* ==========================================================================
+   CLARO — "Pergaminho"
+   ========================================================================== */
+[data-theme='light'] {
+  color-scheme: light;
+
+  --font-heading: var(--font-display);
+  --heading-weight: 700;
+  --heading-tracking: 0.015em;
+
+  --bg: #f3ede1;
+  --bg-image:
+    radial-gradient(120% 60% at 50% -12%, #fffaf0 0%, transparent 62%),
+    radial-gradient(70% 50% at 100% 110%, rgba(163, 36, 42, 0.06) 0%, transparent 60%);
+  --surface-1: #fffcf6;
+  --surface-2: #f8f2e7;
+  --surface-3: #eee5d4;
+  --surface-sheet: #fffcf6;
+  --surface-glass: rgba(255, 252, 246, 0.9);
+  --surface-inverse: #22180f;
+
+  --line: rgba(70, 48, 24, 0.11);
+  --line-2: rgba(70, 48, 24, 0.19);
+  --line-3: rgba(70, 48, 24, 0.32);
+
+  --text-1: #22180f;
+  --text-2: #56483a;
+  --text-3: #75675a;
+  --text-on-accent: #ffffff;
+
+  --accent: #a3242a;
+  --accent-2: #bd323a;
+  --accent-ink: #9a1f25;
+  --accent-soft: rgba(163, 36, 42, 0.08);
+  --accent-line: rgba(163, 36, 42, 0.38);
+  --accent-glow: rgba(163, 36, 42, 0.18);
+
+  --brand: #a3242a;
+  --brand-ink: #9a1f25;
+  --brand-soft: rgba(163, 36, 42, 0.08);
+
+  --gold: #a87721;
+  --gold-ink: #7a5410;
+  --gold-soft: rgba(176, 128, 32, 0.13);
+  --gold-line: rgba(150, 105, 25, 0.4);
+
+  --danger: #b3261e;
+  --danger-ink: #9b1f18;
+  --success: #2f7d3b;
+  --success-ink: #24672f;
+  --warning: #a86d00;
+  --warning-ink: #855600;
+  --info: #2b5fc7;
+  --info-ink: #214ea6;
+
+  --hp: #c0392b;
+  --hp-deep: #e8a39a;
+  --mp: #2b5fc7;
+  --mp-deep: #9fb8ea;
+  --temp: #0f8c94;
+  --def: #8a5f12;
+
+  --shadow-1: 0 1px 2px rgba(60, 40, 20, 0.08);
+  --shadow-2: 0 8px 22px rgba(60, 40, 20, 0.1);
+  --shadow-3: 0 22px 56px rgba(60, 40, 20, 0.18);
+  --shadow-accent: 0 6px 18px rgba(163, 36, 42, 0.18);
+  --scrim: rgba(34, 24, 15, 0.4);
+  --focus-ring: 0 0 0 3px rgba(163, 36, 42, 0.3);
+  --grain-opacity: 0.045;
+  --hairline-ornament: linear-gradient(90deg, transparent, rgba(163, 36, 42, 0.35), transparent);
+
+  --theme-meta: #f3ede1;
+}
+
+/* ==========================================================================
+   Tokens derivados (iguais para todos os temas — calculados por elemento)
+   ========================================================================== */
+:root,
+[data-theme] {
+  --accent-tint: color-mix(in srgb, var(--accent) 22%, var(--surface-1));
+  --danger-soft: color-mix(in srgb, var(--danger) 14%, transparent);
+  --danger-line: color-mix(in srgb, var(--danger) 42%, transparent);
+  --success-soft: color-mix(in srgb, var(--success) 14%, transparent);
+  --success-line: color-mix(in srgb, var(--success) 40%, transparent);
+  --warning-soft: color-mix(in srgb, var(--warning) 15%, transparent);
+  --warning-line: color-mix(in srgb, var(--warning) 42%, transparent);
+  --info-soft: color-mix(in srgb, var(--info) 14%, transparent);
+  --info-line: color-mix(in srgb, var(--info) 40%, transparent);
+  --hp-soft: color-mix(in srgb, var(--hp) 14%, transparent);
+  --mp-soft: color-mix(in srgb, var(--mp) 14%, transparent);
+  --temp-soft: color-mix(in srgb, var(--temp) 16%, transparent);
+  --hp-ink: color-mix(in oklab, var(--hp) 72%, var(--text-1));
+  --mp-ink: color-mix(in oklab, var(--mp) 70%, var(--text-1));
+  --temp-ink: color-mix(in oklab, var(--temp) 72%, var(--text-1));
+  --def-ink: color-mix(in oklab, var(--def) 78%, var(--text-1));
+
+  /* ---------- Aliases legados (rede de segurança p/ código antigo) ---------- */
+  --bg-main: var(--bg);
+  --bg-surface: var(--surface-1);
+  --bg-surface-elevated: var(--surface-2);
+  --bg-surface-hover: var(--surface-3);
+  --bg-card: var(--surface-1);
+  --bg-glass: var(--surface-glass);
+  --border-color: var(--line-2);
+  --border-hover: var(--accent-line);
+  --border-gold: var(--gold-line);
+  --t20-gold: var(--gold);
+  --t20-gold-light: var(--gold-ink);
+  --t20-gold-dark: var(--gold);
+  --t20-gold-glow: var(--gold-soft);
+  --artonian-gold: var(--gold);
+  --t20-ruby: var(--danger);
+  --t20-ruby-hover: var(--danger-ink);
+  --t20-ruby-dark: var(--danger);
+  --t20-ruby-glow: var(--danger-soft);
+  --t20-mana: var(--mp);
+  --t20-mana-light: var(--mp-ink);
+  --t20-mana-glow: var(--mp-soft);
+  --t20-life: var(--success);
+  --t20-life-light: var(--success-ink);
+  --t20-life-glow: var(--success-soft);
+  --text-main: var(--text-1);
+  --text-muted: var(--text-2);
+  --text-dim: var(--text-3);
+  --text-inverse: var(--text-on-accent);
+  --font-fantasy: var(--font-display);
+  --font-sans: var(--font-body);
+  --radius-xs: var(--r-xs);
+  --radius-sm: var(--r-sm);
+  --radius-md: var(--r-md);
+  --radius-lg: var(--r-lg);
+  --radius-xl: var(--r-xl);
+  --shadow-sm: var(--shadow-1);
+  --shadow-md: var(--shadow-2);
+  --shadow-lg: var(--shadow-3);
+  --shadow-xl: var(--shadow-3);
+  --transition: all var(--dur-2) var(--ease-out);
 }

@@ -2,54 +2,34 @@ import React, { useState } from 'react';
 import { Dices, FileText } from 'lucide-react';
 import { CharacterRollHistoryTab } from './CharacterRollHistoryTab';
 import { CharacterAuditTab } from './CharacterAuditTab';
+import { Segmented } from '../ui/controls';
 
 interface LogsTabProps {
   characterId: string;
   characterName: string;
+  /** Muda a cada rolagem/alteração para recarregar os registros ao vivo. */
+  revision?: string | number;
 }
 
-/**
- * Aba unificada de Logs do Personagem, com sub-abas "Rolagens" e "Auditoria".
- * Substitui as antigas abas separadas "Histórico" e "Auditoria" no CharacterSheetView.
- * Os dados já vêm filtrados pelo personagem ativo — sem necessidade de select de personagem.
- */
-export const LogsTab: React.FC<LogsTabProps> = ({ characterId, characterName }) => {
+/** Registro do personagem: rolagens e auditoria de alterações (já filtrados pelo herói). */
+export const LogsTab: React.FC<LogsTabProps> = ({ characterId, characterName, revision }) => {
   const [subTab, setSubTab] = useState<'rolagens' | 'auditoria'>('rolagens');
 
   return (
-    <div>
-      {/* Sub-abas: Rolagens | Auditoria */}
-      <div className="sub-tabs sub-tabs-nested">
-        <button
-          type="button"
-          className={subTab === 'rolagens' ? 'active' : ''}
-          onClick={() => setSubTab('rolagens')}
-        >
-          <Dices size={14} />
-          Rolagens
-        </button>
-        <button
-          type="button"
-          className={subTab === 'auditoria' ? 'active' : ''}
-          onClick={() => setSubTab('auditoria')}
-        >
-          <FileText size={14} />
-          Auditoria
-        </button>
-      </div>
-
-      {/* Conteúdo das sub-abas */}
-      {subTab === 'rolagens' && (
-        <CharacterRollHistoryTab
-          characterId={characterId}
-          characterName={characterName}
-        />
-      )}
-      {subTab === 'auditoria' && (
-        <CharacterAuditTab
-          characterId={characterId}
-          characterName={characterName}
-        />
+    <div className="stack">
+      <Segmented<'rolagens' | 'auditoria'>
+        value={subTab}
+        onChange={setSubTab}
+        ariaLabel="Tipo de registro"
+        options={[
+          { value: 'rolagens', label: 'Rolagens', icon: <Dices size={16} /> },
+          { value: 'auditoria', label: 'Auditoria', icon: <FileText size={16} /> },
+        ]}
+      />
+      {subTab === 'rolagens' ? (
+        <CharacterRollHistoryTab characterId={characterId} characterName={characterName} revision={revision} />
+      ) : (
+        <CharacterAuditTab characterId={characterId} characterName={characterName} revision={revision} />
       )}
     </div>
   );

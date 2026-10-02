@@ -1,0 +1,86 @@
+/* ==========================================================================
+   Compêndio
+   ========================================================================== */
+
+.appbar-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin-left: 4px;
+  border-radius: var(--r-sm);
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+}
+
+.compendium-bar { display: flex; flex-direction: column; gap: var(--sp-2); padding-top: var(--sp-3); padding-bottom: var(--sp-3); }
+.active-filters { margin-top: 2px; }
+
+.filter-btn { position: relative; }
+.filter-btn.has-active { background: var(--accent-soft); color: var(--accent-ink); }
+.filter-btn-count {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: var(--r-full);
+  background: var(--accent);
+  color: var(--text-on-accent);
+  font-size: 0.6875rem;
+  font-weight: 800;
+  line-height: 18px;
+  text-align: center;
+}
+
+.compendium-list .row-main { gap: 4px; }
+.compendium-list .row { align-items: center; }
+.compendium-list .row.items-start { align-items: flex-start; }
+
+.circle-medal {
+  --medal: var(--info);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: var(--fs-sm);
+  color: color-mix(in oklab, var(--medal) 70%, var(--text-1));
+  background: color-mix(in srgb, var(--medal) 14%, var(--surface-2));
+  border: 1px solid color-mix(in srgb, var(--medal) 35%, transparent);
+}
+.circle-divina { --medal: var(--gold); }
+.circle-universal { --medal: var(--accent); }
+
+/* Oficina */
+.forge-layout { display: flex; flex-direction: column; gap: var(--sp-4); }
+@media (min-width: 900px) {
+  .forge-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 340px); align-items: start; }
+  .forge-preview { order: 2; position: sticky; top: 0; }
+}
+.forge-preview { display: flex; flex-direction: column; gap: var(--sp-3); }
+.forge-preview-name { font-family: var(--font-heading); font-weight: var(--heading-weight); font-size: var(--fs-lg); }
+.forge-stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: var(--sp-2); }
+.forge-stat { display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; border-radius: var(--r-sm); background: var(--surface-2); }
+.forge-effects { margin: 0; padding-left: 18px; font-size: var(--fs-sm); color: var(--text-2); }
+.forge-breakdown {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px var(--sp-3);
+  font-size: var(--fs-sm);
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+}
+.forge-row { align-items: flex-start; padding-top: 12px; padding-bottom: 12px; }
+.forge-row .mark { margin-top: 2px; }
+.forge-row.is-selected { background: var(--accent-soft); }
+.forge-row.is-disabled .row-title { color: var(--text-3); }
+.forge-footer { flex: 1 1 auto; display: flex; flex-direction: column; gap: var(--sp-2); min-width: 0; }
+.forge-cost { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--sp-2); }
+.forge-cost-value { font-family: var(--font-display); font-size: var(--fs-2xl); font-weight: 800; color: var(--gold-ink); line-height: 1; }

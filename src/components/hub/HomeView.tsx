@@ -1,20 +1,25 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import {
-  Users,
+  ArrowRight,
   BookOpen,
-  Sparkles,
+  ChevronRight,
   Package,
   Plus,
+  ScrollText,
   Shield,
-  Heart,
-  Zap,
-  ArrowRight,
-  Scroll,
-  Dices,
+  Sparkles,
+  Swords,
+  UserPlus,
+  Users,
 } from 'lucide-react';
 import type { CharacterSheet } from '../../types/character';
-import { ClassBadge } from '../common/T20Badge';
-import { getClassTheme } from '../../styles/classTheme';
+import { RULES_CITATIONS } from '../../data/rulesCitations';
+import { AppBar } from '../ui/AppBar';
+import { D20Icon } from '../ui/Icons';
+import { SectionHeader } from '../ui/controls';
+import { ClassSigil, classColorVars } from '../common/ClassSigil';
+import { DetailModal, type DetailModalData } from '../common/DetailModal';
+import { heroLine, originName, percent } from '../../utils/displayNames';
 
 interface HomeViewProps {
   characters: CharacterSheet[];
@@ -23,7 +28,61 @@ interface HomeViewProps {
   onOpenCharacterSheet: (char: CharacterSheet) => void;
   onCreateNewCharacter: () => void;
   onNavigateToCompendium: (tab: 'magias' | 'poderes' | 'itens', subTab?: 'gerais' | 'classe') => void;
+  onOpenDice: () => void;
+  onOpenSettings: () => void;
 }
+
+const greeting = () => {
+  const h = new Date().getHours();
+  if (h < 5) return 'Vigília da madrugada';
+  if (h < 12) return 'Bom dia, aventureiro';
+  if (h < 18) return 'Boa tarde, aventureiro';
+  return 'Boa noite, aventureiro';
+};
+
+/** Escolhe uma regra "do dia" de forma estável ao longo do dia. */
+const pickDailyRule = () => {
+  const list = Object.values(RULES_CITATIONS);
+  const day = Math.floor(Date.now() / 86_400_000);
+  return list[day % list.length];
+};
+
+const Vitals: React.FC<{ hero: CharacterSheet }> = ({ hero }) => {
+  const { currentHp, maxHp, tempHp, currentMp, maxMp, defense } = hero.stats;
+  return (
+    <div className="home-vitals">
+      <div className="home-vital">
+        <div className="hstack between">
+          <span className="t-label">Vida</span>
+          <span className="t-sm t-bold t-num">
+            {currentHp}
+            <span className="t-3">/{maxHp.value}</span>
+            {tempHp > 0 && <span className="t-temp"> +{tempHp}</span>}
+          </span>
+        </div>
+        <div className="meter meter-hp" style={{ '--pct': percent(currentHp, maxHp.value) } as React.CSSProperties}>
+          <span className="meter-fill" />
+        </div>
+      </div>
+      <div className="home-vital">
+        <div className="hstack between">
+          <span className="t-label">Mana</span>
+          <span className="t-sm t-bold t-num">
+            {currentMp}
+            <span className="t-3">/{maxMp.value}</span>
+          </span>
+        </div>
+        <div className="meter meter-mp" style={{ '--pct': percent(currentMp, maxMp.value) } as React.CSSProperties}>
+          <span className="meter-fill" />
+        </div>
+      </div>
+      <div className="home-def" aria-label={`Defesa ${defense.value}`}>
+        <Shield size={16} />
+        <span className="t-num">{defense.value}</span>
+      </div>
+    </div>
+  );
+};
 
 export const HomeView: React.FC<HomeViewProps> = ({
   characters,
@@ -32,317 +91,237 @@ export const HomeView: React.FC<HomeViewProps> = ({
   onOpenCharacterSheet,
   onCreateNewCharacter,
   onNavigateToCompendium,
+  onOpenDice,
 }) => {
-  const lastActiveOrFirst = activeCharacter || (characters.length > 0 ? characters[0] : null);
+  const featured = activeCharacter || characters[0] || null;
+  const others = characters.filter((c) => c.id !== featured?.id);
+  const dailyRule = useMemo(pickDailyRule, []);
+  const [detail, setDetail] = useState<DetailModalData | null>(null);
+
+  const playerName = featured?.playerName?.trim();
 
   return (
-    <div className="container" style={{ padding: '2rem 1.5rem 6rem 1.5rem', maxWidth: '1280px' }}>
-      {/* Hero Banner Épico */}
-      <div
-        className="t20-card t20-card-gold"
-        style={{
-          padding: '2.5rem 2rem',
-          marginBottom: '2rem',
-          background: 'radial-gradient(ellipse at top right, rgba(230, 57, 70, 0.28) 0%, rgba(20, 23, 38, 0.95) 75%)',
-          border: '1px solid var(--border-gold)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: '1.5rem',
-        }}
-      >
-        <div style={{ maxWidth: '680px' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.65rem' }}>
-            <span className="badge badge-ruby" style={{ fontWeight: 800 }}>TORMENTA 20</span>
-            <span className="badge badge-gold">Edição Jogo do Ano (v1.3)</span>
-          </div>
-          <h1 style={{ fontSize: '2.4rem', lineHeight: 1.15, margin: '0.25rem 0 0.85rem 0' }}>
-            Forje e Comande Heróis de Arton
-          </h1>
-          <p style={{ fontSize: '1rem', color: '#cbd5e1', lineHeight: 1.6, margin: 0 }}>
-            Aplicativo oficial de criação, evolução e gerenciamento de fichas com cálculos canônicos em tempo real, compêndio completo e registro auditável de rolagens.
+    <>
+      <AppBar
+        brand
+        actions={
+          <button type="button" className="icon-btn" onClick={onCreateNewCharacter} aria-label="Criar novo herói">
+            <UserPlus size={22} />
+          </button>
+        }
+      />
+
+      <main className="page stack-xl">
+        {/* Saudação */}
+        <section className="home-hero animate-in">
+          <D20Icon className="home-hero-watermark" size={180} strokeWidth={0.8} />
+          <span className="eyebrow">{playerName ? `Salve, ${playerName}` : greeting()}</span>
+          <h1 className="home-hero-title">Forje sua lenda em Arton</h1>
+          <p className="t-2 t-sm" style={{ maxWidth: 460 }}>
+            Crie heróis com as regras do Jogo do Ano, role dados e consulte o compêndio — tudo na palma da mão.
           </p>
-        </div>
+        </section>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', minWidth: '220px' }}>
-          <button
-            type="button"
-            onClick={onCreateNewCharacter}
-            className="btn btn-primary"
-            style={{
-              padding: '0.9rem 1.5rem',
-              fontSize: '1.05rem',
-              gap: '0.5rem',
-              boxShadow: '0 8px 24px rgba(230, 57, 70, 0.45)',
-              fontWeight: 800,
-            }}
-          >
-            <Plus size={20} />
-            Novo Personagem
-          </button>
-          <button
-            type="button"
-            onClick={onNavigateToCharacters}
-            className="btn btn-secondary"
-            style={{ padding: '0.75rem 1.25rem', fontSize: '0.95rem', gap: '0.5rem' }}
-          >
-            <Users size={18} />
-            Ver Fichas ({characters.length})
-          </button>
-        </div>
-      </div>
-
-      {/* Destaque do Personagem Ativo / Recente (se houver) */}
-      {lastActiveOrFirst && (
-        <div style={{ marginBottom: '2rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem' }}>
-            <h2 style={{ fontSize: '1.25rem', margin: 0, color: 'var(--t20-gold-light)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Shield size={18} />
-              Personagem em Destaque
-            </h2>
-            <button
-              type="button"
-              onClick={onNavigateToCharacters}
-              className="btn btn-ghost"
-              style={{ fontSize: '0.85rem', gap: '0.35rem', color: 'var(--text-muted)' }}
+        {/* Continuar aventura */}
+        {featured ? (
+          <section className="stack">
+            <SectionHeader
+              title="Continuar aventura"
+              action={
+                characters.length > 1 ? (
+                  <button type="button" className="btn btn-ghost btn-sm" onClick={onNavigateToCharacters}>
+                    Todos ({characters.length})
+                    <ChevronRight size={16} />
+                  </button>
+                ) : undefined
+              }
+            />
+            <article
+              className="card classed card-interactive home-featured"
+              style={classColorVars(featured.classId)}
+              onClick={() => onOpenCharacterSheet(featured)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onOpenCharacterSheet(featured);
+                }
+              }}
+              aria-label={`Abrir ficha de ${featured.name}`}
             >
-              Ver todos ({characters.length})
-              <ArrowRight size={14} />
+              <div className="hstack-lg items-start">
+                <ClassSigil classId={featured.classId} size="lg" />
+                <div className="stack-xs grow">
+                  <span className="home-featured-name">{featured.name}</span>
+                  <span className="t-sm t-2 truncate">{heroLine(featured)}</span>
+                  <span className="t-xs t-3 truncate">{originName(featured.originId)}</span>
+                </div>
+                <span className="badge badge-class badge-lg shrink-0">Nv. {featured.level}</span>
+              </div>
+              <Vitals hero={featured} />
+              <div className="home-featured-cta">
+                <span>Abrir ficha</span>
+                <ArrowRight size={18} />
+              </div>
+            </article>
+          </section>
+        ) : (
+          <section className="card card-accent card-loose stack animate-in">
+            <span className="sigil sigil-lg">
+              <Sparkles size={28} />
+            </span>
+            <h2>Sua primeira lenda começa aqui</h2>
+            <p className="t-2 t-sm">
+              O criador guiado conduz raça, classe, origem, divindade, atributos e equipamentos — com as regras
+              conferidas a cada passo.
+            </p>
+            <button type="button" className="btn btn-primary btn-lg btn-block" onClick={onCreateNewCharacter}>
+              <Plus size={20} />
+              Criar meu herói
+            </button>
+          </section>
+        )}
+
+        {/* Ações rápidas */}
+        <section className="stack">
+          <SectionHeader title="Ações rápidas" />
+          <div className="quick-grid">
+            <button type="button" className="quick-tile quick-tile-accent" onClick={onCreateNewCharacter}>
+              <UserPlus size={24} />
+              <span className="quick-title">Novo herói</span>
+              <span className="quick-sub">Criador guiado</span>
+            </button>
+            <button type="button" className="quick-tile" onClick={onOpenDice}>
+              <D20Icon size={24} />
+              <span className="quick-title">Rolar dados</span>
+              <span className="quick-sub">d4 ao d100</span>
+            </button>
+            <button type="button" className="quick-tile" onClick={() => onNavigateToCompendium('magias')}>
+              <Sparkles size={24} />
+              <span className="quick-title">Grimório</span>
+              <span className="quick-sub">Magias do 1º ao 5º círculo</span>
+            </button>
+            <button type="button" className="quick-tile" onClick={() => onNavigateToCompendium('itens')}>
+              <Package size={24} />
+              <span className="quick-title">Arsenal</span>
+              <span className="quick-sub">Itens e oficina</span>
             </button>
           </div>
+        </section>
 
-          {(() => {
-            const heroTheme = getClassTheme(lastActiveOrFirst.classId);
-            return (
-              <div
-                className="t20-card"
-                style={{
-                  padding: '1.5rem',
-                  background: `linear-gradient(135deg, ${heroTheme.surface}35 0%, rgba(15, 18, 30, 0.95) 100%)`,
-                  borderLeft: `4px solid ${heroTheme.primary}`,
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  flexWrap: 'wrap',
-                  gap: '1.25rem',
-                }}
-              >
-                <div style={{ flex: '1 1 280px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.35rem', flexWrap: 'wrap' }}>
-                    <h3 style={{ fontSize: '1.6rem', margin: 0 }}>{lastActiveOrFirst.name}</h3>
-                    <ClassBadge classIdOrName={lastActiveOrFirst.classId} />
-                    <span className="badge badge-gold">Nível {lastActiveOrFirst.level}</span>
-                  </div>
-                  <p style={{ margin: '0.15rem 0 0.75rem 0', color: 'var(--text-dim)', fontSize: '0.9rem' }}>
-                    {lastActiveOrFirst.raceId.toUpperCase()} • {lastActiveOrFirst.originId.toUpperCase()}
-                  </p>
-
-                  <div style={{ display: 'flex', gap: '1.25rem', flexWrap: 'wrap' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#f87171', fontWeight: 700 }}>
-                      <Heart size={16} />
-                      <span>{lastActiveOrFirst.stats.currentHp} / {lastActiveOrFirst.stats.maxHp.value} PV</span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#60a5fa', fontWeight: 700 }}>
-                      <Zap size={16} />
-                      <span>{lastActiveOrFirst.stats.currentMp} / {lastActiveOrFirst.stats.maxMp.value} PM</span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: 'var(--t20-gold)', fontWeight: 700 }}>
-                      <Shield size={16} />
-                      <span>{lastActiveOrFirst.stats.defense.value} Defesa</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <button
-                    type="button"
-                    onClick={() => onOpenCharacterSheet(lastActiveOrFirst)}
-                    className="btn btn-gold"
-                    style={{ padding: '0.75rem 1.4rem', fontWeight: 700, gap: '0.45rem' }}
-                  >
-                    Abrir Ficha
-                    <ArrowRight size={16} />
-                  </button>
-                </div>
-              </div>
-            );
-          })()}
-        </div>
-      )}
-
-      {/* Grid de Acesso Rápido / Compêndio */}
-      <div style={{ marginBottom: '2rem' }}>
-        <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <BookOpen size={18} />
-          Compêndio de Regras e Conteúdo
-        </h2>
-
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: '1rem',
-          }}
-        >
-          {/* Card Magias */}
-          <div
-            className="t20-card"
-            onClick={() => onNavigateToCompendium('magias')}
-            style={{
-              padding: '1.35rem',
-              cursor: 'pointer',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              transition: 'var(--transition)',
-            }}
-          >
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: '#60a5fa' }}>
-                <BookOpen size={22} />
-                <h3 style={{ margin: 0, fontSize: '1.15rem', color: '#ffffff' }}>Grimório de Magias</h3>
-              </div>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
-                Catálogo canônico de magias arcanas e divinas do 1º ao 5º círculo com custos em PM, escolas e aprimoramentos.
-              </p>
+        {/* Outros heróis */}
+        {others.length > 0 && (
+          <section className="stack">
+            <SectionHeader
+              title="Sua guilda"
+              icon={<Users size={20} />}
+              action={
+                <button type="button" className="btn btn-ghost btn-sm" onClick={onNavigateToCharacters}>
+                  Gerenciar
+                  <ChevronRight size={16} />
+                </button>
+              }
+            />
+            <div className="hero-strip" role="list">
+              {others.map((hero) => (
+                <button
+                  key={hero.id}
+                  type="button"
+                  role="listitem"
+                  className="hero-mini card classed"
+                  style={classColorVars(hero.classId)}
+                  onClick={() => onOpenCharacterSheet(hero)}
+                >
+                  <ClassSigil classId={hero.classId} size="sm" />
+                  <span className="hero-mini-name truncate">{hero.name}</span>
+                  <span className="t-xs t-3 truncate">{heroLine(hero)}</span>
+                  <span className="meter meter-hp meter-sm" style={{ '--pct': percent(hero.stats.currentHp, hero.stats.maxHp.value) } as React.CSSProperties}>
+                    <span className="meter-fill" />
+                  </span>
+                </button>
+              ))}
+              <button type="button" role="listitem" className="hero-mini hero-mini-new" onClick={onCreateNewCharacter}>
+                <span className="sigil sigil-sm">
+                  <Plus size={18} />
+                </span>
+                <span className="hero-mini-name">Novo herói</span>
+                <span className="t-xs t-3">Começar do zero</span>
+              </button>
             </div>
-            <div style={{ marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.85rem', color: 'var(--t20-gold)', fontWeight: 600 }}>
-              <span>Explorar Magias</span>
-              <ArrowRight size={14} />
-            </div>
+          </section>
+        )}
+
+        {/* Compêndio */}
+        <section className="stack">
+          <SectionHeader title="Compêndio" icon={<BookOpen size={20} />} />
+          <div className="list">
+            <button type="button" className="row" onClick={() => onNavigateToCompendium('magias')}>
+              <span className="sigil sigil-sm"><Sparkles size={18} /></span>
+              <span className="row-main">
+                <span className="row-title">Grimório de magias</span>
+                <span className="row-sub">Arcanas, divinas e universais, com aprimoramentos</span>
+              </span>
+              <ChevronRight size={18} className="t-3" />
+            </button>
+            <button type="button" className="row" onClick={() => onNavigateToCompendium('poderes', 'gerais')}>
+              <span className="sigil sigil-sm"><Swords size={18} /></span>
+              <span className="row-main">
+                <span className="row-title">Poderes gerais</span>
+                <span className="row-sub">Combate, destino, magia, concedidos e da Tormenta</span>
+              </span>
+              <ChevronRight size={18} className="t-3" />
+            </button>
+            <button type="button" className="row" onClick={() => onNavigateToCompendium('poderes', 'classe')}>
+              <span className="sigil sigil-sm"><Shield size={18} /></span>
+              <span className="row-main">
+                <span className="row-title">Poderes de classe</span>
+                <span className="row-sub">Os poderes das 14 classes oficiais</span>
+              </span>
+              <ChevronRight size={18} className="t-3" />
+            </button>
+            <button type="button" className="row" onClick={() => onNavigateToCompendium('itens')}>
+              <span className="sigil sigil-sm"><Package size={18} /></span>
+              <span className="row-main">
+                <span className="row-title">Itens & oficina</span>
+                <span className="row-sub">Armas, armaduras, melhorias, materiais e encantos</span>
+              </span>
+              <ChevronRight size={18} className="t-3" />
+            </button>
           </div>
+        </section>
 
-          {/* Card Poderes Gerais */}
-          <div
-            className="t20-card"
-            onClick={() => onNavigateToCompendium('poderes', 'gerais')}
-            style={{
-              padding: '1.35rem',
-              cursor: 'pointer',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              transition: 'var(--transition)',
-            }}
-          >
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: 'var(--artonian-gold, #f59e0b)' }}>
-                <Sparkles size={22} />
-                <h3 style={{ margin: 0, fontSize: '1.15rem', color: '#ffffff' }}>Poderes Gerais</h3>
-              </div>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
-                Poderes de Combate, Destino, Magia, Concedidos e Tormenta com validação automática de pré-requisitos canônicos.
-              </p>
-            </div>
-            <div style={{ marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.85rem', color: 'var(--t20-gold)', fontWeight: 600 }}>
-              <span>Ver Poderes Gerais</span>
-              <ArrowRight size={14} />
-            </div>
-          </div>
+        {/* Regra em destaque */}
+        {dailyRule && (
+          <section className="stack">
+            <SectionHeader title="Regra em destaque" icon={<ScrollText size={20} />} />
+            <button
+              type="button"
+              className="card card-interactive rule-card"
+              onClick={() =>
+                setDetail({
+                  title: dailyRule.title,
+                  subtitle: `${dailyRule.chapter} · ${dailyRule.page}`,
+                  category: 'Regra oficial',
+                  description: dailyRule.explanation,
+                  ruleCitation: dailyRule,
+                  initialTab: 'rules',
+                })
+              }
+            >
+              <span className="eyebrow">{dailyRule.page}</span>
+              <span className="rule-card-title">{dailyRule.title}</span>
+              <span className="rule-card-quote clamp-3">{dailyRule.quote}</span>
+              <span className="hstack t-accent t-sm t-semibold">
+                Ler a regra completa
+                <ArrowRight size={16} />
+              </span>
+            </button>
+          </section>
+        )}
+      </main>
 
-          {/* Card Poderes por Classe */}
-          <div
-            className="t20-card"
-            onClick={() => onNavigateToCompendium('poderes', 'classe')}
-            style={{
-              padding: '1.35rem',
-              cursor: 'pointer',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              transition: 'var(--transition)',
-            }}
-          >
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: 'var(--t20-gold)' }}>
-                <Shield size={22} />
-                <h3 style={{ margin: 0, fontSize: '1.15rem', color: '#ffffff' }}>Poderes por Classe</h3>
-              </div>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
-                Habilidades e poderes específicos para as 14 classes de Arton com filtros por classe e pré-requisitos oficiais.
-              </p>
-            </div>
-            <div style={{ marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.85rem', color: 'var(--t20-gold)', fontWeight: 600 }}>
-              <span>Ver Poderes de Classe</span>
-              <ArrowRight size={14} />
-            </div>
-          </div>
-
-          {/* Card Itens e Equipamento */}
-          <div
-            className="t20-card"
-            onClick={() => onNavigateToCompendium('itens')}
-            style={{
-              padding: '1.35rem',
-              cursor: 'pointer',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              transition: 'var(--transition)',
-            }}
-          >
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: 'var(--t20-life-light, #34d399)' }}>
-                <Package size={22} />
-                <h3 style={{ margin: 0, fontSize: '1.15rem', color: '#ffffff' }}>Itens & Oficina</h3>
-              </div>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
-                Armas, armaduras, escudos e itens gerais com regras de espaços de carga, melhorias mecânicas e materiais especiais.
-              </p>
-            </div>
-            <div style={{ marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.85rem', color: 'var(--t20-gold)', fontWeight: 600 }}>
-              <span>Consultar Itens</span>
-              <ArrowRight size={14} />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Regras Oficiais T20 JDA em Destaque */}
-      <div
-        className="t20-card"
-        style={{
-          padding: '1.5rem',
-          background: 'rgba(15, 23, 42, 0.6)',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.85rem' }}>
-          <Scroll size={18} style={{ color: 'var(--t20-gold)' }} />
-          <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#ffffff' }}>
-            Diretrizes Canônicas do Sistema (T20 JDA v1.3)
-          </h3>
-        </div>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-            gap: '1rem',
-            fontSize: '0.85rem',
-            color: '#cbd5e1',
-          }}
-        >
-          <div>
-            <strong style={{ color: 'var(--t20-gold-light)' }}>• Atributo é Modificador:</strong>
-            <p style={{ margin: '0.25rem 0 0 0', lineHeight: 1.5 }}>
-              Não há valores como 10-20. O valor do atributo (ex: Força +3) é o modificador aplicado diretamente.
-            </p>
-          </div>
-          <div>
-            <strong style={{ color: 'var(--t20-gold-light)' }}>• Resistências são Perícias:</strong>
-            <p style={{ margin: '0.25rem 0 0 0', lineHeight: 1.5 }}>
-              Fortitude (CON), Reflexos (DES) e Vontade (SAB) são perícias normais e rolam com metade do nível + treino.
-            </p>
-          </div>
-          <div>
-            <strong style={{ color: 'var(--t20-gold-light)' }}>• Limite de Gasto de PM:</strong>
-            <p style={{ margin: '0.25rem 0 0 0', lineHeight: 1.5 }}>
-              O total de Pontos de Mana gasto por magia ou efeito nunca pode ultrapassar o nível do personagem.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
+      <DetailModal data={detail} onClose={() => setDetail(null)} />
+    </>
   );
 };
