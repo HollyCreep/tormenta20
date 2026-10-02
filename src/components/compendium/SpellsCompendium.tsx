@@ -1,289 +1,165 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
+import { BookOpen, Sparkles } from 'lucide-react';
 import { SPELLS_LIST } from '../../data/spells';
-import { DetailModal, DetailModalData } from '../common/DetailModal';
-import { SchoolBadge, CircleBadge, SpellTypeBadge } from '../common/T20Badge';
+import type { Spell } from '../../types/rules';
+import { DetailModal, type DetailModalData } from '../common/DetailModal';
+import { SchoolBadge, getSchoolInfo } from '../common/T20Badge';
 import { cleanT20Text, getSpellRuleCitation } from '../../utils/textUtils';
-import {
-  Search,
-  Sparkles,
-  ArrowLeft,
-  BookOpen,
-  Info,
-  Flame,
-  Shield,
-  Eye,
-  Hand,
-  Skull,
-  Zap,
-  RefreshCw,
-  Layers,
-} from 'lucide-react';
+import { EmptyState, SearchField, Segmented, SelectField } from '../ui/controls';
+import { ActiveFilters, FilterButton, FilterSheet, normalizeSearch } from './FilterSheet';
 
 interface SpellsCompendiumProps {
-  onBack: () => void;
+  switcher?: React.ReactNode;
+  onBack?: () => void;
 }
 
-export const SpellsCompendium: React.FC<SpellsCompendiumProps> = ({ onBack }) => {
+const COST: Record<number, number> = { 1: 1, 2: 3, 3: 6, 4: 10, 5: 15 };
+const SCHOOLS = ['Abjuração', 'Adivinhação', 'Convocação', 'Encantamento', 'Evocação', 'Ilusão', 'Necromancia', 'Transmutação'];
+type SpellType = 'todos' | 'arcana' | 'divina' | 'universal';
+const TYPE_LABEL: Record<SpellType, string> = { todos: 'Todas', arcana: 'Arcana', divina: 'Divina', universal: 'Universal' };
+
+const CASTING_RULES: DetailModalData = {
+  title: 'Lançando magias',
+  category: 'Regra oficial',
+  subtitle: 'Capítulo 4: Magia (pág. 176)',
+  description:
+    'Magias gastam Pontos de Mana (PM). O custo básico depende do círculo: 1 PM (1º), 3 PM (2º), 6 PM (3º), 10 PM (4º) e 15 PM (5º). O limite de PM que um conjurador pode gastar em uma mesma magia é igual ao seu nível de personagem.',
+  ruleCitation: {
+    id: 'regras_magia',
+    title: 'Lançando Magias',
+    book: 'Tormenta 20: Edição Jogo do Ano (v1.3)',
+    chapter: 'Capítulo 4: Magia',
+    section: 'Regras de Conjuração',
+    page: 'Página 176',
+    quote:
+      '“Para lançar uma magia, você precisa gastar Pontos de Mana (PM). O limite máximo de PM que você pode gastar em cada magia lançada é igual ao seu nível.”',
+    explanation: 'Aprimoramentos aumentam o efeito da magia pagando PM adicionais, sempre respeitando o teto do seu nível.',
+  },
+  initialTab: 'rules',
+};
+
+export const SpellsCompendium: React.FC<SpellsCompendiumProps> = ({ switcher }) => {
   const [search, setSearch] = useState('');
-  const [circleFilter, setCircleFilter] = useState<number | 'todos'>('todos');
-  const [schoolFilter, setSchoolFilter] = useState<string>('todas');
-  const [typeFilter, setTypeFilter] = useState<'todos' | 'arcana' | 'divina' | 'universal'>('todos');
-  const [modalDetail, setModalDetail] = useState<DetailModalData | null>(null);
+  const [circle, setCircle] = useState<number>(0);
+  const [school, setSchool] = useState('todas');
+  const [type, setType] = useState<SpellType>('todos');
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [detail, setDetail] = useState<DetailModalData | null>(null);
 
-  const filteredSpells = useMemo(() => {
+  const results = useMemo(() => {
+    const q = normalizeSearch(search.trim());
     return SPELLS_LIST.filter((sp) => {
-      if (circleFilter !== 'todos' && sp.circle !== circleFilter) return false;
-      if (schoolFilter !== 'todas' && sp.school.toLowerCase() !== schoolFilter.toLowerCase()) return false;
-      if (typeFilter !== 'todos' && sp.type.toLowerCase() !== typeFilter.toLowerCase()) return false;
+      if (circle && sp.circle !== circle) return false;
+      if (school !== 'todas' && sp.school !== school) return false;
+      if (type !== 'todos' && sp.type !== type) return false;
+      if (!q) return true;
+      return normalizeSearch(`${sp.name} ${sp.description} ${sp.targetArea || ''}`).includes(q);
+    }).sort((a, b) => a.circle - b.circle || a.name.localeCompare(b.name, 'pt-BR'));
+  }, [search, circle, school, type]);
 
-      if (!search.trim()) return true;
-      const term = search.toLowerCase().trim();
-      return (
-        sp.name.toLowerCase().includes(term) ||
-        sp.description.toLowerCase().includes(term) ||
-        (sp.targetArea && sp.targetArea.toLowerCase().includes(term))
-      );
+  const chips = [
+    ...(circle ? [{ key: 'c', label: `${circle}º círculo`, onRemove: () => setCircle(0) }] : []),
+    ...(type !== 'todos' ? [{ key: 't', label: TYPE_LABEL[type], onRemove: () => setType('todos') }] : []),
+    ...(school !== 'todas' ? [{ key: 's', label: school, onRemove: () => setSchool('todas') }] : []),
+  ];
+
+  const openDetail = (sp: Spell) => {
+    setDetail({
+      title: cleanT20Text(sp.name),
+      category: `Magia ${sp.type} · ${sp.circle}º círculo`,
+      subtitle: `${sp.school} · ${cleanT20Text(sp.execution)}`,
+      cost: `${COST[sp.circle]} PM`,
+      execution: cleanT20Text(sp.execution),
+      range: cleanT20Text(sp.range),
+      targetArea: cleanT20Text(sp.targetArea),
+      duration: cleanT20Text(sp.duration),
+      resistance: sp.resistance ? cleanT20Text(sp.resistance) : undefined,
+      description: cleanT20Text(sp.description),
+      upgrades: sp.upgrades,
+      ruleCitation: getSpellRuleCitation(sp),
     });
-  }, [circleFilter, schoolFilter, typeFilter, search]);
+  };
 
   return (
-    <div style={{ maxWidth: '1240px', margin: '0 auto', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      {/* Top Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <button
-            type="button"
-            onClick={onBack}
-            className="btn btn-secondary"
-            style={{ padding: '0.45rem 0.8rem', gap: '0.4rem', fontSize: '0.85rem' }}
-          >
-            <ArrowLeft size={16} />
-            Voltar
-          </button>
-          <div>
-            <h1 style={{ fontSize: '1.75rem', margin: 0 }}>Catálogo de Magias (Grimório Artoniano)</h1>
-            <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
-              Tormenta 20: Edição Jogo do Ano (v1.3) • Capítulo 4: Magia (pág. 176-217)
-            </p>
-          </div>
+    <>
+      <div className="subbar compendium-bar">
+        {switcher}
+        <div className="filter-row">
+          <SearchField value={search} onChange={setSearch} placeholder="Buscar magia ou efeito…" />
+          <FilterButton activeCount={chips.length} onClick={() => setFiltersOpen(true)} />
         </div>
+        <ActiveFilters chips={chips} />
+      </div>
 
-        <button
-          type="button"
-          onClick={() =>
-            setModalDetail({
-              title: 'Regras de Lançamento de Magias',
-              category: 'Regra Oficial • Tormenta 20',
-              subtitle: 'Capítulo 4: Magia (pág. 176)',
-              description:
-                'Magias são rituais arcanos e preces divinas que canalizam Pontos de Mana (PM). O custo básico de uma magia é igual ao seu círculo: 1 PM para 1º círculo, 3 PM para 2º círculo, 6 PM para 3º círculo, 10 PM para 4º círculo e 15 PM para 5º círculo. O limite de PM que um conjurador pode gastar por magia é igual ao seu nível de personagem.',
-              ruleCitation: {
-                id: 'regras_magia',
-                title: 'Lançando Magias',
-                book: 'Tormenta 20: Edição Jogo do Ano (v1.3)',
-                chapter: 'Capítulo 4: Magia',
-                section: 'Regras de Conjuração',
-                page: 'Página 176',
-                quote: '“Para lançar uma magia, você precisa gastar Pontos de Mana (PM). O limite máximo de PM que você pode gastar em cada magia lançada é igual ao seu nível.”',
-                explanation: 'Aprimoramentos aumentam o efeito da magia pagando custos adicionais de PM, respeitando sempre o teto do seu nível.',
-              },
-            })
-          }
-          className="btn btn-ghost"
-          style={{ padding: '0.4rem 0.75rem', fontSize: '0.8rem', color: 'var(--t20-gold)', border: '1px solid rgba(245, 158, 11, 0.3)' }}
-        >
-          <BookOpen size={14} />
-          Ver Regras de Conjuração
+      <div className="hstack between">
+        <span className="t-sm t-3">
+          {results.length} {results.length === 1 ? 'magia' : 'magias'}
+        </span>
+        <button type="button" className="btn btn-ghost btn-sm" onClick={() => setDetail(CASTING_RULES)}>
+          <BookOpen size={16} />
+          Regras de conjuração
         </button>
       </div>
 
-      {/* Barra de Filtros e Busca */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-        {/* Linha 1: Círculos e Tipo */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)', fontWeight: 600 }}>Círculo:</span>
-            <div className="btn-group">
-              {(['todos', 1, 2, 3, 4, 5] as const).map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  onClick={() => setCircleFilter(c)}
-                  className={`btn ${circleFilter === c ? 'active' : ''}`}
-                >
-                  {c === 'todos' ? 'Todos os Círculos' : `${c}º Círculo`}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)', fontWeight: 600 }}>Tipo:</span>
-            <div className="btn-group">
-              {(['todos', 'arcana', 'divina', 'universal'] as const).map((t) => (
-                <button
-                  key={t}
-                  type="button"
-                  onClick={() => setTypeFilter(t)}
-                  className={`btn ${typeFilter === t ? 'active' : ''}`}
-                  style={{ textTransform: 'capitalize' }}
-                >
-                  {t === 'todos' ? 'Todos' : t}
-                </button>
-              ))}
-            </div>
-          </div>
+      {results.length === 0 ? (
+        <EmptyState icon={<Sparkles size={24} />} title="Nenhuma magia encontrada" description="Ajuste a busca ou os filtros." />
+      ) : (
+        <div className="list compendium-list">
+          {results.map((sp) => (
+            <button key={sp.id} type="button" className="row" onClick={() => openDetail(sp)}>
+              <span className={`circle-medal circle-${sp.type}`} aria-label={`${sp.circle}º círculo`}>
+                {sp.circle}º
+              </span>
+              <span className="row-main">
+                <span className="row-title">{cleanT20Text(sp.name)}</span>
+                <span className="row-sub truncate">
+                  {getSchoolInfo(sp.school).name} · {cleanT20Text(sp.execution)} · {cleanT20Text(sp.range)}
+                </span>
+              </span>
+              <span className="badge badge-mp shrink-0">{COST[sp.circle]} PM</span>
+            </button>
+          ))}
         </div>
+      )}
 
-        {/* Linha 2: Escolas de Magia e Busca */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)', fontWeight: 600 }}>Escola:</span>
-            <div className="btn-group" style={{ flexWrap: 'wrap' }}>
-              {[
-                'todas',
-                'Abjuração',
-                'Adivinhação',
-                'Convocação',
-                'Encantamento',
-                'Evocação',
-                'Ilusão',
-                'Necromancia',
-                'Transmutação',
-              ].map((sch) => (
-                <button
-                  key={sch}
-                  type="button"
-                  onClick={() => setSchoolFilter(sch)}
-                  className={`btn ${schoolFilter.toLowerCase() === sch.toLowerCase() ? 'active' : ''}`}
-                >
-                  {sch === 'todas' ? 'Todas as Escolas' : sch}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ position: 'relative', minWidth: '260px', flex: '1', maxWidth: '380px' }}>
-            <input
-              type="text"
-              placeholder="Buscar por nome, efeito, alvo..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              style={{ width: '100%', padding: '0.45rem 0.85rem 0.45rem 2.2rem', fontSize: '0.85rem' }}
-            />
-            <Search size={14} style={{ position: 'absolute', left: '0.8rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-dim)' }} />
-          </div>
+      <FilterSheet
+        open={filtersOpen}
+        onClose={() => setFiltersOpen(false)}
+        resultCount={results.length}
+        onClear={() => {
+          setCircle(0);
+          setType('todos');
+          setSchool('todas');
+        }}
+      >
+        <div className="field">
+          <span className="field-label">Círculo</span>
+          <Segmented<number>
+            value={circle}
+            onChange={setCircle}
+            ariaLabel="Círculo"
+            options={[0, 1, 2, 3, 4, 5].map((c) => ({ value: c, label: c === 0 ? 'Todos' : `${c}º` }))}
+          />
         </div>
-      </div>
+        <div className="field">
+          <span className="field-label">Tradição</span>
+          <Segmented<SpellType>
+            value={type}
+            onChange={setType}
+            ariaLabel="Tradição"
+            options={(Object.keys(TYPE_LABEL) as SpellType[]).map((t) => ({ value: t, label: TYPE_LABEL[t] }))}
+          />
+        </div>
+        <SelectField
+          label="Escola"
+          value={school}
+          onChange={setSchool}
+          options={[{ value: 'todas', label: 'Todas as escolas' }, ...SCHOOLS.map((s) => ({ value: s, label: s }))]}
+        />
+        {school !== 'todas' && <SchoolBadge school={school} />}
+      </FilterSheet>
 
-      <div style={{ fontSize: '0.85rem', color: 'var(--text-dim)' }}>
-        Mostrando <strong>{filteredSpells.length}</strong> de {SPELLS_LIST.length} magias catalogadas:
-      </div>
-
-      {/* Grade de Magias */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '1.25rem' }}>
-        {filteredSpells.map((sp) => {
-          const cleanDesc = cleanT20Text(sp.description);
-          return (
-            <div
-              key={`${sp.id}-${sp.circle}`}
-              className="t20-card"
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-                padding: '1.25rem',
-                gap: '0.85rem',
-              }}
-            >
-              <div>
-                {/* Header: Nome e Badges */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                  <h3 style={{ fontSize: '1.2rem', color: '#ffffff', margin: 0 }}>{cleanT20Text(sp.name)}</h3>
-                  <SchoolBadge school={sp.school} />
-                </div>
-
-                {/* Sub-badges: Círculo, Tipo, PM base */}
-                <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap', marginBottom: '0.65rem' }}>
-                  <CircleBadge circle={sp.circle} />
-                  <SpellTypeBadge type={sp.type} />
-                  <span className="badge badge-slate" style={{ fontSize: '0.7rem' }}>
-                    {sp.circle === 1 ? '1 PM' : sp.circle === 2 ? '3 PM' : sp.circle === 3 ? '6 PM' : sp.circle === 4 ? '10 PM' : '15 PM'}
-                  </span>
-                </div>
-
-                {/* Estatísticas Rápidas */}
-                <div style={{ fontSize: '0.775rem', color: '#94a3b8', lineHeight: 1.5, background: 'rgba(0,0,0,0.25)', padding: '0.5rem 0.65rem', borderRadius: 'var(--radius-sm)', marginBottom: '0.75rem' }}>
-                  <div><strong>Execução:</strong> {cleanT20Text(sp.execution)} • <strong>Alcance:</strong> {cleanT20Text(sp.range)}</div>
-                  <div><strong>Alvo/Área:</strong> {cleanT20Text(sp.targetArea)} • <strong>Duração:</strong> {cleanT20Text(sp.duration)}</div>
-                  {sp.resistance && <div><strong>Resistência:</strong> {cleanT20Text(sp.resistance)}</div>}
-                </div>
-
-                {/* Descrição Principal */}
-                <p style={{ fontSize: '0.85rem', color: '#cbd5e1', lineHeight: 1.5, margin: 0 }}>
-                  {cleanDesc}
-                </p>
-
-                {/* Aprimoramentos */}
-                {sp.upgrades && sp.upgrades.length > 0 && (
-                  <div style={{ marginTop: '0.75rem', borderTop: '1px dashed rgba(255,255,255,0.08)', paddingTop: '0.5rem' }}>
-                    <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--t20-gold-light)', marginBottom: '0.35rem' }}>
-                      Aprimoramentos ({sp.upgrades.length}):
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                      {sp.upgrades.slice(0, 2).map((up, idx) => (
-                        <div key={idx} style={{ fontSize: '0.75rem', color: '#cbd5e1', lineHeight: 1.4 }}>
-                          <strong style={{ color: 'var(--t20-mana)' }}>{cleanT20Text(up.cost)}:</strong> {cleanT20Text(up.description)}
-                        </div>
-                      ))}
-                      {sp.upgrades.length > 2 && (
-                        <div style={{ fontSize: '0.725rem', color: 'var(--text-dim)', fontStyle: 'italic' }}>
-                          + {sp.upgrades.length - 2} outros aprimoramentos disponíveis no modal de detalhes.
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Botão Ver Detalhes */}
-              <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '0.65rem', display: 'flex', justifyContent: 'flex-end' }}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const citation = getSpellRuleCitation(sp);
-                    setModalDetail({
-                      title: sp.name,
-                      category: `Magia ${sp.type.toUpperCase()} • ${sp.circle}º Círculo (${sp.school})`,
-                      subtitle: `Execução: ${cleanT20Text(sp.execution)} • Alcance: ${cleanT20Text(sp.range)} • Duração: ${cleanT20Text(sp.duration)}`,
-                      description: cleanDesc,
-                      stats: [
-                        { label: 'Círculo', value: `${sp.circle}º Círculo` },
-                        { label: 'Custo Base', value: sp.circle === 1 ? '1 PM' : sp.circle === 2 ? '3 PM' : sp.circle === 3 ? '6 PM' : sp.circle === 4 ? '10 PM' : '15 PM' },
-                        { label: 'Escola', value: sp.school },
-                        { label: 'Tradição', value: sp.type },
-                        { label: 'Execução', value: cleanT20Text(sp.execution) },
-                        { label: 'Alcance', value: cleanT20Text(sp.range) },
-                        { label: 'Alvo/Área', value: cleanT20Text(sp.targetArea) },
-                        { label: 'Duração', value: cleanT20Text(sp.duration) },
-                        ...(sp.resistance ? [{ label: 'Resistência', value: cleanT20Text(sp.resistance) }] : []),
-                      ],
-                      ruleCitation: citation,
-                    });
-                  }}
-                  className="btn btn-ghost"
-                  style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem', color: 'var(--t20-gold)', gap: '0.3rem' }}
-                >
-                  <Info size={13} />
-                  Ver Detalhes Oficiais
-                </button>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      <DetailModal data={modalDetail} onClose={() => setModalDetail(null)} />
-    </div>
+      <DetailModal data={detail} onClose={() => setDetail(null)} />
+    </>
   );
 };

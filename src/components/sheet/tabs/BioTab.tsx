@@ -1,52 +1,58 @@
 import React from 'react';
+import { Feather, UserRound } from 'lucide-react';
 import type { CharacterSheet } from '../../../types/character';
 import { NotebookSection } from '../NotebookSection';
 
 interface BioTabProps {
   character: CharacterSheet;
   onUpdateCharacter: (character: CharacterSheet) => void;
+  onEditInWizard?: () => void;
 }
 
 export const BioTab: React.FC<BioTabProps> = ({ character, onUpdateCharacter }) => {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1rem' }}>
-        <div className="t20-card">
-          <h3 style={{ fontSize: '1.15rem', color: 'var(--t20-gold-light)', marginBottom: '0.5rem' }}>
-            Histórico & Personalidade
-          </h3>
-          <p style={{ color: '#e2e8f0', whiteSpace: 'pre-line', lineHeight: 1.6, margin: 0 }}>
-            {character.bio.history || 'Nenhum histórico anotado ainda.'}
-          </p>
-        </div>
+  const { bio } = character;
+  const details = [
+    { label: 'Idade', value: bio.age },
+    { label: 'Gênero', value: bio.gender },
+    { label: 'Altura', value: bio.height },
+    { label: 'Peso', value: bio.weight },
+    { label: 'Olhos', value: bio.eyes },
+    { label: 'Cabelos', value: bio.hair },
+  ].filter((d) => d.value);
 
-        <div className="t20-card">
-          <h3 style={{ fontSize: '1.15rem', color: 'var(--t20-gold-light)', marginBottom: '0.5rem' }}>
-            Aparência Física & Detalhes
+  return (
+    <div className="stack-xl">
+      <div className="grid-auto">
+        <article className="card stack-sm">
+          <h3 className="section-title t-md">
+            <Feather size={18} />
+            História & personalidade
           </h3>
-          <p style={{ color: '#e2e8f0', whiteSpace: 'pre-line', lineHeight: 1.6, margin: 0 }}>
-            {character.bio.appearance || 'Nenhuma aparência física descrita ainda.'}
-          </p>
-          <div style={{ display: 'flex', gap: '1rem', marginTop: '0.75rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-            <span>
-              Idade: <strong>{character.bio.age || '—'}</strong>
-            </span>
-            <span>
-              Gênero: <strong>{character.bio.gender || '—'}</strong>
-            </span>
-          </div>
-        </div>
+          <p className="t-body pre-line">{bio.history || bio.personality || 'Nenhum histórico anotado ainda.'}</p>
+        </article>
+
+        <article className="card stack-sm">
+          <h3 className="section-title t-md">
+            <UserRound size={18} />
+            Aparência
+          </h3>
+          <p className="t-body pre-line">{bio.appearance || 'Nenhuma aparência descrita ainda.'}</p>
+          {details.length > 0 && (
+            <div className="kv">
+              {details.map((d) => (
+                <div key={d.label} className="kv-item">
+                  <span className="kv-key">{d.label}</span>
+                  <span className="kv-value">{d.value}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </article>
       </div>
 
-      {/* Caderno de Anotações Rico com Imagens e Câmera */}
       <NotebookSection
         notes={character.notes || []}
-        onUpdateNotes={(updatedNotes) => {
-          onUpdateCharacter({
-            ...character,
-            notes: updatedNotes,
-          });
-        }}
+        onUpdateNotes={(updatedNotes) => onUpdateCharacter({ ...character, notes: updatedNotes })}
       />
     </div>
   );

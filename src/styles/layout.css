@@ -1,0 +1,293 @@
+/* ==========================================================================
+   Layout — shell do app (mobile-first) e regiões fixas
+   ========================================================================== */
+
+.app {
+  min-height: 100dvh;
+}
+
+.app-main {
+  min-width: 0;
+  min-height: 100dvh;
+}
+
+/* ---------------------------------------------------------------------------
+   Páginas
+   --------------------------------------------------------------------------- */
+.page {
+  width: 100%;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--sp-4) calc(var(--gutter) + var(--safe-right)) calc(var(--nav-h) + var(--safe-bottom) + var(--sp-8))
+    calc(var(--gutter) + var(--safe-left));
+}
+.page-wide { max-width: var(--content-wide); }
+.page-flow { padding-bottom: calc(88px + var(--safe-bottom) + var(--sp-6)); }
+
+/* ---------------------------------------------------------------------------
+   App bar (topo)
+   --------------------------------------------------------------------------- */
+.appbar {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-appbar);
+  padding-top: var(--safe-top);
+  background: var(--surface-glass);
+  backdrop-filter: saturate(1.4) blur(16px);
+  -webkit-backdrop-filter: saturate(1.4) blur(16px);
+  border-bottom: 1px solid var(--line);
+}
+.appbar-inner {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  height: var(--appbar-h);
+  max-width: var(--content-wide);
+  margin: 0 auto;
+  padding: 0 calc(var(--sp-2) + var(--safe-right)) 0 calc(var(--sp-2) + var(--safe-left));
+}
+.appbar-heading {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 var(--sp-2);
+}
+.appbar-heading { transition: opacity var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-out); }
+.appbar-heading.is-hidden { opacity: 0; transform: translateY(6px); pointer-events: none; }
+.appbar-title {
+  font-family: var(--font-heading);
+  font-weight: var(--heading-weight);
+  letter-spacing: var(--heading-tracking);
+  font-size: var(--fs-lg);
+  line-height: 1.2;
+  color: var(--text-1);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.appbar-subtitle {
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.appbar-actions { display: flex; align-items: center; gap: 2px; flex-shrink: 0; }
+
+/* Marca */
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 var(--sp-2);
+  border: 0;
+  background: transparent;
+  color: var(--text-1);
+  cursor: pointer;
+}
+.brand-mark {
+  width: 30px;
+  height: 30px;
+  color: var(--brand);
+  filter: drop-shadow(0 2px 8px color-mix(in srgb, var(--brand) 40%, transparent));
+}
+.brand-word {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+  text-align: left;
+}
+.brand-name {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.08rem;
+  letter-spacing: 0.08em;
+  color: var(--text-1);
+}
+.brand-name em {
+  font-style: normal;
+  color: var(--brand-ink);
+}
+.brand-tag {
+  margin-top: 3px;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+/* ---------------------------------------------------------------------------
+   Sub-barra fixa (abas, busca e filtros sob a app bar)
+   --------------------------------------------------------------------------- */
+.subbar {
+  position: sticky;
+  top: calc(var(--appbar-h) + var(--safe-top));
+  z-index: var(--z-sticky);
+  margin: 0 calc(var(--gutter) * -1);
+  padding: var(--sp-2) var(--gutter);
+  background: var(--surface-glass);
+  backdrop-filter: saturate(1.4) blur(16px);
+  -webkit-backdrop-filter: saturate(1.4) blur(16px);
+  border-bottom: 1px solid var(--line);
+}
+.subbar-tabs { padding-top: 0; padding-bottom: 0; }
+
+/* ---------------------------------------------------------------------------
+   Navegação inferior (mobile)
+   --------------------------------------------------------------------------- */
+.bottom-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: var(--z-nav);
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  align-items: stretch;
+  height: calc(var(--nav-h) + var(--safe-bottom));
+  padding: 0 var(--safe-right) var(--safe-bottom) var(--safe-left);
+  background: var(--surface-glass);
+  backdrop-filter: saturate(1.4) blur(18px);
+  -webkit-backdrop-filter: saturate(1.4) blur(18px);
+  border-top: 1px solid var(--line-2);
+}
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-3);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: color var(--dur-2);
+}
+.nav-pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 30px;
+  border-radius: var(--r-full);
+  transition: background-color var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-spring);
+}
+.nav-item[aria-current='page'] { color: var(--text-1); }
+.nav-item[aria-current='page'] .nav-pill { background: var(--accent-soft); color: var(--accent-ink); }
+.nav-item:active .nav-pill { transform: scale(0.9); }
+
+/* Botão central de dados (d20) */
+.nav-fab-slot { display: flex; align-items: flex-start; justify-content: center; }
+.dice-fab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  margin-top: -18px;
+  border: 0;
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.28), transparent 55%),
+    linear-gradient(145deg, var(--accent-2), var(--accent));
+  color: var(--text-on-accent);
+  box-shadow: 0 10px 24px var(--accent-glow), 0 0 0 4px var(--bg), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  cursor: pointer;
+  transform: rotate(45deg);
+  transition: transform var(--dur-2) var(--ease-spring), box-shadow var(--dur-2);
+}
+.dice-fab > svg { transform: rotate(-45deg); width: 30px; height: 30px; }
+.dice-fab:active { transform: rotate(45deg) scale(0.92); }
+.dice-fab.is-rolling > svg { animation: fab-spin 0.6s var(--ease-out); }
+@keyframes fab-spin { from { transform: rotate(-45deg); } to { transform: rotate(315deg); } }
+
+/* ---------------------------------------------------------------------------
+   Barra de ação fixa (fluxos como o criador)
+   --------------------------------------------------------------------------- */
+.action-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: var(--z-nav);
+  padding: var(--sp-3) calc(var(--gutter) + var(--safe-right)) calc(var(--sp-3) + var(--safe-bottom))
+    calc(var(--gutter) + var(--safe-left));
+  background: var(--surface-glass);
+  backdrop-filter: saturate(1.4) blur(18px);
+  -webkit-backdrop-filter: saturate(1.4) blur(18px);
+  border-top: 1px solid var(--line-2);
+}
+.action-bar-inner {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  max-width: var(--content-max);
+  margin: 0 auto;
+}
+
+/* Quando o fluxo (wizard) está ativo, toasts sobem acima da barra de ação */
+html[data-flow='true'] .toast-stack { bottom: calc(88px + var(--safe-bottom)); }
+
+/* ---------------------------------------------------------------------------
+   Nav rail (desktop)
+   --------------------------------------------------------------------------- */
+.rail { display: none; }
+
+@media (min-width: 1024px) {
+  :root { --gutter: 28px; }
+
+  .app { display: grid; grid-template-columns: var(--rail-w) minmax(0, 1fr); }
+
+  .rail {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-nav);
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sp-2);
+    padding: var(--sp-4) 0;
+    background: var(--surface-1);
+    border-right: 1px solid var(--line);
+  }
+  .rail .brand { flex-direction: column; gap: 6px; padding: var(--sp-2) 0 var(--sp-4); }
+  .rail .brand-mark { width: 38px; height: 38px; }
+  .rail .brand-word { display: none; }
+  .rail .nav-item { width: 100%; padding: var(--sp-2) 0; gap: 6px; font-size: var(--fs-xs); }
+  .rail .nav-pill { width: 56px; height: 34px; }
+  .rail .dice-fab { margin: var(--sp-2) 0 var(--sp-4); width: 52px; height: 52px; border-radius: 16px; box-shadow: 0 8px 20px var(--accent-glow); }
+  .rail-spacer { flex: 1 1 auto; }
+
+  .bottom-nav { display: none; }
+
+  .page { padding-bottom: var(--sp-12); padding-top: var(--sp-6); }
+  .page-flow { padding-bottom: calc(96px + var(--sp-6)); }
+
+  .appbar-inner { padding: 0 var(--sp-4); }
+  .appbar .brand { display: none; }
+
+  .toast-stack { bottom: var(--sp-6); }
+  html[data-flow='true'] .toast-stack { bottom: calc(96px + var(--sp-4)); }
+
+  .action-bar { left: var(--rail-w); }
+}
+
+@media (min-width: 1024px) {
+  .app[data-flow='true'] { grid-template-columns: minmax(0, 1fr); }
+  .app[data-flow='true'] .rail { display: none; }
+  .app[data-flow='true'] .action-bar { left: 0; }
+}
+
+@media (min-width: 1024px) {
+  .appbar-heading.is-hidden { opacity: 1; transform: none; pointer-events: auto; }
+}

@@ -166,4 +166,16 @@ export const RULES_CITATIONS: Record<string, RuleCitation> = {
     explanation:
       'Cada item ocupa um número determinado de espaços (slots) no inventário. O dinheiro padrão de Arton é o Tibar (T$). Armaduras fornecem bônus de Defesa, mas limitam seu bônus de Destreza e podem aplicar penalidades de armadura.',
   },
+  WEAPON_ATTACK_DAMAGE: {
+    id: 'WEAPON_ATTACK_DAMAGE',
+    title: 'Teste de Ataque e Dano com Armas',
+    book: 'Tormenta 20: Edição Jogo do Ano (v1.3)',
+    chapter: 'Capítulo 5: Jogando & Capítulo 3: Equipamento',
+    section: 'Estatísticas de Combate — Teste de Ataque e Dano; Melhorias',
+    page: 'Página 230 (PDF pág. 236) e Páginas 164–165 (PDF págs. 170–171)',
+    quote:
+      '“Para ataques corpo a corpo ou com armas de arremesso, você soma sua Força na rolagem de dano. Dano com Arma Corpo a Corpo ou de Arremesso = Dano da Arma + Força do Atacante. Dano com Arma de Disparo = Dano da Arma.” — “Certeira. Fabricada para ser mais precisa e balanceada, a arma fornece +1 nos testes de ataque.”',
+    explanation:
+      'O teste de ataque é um teste de Luta (corpo a corpo) ou Pontaria (à distância) — por isso as penalidades de condições que já afetam essas perícias não são aplicadas de novo. Melhorias como Certeira (+1) e Pungente (+2) somam ao ataque; Cruel (+1) e Atroz (+2) somam ao dano. A Força entra no dano de armas corpo a corpo e de arremesso, mas não no de armas de disparo.',
+  },
 };

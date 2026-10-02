@@ -1,29 +1,20 @@
-import React, { useState } from 'react';
-import { EquipmentItem } from '../../types/rules';
+import React, { useMemo, useState } from 'react';
+import { AlertTriangle, Check, Coins, Flame, Gem, Lock, Shield, Sliders, Sparkles, Wrench } from 'lucide-react';
+import type { EquipmentItem, ItemModifier } from '../../types/rules';
 import {
-  ITEM_MODIFIERS_LIST,
-  canApplyModifier,
-  calculateModifiedItem,
-  IMPROVEMENT_TIER_COSTS,
   ENCHANTMENT_TIER_COSTS,
-  removeModifierWithDependents,
+  IMPROVEMENT_TIER_COSTS,
+  ITEM_MODIFIERS_LIST,
+  calculateModifiedItem,
+  canApplyModifier,
   getDependentModifierIds,
+  removeModifierWithDependents,
   sanitizeModifiers,
 } from '../../data/itemModifiers';
 import { EQUIPMENT_LIST } from '../../data/equipment';
-import { ItemCard } from '../common/ItemCard';
-import {
-  Sparkles,
-  Shield,
-  Check,
-  X,
-  AlertCircle,
-  Coins,
-  Wrench,
-  Sliders,
-  Flame,
-  Info,
-} from 'lucide-react';
+import { Sheet } from '../ui/Sheet';
+import { Segmented } from '../ui/controls';
+import { useFeedback } from '../ui/Feedback';
 
 interface ItemModifierModalProps {
   item: EquipmentItem;
@@ -33,8 +24,22 @@ interface ItemModifierModalProps {
   isOpen: boolean;
   onClose: () => void;
   onApply: (customizedItem: EquipmentItem, appliedModifierIds: string[], totalCost: number) => void;
+  /**
+   * Como cobrar:
+   * • 'full'       — compra de um item novo já melhorado (preço total);
+   * • 'difference' — melhorar item que o herói já possui: paga só a diferença (Cap. 3, pág. 167);
+   * • 'none'       — simulação (compêndio), sem custo.
+   */
+  chargeMode?: 'full' | 'difference' | 'none';
 }
 
+type ForgeTab = 'melhorias' | 'materiais' | 'encantos' | 'valores';
+
+const money = (n: number) => `T$ ${Math.round(n).toLocaleString('pt-BR')}`;
+
+const priceOf = (price?: string) => parseFloat((price || '').replace(/[^\d.,]/g, '').replace(/\./g, '').replace(',', '.')) || 0;
+
+/** Oficina: melhorias (Tab. 3-8), materiais especiais (Tab. 3-9) e encantos (Cap. 8). */
 export const ItemModifierModal: React.FC<ItemModifierModalProps> = ({
   item,
   initialModifiers = [],
@@ -42,21 +47,22 @@ export const ItemModifierModal: React.FC<ItemModifierModalProps> = ({
   isOpen,
   onClose,
   onApply,
+  chargeMode = 'full',
 }) => {
-  // Encontra item base canônico caso esteja reabrindo customização prévia
+  const { toast } = useFeedback();
   const originalEquipment = EQUIPMENT_LIST.find((eq) => eq.id === item.id);
   const baseName = originalEquipment?.name || item.name;
   const basePrice = originalEquipment?.price || item.price;
   const baseSpaces = originalEquipment?.spaces !== undefined ? originalEquipment.spaces : item.spaces;
   const baseDamage = originalEquipment?.damage || item.damage || '';
   const baseCritical = originalEquipment?.critical || item.critical || '';
-  const baseDefense = originalEquipment?.defenseBonus !== undefined ? originalEquipment.defenseBonus : (item.defenseBonus || 0);
-  const basePenalty = originalEquipment?.armorPenalty !== undefined ? originalEquipment.armorPenalty : (item.armorPenalty || 0);
+  const baseDefense = originalEquipment?.defenseBonus !== undefined ? originalEquipment.defenseBonus : item.defenseBonus || 0;
+  const basePenalty = originalEquipment?.armorPenalty !== undefined ? originalEquipment.armorPenalty : item.armorPenalty || 0;
+  const isArmorLike = item.category.startsWith('armadura') || item.category === 'escudo';
+  const isWeapon = item.category.startsWith('arma');
 
   const [selectedModifiers, setSelectedModifiers] = useState<string[]>(sanitizeModifiers(initialModifiers));
-  const [activeTab, setActiveTab] = useState<'melhorias' | 'materiais' | 'encantos' | 'valores'>('melhorias');
-
-  // Valores customizados editáveis pelo usuário
+  const [activeTab, setActiveTab] = useState<ForgeTab>('melhorias');
   const [customName, setCustomName] = useState(baseName);
   const [customPriceStr, setCustomPriceStr] = useState(basePrice);
   const [customSpaces, setCustomSpaces] = useState(baseSpaces);
@@ -66,9 +72,6 @@ export const ItemModifierModal: React.FC<ItemModifierModalProps> = ({
   const [customPenalty, setCustomPenalty] = useState(basePenalty);
   const [customDescription, setCustomDescription] = useState(item.description || originalEquipment?.description || '');
 
-  if (!isOpen) return null;
-
-  // Item base com valores personalizados aplicados
   const baseItemWithEdits: EquipmentItem = {
     ...item,
     name: customName,
@@ -76,15 +79,23 @@ export const ItemModifierModal: React.FC<ItemModifierModalProps> = ({
     spaces: customSpaces,
     damage: customDamage || undefined,
     critical: customCritical || undefined,
-    defenseBonus: item.category.startsWith('armadura') || item.category === 'escudo' ? customDefense : undefined,
-    armorPenalty: item.category.startsWith('armadura') || item.category === 'escudo' ? customPenalty : undefined,
+    defenseBonus: isArmorLike ? customDefense : undefined,
+    armorPenalty: isArmorLike ? customPenalty : undefined,
     description: customDescription,
   };
 
-  // Recalcula o item dinamicamente com melhorias, materiais e encantos
   const calculated = calculateModifiedItem(baseItemWithEdits, selectedModifiers);
 
-  // Cria objeto EquipmentItem resultante para o Live Preview e para salvar no inventário
+  // Preço já pago pelas modificações atuais (para cobrar só a diferença)
+  const previousTotal = useMemo(
+    () => calculateModifiedItem({ ...item, price: basePrice }, sanitizeModifiers(initialModifiers)).totalPrice,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+  const costToPay =
+    chargeMode === 'none' ? 0 : chargeMode === 'difference' ? Math.max(0, calculated.totalPrice - previousTotal) : calculated.totalPrice;
+  const canAfford = chargeMode === 'none' || characterTibares === undefined || characterTibares >= costToPay;
+
   const previewItem: EquipmentItem = {
     ...baseItemWithEdits,
     name: calculated.name,
@@ -98,712 +109,301 @@ export const ItemModifierModal: React.FC<ItemModifierModalProps> = ({
     description: baseItemWithEdits.description,
   };
 
-  const improvements = ITEM_MODIFIERS_LIST.filter((m) => m.type === 'melhoria');
-  const materials = ITEM_MODIFIERS_LIST.filter((m) => m.type === 'material_especial');
-  const enchantments = ITEM_MODIFIERS_LIST.filter((m) => m.type === 'encanto');
+  const byType = (type: ItemModifier['type']) => ITEM_MODIFIERS_LIST.filter((m) => m.type === type);
+  const countOf = (pred: (m: ItemModifier) => boolean) =>
+    selectedModifiers.filter((id) => {
+      const m = ITEM_MODIFIERS_LIST.find((x) => x.id === id);
+      return m ? pred(m) : false;
+    }).length;
 
-  const handleToggleModifier = (modId: string) => {
+  const improvementsCount = countOf((m) => m.type === 'melhoria' || m.type === 'material_especial');
+  const enchantmentsCount = countOf((m) => m.type === 'encanto');
+  const hasSpecialMaterial = countOf((m) => m.type === 'material_especial') > 0;
+
+  const handleToggle = (modId: string) => {
     if (selectedModifiers.includes(modId)) {
-      // Cascata: desmarcar um modificador remove ele e todos que dependem dele
-      const newModifiers = removeModifierWithDependents(modId, selectedModifiers);
-      setSelectedModifiers(newModifiers);
-    } else {
-      const mod = ITEM_MODIFIERS_LIST.find((m) => m.id === modId);
-      if (!mod) return;
-      const check = canApplyModifier(baseItemWithEdits, mod, selectedModifiers);
-      if (check.allowed) {
-        setSelectedModifiers([...selectedModifiers, modId]);
-      } else {
-        alert(check.reason || 'Este modificador não pode ser aplicado.');
-      }
+      // Cascata: remover um modificador remove os que dependem dele (ex.: Cruel → Atroz)
+      setSelectedModifiers(removeModifierWithDependents(modId, selectedModifiers));
+      return;
     }
+    const mod = ITEM_MODIFIERS_LIST.find((m) => m.id === modId);
+    if (!mod) return;
+    const check = canApplyModifier(baseItemWithEdits, mod, selectedModifiers);
+    if (check.allowed) setSelectedModifiers([...selectedModifiers, modId]);
+    else toast(check.reason || 'Este modificador não pode ser aplicado.', { tone: 'warning' });
   };
 
-  const improvementsCount = selectedModifiers.filter((id) => {
-    const m = ITEM_MODIFIERS_LIST.find((x) => x.id === id);
-    return m && (m.type === 'melhoria' || m.type === 'material_especial');
-  }).length;
+  const renderModifierList = (list: ItemModifier[]) => (
+    <div className="list">
+      {list.map((mod) => {
+        const isSelected = selectedModifiers.includes(mod.id);
+        const check = canApplyModifier(baseItemWithEdits, mod, selectedModifiers);
+        const isAllowed = isSelected || check.allowed;
+        const dependents = getDependentModifierIds(mod.id).filter((d) => selectedModifiers.includes(d));
+        const extraPrice =
+          mod.priceByItemType && isWeapon
+            ? mod.priceByItemType.arma
+            : mod.priceByItemType && item.category === 'escudo'
+              ? mod.priceByItemType.escudo
+              : mod.priceByItemType && item.category === 'armadura_leve'
+                ? mod.priceByItemType.armadura_leve
+                : mod.priceByItemType && item.category === 'armadura_pesada'
+                  ? mod.priceByItemType.armadura_pesada
+                  : mod.additionalPrice;
+        return (
+          <button
+            key={mod.id}
+            type="button"
+            role="checkbox"
+            aria-checked={isSelected}
+            className={`row forge-row${isSelected ? ' is-selected' : ''}${!isAllowed ? ' is-disabled' : ''}`}
+            onClick={() => (isAllowed ? handleToggle(mod.id) : toast(check.reason || 'Indisponível para este item.', { tone: 'warning' }))}
+          >
+            <span className={`mark${isSelected ? ' is-on' : ''}${!isAllowed ? ' mark-locked' : ''}`}>
+              {isSelected ? <Check size={14} strokeWidth={3} /> : !isAllowed ? <Lock size={12} /> : null}
+            </span>
+            <span className="row-main">
+              <span className="row-title hstack-xs wrap">
+                {mod.name}
+                {!!extraPrice && <span className="badge badge-gold">+{money(extraPrice)}</span>}
+              </span>
+              <span className="row-sub">{mod.description}</span>
+              {mod.requirementText && !isSelected && (
+                <span className={`t-xs ${check.allowed ? 't-success' : 't-warning'}`}>
+                  {mod.requirementText}
+                  {check.allowed ? ' ✓' : ''}
+                </span>
+              )}
+              {!isAllowed && check.reason && <span className="t-xs t-danger">{check.reason}</span>}
+              {isSelected && dependents.length > 0 && (
+                <span className="t-xs t-warning">Remover também tira: {dependents.join(', ')}</span>
+              )}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
 
-  const enchantmentsCount = selectedModifiers.filter((id) => {
-    const m = ITEM_MODIFIERS_LIST.find((x) => x.id === id);
-    return m && m.type === 'encanto';
-  }).length;
-
-  const hasSpecialMaterial = selectedModifiers.some((id) => {
-    const m = ITEM_MODIFIERS_LIST.find((x) => x.id === id);
-    return m && m.type === 'material_especial';
-  });
-
-  const canAfford = characterTibares === undefined || characterTibares >= calculated.totalPrice;
+  const primaryLabel =
+    chargeMode === 'none'
+      ? 'Concluir simulação'
+      : costToPay > 0
+        ? `Forjar · ${money(costToPay)}`
+        : 'Salvar alterações';
 
   return (
-    <div className="modal-overlay" onClick={onClose} style={{ zIndex: 1000 }}>
-      <div
-        className="modal-content"
-        onClick={(e) => e.stopPropagation()}
-        style={{
-          maxWidth: '1150px',
-          width: '95vw',
-          maxHeight: '92vh',
-          display: 'flex',
-          flexDirection: 'column',
-          background: 'var(--bg-surface)',
-          border: '1px solid var(--border-gold)',
-          borderRadius: 'var(--radius-xl)',
-          overflow: 'hidden',
-        }}
-      >
-        {/* Header do Modal */}
-        <div
-          style={{
-            padding: '1.25rem 1.5rem',
-            borderBottom: '1px solid var(--border-color)',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            background: 'rgba(0,0,0,0.35)',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-            <Wrench size={22} style={{ color: 'var(--t20-gold)' }} />
-            <div>
-              <h2 style={{ fontSize: '1.35rem', margin: 0, color: '#ffffff' }}>
-                Oficina & Customização: {customName}
-              </h2>
-              <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)' }}>
-                Itens Superiores (pág. 164) e Encantos Mágicos (pág. 340) • Tormenta 20 Edição Jogo do Ano
+    <Sheet
+      open={isOpen}
+      onClose={onClose}
+      title="Oficina"
+      subtitle={baseName}
+      icon={<Wrench size={22} />}
+      size="xl"
+      full
+      toolbar={
+        <Segmented<ForgeTab>
+          value={activeTab}
+          onChange={setActiveTab}
+          ariaLabel="Seção da oficina"
+          options={[
+            { value: 'melhorias', label: `Melhorias ${improvementsCount}/4`, icon: <Sparkles size={15} /> },
+            { value: 'materiais', label: hasSpecialMaterial ? 'Material ✓' : 'Material', icon: <Gem size={15} /> },
+            { value: 'encantos', label: `Encantos ${enchantmentsCount}/3`, icon: <Flame size={15} /> },
+            { value: 'valores', label: 'Ajustes', icon: <Sliders size={15} /> },
+          ]}
+        />
+      }
+      footer={
+        <div className="forge-footer">
+          <div className="forge-cost">
+            <span className="stack-xs">
+              <span className="t-label">{chargeMode === 'difference' ? 'Custo da forja' : chargeMode === 'none' ? 'Preço final' : 'Preço total'}</span>
+              <span className="forge-cost-value t-num">{money(chargeMode === 'none' ? calculated.totalPrice : costToPay)}</span>
+            </span>
+            {characterTibares !== undefined && chargeMode !== 'none' && (
+              <span className={`t-xs ${canAfford ? 't-success' : 't-danger'} hstack-xs`}>
+                <Coins size={13} />
+                Você tem {money(characterTibares)}
               </span>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            onClick={onClose}
-            className="btn btn-ghost"
-            style={{ padding: '0.4rem', borderRadius: '50%' }}
-          >
-            <X size={20} />
-          </button>
-        </div>
-
-        {/* Abas Superiores do Modal */}
-        <div
-          style={{
-            display: 'flex',
-            borderBottom: '1px solid var(--border-color)',
-            background: 'rgba(0,0,0,0.2)',
-            padding: '0.5rem 1.5rem',
-            gap: '0.5rem',
-            flexWrap: 'wrap',
-          }}
-        >
-          <button
-            type="button"
-            onClick={() => setActiveTab('melhorias')}
-            className={`btn ${activeTab === 'melhorias' ? 'btn-gold' : 'btn-ghost'}`}
-            style={{ fontSize: '0.85rem', gap: '0.4rem' }}
-          >
-            <Sparkles size={15} />
-            Melhorias Mecânicas ({improvementsCount}/4)
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('materiais')}
-            className={`btn ${activeTab === 'materiais' ? 'btn-primary' : 'btn-ghost'}`}
-            style={{ fontSize: '0.85rem', gap: '0.4rem' }}
-          >
-            <Shield size={15} />
-            Materiais Especiais {hasSpecialMaterial ? '(Aplicado)' : ''}
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('encantos')}
-            className={`btn ${activeTab === 'encantos' ? 'btn-ruby' : 'btn-ghost'}`}
-            style={{ fontSize: '0.85rem', gap: '0.4rem' }}
-          >
-            <Flame size={15} />
-            Encantos Mágicos ({enchantmentsCount}/3)
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('valores')}
-            className={`btn ${activeTab === 'valores' ? 'active' : 'btn-ghost'}`}
-            style={{ fontSize: '0.85rem', gap: '0.4rem' }}
-          >
-            <Sliders size={15} />
-            Editar Valores Básicos
-          </button>
-        </div>
-
-        {/* Corpo: Grade 2 Colunas */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'minmax(350px, 1.45fr) minmax(320px, 1fr)',
-            gap: '1.5rem',
-            padding: '1.5rem',
-            overflowY: 'auto',
-            flex: 1,
-          }}
-        >
-          {/* COLUNA ESQUERDA: Seletor Interativo */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-            {/* ABA 1: MELHORIAS MECÂNICAS */}
-            {activeTab === 'melhorias' && (
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                  <span style={{ fontWeight: 800, fontSize: '0.95rem', color: 'var(--t20-gold-light)' }}>
-                    Melhorias Mecânicas (Tabela 3-8, pág. 165)
-                  </span>
-                  <span className={`badge ${improvementsCount >= 4 ? 'badge-ruby' : 'badge-gold'}`} style={{ fontSize: '0.75rem' }}>
-                    {improvementsCount} de 4 melhorias usadas
-                  </span>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '0.65rem' }}>
-                  {improvements.map((mod) => {
-                    const isSelected = selectedModifiers.includes(mod.id);
-                    const check = canApplyModifier(baseItemWithEdits, mod, selectedModifiers);
-                    const isAllowed = isSelected || check.allowed;
-                    const activeDependents = getDependentModifierIds(mod.id).filter((depId) => selectedModifiers.includes(depId));
-
-                    return (
-                      <div
-                        key={mod.id}
-                        onClick={() => {
-                          if (isAllowed) handleToggleModifier(mod.id);
-                        }}
-                        className="t20-card"
-                        style={{
-                          cursor: isAllowed ? 'pointer' : 'not-allowed',
-                          padding: '0.75rem',
-                          opacity: isAllowed ? 1 : 0.45,
-                          borderColor: isSelected
-                            ? 'var(--t20-gold)'
-                            : isAllowed
-                            ? 'var(--border-color)'
-                            : 'rgba(239, 68, 68, 0.3)',
-                          background: isSelected
-                            ? 'rgba(245, 158, 11, 0.12)'
-                            : isAllowed
-                            ? 'rgba(0,0,0,0.2)'
-                            : 'rgba(239, 68, 68, 0.04)',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          justifyContent: 'space-between',
-                          gap: '0.35rem',
-                          transition: 'var(--transition)',
-                        }}
-                      >
-                        <div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ fontWeight: 700, fontSize: '0.9rem', color: isSelected ? 'var(--t20-gold-light)' : '#ffffff' }}>
-                              {mod.name}
-                            </span>
-                            {isSelected && <Check size={16} style={{ color: 'var(--t20-gold)' }} />}
-                          </div>
-
-                          {/* Alerta de pré-requisito ativo caso este modificador seja desmarcado */}
-                          {isSelected && activeDependents.length > 0 && (
-                            <div
-                              style={{
-                                fontSize: '0.7rem',
-                                color: '#f59e0b',
-                                background: 'rgba(245, 158, 11, 0.12)',
-                                border: '1px solid rgba(245, 158, 11, 0.25)',
-                                padding: '0.2rem 0.4rem',
-                                borderRadius: '4px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '0.25rem',
-                                margin: '0.3rem 0',
-                              }}
-                            >
-                              <AlertCircle size={11} />
-                              <span>
-                                Pré-requisito ativo de:{' '}
-                                {activeDependents
-                                  .map((d) => ITEM_MODIFIERS_LIST.find((m) => m.id === d)?.name || d)
-                                  .join(', ')}{' '}
-                                (desmarcar removerá ambos)
-                              </span>
-                            </div>
-                          )}
-
-                          {/* Requisito prévio do modificador */}
-                          {mod.requirementText && !isSelected && (
-                            <div
-                              style={{
-                                fontSize: '0.7rem',
-                                color: check.allowed ? '#34d399' : '#f87171',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '0.25rem',
-                                margin: '0.2rem 0',
-                              }}
-                            >
-                              <Info size={11} />
-                              <span>{mod.requirementText} {check.allowed ? '(satisfeito)' : ''}</span>
-                            </div>
-                          )}
-
-                          {!isAllowed && (
-                            <div style={{ fontSize: '0.7rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '0.25rem', margin: '0.2rem 0' }}>
-                              <AlertCircle size={11} />
-                              <span>{check.reason}</span>
-                            </div>
-                          )}
-
-                          <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.775rem', color: '#cbd5e1', lineHeight: 1.4 }}>
-                            {mod.description}
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* ABA 2: MATERIAIS ESPECIAIS */}
-            {activeTab === 'materiais' && (
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                  <span style={{ fontWeight: 800, fontSize: '0.95rem', color: '#38bdf8' }}>
-                    Materiais Especiais (Tabela 3-9, pág. 166)
-                  </span>
-                  <span className="badge badge-blue" style={{ fontSize: '0.75rem' }}>
-                    Conta como 1 melhoria do item
-                  </span>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '0.65rem' }}>
-                  {materials.map((mat) => {
-                    const isSelected = selectedModifiers.includes(mat.id);
-                    const check = canApplyModifier(baseItemWithEdits, mat, selectedModifiers);
-                    const isAllowed = isSelected || check.allowed;
-
-                    let matCost = 0;
-                    if (mat.priceByItemType) {
-                      if (baseItemWithEdits.category.startsWith('arma')) matCost = mat.priceByItemType.arma || 0;
-                      else if (baseItemWithEdits.category === 'armadura_leve') matCost = mat.priceByItemType.armadura_leve || 0;
-                      else if (baseItemWithEdits.category === 'armadura_pesada') matCost = mat.priceByItemType.armadura_pesada || 0;
-                      else if (baseItemWithEdits.category === 'escudo') matCost = mat.priceByItemType.escudo || 0;
-                      else if (baseItemWithEdits.category === 'esoterico') matCost = mat.priceByItemType.esoterico || 0;
-                    }
-
-                    return (
-                      <div
-                        key={mat.id}
-                        onClick={() => {
-                          if (isAllowed) handleToggleModifier(mat.id);
-                        }}
-                        className="t20-card"
-                        style={{
-                          cursor: isAllowed ? 'pointer' : 'not-allowed',
-                          padding: '0.75rem',
-                          opacity: isAllowed ? 1 : 0.45,
-                          borderColor: isSelected
-                            ? '#38bdf8'
-                            : isAllowed
-                            ? 'var(--border-color)'
-                            : 'rgba(239, 68, 68, 0.3)',
-                          background: isSelected
-                            ? 'rgba(56, 189, 248, 0.12)'
-                            : isAllowed
-                            ? 'rgba(0,0,0,0.2)'
-                            : 'rgba(239, 68, 68, 0.04)',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          justifyContent: 'space-between',
-                          gap: '0.35rem',
-                          transition: 'var(--transition)',
-                        }}
-                      >
-                        <div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ fontWeight: 700, fontSize: '0.9rem', color: isSelected ? '#38bdf8' : '#ffffff' }}>
-                              {mat.name}
-                            </span>
-                            <span className="badge badge-gold" style={{ fontSize: '0.7rem' }}>
-                              +T$ {matCost.toLocaleString('pt-BR')}
-                            </span>
-                          </div>
-
-                          {!isAllowed && (
-                            <div style={{ fontSize: '0.7rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '0.25rem', margin: '0.2rem 0' }}>
-                              <AlertCircle size={11} />
-                              <span>{check.reason}</span>
-                            </div>
-                          )}
-
-                          <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.775rem', color: '#cbd5e1', lineHeight: 1.4 }}>
-                            {mat.description}
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* ABA 3: ENCANTOS MÁGICOS */}
-            {activeTab === 'encantos' && (
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                  <span style={{ fontWeight: 800, fontSize: '0.95rem', color: 'var(--t20-ruby)' }}>
-                    Encantos Mágicos (Capítulo 8, Tabelas 8-7, 8-8 e 8-10)
-                  </span>
-                  <span className={`badge ${enchantmentsCount >= 3 ? 'badge-ruby' : 'badge-slate'}`} style={{ fontSize: '0.75rem' }}>
-                    {enchantmentsCount} de 3 encantos usados
-                  </span>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '0.65rem' }}>
-                  {enchantments.map((enc) => {
-                    const isSelected = selectedModifiers.includes(enc.id);
-                    const check = canApplyModifier(baseItemWithEdits, enc, selectedModifiers);
-                    const isAllowed = isSelected || check.allowed;
-                    const activeDependents = getDependentModifierIds(enc.id).filter((depId) => selectedModifiers.includes(depId));
-
-                    return (
-                      <div
-                        key={enc.id}
-                        onClick={() => {
-                          if (isAllowed) handleToggleModifier(enc.id);
-                        }}
-                        className="t20-card"
-                        style={{
-                          cursor: isAllowed ? 'pointer' : 'not-allowed',
-                          padding: '0.75rem',
-                          opacity: isAllowed ? 1 : 0.45,
-                          borderColor: isSelected
-                            ? 'var(--t20-ruby)'
-                            : isAllowed
-                            ? 'var(--border-color)'
-                            : 'rgba(239, 68, 68, 0.3)',
-                          background: isSelected
-                            ? 'rgba(225, 29, 72, 0.12)'
-                            : isAllowed
-                            ? 'rgba(0,0,0,0.2)'
-                            : 'rgba(239, 68, 68, 0.04)',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          justifyContent: 'space-between',
-                          gap: '0.35rem',
-                          transition: 'var(--transition)',
-                        }}
-                      >
-                        <div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ fontWeight: 700, fontSize: '0.9rem', color: isSelected ? '#ff6b7b' : '#ffffff' }}>
-                              {enc.name}
-                            </span>
-                            {isSelected && <Check size={16} style={{ color: 'var(--t20-ruby)' }} />}
-                          </div>
-
-                          {/* Alerta de pré-requisito ativo caso este encanto seja desmarcado */}
-                          {isSelected && activeDependents.length > 0 && (
-                            <div
-                              style={{
-                                fontSize: '0.7rem',
-                                color: '#f59e0b',
-                                background: 'rgba(245, 158, 11, 0.12)',
-                                border: '1px solid rgba(245, 158, 11, 0.25)',
-                                padding: '0.2rem 0.4rem',
-                                borderRadius: '4px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '0.25rem',
-                                margin: '0.3rem 0',
-                              }}
-                            >
-                              <AlertCircle size={11} />
-                              <span>
-                                Pré-requisito ativo de:{' '}
-                                {activeDependents
-                                  .map((d) => ITEM_MODIFIERS_LIST.find((m) => m.id === d)?.name || d)
-                                  .join(', ')}{' '}
-                                (desmarcar removerá ambos)
-                              </span>
-                            </div>
-                          )}
-
-                          {/* Requisito prévio do encanto */}
-                          {enc.requirementText && !isSelected && (
-                            <div
-                              style={{
-                                fontSize: '0.7rem',
-                                color: check.allowed ? '#34d399' : '#f87171',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '0.25rem',
-                                margin: '0.2rem 0',
-                              }}
-                            >
-                              <Info size={11} />
-                              <span>{enc.requirementText} {check.allowed ? '(satisfeito)' : ''}</span>
-                            </div>
-                          )}
-
-                          {!isAllowed && (
-                            <div style={{ fontSize: '0.7rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '0.25rem', margin: '0.2rem 0' }}>
-                              <AlertCircle size={11} />
-                              <span>{check.reason}</span>
-                            </div>
-                          )}
-
-                          <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.775rem', color: '#cbd5e1', lineHeight: 1.4 }}>
-                            {enc.description}
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* ABA 4: EDITAR VALORES BÁSICOS */}
-            {activeTab === 'valores' && (
-              <div className="t20-card" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                <div style={{ fontWeight: 800, fontSize: '1rem', color: '#ffffff', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>
-                  Propriedades & Estatísticas Básicas do Item
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                  <div>
-                    <label style={{ fontSize: '0.8rem', color: 'var(--text-dim)', display: 'block', marginBottom: '0.3rem' }}>
-                      Nome do Item
-                    </label>
-                    <input
-                      type="text"
-                      value={customName}
-                      onChange={(e) => setCustomName(e.target.value)}
-                      style={{ width: '100%', padding: '0.45rem 0.75rem', fontSize: '0.9rem' }}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={{ fontSize: '0.8rem', color: 'var(--text-dim)', display: 'block', marginBottom: '0.3rem' }}>
-                      Preço Base
-                    </label>
-                    <input
-                      type="text"
-                      value={customPriceStr}
-                      onChange={(e) => setCustomPriceStr(e.target.value)}
-                      placeholder="Ex: T$ 25"
-                      style={{ width: '100%', padding: '0.45rem 0.75rem', fontSize: '0.9rem' }}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={{ fontSize: '0.8rem', color: 'var(--text-dim)', display: 'block', marginBottom: '0.3rem' }}>
-                      Espaços de Carga
-                    </label>
-                    <input
-                      type="number"
-                      min={0}
-                      max={10}
-                      value={customSpaces}
-                      onChange={(e) => setCustomSpaces(parseInt(e.target.value, 10) || 0)}
-                      style={{ width: '100%', padding: '0.45rem 0.75rem', fontSize: '0.9rem' }}
-                    />
-                  </div>
-
-                  {baseItemWithEdits.category.startsWith('arma') && (
-                    <>
-                      <div>
-                        <label style={{ fontSize: '0.8rem', color: 'var(--text-dim)', display: 'block', marginBottom: '0.3rem' }}>
-                          Dano (Ex: 1d8, 2d6)
-                        </label>
-                        <input
-                          type="text"
-                          value={customDamage}
-                          onChange={(e) => setCustomDamage(e.target.value)}
-                          style={{ width: '100%', padding: '0.45rem 0.75rem', fontSize: '0.9rem' }}
-                        />
-                      </div>
-
-                      <div>
-                        <label style={{ fontSize: '0.8rem', color: 'var(--text-dim)', display: 'block', marginBottom: '0.3rem' }}>
-                          Crítico (Ex: 19, 19/x3, x3)
-                        </label>
-                        <input
-                          type="text"
-                          value={customCritical}
-                          onChange={(e) => setCustomCritical(e.target.value)}
-                          style={{ width: '100%', padding: '0.45rem 0.75rem', fontSize: '0.9rem' }}
-                        />
-                      </div>
-                    </>
-                  )}
-
-                  {(baseItemWithEdits.category.startsWith('armadura') || baseItemWithEdits.category === 'escudo') && (
-                    <>
-                      <div>
-                        <label style={{ fontSize: '0.8rem', color: 'var(--text-dim)', display: 'block', marginBottom: '0.3rem' }}>
-                          Bônus na Defesa (+Defesa)
-                        </label>
-                        <input
-                          type="number"
-                          value={customDefense}
-                          onChange={(e) => setCustomDefense(parseInt(e.target.value, 10) || 0)}
-                          style={{ width: '100%', padding: '0.45rem 0.75rem', fontSize: '0.9rem' }}
-                        />
-                      </div>
-
-                      <div>
-                        <label style={{ fontSize: '0.8rem', color: 'var(--text-dim)', display: 'block', marginBottom: '0.3rem' }}>
-                          Penalidade de Armadura
-                        </label>
-                        <input
-                          type="number"
-                          value={customPenalty}
-                          onChange={(e) => setCustomPenalty(parseInt(e.target.value, 10) || 0)}
-                          style={{ width: '100%', padding: '0.45rem 0.75rem', fontSize: '0.9rem' }}
-                        />
-                      </div>
-                    </>
-                  )}
-                </div>
-
-                <div>
-                  <label style={{ fontSize: '0.8rem', color: 'var(--text-dim)', display: 'block', marginBottom: '0.3rem' }}>
-                    Descrição / Notas do Item
-                  </label>
-                  <textarea
-                    rows={3}
-                    value={customDescription}
-                    onChange={(e) => setCustomDescription(e.target.value)}
-                    style={{ width: '100%', padding: '0.45rem 0.75rem', fontSize: '0.85rem' }}
-                  />
-                </div>
-              </div>
             )}
           </div>
-
-          {/* COLUNA DIREITA: Live Preview Card & Detalhamento Financeiro */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', position: 'sticky', top: 0 }}>
-            <div>
-              <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase', marginBottom: '0.5rem', letterSpacing: '0.04em' }}>
-                Pré-visualização do Item em Tempo Real:
-              </div>
-              <ItemCard
-                item={previewItem}
-                appliedModifiers={selectedModifiers}
-                actionType="compendium"
-              />
-            </div>
-
-            {/* Painel Financeiro e Cálculo de Custos */}
-            <div
-              className="t20-card"
-              style={{
-                padding: '1rem',
-                background: 'rgba(0,0,0,0.3)',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.5rem',
+          <div className="hstack">
+            <button type="button" className="btn btn-secondary" onClick={onClose}>
+              Cancelar
+            </button>
+            <button
+              type="button"
+              className="btn btn-primary grow"
+              disabled={!canAfford}
+              onClick={() => {
+                onApply(previewItem, selectedModifiers, costToPay);
+                onClose();
               }}
             >
-              <div style={{ fontWeight: 700, fontSize: '0.95rem', color: '#ffffff', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.4rem' }}>
-                Cálculo de Custos & Regras:
-              </div>
-
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', color: '#cbd5e1' }}>
-                <span>Preço Base do Item:</span>
-                <span>{baseItemWithEdits.price}</span>
-              </div>
-
-              {improvementsCount > 0 && (
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', color: 'var(--t20-gold)' }}>
-                  <span>Melhoria(s) ({improvementsCount}) [Tab. 3-7]:</span>
-                  <span>+T$ {(IMPROVEMENT_TIER_COSTS[improvementsCount] || 0).toLocaleString('pt-BR')}</span>
-                </div>
-              )}
-
-              {hasSpecialMaterial && (
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', color: '#38bdf8' }}>
-                  <span>Material Especial (Tab. 3-9):</span>
-                  <span>
-                    +T${' '}
-                    {(
-                      calculated.totalPrice -
-                      (parseFloat(baseItemWithEdits.price.replace(/[^\d.,]/g, '').replace(',', '.')) || 0) -
-                      (IMPROVEMENT_TIER_COSTS[improvementsCount] || 0) -
-                      (ENCHANTMENT_TIER_COSTS[enchantmentsCount] || 0)
-                    ).toLocaleString('pt-BR')}
-                  </span>
-                </div>
-              )}
-
-              {enchantmentsCount > 0 && (
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', color: '#f43f5e' }}>
-                  <span>Encanto(s) Mágico(s) ({enchantmentsCount}) [Tab. 8-7]:</span>
-                  <span>+T$ {(ENCHANTMENT_TIER_COSTS[enchantmentsCount] || 0).toLocaleString('pt-BR')}</span>
-                </div>
-              )}
-
-              <div
-                style={{
-                  borderTop: '1px solid var(--border-color)',
-                  paddingTop: '0.5rem',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  fontWeight: 800,
-                  fontSize: '1.1rem',
-                  color: '#ffffff',
-                }}
-              >
-                <span>Preço Total Final:</span>
-                <span style={{ color: 'var(--t20-gold-light)', fontFamily: 'var(--font-mono)' }}>
-                  {calculated.totalPriceStr}
-                </span>
-              </div>
-
-              {characterTibares !== undefined && (
-                <div style={{ fontSize: '0.8rem', color: canAfford ? '#34d399' : '#f87171', display: 'flex', alignItems: 'center', gap: '0.35rem', marginTop: '0.25rem' }}>
-                  <Coins size={14} />
-                  <span>
-                    Seu dinheiro: <strong>T$ {characterTibares.toLocaleString('pt-BR')}</strong>{' '}
-                    {canAfford ? '(Saldo Suficiente)' : '(Saldo Insuficiente)'}
-                  </span>
-                </div>
-              )}
-            </div>
-
-            {/* Ações de Cancelar / Salvar */}
-            <div style={{ display: 'flex', gap: '0.75rem' }}>
-              <button
-                type="button"
-                onClick={onClose}
-                className="btn btn-secondary"
-                style={{ flex: 1 }}
-              >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                disabled={!canAfford}
-                onClick={() => {
-                  onApply(previewItem, selectedModifiers, calculated.totalPrice);
-                  onClose();
-                }}
-                className="btn btn-primary"
-                style={{ flex: 1.5, gap: '0.4rem' }}
-              >
-                <Check size={16} />
-                Salvar Customização
-              </button>
-            </div>
+              <Check size={18} />
+              {canAfford ? primaryLabel : 'Tibares insuficientes'}
+            </button>
           </div>
         </div>
+      }
+    >
+      <div className="forge-layout">
+        {/* Prévia ao vivo */}
+        <aside className="card card-accent forge-preview">
+          <span className="eyebrow">Resultado</span>
+          <span className="forge-preview-name">{calculated.name}</span>
+          <div className="forge-stats">
+            {isWeapon && (
+              <>
+                <span className="forge-stat">
+                  <span className="kv-key">Ataque</span>
+                  <span className="kv-value">{calculated.attackBonus > 0 ? `+${calculated.attackBonus}` : '—'}</span>
+                </span>
+                <span className="forge-stat">
+                  <span className="kv-key">Dano</span>
+                  <span className="kv-value t-mono">{previewItem.damage || '—'}</span>
+                </span>
+                <span className="forge-stat">
+                  <span className="kv-key">Crítico</span>
+                  <span className="kv-value t-mono">{previewItem.critical || 'x2'}</span>
+                </span>
+              </>
+            )}
+            {isArmorLike && (
+              <>
+                <span className="forge-stat">
+                  <span className="kv-key">Defesa</span>
+                  <span className="kv-value">+{calculated.defenseBonus}</span>
+                </span>
+                <span className="forge-stat">
+                  <span className="kv-key">Penalidade</span>
+                  <span className="kv-value">{calculated.armorPenalty}</span>
+                </span>
+              </>
+            )}
+            <span className="forge-stat">
+              <span className="kv-key">Espaços</span>
+              <span className="kv-value">{calculated.spaces}</span>
+            </span>
+          </div>
+          {calculated.additionalEffects.length > 0 && (
+            <ul className="forge-effects">
+              {calculated.additionalEffects.map((e, i) => (
+                <li key={i}>{e}</li>
+              ))}
+            </ul>
+          )}
+          <div className="divider" />
+          <div className="forge-breakdown">
+            <span>Item base</span>
+            <span>{money(priceOf(baseItemWithEdits.price))}</span>
+            {improvementsCount > 0 && (
+              <>
+                <span>Melhorias ({improvementsCount}) · Tab. 3-7</span>
+                <span>+{money(IMPROVEMENT_TIER_COSTS[improvementsCount] || 0)}</span>
+              </>
+            )}
+            {enchantmentsCount > 0 && (
+              <>
+                <span>Encantos ({enchantmentsCount}) · Tab. 8-7</span>
+                <span>+{money(ENCHANTMENT_TIER_COSTS[enchantmentsCount] || 0)}</span>
+              </>
+            )}
+            <span className="t-bold t-1">Preço final</span>
+            <span className="t-bold t-gold">{calculated.totalPriceStr}</span>
+            {chargeMode === 'difference' && (
+              <>
+                <span>Já pago (modificações atuais)</span>
+                <span>−{money(previousTotal)}</span>
+              </>
+            )}
+          </div>
+          {chargeMode === 'difference' && (
+            <p className="t-xs t-3">Para melhorar um item que você já tem, paga-se a diferença (Cap. 3, pág. 167).</p>
+          )}
+        </aside>
+
+        <div className="stack">
+          {activeTab === 'melhorias' && (
+            <>
+              <div className="callout">
+                <Shield size={18} />
+                <span>Até 4 melhorias por item, cada uma uma única vez. Pré-requisitos são removidos em cascata (Tab. 3-8, pág. 165).</span>
+              </div>
+              {renderModifierList(byType('melhoria'))}
+            </>
+          )}
+          {activeTab === 'materiais' && (
+            <>
+              <div className="callout callout-gold">
+                <Gem size={18} />
+                <span>Material especial ocupa uma das 4 melhorias e soma preço próprio (Tab. 3-9, pág. 166).</span>
+              </div>
+              {renderModifierList(byType('material_especial'))}
+            </>
+          )}
+          {activeTab === 'encantos' && (
+            <>
+              <div className="callout callout-accent">
+                <Flame size={18} />
+                <span>Até 3 encantos mágicos, com custo por patamar (Cap. 8, págs. 340–344).</span>
+              </div>
+              {renderModifierList(byType('encanto'))}
+            </>
+          )}
+          {activeTab === 'valores' && (
+            <div className="stack">
+              <div className="callout callout-warning">
+                <AlertTriangle size={18} />
+                <span>Ajustes manuais saem das regras do livro — use para itens da campanha combinados com o mestre.</span>
+              </div>
+              <label className="field">
+                <span className="field-label">Nome</span>
+                <input value={customName} onChange={(e) => setCustomName(e.target.value)} />
+              </label>
+              <div className="grid-2">
+                <label className="field">
+                  <span className="field-label">Preço base</span>
+                  <input value={customPriceStr} onChange={(e) => setCustomPriceStr(e.target.value)} />
+                </label>
+                <label className="field">
+                  <span className="field-label">Espaços</span>
+                  <input type="number" inputMode="numeric" min={0} value={customSpaces} onChange={(e) => setCustomSpaces(parseInt(e.target.value, 10) || 0)} />
+                </label>
+              </div>
+              {isWeapon && (
+                <div className="grid-2">
+                  <label className="field">
+                    <span className="field-label">Dano</span>
+                    <input value={customDamage} onChange={(e) => setCustomDamage(e.target.value)} placeholder="1d8" />
+                  </label>
+                  <label className="field">
+                    <span className="field-label">Crítico</span>
+                    <input value={customCritical} onChange={(e) => setCustomCritical(e.target.value)} placeholder="19/x2" />
+                  </label>
+                </div>
+              )}
+              {isArmorLike && (
+                <div className="grid-2">
+                  <label className="field">
+                    <span className="field-label">Bônus na Defesa</span>
+                    <input type="number" inputMode="numeric" value={customDefense} onChange={(e) => setCustomDefense(parseInt(e.target.value, 10) || 0)} />
+                  </label>
+                  <label className="field">
+                    <span className="field-label">Penalidade</span>
+                    <input type="number" inputMode="numeric" value={customPenalty} onChange={(e) => setCustomPenalty(parseInt(e.target.value, 10) || 0)} />
+                  </label>
+                </div>
+              )}
+              <label className="field">
+                <span className="field-label">Descrição</span>
+                <textarea rows={4} value={customDescription} onChange={(e) => setCustomDescription(e.target.value)} />
+              </label>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </Sheet>
   );
 };

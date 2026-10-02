@@ -1,6 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Dices, RotateCcw, X, Sparkles, ChevronDown, ChevronUp, History, AlertTriangle, FileText } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { History, Trash2, X } from 'lucide-react';
 import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
+import { Sheet } from '../ui/Sheet';
+import { NumberStepper } from '../ui/controls';
+import { D20Icon } from '../ui/Icons';
 
 export interface RollResult {
   id: string;
@@ -20,444 +23,283 @@ interface DiceRollerWidgetProps {
   rolls: RollResult[];
   onRoll: (title: string, diceSides: number, modifier: number, count?: number) => void;
   onClearHistory: () => void;
-  onOpenFullHistory?: () => void;
-  onOpenChangeLog?: () => void;
+  isOpen: boolean;
+  onOpen: () => void;
+  onClose: () => void;
+}
+
+const DICE = [4, 6, 8, 10, 12, 20, 100] as const;
+const TOAST_MS = 5200;
+
+const parseCleanTitle = (rawTitle: string) => {
+  const match = rawTitle.match(/^(.*?)\s*\[(.*)\]$/);
+  return match ? match[1].trim() : rawTitle.trim();
+};
+
+const formatMod = (v: number) => (v > 0 ? `+${v}` : `${v}`);
+
+/** Silhuetas dos dados — cada tipo tem sua forma. */
+const DieShape: React.FC<{ sides: number }> = ({ sides }) => {
+  const common = {
+    width: 34,
+    height: 34,
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: 1.6,
+    strokeLinejoin: 'round' as const,
+    strokeLinecap: 'round' as const,
+    'aria-hidden': true,
+  };
+  switch (sides) {
+    case 4:
+      return (
+        <svg {...common}>
+          <path d="M12 3 21.5 19.5h-19Z" />
+          <path d="M12 3v16.5" opacity=".45" />
+        </svg>
+      );
+    case 6:
+      return (
+        <svg {...common}>
+          <rect x="4" y="4" width="16" height="16" rx="3.5" />
+          <circle cx="9" cy="9" r="1.2" fill="currentColor" stroke="none" />
+          <circle cx="15" cy="15" r="1.2" fill="currentColor" stroke="none" />
+          <circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none" />
+        </svg>
+      );
+    case 8:
+      return (
+        <svg {...common}>
+          <path d="M12 2 21 12 12 22 3 12Z" />
+          <path d="M3 12h18M12 2l-4 10 4 10 4-10Z" opacity=".45" />
+        </svg>
+      );
+    case 10:
+    case 100:
+      return (
+        <svg {...common}>
+          <path d="M12 2 21 10.5 12 22 3 10.5Z" />
+          <path d="M3 10.5 12 14l9-3.5M12 14v8M12 2 8 11.8M12 2l4 9.8" opacity=".45" />
+          {sides === 100 && <circle cx="12" cy="12" r="10.5" opacity=".35" />}
+        </svg>
+      );
+    case 12:
+      return (
+        <svg {...common}>
+          <path d="M12 2.5 21 9.1 17.6 20H6.4L3 9.1Z" />
+          <path d="M12 7l4.3 3.1-1.6 5H9.3l-1.6-5Z" opacity=".55" />
+        </svg>
+      );
+    default:
+      return <D20Icon size={34} strokeWidth={1.6} />;
+  }
+};
+
+function fireHaptics(roll: RollResult) {
+  try {
+    const p = roll.isCrit
+      ? Haptics.notification({ type: NotificationType.Success })
+      : roll.isFumble
+        ? Haptics.notification({ type: NotificationType.Error })
+        : Haptics.impact({ style: ImpactStyle.Light });
+    Promise.resolve(p).catch(() => {});
+  } catch {
+    // Web sem suporte a vibração: ignora
+  }
+}
+
+async function celebrateCrit() {
+  try {
+    const { default: confetti } = await import('canvas-confetti');
+    const styles = getComputedStyle(document.documentElement);
+    const colors = [styles.getPropertyValue('--accent').trim(), styles.getPropertyValue('--gold').trim(), '#ffffff'].filter(Boolean);
+    confetti({ particleCount: 90, spread: 70, startVelocity: 38, origin: { y: 0.75 }, colors, scalar: 0.9, zIndex: 1000 });
+  } catch {
+    // efeito opcional
+  }
 }
 
 export const DiceRollerWidget: React.FC<DiceRollerWidgetProps> = ({
   rolls,
   onRoll,
   onClearHistory,
-  onOpenFullHistory,
-  onOpenChangeLog,
+  isOpen,
+  onOpen,
+  onClose,
 }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [customMod, setCustomMod] = useState<number>(0);
-  const [lastRollAnimation, setLastRollAnimation] = useState<number | null>(null);
-  const [isToastVisible, setIsToastVisible] = useState(false);
-  const [progress, setProgress] = useState(100);
-  const dismissTimerRef = useRef<any>(null);
-  const progressIntervalRef = useRef<any>(null);
+  const [count, setCount] = useState(1);
+  const [modifier, setModifier] = useState(0);
+  const [toastRollId, setToastRollId] = useState<string | null>(null);
+  const timerRef = useRef<number | undefined>(undefined);
+  const seenRef = useRef<string | null>(null);
 
-  const latestRoll = rolls[0];
+  const latest = rolls[0];
 
-  // Helper para limpar títulos longos que contenham fórmulas entre colchetes
-  const parseCleanTitle = (rawTitle: string) => {
-    const match = rawTitle.match(/^(.*?)\s*\[(.*)\]$/);
-    if (match) {
-      return {
-        title: match[1].trim(),
-        formulaDetail: match[2].trim(),
-      };
-    }
-    return {
-      title: rawTitle.trim(),
-      formulaDetail: '',
-    };
-  };
-
-  // Quando surge uma nova rolagem, ativa o toast com temporizador de fade out (6 segundos)
+  // Reage a cada rolagem nova: vibração, confete no 20 natural e toast (se a bandeja estiver fechada)
   useEffect(() => {
-    if (latestRoll) {
-      setIsToastVisible(true);
-      setProgress(100);
-
-      // Vibração tátil nativa no dispositivo mobile
-      try {
-        if (latestRoll.isCrit) {
-          Haptics.notification({ type: NotificationType.Success });
-        } else if (latestRoll.isFumble) {
-          Haptics.notification({ type: NotificationType.Error });
-        } else {
-          Haptics.impact({ style: ImpactStyle.Light });
-        }
-      } catch {
-        // Fallback transparente na web
-      }
-
-      if (dismissTimerRef.current) clearTimeout(dismissTimerRef.current);
-      if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
-
-      const totalDuration = 6000;
-      const step = 50;
-      const decrement = (step / totalDuration) * 100;
-
-      progressIntervalRef.current = setInterval(() => {
-        setProgress((prev) => {
-          if (prev <= decrement) {
-            clearInterval(progressIntervalRef.current);
-            return 0;
-          }
-          return prev - decrement;
-        });
-      }, step);
-
-      dismissTimerRef.current = setTimeout(() => {
-        setIsToastVisible(false);
-      }, totalDuration);
+    if (!latest || seenRef.current === latest.id) return;
+    seenRef.current = latest.id;
+    fireHaptics(latest);
+    if (latest.isCrit) celebrateCrit();
+    if (!isOpen) {
+      setToastRollId(latest.id);
+      window.clearTimeout(timerRef.current);
+      timerRef.current = window.setTimeout(() => setToastRollId(null), TOAST_MS);
     }
+  }, [latest, isOpen]);
 
-    return () => {
-      if (dismissTimerRef.current) clearTimeout(dismissTimerRef.current);
-      if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
-    };
-  }, [latestRoll?.id]);
+  useEffect(() => () => window.clearTimeout(timerRef.current), []);
 
-  const handleQuickRoll = (sides: number) => {
-    setLastRollAnimation(sides);
-    setTimeout(() => setLastRollAnimation(null), 600);
-    onRoll(`Rolagem d${sides}`, sides, customMod);
+  // Abrir a bandeja esconde o toast
+  useEffect(() => {
+    if (isOpen) setToastRollId(null);
+  }, [isOpen]);
+
+  const toastRoll = toastRollId ? rolls.find((r) => r.id === toastRollId) : undefined;
+
+  const holdToast = () => window.clearTimeout(timerRef.current);
+  const releaseToast = () => {
+    window.clearTimeout(timerRef.current);
+    timerRef.current = window.setTimeout(() => setToastRollId(null), 2500);
   };
 
-  const parsedTitleInfo = latestRoll ? parseCleanTitle(latestRoll.title) : { title: '', formulaDetail: '' };
+  const quickRoll = (sides: number) => {
+    const label = `${count > 1 ? count : ''}d${sides}`;
+    onRoll(`Rolagem ${label}`, sides, modifier, count);
+  };
+
+  const stageTone = latest?.isCrit ? 'crit' : latest?.isFumble ? 'fumble' : 'normal';
 
   return (
-    <div
-      className="dice-roller-widget-container"
-      style={{
-        position: 'fixed',
-        bottom: '5.25rem',
-        right: '1.5rem',
-        zIndex: 900,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-end',
-        gap: '0.5rem',
-      }}
-    >
-      {/* Toast Flutuante com Fade Time e Fechar (Anexo 1) */}
-      {!isExpanded && latestRoll && isToastVisible && (
+    <>
+      {toastRoll && (
         <div
-          onMouseEnter={() => {
-            // Pausa o auto-dismiss ao passar o mouse
-            if (dismissTimerRef.current) clearTimeout(dismissTimerRef.current);
-            if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
-          }}
-          style={{
-            background: 'rgba(15, 23, 42, 0.95)',
-            backdropFilter: 'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
-            border: latestRoll.isCrit
-              ? '2px solid var(--t20-gold)'
-              : latestRoll.isFumble
-              ? '2px solid #ef4444'
-              : '1px solid rgba(245, 158, 11, 0.3)',
-            boxShadow: latestRoll.isCrit
-              ? '0 10px 30px rgba(245, 158, 11, 0.35)'
-              : '0 10px 30px rgba(0, 0, 0, 0.6)',
-            borderRadius: 'var(--radius-lg)',
-            padding: '0.65rem 0.85rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.75rem',
-            width: '320px',
-            position: 'relative',
-            overflow: 'hidden',
-            animation: 'fadeIn 0.2s ease-out',
-          }}
+          className="roll-toast no-print"
+          data-tone={toastRoll.isCrit ? 'crit' : toastRoll.isFumble ? 'fumble' : 'normal'}
+          role="status"
+          aria-live="polite"
+          onPointerEnter={holdToast}
+          onPointerDown={holdToast}
+          onPointerLeave={releaseToast}
         >
-          {/* Barra de Progresso do Fade Time */}
-          <div
-            style={{
-              position: 'absolute',
-              bottom: 0,
-              left: 0,
-              height: '3px',
-              width: `${progress}%`,
-              background: latestRoll.isCrit ? 'var(--t20-gold)' : latestRoll.isFumble ? '#ef4444' : 'var(--t20-mana)',
-              transition: 'width 0.05s linear',
-            }}
-          />
-
-          {/* Círculo com o Total */}
-          <div
-            onClick={() => setIsExpanded(true)}
-            style={{
-              width: 42,
-              height: 42,
-              borderRadius: '50%',
-              background: latestRoll.isCrit
-                ? 'rgba(245, 158, 11, 0.25)'
-                : latestRoll.isFumble
-                ? 'rgba(239, 68, 68, 0.25)'
-                : 'rgba(255, 255, 255, 0.08)',
-              border: latestRoll.isCrit
-                ? '2px solid var(--t20-gold)'
-                : latestRoll.isFumble
-                ? '2px solid #ef4444'
-                : '1px solid rgba(255, 255, 255, 0.15)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontFamily: 'var(--font-mono)',
-              fontWeight: 800,
-              fontSize: '1.2rem',
-              color: latestRoll.isCrit ? 'var(--t20-gold-light)' : latestRoll.isFumble ? '#f87171' : '#ffffff',
-              cursor: 'pointer',
-              flexShrink: 0,
-            }}
-            title="Clique para ver o rolador de dados e histórico"
-          >
-            {latestRoll.total}
-          </div>
-
-          {/* Título Limpo e Subtítulo Sintético */}
-          <div
-            onClick={() => setIsExpanded(true)}
-            style={{ flex: 1, minWidth: 0, cursor: 'pointer' }}
-            title="Clique para abrir detalhes da rolagem"
-          >
-            <div
-              style={{
-                fontSize: '0.85rem',
-                fontWeight: 700,
-                color: '#ffffff',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-              }}
-            >
-              {parsedTitleInfo.title}
-            </div>
-            <div
-              style={{
-                fontSize: '0.75rem',
-                color: 'var(--t20-mana-light)',
-                fontFamily: 'var(--font-mono)',
-                marginTop: '0.15rem',
-              }}
-            >
-              {latestRoll.formula}
-            </div>
-          </div>
-
-          {/* Botão de Fechar 'X' Imediato */}
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsToastVisible(false);
-            }}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              color: 'var(--text-dim)',
-              cursor: 'pointer',
-              padding: '0.25rem',
-              borderRadius: '50%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-            }}
-            title="Fechar resultado flutuante"
-          >
-            <X size={15} />
-          </button>
-        </div>
-      )}
-
-      {/* Painel Expandido do Rolador de Dados */}
-      {isExpanded && (
-        <div
-          className="t20-card"
-          style={{
-            width: '330px',
-            maxHeight: '520px',
-            boxShadow: 'var(--shadow-xl)',
-            background: 'rgba(15, 23, 42, 0.98)',
-            backdropFilter: 'blur(16px)',
-            border: '1px solid var(--border-gold)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '0.85rem',
-            animation: 'modalSlideUp 0.2s ease-out',
-            zIndex: 950,
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 700, color: 'var(--t20-gold-light)' }}>
-              <Dices size={18} />
-              <span>Rolador de Dados</span>
-            </div>
-            <div style={{ display: 'flex', gap: '0.25rem' }}>
-              {onOpenFullHistory && (
-                <button
-                  type="button"
-                  onClick={onOpenFullHistory}
-                  className="btn btn-ghost"
-                  style={{ padding: '0.25rem 0.4rem', fontSize: '0.75rem', color: 'var(--t20-gold)' }}
-                  title="Abrir Histórico Completo de Rolagens"
-                >
-                  <History size={14} />
-                </button>
-              )}
-              {onOpenChangeLog && (
-                <button
-                  type="button"
-                  onClick={onOpenChangeLog}
-                  className="btn btn-ghost"
-                  style={{ padding: '0.25rem 0.4rem', fontSize: '0.75rem', color: 'var(--t20-mana-light)' }}
-                  title="Abrir Log de Alterações de Ficha"
-                >
-                  <FileText size={14} />
-                </button>
-              )}
-              <button
-                type="button"
-                onClick={onClearHistory}
-                className="btn btn-ghost"
-                style={{ padding: '0.25rem', fontSize: '0.75rem', color: '#f87171' }}
-                title="Limpar histórico rápido"
-              >
-                <RotateCcw size={14} />
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsExpanded(false)}
-                className="btn btn-ghost"
-                style={{ padding: '0.25rem', color: 'var(--text-dim)' }}
-              >
-                <X size={16} />
-              </button>
-            </div>
-          </div>
-
-          {/* Seletor de Dados Rápidos */}
-          <div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)', marginBottom: '0.35rem' }}>Dados rápidos:</div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.4rem' }}>
-              {[4, 6, 8, 10, 12, 20, 100].map((d) => (
-                <button
-                  key={d}
-                  type="button"
-                  onClick={() => handleQuickRoll(d)}
-                  className={`btn ${lastRollAnimation === d ? 'btn-gold animate-shake' : 'btn-secondary'}`}
-                  style={{
-                    padding: '0.45rem 0.2rem',
-                    fontSize: '0.8rem',
-                    fontWeight: 700,
-                    fontFamily: 'var(--font-mono)',
-                    border: d === 20 ? '1px solid var(--t20-gold)' : undefined,
-                  }}
-                >
-                  d{d}
-                </button>
-              ))}
-              <div style={{ display: 'flex', alignItems: 'center', background: 'rgba(0,0,0,0.3)', borderRadius: 'var(--radius-sm)', padding: '0 0.4rem' }}>
-                <span style={{ fontSize: '0.7rem', color: 'var(--text-dim)', marginRight: '0.2rem' }}>Mod:</span>
-                <input
-                  type="number"
-                  value={customMod}
-                  onChange={(e) => setCustomMod(parseInt(e.target.value, 10) || 0)}
-                  style={{ width: '100%', background: 'transparent', border: 'none', color: '#fff', fontSize: '0.8rem', padding: '0.2rem 0', fontFamily: 'var(--font-mono)' }}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Histórico Recente */}
-          <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.45rem', minHeight: '120px', maxHeight: '220px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.72rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                Últimas Rolagens
+          <button type="button" className="roll-toast-main" onClick={onOpen} aria-label="Abrir bandeja de dados">
+            <span className="roll-toast-total t-num">{toastRoll.total}</span>
+            <span className="roll-toast-text">
+              <span className="roll-toast-title truncate">
+                {toastRoll.isCrit ? 'Crítico! · ' : toastRoll.isFumble ? 'Falha crítica · ' : ''}
+                {toastRoll.cleanTitle || parseCleanTitle(toastRoll.title)}
               </span>
-              {onOpenFullHistory && (
-                <button
-                  type="button"
-                  onClick={onOpenFullHistory}
-                  style={{ background: 'transparent', border: 'none', color: 'var(--t20-gold)', fontSize: '0.72rem', cursor: 'pointer', padding: 0 }}
-                >
-                  Ver todas ➔
+              <span className="roll-toast-formula truncate">{toastRoll.formula}</span>
+            </span>
+          </button>
+          <button type="button" className="icon-btn icon-btn-sm" onClick={() => setToastRollId(null)} aria-label="Dispensar">
+            <X size={18} />
+          </button>
+          <span className="roll-toast-timer" style={{ animationDuration: `${TOAST_MS}ms` }} />
+        </div>
+      )}
+
+      <Sheet
+        open={isOpen}
+        onClose={onClose}
+        title="Bandeja de Dados"
+        subtitle="Toque em um dado para rolar"
+        icon={<D20Icon size={24} />}
+        size="md"
+      >
+        <div className="stack-lg">
+          {/* Palco do resultado */}
+          <div className="dice-stage" data-tone={stageTone} aria-live="polite">
+            {latest ? (
+              <>
+                <span className="t-label">{latest.cleanTitle || parseCleanTitle(latest.title)}</span>
+                <span key={latest.id} className="dice-total t-num">
+                  {latest.total}
+                </span>
+                <span className="dice-formula t-mono">{latest.formula}</span>
+                {latest.breakdown && <span className="t-xs t-3 t-center">{latest.breakdown}</span>}
+                {latest.isCrit && <span className="badge badge-gold badge-lg badge-upper">20 natural — crítico!</span>}
+                {latest.isFumble && <span className="badge badge-danger badge-lg badge-upper">1 natural — falha crítica</span>}
+              </>
+            ) : (
+              <>
+                <D20Icon size={56} strokeWidth={1.2} className="dice-stage-idle" />
+                <span className="t-sm t-3">Nenhuma rolagem ainda. Os deuses aguardam.</span>
+              </>
+            )}
+          </div>
+
+          {/* Quantidade e modificador */}
+          <div className="grid-2">
+            <div className="field">
+              <span className="field-label">Quantidade</span>
+              <NumberStepper value={count} onChange={setCount} min={1} max={20} ariaLabel="quantidade de dados" />
+            </div>
+            <div className="field">
+              <span className="field-label">Modificador</span>
+              <NumberStepper
+                value={modifier}
+                onChange={setModifier}
+                min={-30}
+                max={30}
+                format={formatMod}
+                ariaLabel="modificador"
+              />
+            </div>
+          </div>
+
+          {/* Dados */}
+          <div className="dice-grid">
+            {DICE.map((sides) => (
+              <button
+                key={sides}
+                type="button"
+                className={`die${sides === 20 ? ' die-hero' : ''}`}
+                onClick={() => quickRoll(sides)}
+                aria-label={`Rolar ${count > 1 ? count : ''}d${sides}${modifier ? ` ${formatMod(modifier)}` : ''}`}
+              >
+                <DieShape sides={sides} />
+                <span className="die-label">d{sides}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Histórico da sessão */}
+          <section className="stack-sm">
+            <div className="section-head">
+              <h3 className="section-title t-md">
+                <History size={18} />
+                Rolagens recentes
+              </h3>
+              {rolls.length > 0 && (
+                <button type="button" className="btn btn-ghost btn-sm" onClick={onClearHistory}>
+                  <Trash2 size={16} />
+                  Limpar
                 </button>
               )}
             </div>
-
             {rolls.length === 0 ? (
-              <div style={{ textAlign: 'center', color: 'var(--text-dim)', fontSize: '0.8rem', padding: '1.5rem 0' }}>
-                Nenhum dado rolado ainda.
-              </div>
+              <p className="t-sm t-3">As rolagens desta sessão aparecem aqui.</p>
             ) : (
-              rolls.slice(0, 10).map((r) => {
-                const info = parseCleanTitle(r.title);
-                return (
-                  <div
-                    key={r.id}
-                    style={{
-                      background: r.isCrit
-                        ? 'rgba(245, 158, 11, 0.1)'
-                        : r.isFumble
-                        ? 'rgba(239, 68, 68, 0.1)'
-                        : 'rgba(255, 255, 255, 0.03)',
-                      border: r.isCrit
-                        ? '1px solid rgba(245, 158, 11, 0.3)'
-                        : r.isFumble
-                        ? '1px solid rgba(239, 68, 68, 0.3)'
-                        : '1px solid rgba(255, 255, 255, 0.05)',
-                      borderRadius: 'var(--radius-sm)',
-                      padding: '0.45rem 0.65rem',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <div style={{ minWidth: 0, flex: 1 }}>
-                      <div style={{ fontSize: '0.78rem', color: '#ffffff', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {info.title}
-                      </div>
-                      <div style={{ fontSize: '0.72rem', color: 'var(--t20-mana-light)', fontFamily: 'var(--font-mono)' }}>
-                        {r.formula}
-                      </div>
-                      {info.formulaDetail && (
-                        <div style={{ fontSize: '0.68rem', color: 'var(--text-dim)', marginTop: '0.1rem' }}>
-                          {info.formulaDetail}
-                        </div>
-                      )}
-                    </div>
-                    <div
-                      style={{
-                        fontFamily: 'var(--font-mono)',
-                        fontWeight: 800,
-                        fontSize: '1.1rem',
-                        color: r.isCrit ? 'var(--t20-gold-light)' : r.isFumble ? '#f87171' : '#ffffff',
-                        marginLeft: '0.5rem',
-                      }}
-                    >
+              <div className="list">
+                {rolls.slice(0, 12).map((r) => (
+                  <div key={r.id} className="row row-compact">
+                    <span className="roll-chip t-num" data-tone={r.isCrit ? 'crit' : r.isFumble ? 'fumble' : 'normal'}>
                       {r.total}
+                    </span>
+                    <div className="row-main">
+                      <span className="row-title truncate">{r.cleanTitle || parseCleanTitle(r.title)}</span>
+                      <span className="row-sub t-mono truncate">{r.formula}</span>
                     </div>
+                    <span className="t-xs t-3 t-num">{r.timestamp}</span>
                   </div>
-                );
-              })
+                ))}
+              </div>
             )}
-          </div>
-
-          {/* Botões do Rodapé */}
-          <div style={{ display: 'flex', gap: '0.5rem', paddingTop: '0.35rem', borderTop: '1px solid var(--border-color)' }}>
-            {onOpenFullHistory && (
-              <button
-                type="button"
-                onClick={onOpenFullHistory}
-                className="btn btn-secondary"
-                style={{ flex: 1, padding: '0.35rem', fontSize: '0.75rem', gap: '0.3rem' }}
-              >
-                <History size={13} />
-                Histórico Geral
-              </button>
-            )}
-            {onOpenChangeLog && (
-              <button
-                type="button"
-                onClick={onOpenChangeLog}
-                className="btn btn-secondary"
-                style={{ flex: 1, padding: '0.35rem', fontSize: '0.75rem', gap: '0.3rem' }}
-              >
-                <FileText size={13} />
-                Log da Ficha
-              </button>
-            )}
-          </div>
+          </section>
         </div>
-      )}
-    </div>
+      </Sheet>
+    </>
   );
 };

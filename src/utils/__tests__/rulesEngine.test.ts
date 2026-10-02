@@ -8,6 +8,9 @@ import {
   calculateMaxSpaces,
   calculateSkillBonus,
   getAttackConditionPenalty,
+  getAttackOnlyConditionPenalty,
+  calculateWeaponAttack,
+  calculateWeaponDamage,
   recalculateFullCharacterSheet,
 } from '../rulesEngine';
 import type { CharacterAttributes, CharacterSheet, CharacterInventoryItem } from '../../types/character';
@@ -285,5 +288,58 @@ describe('Tormenta 20 JDA (v1.3) — rulesEngine', () => {
       expect(updated.stats.defense.value).toBe(12); // 10 + 2
       expect(updated.skills['luta']).toBeDefined();
     });
+  });
+});
+
+describe('Tormenta 20 JDA (v1.3) — ataque e dano com armas (Cap. 5, pág. 230)', () => {
+  const skills = {
+    luta: { id: 'luta', name: 'Luta', attribute: 'for', isTrained: true, total: 5, breakdown: { value: 5, formula: '', components: [] }, source: 'classe' },
+    pontaria: { id: 'pontaria', name: 'Pontaria', attribute: 'des', isTrained: false, total: 1, breakdown: { value: 1, formula: '', components: [] }, source: 'custom' },
+  } as any;
+  const attrs = { for: 3, des: 1, con: 2, int: 0, sab: 0, car: 0 };
+
+  it('ataque corpo a corpo usa Luta + bônus da arma (Certeira +1)', () => {
+    const atk = calculateWeaponAttack({ skills, activeConditions: [] }, { name: 'Espada longa', subcategory: 'uma_mao', attackBonus: 1 });
+    expect(atk.value).toBe(6);
+    expect(atk.isMelee).toBe(true);
+  });
+
+  it('não reaplica Abalado (já descontado na perícia), mas aplica Caído no corpo a corpo', () => {
+    const atk = calculateWeaponAttack({ skills, activeConditions: ['abalado', 'caido'] }, { name: 'Espada longa', subcategory: 'uma_mao' });
+    expect(atk.value).toBe(0); // Luta 5 (já com Abalado) − 5 (Caído)
+    expect(getAttackOnlyConditionPenalty(['abalado'], true).penalty).toBe(0);
+  });
+
+  it('ataque à distância usa Pontaria e ignora Caído', () => {
+    const atk = calculateWeaponAttack({ skills, activeConditions: ['caido'] }, { name: 'Arco curto', subcategory: 'distancia' });
+    expect(atk.value).toBe(1);
+    expect(atk.isMelee).toBe(false);
+  });
+
+  it('dano corpo a corpo soma Força: espada longa 1d8 com Força 3 = 1d8+3', () => {
+    const dmg = calculateWeaponDamage({ totalAttributes: attrs }, { damage: '1d8', subcategory: 'uma_mao' });
+    expect(dmg).toMatchObject({ count: 1, sides: 8, modifier: 3, formula: '1d8+3', addsStrength: true });
+  });
+
+  it('dano de arma de disparo NÃO soma Força', () => {
+    const dmg = calculateWeaponDamage(
+      { totalAttributes: attrs },
+      { damage: '1d8', subcategory: 'distancia', description: 'Besta leve com mecanismo de disparo.' }
+    );
+    expect(dmg?.formula).toBe('1d8');
+    expect(dmg?.addsStrength).toBe(false);
+  });
+
+  it('arma de arremesso soma Força e melhorias de dano (Cruel +1) entram no modificador', () => {
+    const dmg = calculateWeaponDamage(
+      { totalAttributes: attrs },
+      { damage: '1d6 + 1', subcategory: 'distancia', description: 'Lança feita para arremesso.' }
+    );
+    expect(dmg?.modifier).toBe(4);
+    expect(dmg?.formula).toBe('1d6+4');
+  });
+
+  it('armas sem dano (rede) retornam null', () => {
+    expect(calculateWeaponDamage({ totalAttributes: attrs }, { damage: '-', subcategory: 'distancia' })).toBeNull();
   });
 });

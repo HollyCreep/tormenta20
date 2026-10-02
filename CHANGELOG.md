@@ -4,6 +4,29 @@ Todas as alterações notáveis deste projeto serão documentadas neste arquivo.
 
 ---
 
+## [0.5.0] - 2026-10-02 — Redesign mobile-first e novos temas
+
+### 🎨 Interface
+- Novo design system em `src/styles/` (tokens, base, componentes, layout e telas) e primitivos em `src/components/ui/` (Sheet, Segmented, SearchField, SelectField, Switch, NumberStepper, MenuSheet, Feedback).
+- Três temas reconstruídos com identidades próprias: **Clássico** ("Tomo de Arton"), **Escuro** ("Obsidiana") e **Claro** ("Pergaminho"), com prévias reais na tela de Ajustes, sem "flash" ao abrir e barra de status do Android acompanhando o tema.
+- Navegação com barra inferior de 5 destinos e botão central de dados (d20); trilho lateral no desktop.
+- Bandeja de dados (d4–d100, quantidade, modificador, histórico), toast de rolagem e confete no 20 natural.
+- Todos os modais viraram bottom sheets (diálogos no desktop) com Esc, arrastar para fechar e botão voltar do Android.
+- Ficha: vitais com teclado numérico (dano, cura e PV temporários), sheet com as 21 condições, testes rápidos de resistência, abas fixas.
+- Compêndio: busca fixa, filtros em sheet com selects/segmentados e chips removíveis, listas compactas.
+- Criador: escolhas em pickers com busca, barra de ação fixa, progresso por etapas e resumo vivo.
+- `alert()`/`confirm()` substituídos por toasts e confirmações em sheet.
+
+### 🐛 Correções
+- Ataque com arma não aplica de novo penalidades de condição já descontadas em Luta/Pontaria; soma bônus da arma (Certeira/Pungente) — Cap. 5, pág. 230; Cap. 3, pág. 164.
+- Dano corpo a corpo/arremesso soma Força (Cap. 5, pág. 230).
+- Oficina na ficha cobra apenas a diferença ao melhorar um item já possuído (Cap. 3, pág. 167) e preserva o bônus de ataque.
+- Magias iniciais limitadas ao 1º círculo; removidas magias padrão inexistentes; perícias/magias resetadas ao trocar de classe.
+- Compra de pontos permite apenas um atributo em −1 (Cap. 1, pág. 17); conjunto padrão e rolagem permitem trocar valores entre atributos.
+- Condições 11–21 inacessíveis; rodapé do criador escondido pela navegação; estado obsoleto em Subir de Nível/Adicionar Item; rótulo "Classe" em poderes de raça/origem; editar no criador perdia as anotações.
+
+---
+
 ## [0.3.0] - 2026-10-01
 
 ### ⚔️ Novas Funcionalidades (Features)

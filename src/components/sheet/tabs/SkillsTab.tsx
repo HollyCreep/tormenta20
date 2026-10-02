@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
-import { Info, Dices } from 'lucide-react';
-import type { CharacterSheet } from '../../../types/character';
+import React, { useMemo, useState } from 'react';
+import { Calculator, Lock, ShieldAlert } from 'lucide-react';
+import type { CharacterSheet, TrainedSkillData } from '../../../types/character';
 import { SKILLS_LIST } from '../../../data/skills';
-import { StatBreakdownBadge } from '../../common/StatBreakdownBadge';
+import { RULES_CITATIONS } from '../../../data/rulesCitations';
 import type { DetailModalData } from '../../common/DetailModal';
+import { EmptyState, SearchField, Segmented } from '../../ui/controls';
+import { formatSigned } from '../../../utils/displayNames';
 
 interface SkillsTabProps {
   character: CharacterSheet;
@@ -11,146 +13,114 @@ interface SkillsTabProps {
   onSetModalDetail: (data: DetailModalData) => void;
 }
 
-export const SkillsTab: React.FC<SkillsTabProps> = ({
-  character,
-  onRollSkill,
-  onSetModalDetail,
-}) => {
-  const [skillSearch, setSkillSearch] = useState('');
-  const [skillFilter, setSkillFilter] = useState<'todas' | 'treinadas'>('treinadas');
+type SkillFilter = 'treinadas' | 'todas';
 
-  const filteredSkills = Object.values(character.skills).filter((sk) => {
-    const matchesFilter = skillFilter === 'todas' || sk.isTrained;
-    const matchesSearch = sk.name.toLowerCase().includes(skillSearch.toLowerCase());
-    return matchesFilter && matchesSearch;
-  });
+const normalize = (s: string) =>
+  s
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '');
+
+/** Bônus de treino pelo nível (Cap. 2, pág. 114): +2 (1–6), +4 (7–14), +6 (15–20). */
+const trainingBonus = (level: number) => (level >= 15 ? 6 : level >= 7 ? 4 : 2);
+
+export const SkillsTab: React.FC<SkillsTabProps> = ({ character, onRollSkill, onSetModalDetail }) => {
+  const [search, setSearch] = useState('');
+  const [filter, setFilter] = useState<SkillFilter>('treinadas');
+
+  const all = useMemo(
+    () => Object.values(character.skills).sort((a, b) => a.name.localeCompare(b.name, 'pt-BR')),
+    [character.skills]
+  );
+  const trainedCount = all.filter((s) => s.isTrained).length;
+  const q = normalize(search.trim());
+  const visible = all.filter((sk) => (filter === 'todas' || sk.isTrained) && (!q || normalize(sk.name).includes(q)));
+
+  const openDetail = (sk: TrainedSkillData) => {
+    const def = SKILLS_LIST.find((s) => s.id === sk.id);
+    onSetModalDetail({
+      title: sk.name,
+      category: `Perícia · ${sk.attribute.toUpperCase()}`,
+      subtitle: sk.isTrained
+        ? `Treinada (+${trainingBonus(character.level)} de treino no nível ${character.level})`
+        : 'Destreinada',
+      description: def?.description || 'Perícia de Tormenta 20.',
+      ruleCitation: RULES_CITATIONS.SKILL_TRAINING_NO_STACK,
+      stats: [
+        { label: 'Bônus total', value: formatSigned(sk.total) },
+        { label: 'Fórmula', value: sk.breakdown.formula || '—' },
+        ...sk.breakdown.components.map((c) => ({
+          label: c.label,
+          value: typeof c.value === 'number' ? formatSigned(c.value) : c.value,
+        })),
+      ],
+    });
+  };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: '0.75rem',
-        }}
-      >
-        <div style={{ display: 'flex', gap: '0.4rem' }}>
-          <button
-            type="button"
-            onClick={() => setSkillFilter('treinadas')}
-            className={`btn ${skillFilter === 'treinadas' ? 'btn-primary' : 'btn-secondary'}`}
-            style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem' }}
-          >
-            Apenas Treinadas
-          </button>
-          <button
-            type="button"
-            onClick={() => setSkillFilter('todas')}
-            className={`btn ${skillFilter === 'todas' ? 'btn-primary' : 'btn-secondary'}`}
-            style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem' }}
-          >
-            Todas as Perícias (29)
-          </button>
-        </div>
-
-        <div style={{ maxWidth: '240px', width: '100%' }}>
-          <input
-            type="text"
-            placeholder="Buscar perícia..."
-            value={skillSearch}
-            onChange={(e) => setSkillSearch(e.target.value)}
-            style={{ padding: '0.35rem 0.65rem', fontSize: '0.85rem' }}
-          />
-        </div>
+    <div className="stack">
+      <div className="stack-sm">
+        <Segmented<SkillFilter>
+          value={filter}
+          onChange={setFilter}
+          ariaLabel="Filtrar perícias"
+          options={[
+            { value: 'treinadas', label: 'Treinadas', count: trainedCount },
+            { value: 'todas', label: 'Todas', count: all.length },
+          ]}
+        />
+        <SearchField value={search} onChange={setSearch} placeholder="Buscar perícia…" />
       </div>
 
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-          gap: '0.65rem',
-        }}
-      >
-        {filteredSkills.map((sk) => {
-          const skDef = SKILLS_LIST.find((s) => s.id === sk.id);
-          return (
-            <div
-              key={sk.id}
-              className="t20-card"
-              style={{
-                padding: '0.65rem 0.85rem',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                background: sk.isTrained ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0,0,0,0.15)',
-                borderColor: sk.isTrained ? 'var(--border-gold)' : 'var(--border-color)',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+      {visible.length === 0 ? (
+        <EmptyState title="Nenhuma perícia encontrada" description="Ajuste a busca ou mostre todas as perícias." />
+      ) : (
+        <div className="list">
+          {visible.map((sk) => {
+            const def = SKILLS_LIST.find((s) => s.id === sk.id);
+            const locked = !!def?.trainedOnly && !sk.isTrained;
+            return (
+              <div key={sk.id} className={`row skill-row${sk.isTrained ? ' is-trained' : ''}`}>
                 <button
                   type="button"
-                  onClick={() =>
-                    onSetModalDetail({
-                      title: sk.name,
-                      category: `Perícia (${sk.attribute.toUpperCase()})`,
-                      subtitle: sk.isTrained ? 'Personagem Treinado (+2 de bônus base)' : 'Destreinado',
-                      description: skDef?.description || 'Perícia padrão de Tormenta 20.',
-                    })
-                  }
-                  className="btn btn-ghost"
-                  style={{ padding: '0.2rem', color: 'var(--text-dim)' }}
-                  title="Ver regras da perícia"
-                >
-                  <Info size={14} />
-                </button>
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                    <span
-                      style={{
-                        fontWeight: 700,
-                        fontSize: '0.925rem',
-                        color: sk.isTrained ? '#ffffff' : 'var(--text-muted)',
-                      }}
-                    >
-                      {sk.name}
-                    </span>
-                    <span className="badge badge-slate" style={{ fontSize: '0.6rem', padding: '0.1rem 0.3rem' }}>
-                      {sk.attribute.toUpperCase()}
-                    </span>
-                  </div>
-                  {sk.isTrained && (
-                    <span style={{ fontSize: '0.65rem', color: 'var(--t20-gold)' }}>
-                      ★ Treinada
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <StatBreakdownBadge
-                  label={sk.name}
-                  breakdown={sk.breakdown}
-                  variant={sk.isTrained ? 'gold' : 'default'}
-                  size="sm"
-                  showLabel={false}
-                />
-                <button
-                  type="button"
+                  className="skill-main"
                   onClick={() => onRollSkill(sk.name, sk.total, sk.breakdown.formula)}
-                  className="btn btn-secondary"
-                  style={{ padding: '0.3rem 0.5rem', fontSize: '0.75rem', gap: '0.25rem' }}
-                  title="Rolar teste com d20"
+                  disabled={locked}
+                  aria-label={locked ? `${sk.name}: somente treinada` : `Rolar ${sk.name}: 1d20 ${formatSigned(sk.total)}`}
                 >
-                  <Dices size={13} />
-                  Rolar
+                  <span className="skill-attr">{sk.attribute.toUpperCase()}</span>
+                  <span className="row-main">
+                    <span className="row-title">
+                      {sk.name}
+                      {sk.isTrained && <span className="skill-trained-dot" aria-label="Treinada" />}
+                    </span>
+                    <span className="row-sub hstack-xs">
+                      {locked ? (
+                        <>
+                          <Lock size={12} /> Somente treinada
+                        </>
+                      ) : sk.isTrained ? (
+                        'Treinada'
+                      ) : (
+                        'Destreinada'
+                      )}
+                      {def?.armorPenalty && (
+                        <span className="hstack-xs" title="Sofre penalidade de armadura">
+                          · <ShieldAlert size={12} /> armadura
+                        </span>
+                      )}
+                    </span>
+                  </span>
+                  <span className={`skill-total t-num${locked ? ' is-locked' : ''}`}>{formatSigned(sk.total)}</span>
+                </button>
+                <button type="button" className="icon-btn icon-btn-sm" onClick={() => openDetail(sk)} aria-label={`Cálculo de ${sk.name}`}>
+                  <Calculator size={17} />
                 </button>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };
