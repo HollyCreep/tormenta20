@@ -9,6 +9,8 @@ import { SKILLS_LIST } from '../../data/skills';
 import { SPELLS_LIST } from '../../data/spells';
 import { GENERAL_POWERS_LIST } from '../../data/generalPowers';
 import {
+  powersWithUnmetPrerequisites,
+  resolvePowerName,
   takenPowersExcept,
   validateAllWizardSteps,
   type PowerSource,
@@ -57,7 +59,7 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
   const [modalDetail, setModalDetail] = useState<DetailModalData | null>(null);
   const [visited, setVisited] = useState<Set<number>>(() => new Set(initialCharacter ? [1, 2, 3, 4, 5, 6, 7, 8, 9] : []));
   const [stepsOpen, setStepsOpen] = useState(false);
-  const { confirm } = useFeedback();
+  const { confirm, toast } = useFeedback();
 
   // Estados da Ficha
   const [name, setName] = useState(initialCharacter?.name || '');
@@ -256,6 +258,32 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
     proficiencies: currentClass.proficiencies,
     isSpellcaster,
   };
+
+  // Ao mudar perícias ou atributos, poderes que deixam de cumprir os pré-requisitos saem
+  // da ficha — o personagem precisa cumpri-los para ter o poder (Cap. 1, págs. 33 e 85).
+  const prereqKey = JSON.stringify([totalAttributes, [...trainedSkillIds].sort(), isSpellcaster, classId]);
+  useEffect(() => {
+    const lost: string[] = [];
+    if (selectedRacialPower) {
+      const [bad] = powersWithUnmetPrerequisites([selectedRacialPower], prereqContext);
+      if (bad) {
+        lost.push(`${bad.name} (falta ${bad.unmet.join(', ')})`);
+        setSelectedRacialPower(undefined);
+      }
+    }
+    const originPowers = selectedOriginBenefits.filter((b) => b.type === 'poder').map((b) => b.name);
+    const badOrigin = powersWithUnmetPrerequisites(originPowers, prereqContext);
+    if (badOrigin.length > 0) {
+      const badNames = new Set(badOrigin.map((b) => b.name));
+      setSelectedOriginBenefits((prev) => prev.filter((b) => !(b.type === 'poder' && badNames.has(resolvePowerName(b.name)))));
+      badOrigin.forEach((b) => lost.push(`${b.name} (falta ${b.unmet.join(', ')})`));
+    }
+    if (lost.length > 0) {
+      toast(`Poder removido por requisito não cumprido: ${lost.join('; ')}.`, { tone: 'warning', duration: 6000 });
+    }
+    // Reage só a mudanças nos requisitos; a escolha do poder já é validada no picker
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prereqKey]);
 
   // Poderes por fonte: o mesmo poder não pode vir de dois benefícios (Cap. 1, pág. 33)
   const powerSources: PowerSource[] = [
