@@ -278,6 +278,10 @@ export interface GeneralPower {
   category: 'combate' | 'destino' | 'magia' | 'tormenta' | 'concedido';
   prerequisites?: string;
   description: string;
+  /** Poderes concedidos: divindades cujos devotos podem escolhê-lo. */
+  deities?: string[];
+  /** Página do livro (T20 JdA v1.3). */
+  page?: number;
 }
 
 export interface Condition {

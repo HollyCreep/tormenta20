@@ -13,7 +13,7 @@ Ferramentas: `.agents/tools/book_extract.py` (extrai blocos do livro por título
 
 - [x] 1. Origens — reconstruir de "Itens./Benefícios." + poder único (Cap. 1, págs. 85–95)
 - [x] 2. Raças — reescrever atributos, tamanho, deslocamento e habilidades (Cap. 1, págs. 18–31)
-- [ ] 3. Poderes gerais — combate, destino, magia, concedidos e Tormenta (Cap. 2, págs. 124–137)
+- [x] 3. Poderes gerais — combate, destino, magia, concedidos e Tormenta (Cap. 2, págs. 124–137)
 - [ ] 4. Pré-requisitos — validador genérico que interpreta o texto do livro (sem switch manual)
 - [ ] 5. Motor — condições (Apêndice), registro de efeitos passivos, carga, sobrecarga, armadura, deslocamento, Defesa, PV, PM, perícias, magias, ataque
 - [ ] 6. Classes — PV/PM, perícias, proficiências, habilidades por nível, magias iniciais, kit (Espólio/Protótipo)
@@ -40,9 +40,10 @@ Ferramentas: `.agents/tools/book_extract.py` (extrai blocos do livro por título
 | 11 | Proficiências | Ladino com armas marciais; Arcanista sem armaduras leves | Ladino: nenhuma; todos usam armas simples e armaduras leves (pág. 32) | etapa 6 |
 | 12 | Raças | Habilidades parafraseadas/erradas (Goblin, Hynne, Kliren, Golem, Medusa, Sílfide, Sereia, Trog, Osteon...) | Cap. 1, págs. 19–31 | corrigido (etapa 2) |
 | 13 | Poderes | Atlético +1,5m; Estilo de Arma e Escudo +1; Carapaça +2; Bênção do Mana +1/nível | +3m; +2; +1 (+1 a cada 2 outros poderes da Tormenta); +1 PM a cada nível ímpar | etapa 5 |
-| 14 | Poderes concedidos | Faltam vários (Escamas Dracônicas, Mente Vazia, Talento Artístico, Rejeição Divina, Voz da Civilização, Êxtase da Loucura...) | Cap. 2, págs. 132–135 | etapa 3 |
+| 14 | Poderes concedidos | Faltam vários (Escamas Dracônicas, Mente Vazia, Talento Artístico, Rejeição Divina, Voz da Civilização, Êxtase da Loucura...) | Cap. 2, págs. 132–135 | corrigido (etapa 3) |
 | 15 | Equipamento | Armadura completa T$ 1.500 | T$ 3.000 (Tabela 3-5, pág. 153) | etapa 10 |
 | 16 | Raças | Kliren Des +1 | Int +2, Car +1, For –1 (Tabela 1-2, pág. 18) | corrigido (etapa 2) |
 | 17 | Raças | Lefou: "2 perícias OU 1 poder" | +2 em 2 perícias; pode trocar UM bônus por poder da Tormenta (pág. 24) | corrigido (etapa 2) |
 | 18 | Raças | Golem escolhe origem | Propósito de Criação: sem origem, +1 poder geral (pág. 27) | corrigido (etapa 2) |
 | 19 | Raças | Sem escolhas de elemento/magias (Qareen, Golem, Sereia, Sílfide) e perícia do Kliren | Escolhas guardadas em racialChoices; magias raciais salvas com atributo-chave próprio | corrigido (etapa 2) |
+| 20 | Poderes | Nomes divergentes (Enciclopédico, Amedrontador, Presas) e textos com ruído do PDF | Conhecimento Enciclopédico, Olhar Amedrontador, Presas Primordiais; textos literais | corrigido (etapa 3) |

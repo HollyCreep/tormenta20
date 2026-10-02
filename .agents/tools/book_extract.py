@@ -46,9 +46,19 @@ def join_text(parts):
     return re.sub(r'\s+', ' ', text).strip()
 
 
-def extract_blocks(names, pdf_from, pdf_to, stop_titles=()):
+def extract_blocks(names, pdf_from, pdf_to, stop_titles=(), score=None):
     """Retorna {nome: {'text', 'pdf', 'page'}} para cada nome encontrado como linha-título."""
-    lines = load_lines(pdf_from, pdf_to)
+    # títulos seguidos de tabulação ("Êxtase da Loucura	 Aharadak, Nimb") viram duas linhas
+    lines = []
+    for pdf, bp, s in load_lines(pdf_from, pdf_to):
+        if '	' in s:
+            head, tail = s.split('	', 1)
+            lines.append((pdf, bp, head.strip()))
+            if tail.strip():
+                lines.append((pdf, bp, tail.strip()))
+        else:
+            lines.append((pdf, bp, s))
+    score = score or (lambda name, text: len(text))
     wanted = {_norm(n): n for n in names}
     stops = {_norm(n) for n in stop_titles} | set(wanted)
     starts = []
@@ -56,6 +66,11 @@ def extract_blocks(names, pdf_from, pdf_to, stop_titles=()):
         key = _norm(s)
         if key in wanted:
             starts.append((i, wanted[key]))
+        elif i + 1 < len(lines):
+            # título quebrado em duas linhas ("Afinidade com" / "a Tormenta")
+            key2 = _norm(s + ' ' + lines[i + 1][2])
+            if key2 in wanted:
+                starts.append((i + 1, wanted[key2]))
     result = {}
     for idx, (i, name) in enumerate(starts):
         parts = []
@@ -67,7 +82,7 @@ def extract_blocks(names, pdf_from, pdf_to, stop_titles=()):
             j += 1
         text = join_text(parts)
         # Um mesmo nome aparece em tabelas-resumo e na descrição; a descrição é o bloco mais longo
-        if name not in result or len(text) > len(result[name]['text']):
+        if name not in result or score(name, text) > score(name, result[name]['text']):
             result[name] = {'text': text, 'pdf': lines[i][0], 'page': lines[i][1]}
     return result
 
