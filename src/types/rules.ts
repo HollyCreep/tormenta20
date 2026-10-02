@@ -8,21 +8,28 @@ export interface AttributeDefinition {
   appliedTo: string[];
 }
 
+/** Escolha que uma habilidade racial exige do jogador (guardada em CharacterSheet.racialChoices). */
+export interface RaceAbilityChoice {
+  /** Chave de armazenamento em racialChoices. */
+  key: string;
+  label: string;
+  kind: 'option' | 'spell' | 'skill';
+  count: number;
+  /** Opções fixas (ids de magia, ids de perícia ou rótulos livres). Vazio = qualquer uma do tipo. */
+  options?: string[];
+  /** Para kind 'spell' sem lista fixa: círculo máximo permitido. */
+  spellCircle?: number;
+}
+
 export interface RaceAbility {
   id: string;
   name: string;
   description: string;
   type: 'passiva' | 'ativa' | 'reacao';
   cost?: string;
-  effects?: {
-    defenseBonus?: number;
-    speedBonus?: number;
-    hpBonusInitial?: number;
-    hpBonusPerLevel?: number;
-    mpBonusPerLevel?: number;
-    skillsGranted?: string[];
-    spellsGranted?: string[];
-  };
+  choice?: RaceAbilityChoice;
+  /** Magias que a habilidade permite lançar (ids do catálogo) e seu atributo-chave. */
+  grantedSpells?: { spellIds: string[]; keyAttribute: AttributeKey };
 }
 
 export interface Race {
@@ -38,6 +45,10 @@ export interface Race {
   selectableAttributesBonus?: number;
   selectableAttributesExclude?: AttributeKey[];
   abilities: RaceAbility[];
+  /** Golem (Propósito de Criação): não escolhe origem e recebe um poder geral (pág. 27). */
+  noOrigin?: boolean;
+  /** Tipo de criatura (humanoide por padrão). */
+  creatureType?: 'humanoide' | 'monstro' | 'construto' | 'morto-vivo' | 'espírito';
   customSelections?: {
     requiresSkillChoice?: boolean;
     skillChoiceCount?: number;

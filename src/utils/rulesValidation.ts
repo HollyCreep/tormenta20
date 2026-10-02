@@ -240,6 +240,8 @@ export interface WizardValidationInput {
   selectedRacialAttributes: string[];
   selectedRacialSkills: string[];
   selectedRacialPower?: string;
+  racialChoices?: Record<string, string[]>;
+  subraceId?: string;
   classId: string;
   selectedClassSkills: string[];
   originId: string;
@@ -303,41 +305,45 @@ export function validateAllWizardSteps(input: WizardValidationInput): Record<num
       }
     }
 
+    const powerName = (id: string) => GENERAL_POWERS_LIST.find((p) => p.id === id || p.name === id)?.name || id;
+    const checkRacialPower = () => {
+      if (!input.selectedRacialPower) return;
+      const prereq = checkPowerPrerequisites(input.selectedRacialPower, prereqContext);
+      if (!prereq.isMet) errors.push(`Pré-requisito não atendido para ${powerName(input.selectedRacialPower)}: ${prereq.unmetRequirements.join(', ')}.`);
+    };
+    const skills = input.selectedRacialSkills.length;
+
     if (currentRace.id === 'humano') {
-      if (input.selectedRacialPower) {
-        if (input.selectedRacialSkills.length !== 1) {
-          errors.push('No modo com poder geral, escolha exatamente 1 perícia treinada.');
-        }
-        const prereq = checkPowerPrerequisites(input.selectedRacialPower, prereqContext);
-        if (!prereq.isMet) {
-          const pName = GENERAL_POWERS_LIST.find((p) => p.id === input.selectedRacialPower)?.name || input.selectedRacialPower;
-          errors.push(`Pré-requisito não atendido para ${pName}: ${prereq.unmetRequirements.join(', ')}.`);
-        }
-      } else {
-        if (input.selectedRacialSkills.length !== 2) {
-          errors.push(`Escolha 2 perícias treinadas pela versatilidade humana (atualmente ${input.selectedRacialSkills.length}).`);
-        }
-      }
-    } else if (currentRace.id === 'osteon') {
-      if (input.selectedRacialPower) {
-        const prereq = checkPowerPrerequisites(input.selectedRacialPower, prereqContext);
-        if (!prereq.isMet) {
-          const pName = GENERAL_POWERS_LIST.find((p) => p.id === input.selectedRacialPower)?.name || input.selectedRacialPower;
-          errors.push(`Pré-requisito não atendido para ${pName}: ${prereq.unmetRequirements.join(', ')}.`);
-        }
-      } else if (input.selectedRacialSkills.length !== 1) {
-        errors.push('Escolha 1 perícia treinada ou 1 poder geral por Memória Póstuma.');
-      }
+      // Versátil: 2 perícias, ou 1 perícia + 1 poder geral (pág. 19)
+      const need = input.selectedRacialPower ? 1 : 2;
+      if (skills !== need) errors.push(`Versátil: escolha ${need} perícia${need > 1 ? 's' : ''} treinada${need > 1 ? 's' : ''} (atualmente ${skills}).`);
+      checkRacialPower();
     } else if (currentRace.id === 'lefou') {
+      // Deformidade: +2 em 2 perícias; pode trocar um bônus por um poder da Tormenta (pág. 24)
+      const need = input.selectedRacialPower ? 1 : 2;
+      if (skills !== need) errors.push(`Deformidade: escolha ${need} perícia${need > 1 ? 's' : ''} para receber +2 (atualmente ${skills}).`);
       if (input.selectedRacialPower) {
-        const prereq = checkPowerPrerequisites(input.selectedRacialPower, prereqContext);
-        if (!prereq.isMet) {
-          errors.push(`Pré-requisito não atendido: ${prereq.unmetRequirements.join(', ')}.`);
-        }
-      } else if (input.selectedRacialSkills.length !== 2) {
-        errors.push(`Escolha 2 perícias para receber +2 de bônus ou 1 poder da Tormenta (atualmente ${input.selectedRacialSkills.length}).`);
+        const pw = GENERAL_POWERS_LIST.find((p) => p.id === input.selectedRacialPower || p.name === input.selectedRacialPower);
+        if (pw && pw.category !== 'tormenta') errors.push('Deformidade só permite trocar um bônus por um poder da Tormenta.');
       }
+      checkRacialPower();
+    } else if (currentRace.id === 'osteon') {
+      // Memória Póstuma: 1 perícia ou 1 poder geral (pág. 29)
+      if (!input.selectedRacialPower && skills !== 1) errors.push('Memória Póstuma: escolha 1 perícia treinada ou 1 poder geral.');
+      checkRacialPower();
+    } else if (currentRace.noOrigin) {
+      // Golem — Propósito de Criação: um poder geral a sua escolha (pág. 27)
+      if (!input.selectedRacialPower) errors.push('Propósito de Criação: escolha um poder geral.');
+      checkRacialPower();
     }
+
+    // Escolhas de habilidades (elemento, magias, perícia do Kliren...)
+    const subrace = currentRace.customSelections?.subraces?.find((sr) => sr.id === (input.subraceId || currentRace.customSelections?.subraces?.[0].id));
+    [...currentRace.abilities, ...(subrace?.abilities || [])].forEach((ab) => {
+      if (!ab.choice) return;
+      const got = input.racialChoices?.[ab.choice.key]?.length || 0;
+      if (got !== ab.choice.count) errors.push(`${ab.name}: escolha ${ab.choice.count} (${ab.choice.label.toLowerCase()}).`);
+    });
 
     results[1] = {
       step: 1,
@@ -382,7 +388,8 @@ export function validateAllWizardSteps(input: WizardValidationInput): Record<num
     const errors: string[] = [];
     const warnings: string[] = [];
 
-    if (input.selectedOriginBenefits.length !== 2) {
+    // Golem não escolhe origem (Propósito de Criação, pág. 27)
+    if (!currentRace.noOrigin && input.selectedOriginBenefits.length !== 2) {
       errors.push(`Escolha 2 benefícios de origem (atualmente ${input.selectedOriginBenefits.length}).`);
     }
 

@@ -82,8 +82,12 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
     initialCharacter?.selectedRacialPower
   );
 
+  // Escolhas de habilidades raciais (elemento, magias, perícia do Kliren...) — Cap. 1, págs. 19–31
+  const [racialChoices, setRacialChoices] = useState<Record<string, string[]>>(initialCharacter?.racialChoices || {});
+
   const handleSelectRace = (newRaceId: string) => {
     setRaceId(newRaceId);
+    setRacialChoices({});
     const newRace = RACES_LIST.find((r) => r.id === newRaceId);
     if (newRace) {
       if (newRace.id === 'humano') {
@@ -107,6 +111,8 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
         setSelectedRacialSkills([]);
         setSelectedRacialPower(undefined);
       }
+      // Golem não tem origem (Propósito de Criação, pág. 27)
+      if (newRace.noOrigin) setSelectedOriginBenefits([]);
     }
   };
 
@@ -182,9 +188,9 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
   // Kit inicial + itens da origem + poder Herança
   const originPowerNames = selectedOriginBenefits.filter((b) => b.type === 'poder').map((b) => b.name);
   const kitGroups = useMemo(
-    () => getStartingKit(currentClass, originId, originPowerNames),
+    () => getStartingKit(currentClass, currentRace.noOrigin ? '' : originId, currentRace.noOrigin ? [] : originPowerNames),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [currentClass, originId, originPowerNames.join('|')]
+    [currentClass, currentRace.noOrigin, originId, originPowerNames.join('|')]
   );
   useEffect(() => {
     setInventory((prev) => reconcileKit(prev, kitGroups, autoKit) ?? prev);
@@ -232,6 +238,7 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
     ...currentClass.mandatorySkills,
     ...selectedClassSkills,
     ...(currentRace.id === 'humano' || currentRace.id === 'osteon' ? selectedRacialSkills : []),
+    ...(racialChoices.kliren_hibrido || []), // Kliren — Híbrido (pág. 28)
     ...selectedOriginBenefits.filter((b) => b.type === 'pericia').map((b) => b.name),
     ...selectedIntSkills,
   ]);
@@ -286,6 +293,8 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
     selectedRacialAttributes,
     selectedRacialSkills,
     selectedRacialPower,
+    racialChoices,
+    subraceId,
     classId,
     selectedClassSkills,
     originId,
@@ -318,7 +327,7 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
   const steps = [
     { num: 1, title: 'Raça' },
     { num: 2, title: 'Classe' },
-    { num: 3, title: 'Origem' },
+    ...(currentRace.noOrigin ? [] : [{ num: 3, title: 'Origem' }]),
     { num: 4, title: 'Divindade' },
     { num: 5, title: 'Atributos' },
     { num: 6, title: 'Perícias' },
@@ -438,8 +447,8 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
       }),
     ];
 
-    // Monta magias aprendidas
-    const finalSpells = isSpellcaster
+    // Monta magias aprendidas (classe + magias raciais, cada uma com seu atributo-chave)
+    const classSpells = isSpellcaster
       ? selectedSpells.map((sId) => {
           const spDef = SPELLS_LIST.find((s) => s.id === sId)!;
           return {
@@ -448,6 +457,16 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
           };
         })
       : [];
+    const subrace = currentRace.customSelections?.subraces?.find((sr) => sr.id === subraceId);
+    const racialSpells = [...currentRace.abilities, ...(subrace?.abilities || [])].flatMap((ab) => {
+      const ids = [...(ab.grantedSpells?.spellIds || []), ...(ab.choice?.kind === 'spell' ? racialChoices[ab.choice.key] || [] : [])];
+      const key = ab.grantedSpells?.keyAttribute || 'car';
+      return ids
+        .map((id) => SPELLS_LIST.find((sp) => sp.id === id))
+        .filter((sp): sp is (typeof SPELLS_LIST)[number] => !!sp)
+        .map((sp) => ({ ...sp, learnedFrom: 'raca' as const, keyAttribute: key }));
+    });
+    const finalSpells = [...classSpells, ...racialSpells.filter((rs) => !classSpells.some((cs) => cs.id === rs.id))];
 
     const newCharacter: CharacterSheet = {
       id: initialCharacter?.id || 'char_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7),
@@ -461,6 +480,7 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
       selectedRacialAttributes,
       selectedRacialSkills,
       selectedRacialPower,
+      racialChoices,
       classId,
       classSubclass,
       selectedClassSkills,
@@ -624,6 +644,8 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
               onSelectRacialSkills={setSelectedRacialSkills}
               onSelectRacialPower={setSelectedRacialPower}
               takenPowers={takenPowersExcept(powerSources, 'raça')}
+              racialChoices={racialChoices}
+              onChangeRacialChoices={setRacialChoices}
               onOpenDetail={setModalDetail}
             />
           )}

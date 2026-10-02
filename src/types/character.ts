@@ -69,6 +69,8 @@ export interface CharacterPower {
 
 export interface CharacterSpell extends Spell {
   learnedFrom: 'classe' | 'raca' | 'origem' | 'poder';
+  /** Atributo-chave próprio (magias raciais: ex. Tatuagem Mística usa Carisma). */
+  keyAttribute?: AttributeKey;
 }
 
 export interface CharacterClassLevel {
@@ -92,6 +94,8 @@ export interface CharacterSheet {
   selectedRacialAttributes?: AttributeKey[];
   selectedRacialSkills?: string[];
   selectedRacialPower?: string;
+  /** Escolhas de habilidades raciais (RaceAbilityChoice.key → valores escolhidos). */
+  racialChoices?: Record<string, string[]>;
 
   // Classe e Multiclasse
   classId: string;

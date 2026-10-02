@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Info } from 'lucide-react';
 import { RACES_LIST } from '../../data/races';
-import type { AttributeKey } from '../../types/rules';
+import type { AttributeKey, RaceAbility, RaceAbilityChoice } from '../../types/rules';
+import { SPELLS_LIST } from '../../data/spells';
 import { ATTRIBUTES_LIST } from '../../data/attributes';
 import { SKILLS_LIST } from '../../data/skills';
 import { GENERAL_POWERS_LIST } from '../../data/generalPowers';
@@ -28,6 +29,8 @@ interface StepRaceProps {
   onSelectRacialPower: (powerId: string) => void;
   /** Poderes já escolhidos em outros benefícios (nome → fonte). */
   takenPowers?: Map<string, string>;
+  racialChoices?: Record<string, string[]>;
+  onChangeRacialChoices?: (choices: Record<string, string[]>) => void;
   onOpenDetail: (data: DetailModalData) => void;
 }
 
@@ -46,11 +49,14 @@ const VERSATILITY: Record<string, { title: string; text: string; a: string; b: s
   },
   lefou: {
     title: 'Deformidade',
-    text: '+2 em duas perícias à escolha, ou um poder da Tormenta.',
+    text: '+2 em duas perícias à escolha; você pode trocar um desses bônus por um poder da Tormenta (Cap. 1, pág. 24).',
     a: '+2 em 2 perícias',
-    b: '1 poder da Tormenta',
+    b: '+2 em 1 perícia + 1 poder',
   },
 };
+
+/** Todas as habilidades com escolha (incluindo as da sub-raça). */
+const abilitiesWithChoice = (abilities: RaceAbility[]) => abilities.filter((a) => a.choice);
 
 export const StepRace: React.FC<StepRaceProps> = ({
   selectedRaceId,
@@ -66,8 +72,11 @@ export const StepRace: React.FC<StepRaceProps> = ({
   onSelectRacialSkills,
   onSelectRacialPower,
   takenPowers,
+  racialChoices = {},
+  onChangeRacialChoices,
   onOpenDetail,
 }) => {
+  const [choicePicker, setChoicePicker] = useState<RaceAbilityChoice | null>(null);
   const [filter, setFilter] = useState<'todas' | 'padrao' | 'rara'>('todas');
   const [racialOption, setRacialOption] = useState<'skills' | 'power'>(selectedRacialPower ? 'power' : 'skills');
   const [powerCategory, setPowerCategory] = useState('todas');
@@ -75,29 +84,33 @@ export const StepRace: React.FC<StepRaceProps> = ({
 
   const race = RACES_LIST.find((r) => r.id === selectedRaceId) || RACES_LIST[0];
   const versatility = VERSATILITY[race.id];
+  const subrace = race.customSelections?.subraces?.find((s) => s.id === (selectedSubraceId || race.customSelections?.subraces?.[0].id));
+  const choiceAbilities = abilitiesWithChoice([...race.abilities, ...(subrace?.abilities || [])]);
+  const isGolem = race.id === 'golem';
 
   useEffect(() => {
     if (selectedRacialPower) setRacialOption('power');
   }, [selectedRacialPower]);
 
-  const maxSkills =
-    race.id === 'humano'
+  // Humano: 2 perícias ou 1 + poder geral · Lefou: +2 em 2 perícias ou 1 + poder da Tormenta
+  // Osteon: 1 perícia ou 1 poder geral · Golem: apenas o poder geral (Propósito de Criação)
+  const maxSkills = isGolem
+    ? 0
+    : race.id === 'humano' || race.id === 'lefou'
       ? racialOption === 'power'
         ? 1
         : 2
-      : race.id === 'osteon' || race.id === 'lefou'
+      : race.id === 'osteon'
         ? racialOption === 'power'
           ? 0
-          : race.id === 'osteon'
-            ? 1
-            : 2
+          : 1
         : race.customSelections?.skillChoiceCount || 0;
 
   const selectOption = (opt: 'skills' | 'power') => {
     setRacialOption(opt);
     if (opt === 'skills') onSelectRacialPower('');
-    else if (race.id === 'humano' && selectedRacialSkills.length > 1) onSelectRacialSkills(selectedRacialSkills.slice(0, 1));
-    else if (race.id === 'osteon' || race.id === 'lefou') onSelectRacialSkills([]);
+    else if ((race.id === 'humano' || race.id === 'lefou') && selectedRacialSkills.length > 1) onSelectRacialSkills(selectedRacialSkills.slice(0, 1));
+    else if (race.id === 'osteon') onSelectRacialSkills([]);
   };
 
   const toggleAttribute = (attr: AttributeKey) => {
@@ -224,6 +237,38 @@ export const StepRace: React.FC<StepRaceProps> = ({
         </ChoiceSection>
       )}
 
+      {isGolem && (
+        <ChoiceSection
+          title="Propósito de Criação"
+          description="Você não escolhe uma origem, mas recebe um poder geral a sua escolha (Cap. 1, pág. 27)."
+          count={{ value: chosenPower ? 1 : 0, total: 1 }}
+        >
+          <SelectedChips
+            labels={chosenPower ? [{ id: chosenPower.id, label: chosenPower.name }] : []}
+            placeholder="Escolher poder geral"
+            onOpen={() => setPicker('power')}
+            onRemove={() => onSelectRacialPower('')}
+          />
+        </ChoiceSection>
+      )}
+
+      {choiceAbilities.map((ab) => {
+        const ch = ab.choice!;
+        const chosen = racialChoices[ch.key] || [];
+        const labelOf = (v: string) =>
+          ch.kind === 'spell' ? SPELLS_LIST.find((sp) => sp.id === v)?.name || v : ch.kind === 'skill' ? SKILLS_LIST.find((sk) => sk.id === v)?.name || v : v;
+        return (
+          <ChoiceSection key={ch.key} title={`${ab.name}: ${ch.label}`} description={ab.description} count={{ value: chosen.length, total: ch.count }}>
+            <SelectedChips
+              labels={chosen.map((v) => ({ id: v, label: labelOf(v) }))}
+              placeholder={`Escolher ${ch.count > 1 ? ch.count : ''} ${ch.kind === 'spell' ? (ch.count > 1 ? 'magias' : 'magia') : ch.kind === 'skill' ? 'perícia' : 'opção'}`}
+              onOpen={() => setChoicePicker(ch)}
+              onRemove={(id) => onChangeRacialChoices?.({ ...racialChoices, [ch.key]: chosen.filter((v) => v !== id) })}
+            />
+          </ChoiceSection>
+        );
+      })}
+
       {race.customSelections?.requiresSkillChoice && (
         <ChoiceSection
           title={versatility?.title || 'Perícias raciais'}
@@ -339,6 +384,28 @@ export const StepRace: React.FC<StepRaceProps> = ({
             ]}
           />
         }
+      />
+
+      <OptionPickerSheet
+        open={!!choicePicker}
+        onClose={() => setChoicePicker(null)}
+        title={choicePicker?.label || ''}
+        options={
+          !choicePicker
+            ? []
+            : choicePicker.kind === 'spell'
+              ? SPELLS_LIST.filter((sp) =>
+                  choicePicker.options?.length ? choicePicker.options.includes(sp.id) : sp.circle <= (choicePicker.spellCircle || 1)
+                ).map((sp) => ({ id: sp.id, title: sp.name, subtitle: `${sp.circle}º círculo · ${sp.school} · ${sp.type}`, searchText: sp.description }))
+              : choicePicker.kind === 'skill'
+                ? SKILLS_LIST.map((sk) => ({ id: sk.id, title: sk.name, subtitle: sk.attribute.toUpperCase() }))
+                : (choicePicker.options || []).map((o) => ({ id: o, title: o }))
+        }
+        value={choicePicker ? racialChoices[choicePicker.key] || [] : []}
+        onChange={(vals) => choicePicker && onChangeRacialChoices?.({ ...racialChoices, [choicePicker.key]: vals.slice(0, choicePicker.count) })}
+        multiple={(choicePicker?.count || 1) > 1}
+        max={choicePicker?.count || 1}
+        searchPlaceholder="Buscar…"
       />
 
       <OptionPickerSheet
