@@ -4,7 +4,7 @@ Todas as alterações notáveis deste projeto serão documentadas neste arquivo.
 
 ---
 
-## [Não lançado] — Correções pós-0.5
+## [0.5.1] - 2026-10-02 — Correções pós-0.5
 
 ### 🐛 Correções
 - Bottom sheets não ficam mais sob a barra de navegação do Android (usa as áreas seguras injetadas pelo Capacitor).
@@ -17,6 +17,9 @@ Todas as alterações notáveis deste projeto serão documentadas neste arquivo.
 - Compra de pontos com a Tabela 1-1 (custo e rolagem) e botão "i" com as regras completas, incluindo o único atributo em −1 (Cap. 1, pág. 17).
 - Ícone "i" padronizado em tudo que abre detalhes.
 - Botão "Resumo" no centro da barra inferior do criador.
+
+### 📦 Android
+- APK assinado sempre com a mesma chave (`android/app/tormenta20-debug.keystore`): novas versões instalam por cima sem desinstalar. A primeira atualização para a 0.5.1 ainda exige desinstalar uma última vez.
 
 ---
 
