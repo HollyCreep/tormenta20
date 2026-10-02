@@ -1073,6 +1073,9 @@ button.stat:hover { border-color: var(--line-3); }
   -webkit-overflow-scrolling: touch;
 }
 .sheet-body-flush { padding: 0; }
+/* Sem rodapé, o próprio corpo reserva a área da barra de navegação do sistema */
+.sheet-body:last-child { padding-bottom: calc(var(--sp-5) + var(--safe-bottom)); }
+.sheet-body-flush:last-child { padding-bottom: var(--safe-bottom); }
 .sheet-footer {
   flex-shrink: 0;
   display: flex;

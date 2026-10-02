@@ -153,6 +153,19 @@ export const StepOrigin: React.FC<StepOriginProps> = ({
         title={origin.name}
         description={origin.description}
         onChange={() => setPicker('origin')}
+        onDetails={() =>
+          onOpenDetail({
+            title: origin.name,
+            category: 'Origem',
+            description: [
+              origin.description,
+              `Itens: ${origin.items.join('; ')}.`,
+              `Perícias: ${origin.skills.map(skillName).join(', ')}.`,
+              `Poderes: ${origin.powers.map((p) => p.name).join(', ')}.`,
+              'Escolha 2 benefícios entre as perícias e poderes listados (Cap. 1, Origens, pág. 85).',
+            ].join('\n\n'),
+          })
+        }
         badges={
           <>
             <Package size={14} className="t-3" />

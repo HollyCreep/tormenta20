@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Check, ChevronDown, Info, Lock, RefreshCw } from 'lucide-react';
 import { Sheet } from '../ui/Sheet';
 import { Counter, SearchField } from '../ui/controls';
@@ -40,6 +40,8 @@ interface ChoiceCardProps {
   changeLabel?: string;
   className?: string;
   style?: React.CSSProperties;
+  /** Abre o modal de detalhes completo (descrição, benefícios, regras). */
+  onDetails?: () => void;
 }
 
 export const ChoiceCard: React.FC<ChoiceCardProps> = ({
@@ -53,8 +55,24 @@ export const ChoiceCard: React.FC<ChoiceCardProps> = ({
   changeLabel = 'Trocar',
   className = '',
   style,
+  onDetails,
 }) => {
   const [expanded, setExpanded] = useState(false);
+  const [overflowing, setOverflowing] = useState(false);
+  const descRef = useRef<HTMLSpanElement>(null);
+
+  // "Ler mais" só faz sentido quando o texto está realmente cortado em 3 linhas
+  useLayoutEffect(() => {
+    const el = descRef.current;
+    if (!el || expanded) return;
+    const measure = () => setOverflowing(el.scrollHeight - el.clientHeight > 1);
+    measure();
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measure) : null;
+    ro?.observe(el);
+    return () => ro?.disconnect();
+  }, [description, expanded]);
+
+  const canExpand = overflowing || expanded;
   return (
     <section className={`card choice-card ${className}`} style={style}>
       <div className="hstack-lg items-start">
@@ -71,13 +89,27 @@ export const ChoiceCard: React.FC<ChoiceCardProps> = ({
       </div>
       {badges && <div className="chip-wrap">{badges}</div>}
       {description && (
-        <button type="button" className="choice-desc" onClick={() => setExpanded((v) => !v)} aria-expanded={expanded}>
-          <span className={expanded ? 'pre-line' : 'clamp-3'}>{description}</span>
-          <span className="choice-desc-more">
-            {expanded ? 'Mostrar menos' : 'Ler mais'}
-            <ChevronDown size={14} style={{ transform: expanded ? 'rotate(180deg)' : undefined }} />
+        <div className="choice-desc">
+          <span ref={descRef} className={expanded ? 'pre-line' : 'clamp-3'}>
+            {description}
           </span>
-        </button>
+          {(canExpand || onDetails) && (
+            <span className="hstack wrap">
+              {canExpand && (
+                <button type="button" className="choice-desc-more" onClick={() => setExpanded((v) => !v)} aria-expanded={expanded}>
+                  {expanded ? 'Mostrar menos' : 'Ler mais'}
+                  <ChevronDown size={14} style={{ transform: expanded ? 'rotate(180deg)' : undefined }} />
+                </button>
+              )}
+              {onDetails && (
+                <button type="button" className="choice-desc-more" onClick={onDetails}>
+                  <Info size={14} />
+                  Ver detalhes
+                </button>
+              )}
+            </span>
+          )}
+        </div>
       )}
     </section>
   );
