@@ -121,7 +121,7 @@ export const PowersCompendium: React.FC<PowersCompendiumProps> = ({ switcher, ac
           {results.map((pow) => {
             const res = ctx ? checkPowerPrerequisites(pow.id, ctx) : null;
             return (
-              <button key={pow.id} type="button" className="row items-start" onClick={() => openDetail(pow)}>
+              <button key={pow.id} type="button" className="row items-start has-detail" onClick={() => openDetail(pow)}>
                 <span className="row-main">
                   <span className="row-title">{cleanT20Text(pow.name)}</span>
                   <span className="row-sub clamp-2">{cleanT20Text(pow.description)}</span>

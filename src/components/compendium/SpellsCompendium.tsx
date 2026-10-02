@@ -106,7 +106,7 @@ export const SpellsCompendium: React.FC<SpellsCompendiumProps> = ({ switcher }) 
       ) : (
         <div className="list compendium-list">
           {results.map((sp) => (
-            <button key={sp.id} type="button" className="row" onClick={() => openDetail(sp)}>
+            <button key={sp.id} type="button" className="row has-detail" onClick={() => openDetail(sp)}>
               <span className={`circle-medal circle-${sp.type}`} aria-label={`${sp.circle}º círculo`}>
                 {sp.circle}º
               </span>

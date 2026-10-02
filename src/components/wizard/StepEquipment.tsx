@@ -336,7 +336,7 @@ export const StepEquipment: React.FC<StepEquipmentProps> = ({
                 const affordable = parsePrice(eq.price) <= remaining;
                 return (
                   <div key={eq.id} className="row pick-row">
-                    <button type="button" className="pick-main" onClick={() => onOpenDetail(getEquipmentDetailModalData(eq))}>
+                    <button type="button" className="pick-main has-detail" onClick={() => onOpenDetail(getEquipmentDetailModalData(eq))}>
                       <span className="inv-icon">{categoryIcon(eq.category)}</span>
                       <span className="row-main">
                         <span className="row-title">{eq.name}</span>
@@ -473,6 +473,7 @@ export const StepEquipment: React.FC<StepEquipmentProps> = ({
               })
             }
           >
+            <Info size={14} />
             Regras de equipamento
           </button>
         </div>

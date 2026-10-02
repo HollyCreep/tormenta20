@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Info } from 'lucide-react';
 import { RACES_LIST } from '../../data/races';
 import type { AttributeKey } from '../../types/rules';
 import { ATTRIBUTES_LIST } from '../../data/attributes';
@@ -242,6 +243,7 @@ export const StepRace: React.FC<StepRaceProps> = ({
                   })
                 }
               >
+                <Info size={14} />
                 Regra
               </button>
             ) : undefined
@@ -301,7 +303,7 @@ export const StepRace: React.FC<StepRaceProps> = ({
             <button
               key={ab.id}
               type="button"
-              className="row items-start"
+              className="row items-start has-detail"
               onClick={() => onOpenDetail({ title: ab.name, category: `Habilidade de ${race.name}`, cost: ab.cost, description: ab.description })}
             >
               <span className="row-main">

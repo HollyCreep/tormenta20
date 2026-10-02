@@ -85,7 +85,7 @@ export const ItemsCompendium: React.FC<ItemsCompendiumProps> = ({ switcher }) =>
         <div className="list compendium-list">
           {results.map((it) => (
             <div key={it.id} className="row pick-row">
-              <button type="button" className="pick-main" onClick={() => setDetail(getEquipmentDetailModalData(it))}>
+              <button type="button" className="pick-main has-detail" onClick={() => setDetail(getEquipmentDetailModalData(it))}>
                 <span className="inv-icon">{categoryIcon(it.category)}</span>
                 <span className="row-main">
                   <span className="row-title">{it.name}</span>

@@ -66,7 +66,7 @@ export const ClassPowersCompendium: React.FC<ClassPowersCompendiumProps> = ({ sw
       ) : (
         <div className="list compendium-list">
           {results.map((p) => (
-            <button key={p.id} type="button" className="row items-start" onClick={() => openDetail(p)}>
+            <button key={p.id} type="button" className="row items-start has-detail" onClick={() => openDetail(p)}>
               <ClassSigil classId={p.classId} size="sm" />
               <span className="row-main">
                 <span className="row-title">{cleanT20Text(p.name)}</span>

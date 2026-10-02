@@ -270,6 +270,7 @@ export const StepOrigin: React.FC<StepOriginProps> = ({
                     })
                   }
                 >
+                  <Info size={14} />
                   Regra (pág. 95)
                 </button>
               </div>
