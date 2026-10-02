@@ -206,11 +206,15 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
     (gp) => gp.id === selectedRacialPower || gp.name === selectedRacialPower
   );
 
+  // Amnésico recebe Lembranças Graduais além dos dois benefícios (Cap. 1, pág. 86)
+  const originFixedPowers = currentOrigin.benefitRule === 'amnesico' ? currentOrigin.powers : [];
+
   // Lista de poderes ativos para regras de cálculo
   const powerNames: string[] = [
     ...currentRace.abilities.map((a) => a.name),
     ...(racialGeneralPower ? [racialGeneralPower.name] : []),
     ...selectedOriginBenefits.filter((b) => b.type === 'poder').map((b) => b.name),
+    ...originFixedPowers.map((p) => p.name),
     ...selectedDeityPowers,
   ];
 
@@ -416,6 +420,13 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
             type: powDef?.type || generalPowDef?.category,
           };
         }),
+      ...originFixedPowers.map((p) => ({
+        id: 'origem_' + p.name.toLowerCase().replace(/\s+/g, '_'),
+        name: p.name,
+        source: 'origem' as const,
+        description: p.description,
+        type: p.type,
+      })),
       ...selectedDeityPowers.map((powName) => {
         const pDef = currentDeity?.grantedPowers.find((p) => p.name === powName);
         return {

@@ -174,6 +174,55 @@ export const StepOrigin: React.FC<StepOriginProps> = ({
         }
       />
 
+      {origin.benefitRule === 'amnesico' ? (
+        <ChoiceSection
+          title="Benefícios do Amnésico"
+          description="Em vez de dois benefícios de uma lista, você recebe uma perícia e um poder escolhidos pelo mestre e o poder Lembranças Graduais (Cap. 1, pág. 86)."
+          count={{ value: selectedOriginBenefits.length, total: 2 }}
+        >
+          <div className="list">
+            {(() => {
+              const skill = selectedOriginBenefits.find((b) => b.type === 'pericia');
+              const power = selectedOriginBenefits.find((b) => b.type === 'poder');
+              return (
+                <>
+                  <div className={`row pick-row${skill ? ' is-selected' : ''}`}>
+                    <button type="button" className="pick-main" onClick={() => (skill ? toggleBenefit('pericia', skill.name) : setPicker('swap'))}>
+                      <span className={`mark${skill ? ' is-on' : ''}`}>{skill && <Check size={14} strokeWidth={3} />}</span>
+                      <span className="row-main">
+                        <span className="row-title">{skill ? skillName(skill.name) : 'Perícia (com o mestre)'}</span>
+                        <span className="row-sub">{skill ? 'Toque para trocar' : 'Toque para escolher uma perícia não treinada'}</span>
+                      </span>
+                    </button>
+                  </div>
+                  <div className={`row pick-row${power ? ' is-selected' : ''}`}>
+                    <button type="button" className="pick-main" onClick={() => setPowerSlot({ name: 'Poder geral', category: 'geral' })}>
+                      <span className={`mark${power ? ' is-on' : ''}`}>{power ? <Check size={14} strokeWidth={3} /> : <Sparkles size={12} />}</span>
+                      <span className="row-main">
+                        <span className="row-title">{power ? power.name : 'Poder geral (com o mestre)'}</span>
+                        <span className="row-sub">{power ? 'Toque para trocar' : 'Toque para escolher o poder'}</span>
+                      </span>
+                    </button>
+                  </div>
+                  {origin.powers.map((pow) => (
+                    <div key={pow.name} className="row pick-row is-selected">
+                      <span className="pick-main">
+                        <span className="mark mark-fixed is-on">
+                          <Check size={14} strokeWidth={3} />
+                        </span>
+                        <span className="row-main">
+                          <span className="row-title">{pow.name}</span>
+                          <span className="row-sub clamp-2">{pow.description}</span>
+                        </span>
+                      </span>
+                    </div>
+                  ))}
+                </>
+              );
+            })()}
+          </div>
+        </ChoiceSection>
+      ) : (
       <ChoiceSection title="Benefícios" description="Escolha 2 entre perícias e poderes." count={{ value: selectedOriginBenefits.length, total: 2 }}>
         <span className="t-label">Perícias</span>
         <div className="list">
@@ -353,6 +402,7 @@ export const StepOrigin: React.FC<StepOriginProps> = ({
           })}
         </div>
       </ChoiceSection>
+      )}
 
       <OptionPickerSheet
         open={picker === 'origin'}

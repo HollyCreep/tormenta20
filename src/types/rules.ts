@@ -116,6 +116,11 @@ export interface Origin {
     description: string;
     type: 'origem' | 'combate' | 'destino' | 'magia' | 'tormenta';
   }[];
+  /**
+   * Regra especial de benefícios. 'amnesico': em vez de dois benefícios da lista, recebe
+   * uma perícia e um poder escolhidos pelo mestre e o poder Lembranças Graduais (pág. 86).
+   */
+  benefitRule?: 'amnesico';
 }
 
 export interface DeityPower {
