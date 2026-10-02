@@ -744,6 +744,16 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
             <ArrowLeft size={18} />
             <span className="hide-xs">Voltar</span>
           </button>
+          <button
+            type="button"
+            className={`btn btn-secondary action-bar-summary${errorSteps.length ? ' has-pending' : ''}`}
+            onClick={() => setStepsOpen(true)}
+            aria-label={`Resumo da ficha${errorSteps.length ? ` (${errorSteps.length} etapas pendentes)` : ''}`}
+          >
+            <ListChecks size={20} />
+            <span>Resumo</span>
+            {errorSteps.length > 0 && <span className="action-bar-dot">{errorSteps.length}</span>}
+          </button>
           {isLastStep ? (
             <button type="button" className="btn btn-primary btn-lg grow" onClick={hasAnyErrors ? () => setStepsOpen(true) : handleSaveCharacter}>
               {hasAnyErrors ? (
