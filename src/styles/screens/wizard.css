@@ -271,3 +271,50 @@
   overflow-wrap: anywhere;
 }
 [data-theme='modern-dark'] .preview-name { font-family: var(--font-body); }
+
+/* Tabela 1-1: Atributos (compra de pontos e rolagem) */
+.attr-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: var(--fs-sm);
+  font-variant-numeric: tabular-nums;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-sm);
+  overflow: hidden;
+}
+.attr-table-title {
+  font-family: var(--font-heading);
+  font-size: var(--fs-xs);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+}
+.attr-table th,
+.attr-table td { padding: 6px 10px; text-align: center; }
+.attr-table th {
+  background: var(--surface-2);
+  color: var(--text-3);
+  font-size: var(--fs-xs);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.attr-table th:first-child,
+.attr-table td:first-child { text-align: left; }
+.attr-table td { color: var(--text-3); border-top: 1px solid var(--line); }
+.attr-table td:first-child { font-weight: 800; color: var(--text-2); }
+.attr-table td.is-focus,
+.attr-table th.is-focus { color: var(--text-1); }
+.attr-table tr.is-used td { background: var(--accent-soft); color: var(--text-1); }
+.attr-table tr.is-used td:first-child { color: var(--accent-ink); }
+.attr-table-count {
+  margin-left: 6px;
+  padding: 0 5px;
+  border-radius: var(--r-full);
+  background: var(--accent);
+  color: var(--text-on-accent);
+  font-size: 0.6875rem;
+  font-weight: 800;
+}
