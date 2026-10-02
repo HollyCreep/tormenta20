@@ -1,38 +1,54 @@
-import React, { useState, useEffect } from 'react';
-import { CharacterSheet } from './types/character';
-import { storageService } from './services/storage';
-import { logService, ChangeLogOptions } from './services/logService';
+import React, { useState, useEffect, useRef, lazy, Suspense } from 'react';
+import type { CharacterSheet } from './types/character';
+import { useCharacter } from './contexts/CharacterContext';
+import { useDice } from './contexts/DiceContext';
 import { CharacterList } from './components/hub/CharacterList';
-import { WizardContainer } from './components/wizard/WizardContainer';
-import { CharacterSheetView } from './components/sheet/CharacterSheetView';
-import { PowersCompendium } from './components/compendium/PowersCompendium';
-import { ItemsCompendium } from './components/compendium/ItemsCompendium';
+import { HomeView } from './components/hub/HomeView';
+import type { CompendiumTabType, PowersSubTabType } from './components/compendium/CompendiumView';
+
+const WizardContainer = lazy(() =>
+  import('./components/wizard/WizardContainer').then((m) => ({ default: m.WizardContainer }))
+);
+const CharacterSheetView = lazy(() =>
+  import('./components/sheet/CharacterSheetView').then((m) => ({ default: m.CharacterSheetView }))
+);
+const CompendiumView = lazy(() =>
+  import('./components/compendium/CompendiumView').then((m) => ({ default: m.CompendiumView }))
+);
 import { ThemeSelector } from './components/common/ThemeSelector';
-import { DiceRollerWidget, RollResult } from './components/common/DiceRollerWidget';
-import { SpellsCompendium } from './components/compendium/SpellsCompendium';
-import { RollHistoryModal } from './components/history/RollHistoryModal';
-import { ChangeLogModal } from './components/history/ChangeLogModal';
-import { Shield, Sparkles, Package, Users, BookOpen, Dices, FileText } from 'lucide-react';
+import { DiceRollerWidget } from './components/common/DiceRollerWidget';
+import { Shield, Users, BookOpen, Home } from 'lucide-react';
 import { App as CapApp } from '@capacitor/app';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { SplashScreen } from '@capacitor/splash-screen';
 import { Capacitor } from '@capacitor/core';
 
 export function App() {
-  const [view, setView] = useState<'list' | 'wizard' | 'sheet' | 'powers' | 'items' | 'spells'>('list');
-  const [prevView, setPrevView] = useState<'list' | 'sheet'>('list');
-  const [characters, setCharacters] = useState<CharacterSheet[]>([]);
-  const [activeCharacterId, setActiveCharacterId] = useState<string | null>(null);
+  const [view, setView] = useState<'home' | 'characters' | 'character-sheet' | 'compendium' | 'wizard'>('home');
+  const [compendiumTab, setCompendiumTab] = useState<CompendiumTabType>('magias');
+  const [powersSubTab, setPowersSubTab] = useState<PowersSubTabType>('gerais');
   const [wizardCharacter, setWizardCharacter] = useState<CharacterSheet | null>(null);
-  const [diceRolls, setDiceRolls] = useState<RollResult[]>([]);
-  const [isRollHistoryOpen, setIsRollHistoryOpen] = useState(false);
-  const [isChangeLogOpen, setIsChangeLogOpen] = useState(false);
 
-  // Carrega personagens do LocalStorage na montagem
-  useEffect(() => {
-    const loaded = storageService.loadCharacters();
-    setCharacters(loaded);
-  }, []);
+  const {
+    characters,
+    activeCharacter,
+    activeCharacterId,
+    setActiveCharacterId,
+    updateCharacter,
+    saveCharacter,
+    deleteCharacter,
+    duplicateCharacter,
+    exportCharacter,
+    importCharacter,
+  } = useCharacter();
+
+  const { recentRolls, rollDice, clearRecentRolls } = useDice();
+
+  // Refs para evitar stale closures no listener do botão voltar nativo
+  const viewRef = useRef(view);
+  const activeCharacterIdRef = useRef(activeCharacterId);
+  viewRef.current = view;
+  activeCharacterIdRef.current = activeCharacterId;
 
   // Integração com Recursos Nativos do Mobile (Status Bar, Splash Screen e Botão Voltar)
   useEffect(() => {
@@ -43,16 +59,16 @@ export function App() {
     }
 
     const backListener = CapApp.addListener('backButton', () => {
-      if (isRollHistoryOpen) {
-        setIsRollHistoryOpen(false);
-      } else if (isChangeLogOpen) {
-        setIsChangeLogOpen(false);
-      } else if (view === 'powers' || view === 'spells' || view === 'items') {
-        setView(prevView);
-      } else if (view === 'wizard') {
-        setView('list');
-      } else if (view === 'sheet') {
-        setView('list');
+      if (viewRef.current === 'character-sheet') {
+        setView('characters');
+      } else if (viewRef.current === 'wizard') {
+        if (activeCharacterIdRef.current) {
+          setView('character-sheet');
+        } else {
+          setView('characters');
+        }
+      } else if (viewRef.current !== 'home') {
+        setView('home');
       } else {
         CapApp.exitApp();
       }
@@ -61,15 +77,12 @@ export function App() {
     return () => {
       backListener.then((sub) => sub.remove()).catch(() => {});
     };
-  }, [view, prevView, isRollHistoryOpen, isChangeLogOpen]);
-
-  const activeCharacter = characters.find((c) => c.id === activeCharacterId) || null;
+  }, []);
 
   // Ações de Navegação e Fichas
   const handleOpenCharacter = (char: CharacterSheet) => {
     setActiveCharacterId(char.id);
-    setView('sheet');
-    setPrevView('sheet');
+    setView('character-sheet');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -85,138 +98,40 @@ export function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleSaveCharacter = (char: CharacterSheet) => {
-    storageService.saveCharacter(char);
-    const updated = storageService.loadCharacters();
-    setCharacters(updated);
-    setActiveCharacterId(char.id);
-    setView('sheet');
-    setPrevView('sheet');
+  const handleSaveWizardCharacter = (char: CharacterSheet) => {
+    saveCharacter(char);
+    setView('character-sheet');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleDeleteCharacter = (id: string) => {
-    storageService.deleteCharacter(id);
-    const updated = storageService.loadCharacters();
-    setCharacters(updated);
-    if (activeCharacterId === id) {
-      setActiveCharacterId(null);
-      setView('list');
-      setPrevView('list');
-    }
+    deleteCharacter(id);
+    setView('characters');
   };
 
   const handleDuplicateCharacter = (char: CharacterSheet) => {
-    const copy = storageService.duplicateCharacter(char);
-    const updated = storageService.loadCharacters();
-    setCharacters(updated);
-    setActiveCharacterId(copy.id);
-    setView('sheet');
-    setPrevView('sheet');
+    duplicateCharacter(char);
+    setView('character-sheet');
   };
 
-  const handleExportCharacter = (char: CharacterSheet) => {
-    storageService.exportCharacterJson(char);
-  };
-
-  const handleImportCharacter = (file: File) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const text = e.target?.result as string;
-        const imported = storageService.importCharacterJson(text);
-        const updated = storageService.loadCharacters();
-        setCharacters(updated);
-        setActiveCharacterId(imported.id);
-        setView('sheet');
-        setPrevView('sheet');
-      } catch (err: any) {
-        alert(err.message || 'Erro ao importar arquivo JSON de personagem.');
-      }
-    };
-    reader.readAsText(file);
-  };
-
-  const handleOpenCompendium = (target: 'powers' | 'items' | 'spells') => {
-    if (view === 'sheet' || view === 'list') {
-      setPrevView(view);
+  const handleImportFile = async (file: File) => {
+    try {
+      await importCharacter(file);
+      setView('character-sheet');
+    } catch (err: any) {
+      alert(err.message || 'Erro ao importar arquivo JSON de personagem.');
     }
-    setView(target);
+  };
+
+  const handleNavigateToCompendium = (tab: CompendiumTabType, subTab?: PowersSubTabType) => {
+    setCompendiumTab(tab);
+    if (subTab) setPowersSubTab(subTab);
+    setView('compendium');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Rolador de Dados Global com Registro Canônico de Auditoria
-  const handleRoll = (rawTitle: string, sides: number, modifier: number, count: number = 1) => {
-    let rollSum = 0;
-    const rollsArray: number[] = [];
-    for (let i = 0; i < count; i++) {
-      const r = Math.floor(Math.random() * sides) + 1;
-      rollsArray.push(r);
-      rollSum += r;
-    }
-
-    const total = rollSum + modifier;
-    // Acerto/Falha Crítica: Em T20, só ocorre em rolagem simples de 1d20 (Cap. 5, pág. 226)
-    const isCrit = sides === 20 && count === 1 && rollsArray[0] === 20;
-    const isFumble = sides === 20 && count === 1 && rollsArray[0] === 1;
-
-    // Extrai título amigável e detalhes de fórmulas entre colchetes
-    let title = rawTitle.trim();
-    let components = '';
-    const match = rawTitle.match(/^(.*?)\s*\[(.*)\]$/);
-    if (match) {
-      title = match[1].trim();
-      components = match[2].trim();
-    }
-
-    // Inferência de categoria para filtros
-    let category: 'ataque' | 'dano' | 'pericia' | 'atributo' | 'magia' | 'livre' = 'livre';
-    const low = title.toLowerCase();
-    if (low.includes('ataque')) category = 'ataque';
-    else if (low.includes('dano')) category = 'dano';
-    else if (low.includes('teste de') || low.includes('perícia') || low.includes('pericia')) category = 'pericia';
-    else if (low.includes('magia') || low.includes('lançar')) category = 'magia';
-    else if (low.includes('força') || low.includes('destreza') || low.includes('constituição') || low.includes('inteligência') || low.includes('sabedoria') || low.includes('carisma')) category = 'atributo';
-
-    const rollType = sides === 20 ? 'd20' : sides === 6 ? 'd6' : sides === 8 ? 'd8' : sides === 10 ? 'd10' : sides === 12 ? 'd12' : sides === 4 ? 'd4' : sides === 100 ? 'd100' : 'multiplo';
-
-    const formula =
-      modifier !== 0
-        ? `${count > 1 ? `${count}d${sides}` : `d${sides}`} [${rollsArray.join(', ')}] ${modifier > 0 ? `+ ${modifier}` : `- ${Math.abs(modifier)}`} = ${total}`
-        : `${count > 1 ? `${count}d${sides}` : `d${sides}`} [${rollsArray.join(', ')}] = ${total}`;
-
-    const newRoll: RollResult = {
-      id: 'roll_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
-      title: rawTitle,
-      cleanTitle: title,
-      formula,
-      diceResult: rollSum,
-      modifier,
-      total,
-      isCrit,
-      isFumble,
-      timestamp: new Date().toLocaleTimeString(),
-      breakdown: components,
-    };
-
-    setDiceRolls((prev) => [newRoll, ...prev.slice(0, 19)]);
-
-    // Grava no histórico persistente
-    logService.addRoll({
-      characterId: activeCharacter?.id,
-      characterName: activeCharacter?.name,
-      userName: activeCharacter?.playerName || 'Jogador',
-      category,
-      rollType: rollType as any,
-      title,
-      formula,
-      components,
-      diceResults: rollsArray,
-      modifier,
-      total,
-      isCrit,
-      isFumble,
-    });
+  const handleRoll = (title: string, sides: number, modifier: number, count?: number) => {
+    rollDice(title, sides, modifier, count || 1, activeCharacter);
   };
 
   return (
@@ -228,60 +143,58 @@ export function App() {
           <div
             className="app-brand"
             onClick={() => {
-              if (activeCharacterId && view !== 'sheet') {
-                setView('sheet');
-              } else {
-                setView('list');
-              }
+              setView('home');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
-            title="Ir para tela inicial de personagens"
+            title="Ir para a página inicial"
+            style={{ cursor: 'pointer' }}
           >
             <Shield size={24} style={{ color: 'var(--t20-ruby)' }} />
             <span className="app-brand-title">Tormenta 20</span>
           </div>
 
-          {/* Navegação por Abas Principais (Button Group Segmentado) */}
+          {/* Navegação Desktop (3 Grupos de Navegação) */}
           <div className="btn-group desktop-nav-group">
             <button
               type="button"
               onClick={() => {
-                if (view === 'powers' || view === 'items' || view === 'spells') {
-                  setView(prevView);
-                } else if (view !== 'list' && view !== 'sheet') {
-                  setView('list');
-                }
+                setView('home');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className={`btn ${view === 'list' || view === 'sheet' || view === 'wizard' ? 'active' : ''}`}
+              className={`btn ${view === 'home' ? 'active' : ''}`}
+            >
+              <Home size={15} />
+              <span>Home</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                if (view === 'character-sheet') {
+                  setView('characters');
+                } else if (activeCharacterId) {
+                  setView('character-sheet');
+                } else {
+                  setView('characters');
+                }
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className={`btn ${view === 'characters' || view === 'character-sheet' || view === 'wizard' ? 'active' : ''}`}
             >
               <Users size={15} />
-              <span>Personagens</span>
+              <span>{view === 'character-sheet' && activeCharacter ? `Ficha (${activeCharacter.name})` : 'Personagens'}</span>
             </button>
 
             <button
               type="button"
-              onClick={() => handleOpenCompendium('powers')}
-              className={`btn ${view === 'powers' ? 'active' : ''}`}
-            >
-              <Sparkles size={15} />
-              <span>Poderes Gerais</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handleOpenCompendium('spells')}
-              className={`btn ${view === 'spells' ? 'active' : ''}`}
+              onClick={() => {
+                setView('compendium');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className={`btn ${view === 'compendium' ? 'active' : ''}`}
             >
               <BookOpen size={15} />
-              <span>Magias</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handleOpenCompendium('items')}
-              className={`btn ${view === 'items' ? 'active' : ''}`}
-            >
-              <Package size={15} />
-              <span>Itens & Equipamento</span>
+              <span>Compêndio</span>
             </button>
           </div>
 
@@ -292,8 +205,23 @@ export function App() {
         </div>
       </header>
 
-      {/* Visualização de Lista / Dashboard */}
-      {view === 'list' && (
+      {/* Visualização: Home */}
+      {view === 'home' && (
+        <HomeView
+          characters={characters}
+          activeCharacter={activeCharacter}
+          onNavigateToCharacters={() => {
+            setView('characters');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          onOpenCharacterSheet={handleOpenCharacter}
+          onCreateNewCharacter={handleCreateNew}
+          onNavigateToCompendium={handleNavigateToCompendium}
+        />
+      )}
+
+      {/* Visualização: Lista de Personagens */}
+      {view === 'characters' && (
         <CharacterList
           characters={characters}
           onOpenCharacter={handleOpenCharacter}
@@ -301,150 +229,132 @@ export function App() {
           onCreateNew={handleCreateNew}
           onDuplicateCharacter={handleDuplicateCharacter}
           onDeleteCharacter={handleDeleteCharacter}
-          onExportCharacter={handleExportCharacter}
-          onImportCharacter={handleImportCharacter}
+          onExportCharacter={exportCharacter}
+          onImportCharacter={handleImportFile}
         />
       )}
 
-      {/* Visualização do Wizard Passo a Passo */}
-      {view === 'wizard' && (
-        <WizardContainer
-          initialCharacter={wizardCharacter}
-          onSave={handleSaveCharacter}
-          onCancel={() => {
-            if (activeCharacterId) {
-              setView('sheet');
-            } else {
-              setView('list');
-            }
-          }}
-        />
-      )}
+      {/* Visualizações Dinâmicas com Suspense */}
+      <Suspense
+        fallback={
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              minHeight: '60vh',
+              color: 'var(--t20-gold)',
+            }}
+          >
+            <div style={{ textAlign: 'center' }}>
+              <Shield
+                size={36}
+                style={{
+                  color: 'var(--t20-ruby)',
+                  marginBottom: '0.75rem',
+                  filter: 'drop-shadow(0 0 10px rgba(239, 68, 68, 0.5))',
+                }}
+              />
+              <div style={{ fontFamily: 'var(--font-fantasy)', fontSize: '1.15rem', color: '#ffffff' }}>
+                Carregando...
+              </div>
+            </div>
+          </div>
+        }
+      >
+        {/* Visualização: Wizard Passo a Passo */}
+        {view === 'wizard' && (
+          <WizardContainer
+            initialCharacter={wizardCharacter}
+            onSave={handleSaveWizardCharacter}
+            onCancel={() => {
+              if (activeCharacterId) {
+                setView('character-sheet');
+              } else {
+                setView('characters');
+              }
+            }}
+          />
+        )}
 
-      {/* Visualização da Ficha Interativa */}
-      {view === 'sheet' && activeCharacter && (
-        <CharacterSheetView
-          character={activeCharacter}
-          onUpdateCharacter={(updated, logOptions) => {
-            // Registra alterações comparando o estado anterior com o atual
-            logService.diffAndLogChanges(
-              activeCharacter,
-              updated,
-              updated.playerName || 'Jogador',
-              logOptions
-            );
-            storageService.saveCharacter(updated);
-            setCharacters(storageService.loadCharacters());
-          }}
-          onEditInWizard={() => handleEditInWizard(activeCharacter)}
-          onBackToList={() => {
-            setView('list');
-            setPrevView('list');
-          }}
-          onExportJson={() => handleExportCharacter(activeCharacter)}
-          onRollDice={(title, sides, mod, count) => handleRoll(title, sides, mod, count || 1)}
-        />
-      )}
+        {/* Visualização: Ficha Interativa do Personagem */}
+        {view === 'character-sheet' && activeCharacter && (
+          <CharacterSheetView
+            character={activeCharacter}
+            onUpdateCharacter={updateCharacter}
+            onEditInWizard={() => handleEditInWizard(activeCharacter)}
+            onBackToList={() => {
+              setView('characters');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onExportJson={() => exportCharacter(activeCharacter)}
+            onRollDice={handleRoll}
+            onNavigateToCompendium={handleNavigateToCompendium}
+          />
+        )}
 
-      {/* Compêndio de Poderes Gerais */}
-      {view === 'powers' && (
-        <PowersCompendium
-          onBack={() => setView(prevView)}
-          activeCharacter={activeCharacter}
-          characters={characters}
-        />
-      )}
-
-      {/* Magias */}
-      {view === 'spells' && (
-        <SpellsCompendium
-          onBack={() => setView(prevView)}
-        />
-      )}
-
-      {/* Compêndio de Itens e Equipamentos */}
-      {view === 'items' && (
-        <ItemsCompendium
-          onBack={() => setView(prevView)}
-        />
-      )}
+        {/* Visualização: Compêndio Unificado (Magias, Poderes, Itens) */}
+        {view === 'compendium' && (
+          <CompendiumView
+            activeTab={compendiumTab}
+            onTabChange={setCompendiumTab}
+            activeCharacter={activeCharacter}
+            characters={characters}
+            initialPowersSubTab={powersSubTab}
+            onBack={() => setView('home')}
+          />
+        )}
+      </Suspense>
 
       {/* Rolador de Dados Flutuante em Todas as Telas */}
       <DiceRollerWidget
-        rolls={diceRolls}
+        rolls={recentRolls}
         onRoll={(title, sides, mod) => handleRoll(title, sides, mod)}
-        onClearHistory={() => setDiceRolls([])}
-        onOpenFullHistory={() => setIsRollHistoryOpen(true)}
-        onOpenChangeLog={() => setIsChangeLogOpen(true)}
+        onClearHistory={clearRecentRolls}
       />
 
-      {/* Modal de Histórico de Rolagens Completo */}
-      <RollHistoryModal
-        isOpen={isRollHistoryOpen}
-        characterNames={characters.map((c) => ({ id: c.id, name: c.name }))}
-        activeCharacterId={activeCharacterId || undefined}
-        onClose={() => setIsRollHistoryOpen(false)}
-      />
-
-      {/* Modal de Auditoria e Alterações da Ficha */}
-      <ChangeLogModal
-        isOpen={isChangeLogOpen}
-        characterNames={characters.map((c) => ({ id: c.id, name: c.name }))}
-        activeCharacterId={activeCharacterId || undefined}
-        onClose={() => setIsChangeLogOpen(false)}
-      />
-
-      {/* Barra de Navegação Inferior Nativa / Mobile (Bottom Navigation) */}
+      {/* Barra de Navegação Inferior Nativa / Mobile (3 Botões Conforme Wireframe) */}
       <nav className="app-bottom-nav no-print" aria-label="Navegação Mobile">
         <button
           type="button"
           onClick={() => {
-            if (activeCharacterId && view !== 'sheet') {
-              setView('sheet');
-            } else {
-              setView('list');
-            }
+            setView('home');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
-          className={`app-bottom-nav-item ${view === 'list' || view === 'sheet' || view === 'wizard' ? 'active' : ''}`}
+          className={`app-bottom-nav-item ${view === 'home' ? 'active' : ''}`}
         >
-          {view === 'sheet' && activeCharacter ? <Shield size={20} /> : <Users size={20} />}
-          <span>{view === 'sheet' && activeCharacter ? 'Ficha' : 'Heróis'}</span>
+          <Home size={20} />
+          <span>Home</span>
         </button>
 
         <button
           type="button"
-          onClick={() => handleOpenCompendium('powers')}
-          className={`app-bottom-nav-item ${view === 'powers' ? 'active' : ''}`}
+          onClick={() => {
+            if (view === 'character-sheet') {
+              setView('characters');
+            } else if (activeCharacterId) {
+              setView('character-sheet');
+            } else {
+              setView('characters');
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          className={`app-bottom-nav-item ${view === 'characters' || view === 'character-sheet' || view === 'wizard' ? 'active' : ''}`}
         >
-          <Sparkles size={20} />
-          <span>Poderes</span>
+          {view === 'character-sheet' && activeCharacter ? <Shield size={20} /> : <Users size={20} />}
+          <span>{view === 'character-sheet' && activeCharacter ? 'Ficha' : 'Personagens'}</span>
         </button>
 
         <button
           type="button"
-          onClick={() => handleOpenCompendium('spells')}
-          className={`app-bottom-nav-item ${view === 'spells' ? 'active' : ''}`}
+          onClick={() => {
+            setView('compendium');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          className={`app-bottom-nav-item ${view === 'compendium' ? 'active' : ''}`}
         >
           <BookOpen size={20} />
-          <span>Magias</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => handleOpenCompendium('items')}
-          className={`app-bottom-nav-item ${view === 'items' ? 'active' : ''}`}
-        >
-          <Package size={20} />
-          <span>Itens</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setIsRollHistoryOpen(true)}
-          className={`app-bottom-nav-item ${isRollHistoryOpen ? 'active' : ''}`}
-        >
-          <Dices size={20} />
-          <span>Dados</span>
+          <span>Compêndio</span>
         </button>
       </nav>
     </div>

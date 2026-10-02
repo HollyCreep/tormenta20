@@ -1,0 +1,250 @@
+/* ==========================================================================
+   ⚔️ Tormenta 20: Jogo do Ano (v1.3) — Identidades Visuais Por Classe
+   Definição de variáveis CSS e classes utilitárias para as 14 classes oficiais.
+   ========================================================================== */
+
+/* ─── ARCANISTA ─── */
+[data-class="arcanista"],
+.class-theme-arcanista {
+  --class-primary: #8B5CF6;
+  --class-secondary: #C4B5FD;
+  --class-background: #1E1238;
+  --class-surface: #2E1B52;
+  --class-border: #6D28D9;
+  --class-text: #F5F3FF;
+  --class-text-muted: #C4B5FD;
+  --class-glow: rgba(139, 92, 246, 0.45);
+  --class-hover: #A78BFA;
+  --class-active: #7C3AED;
+}
+
+/* ─── BÁRBARO ─── */
+[data-class="barbaro"],
+.class-theme-barbaro {
+  --class-primary: #DC2626;
+  --class-secondary: #FCA5A5;
+  --class-background: #3B0A0A;
+  --class-surface: #571111;
+  --class-border: #B91C1C;
+  --class-text: #FEF2F2;
+  --class-text-muted: #FCA5A5;
+  --class-glow: rgba(220, 38, 38, 0.45);
+  --class-hover: #EF4444;
+  --class-active: #B91C1C;
+}
+
+/* ─── BARDO ─── */
+[data-class="bardo"],
+.class-theme-bardo {
+  --class-primary: #DB2777;
+  --class-secondary: #F9A8D4;
+  --class-background: #3B0A25;
+  --class-surface: #521337;
+  --class-border: #BE185D;
+  --class-text: #FDF2F8;
+  --class-text-muted: #F9A8D4;
+  --class-glow: rgba(219, 39, 119, 0.45);
+  --class-hover: #EC4899;
+  --class-active: #BE185D;
+}
+
+/* ─── BUCANEIRO ─── */
+[data-class="bucaneiro"],
+.class-theme-bucaneiro {
+  --class-primary: #0891B2;
+  --class-secondary: #67E8F9;
+  --class-background: #062B35;
+  --class-surface: #0B3F4D;
+  --class-border: #0E7490;
+  --class-text: #ECFEFF;
+  --class-text-muted: #67E8F9;
+  --class-glow: rgba(8, 145, 178, 0.45);
+  --class-hover: #06B6D4;
+  --class-active: #0E7490;
+}
+
+/* ─── CAÇADOR ─── */
+[data-class="cacador"],
+.class-theme-cacador {
+  --class-primary: #15803D;
+  --class-secondary: #86EFAC;
+  --class-background: #062B16;
+  --class-surface: #0B3B20;
+  --class-border: #166534;
+  --class-text: #F0FDF4;
+  --class-text-muted: #86EFAC;
+  --class-glow: rgba(21, 128, 61, 0.45);
+  --class-hover: #22C55E;
+  --class-active: #166534;
+}
+
+/* ─── CAVALEIRO ─── */
+[data-class="cavaleiro"],
+.class-theme-cavaleiro {
+  --class-primary: #1D4ED8;
+  --class-secondary: #93C5FD;
+  --class-background: #0A1B3D;
+  --class-surface: #102957;
+  --class-border: #1E40AF;
+  --class-text: #EFF6FF;
+  --class-text-muted: #93C5FD;
+  --class-glow: rgba(29, 78, 216, 0.45);
+  --class-hover: #3B82F6;
+  --class-active: #1E40AF;
+}
+
+/* ─── CLÉRIGO ─── */
+[data-class="clerigo"],
+.class-theme-clerigo {
+  --class-primary: #D4A017;
+  --class-secondary: #FDE68A;
+  --class-background: #332604;
+  --class-surface: #4A3708;
+  --class-border: #A16207;
+  --class-text: #FFFBEB;
+  --class-text-muted: #FDE68A;
+  --class-glow: rgba(212, 160, 23, 0.45);
+  --class-hover: #EAB308;
+  --class-active: #A16207;
+}
+
+/* ─── DRUIDA ─── */
+[data-class="druida"],
+.class-theme-druida {
+  --class-primary: #059669;
+  --class-secondary: #6EE7B7;
+  --class-background: #022C22;
+  --class-surface: #064E3B;
+  --class-border: #047857;
+  --class-text: #ECFDF5;
+  --class-text-muted: #6EE7B7;
+  --class-glow: rgba(5, 150, 105, 0.45);
+  --class-hover: #10B981;
+  --class-active: #047857;
+}
+
+/* ─── GUERREIRO ─── */
+[data-class="guerreiro"],
+.class-theme-guerreiro {
+  --class-primary: #EA580C;
+  --class-secondary: #FDBA74;
+  --class-background: #3B1608;
+  --class-surface: #54200C;
+  --class-border: #C2410C;
+  --class-text: #FFF7ED;
+  --class-text-muted: #FDBA74;
+  --class-glow: rgba(234, 88, 12, 0.45);
+  --class-hover: #F97316;
+  --class-active: #C2410C;
+}
+
+/* ─── INVENTOR ─── */
+[data-class="inventor"],
+.class-theme-inventor {
+  --class-primary: #CA8A04;
+  --class-secondary: #FDE047;
+  --class-background: #332A04;
+  --class-surface: #4A3B06;
+  --class-border: #A16207;
+  --class-text: #FEFCE8;
+  --class-text-muted: #FDE047;
+  --class-glow: rgba(202, 138, 4, 0.45);
+  --class-hover: #EAB308;
+  --class-active: #A16207;
+}
+
+/* ─── LADINO ─── */
+[data-class="ladino"],
+.class-theme-ladino {
+  --class-primary: #6D28D9;
+  --class-secondary: #C4B5FD;
+  --class-background: #1E0A3D;
+  --class-surface: #30135C;
+  --class-border: #5B21B6;
+  --class-text: #F5F3FF;
+  --class-text-muted: #C4B5FD;
+  --class-glow: rgba(109, 40, 217, 0.45);
+  --class-hover: #8B5CF6;
+  --class-active: #5B21B6;
+}
+
+/* ─── LUTADOR ─── */
+[data-class="lutador"],
+.class-theme-lutador {
+  --class-primary: #C2410C;
+  --class-secondary: #FDBA74;
+  --class-background: #3B1308;
+  --class-surface: #521B0C;
+  --class-border: #9A3412;
+  --class-text: #FFF7ED;
+  --class-text-muted: #FDBA74;
+  --class-glow: rgba(194, 65, 12, 0.45);
+  --class-hover: #EA580C;
+  --class-active: #9A3412;
+}
+
+/* ─── NOBRE ─── */
+[data-class="nobre"],
+.class-theme-nobre {
+  --class-primary: #2563EB;
+  --class-secondary: #BFDBFE;
+  --class-background: #0A1A3A;
+  --class-surface: #112A55;
+  --class-border: #1D4ED8;
+  --class-text: #EFF6FF;
+  --class-text-muted: #BFDBFE;
+  --class-glow: rgba(37, 99, 235, 0.45);
+  --class-hover: #3B82F6;
+  --class-active: #1D4ED8;
+}
+
+/* ─── PALADINO ─── */
+[data-class="paladino"],
+.class-theme-paladino {
+  --class-primary: #EAB308;
+  --class-secondary: #FEF08A;
+  --class-background: #332900;
+  --class-surface: #4A3C05;
+  --class-border: #CA8A04;
+  --class-text: #FEFCE8;
+  --class-text-muted: #FEF08A;
+  --class-glow: rgba(234, 179, 8, 0.50);
+  --class-hover: #FACC15;
+  --class-active: #CA8A04;
+}
+
+/* ─── BADGE DE CLASSE DINÂMICO ─── */
+.badge-class {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.22rem 0.65rem;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-width: 1px;
+  border-style: solid;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+}
+
+.badge-class:hover {
+  filter: brightness(1.15);
+}
+
+/* ─── CARD TEMÁTICO DE CLASSE ─── */
+.card-class-themed {
+  background: linear-gradient(155deg, var(--class-surface, #1e293b) 0%, var(--class-background, #0f172a) 100%);
+  border: 1px solid var(--class-border, rgba(148, 163, 184, 0.2));
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-class-themed:hover {
+  border-color: var(--class-primary, var(--t20-gold));
+  box-shadow: 0 0 16px var(--class-glow, rgba(245, 158, 11, 0.3)), 0 6px 20px rgba(0, 0, 0, 0.5);
+  transform: translateY(-2px);
+}

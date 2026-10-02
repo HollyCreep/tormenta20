@@ -1,3 +1,95 @@
+@import './styles/tokens.css';
+@import './styles/classThemes.css';
+
+/* ─── Sub-Abas do Sistema (Segmented Control Mobile & Desktop) ─── */
+.sub-tabs {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-gold, rgba(245, 158, 11, 0.35));
+  border-radius: var(--radius-lg, 12px);
+  margin-bottom: 1.25rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+.sub-tabs::-webkit-scrollbar {
+  display: none;
+}
+.sub-tabs {
+  scrollbar-width: none;
+}
+
+.sub-tabs button {
+  all: unset;
+  box-sizing: border-box;
+  flex: 1;
+  min-width: max-content;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.55rem 1.1rem;
+  border-radius: var(--radius-md, 8px);
+  background: transparent;
+  color: var(--text-muted, #94a3b8);
+  font-family: var(--font-sans, sans-serif);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+  user-select: none;
+  text-align: center;
+}
+
+.sub-tabs button:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.08);
+  color: #f8fafc;
+}
+
+.sub-tabs button:active:not(.active) {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.sub-tabs button.active {
+  background: linear-gradient(135deg, var(--t20-gold, #f59e0b) 0%, var(--t20-gold-dark, #b45309) 100%);
+  color: #0b0f19 !important;
+  font-weight: 700;
+  box-shadow: 0 2px 10px rgba(245, 158, 11, 0.4);
+}
+
+.sub-tabs button.active svg {
+  color: #0b0f19 !important;
+}
+
+/* Sub-sub-abas aninhadas (Nível 3) */
+.sub-tabs.sub-tabs-nested,
+.sub-tabs-sub {
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  padding: 0.3rem;
+  border-radius: 10px;
+}
+
+.sub-tabs.sub-tabs-nested button.active,
+.sub-tabs-sub button.active {
+  background: linear-gradient(135deg, var(--t20-gold, #f59e0b) 0%, var(--t20-gold-dark, #b45309) 100%);
+  color: #0b0f19 !important;
+  font-weight: 700;
+  box-shadow: 0 2px 10px rgba(245, 158, 11, 0.4);
+}
+
+.sub-tabs.sub-tabs-nested button.active svg,
+.sub-tabs-sub button.active svg {
+  color: #0b0f19 !important;
+}
+
 :root {
   /* Paleta Tormenta 20: Jogo do Ano (Arton Nobre & Ouro Lendário) */
   --bg-main: #0b0f19;

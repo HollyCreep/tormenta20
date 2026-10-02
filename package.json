@@ -1,12 +1,13 @@
 {
   "name": "app-tormenta20",
   "private": true,
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Criador de Personagens e Ficha Interativa para Tormenta 20 - Edição Jogo do Ano (v1.3)",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build --emptyOutDir false",
+    "test": "vitest run",
     "lint": "oxlint",
     "preview": "vite preview",
     "index:pdf": "python scripts/index_manual_pdf.py",
@@ -37,6 +38,7 @@
     "@vitejs/plugin-react": "^6.1.1",
     "oxlint": "^1.81.0",
     "typescript": "~6.0.2",
-    "vite": "^8.3.0"
+    "vite": "^8.3.0",
+    "vitest": "^5.0.3"
   }
 }

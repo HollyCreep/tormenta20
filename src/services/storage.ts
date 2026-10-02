@@ -1,6 +1,7 @@
 import { CharacterSheet } from '../types/character';
 import { createSampleCharacters } from './sampleCharacters';
 import { SPELLS_LIST } from '../data/spells';
+import { logService } from './logService';
 
 const STORAGE_KEY = 'tormenta20_characters_v1';
 
@@ -24,6 +25,15 @@ export const storageService = {
                   hasFixedCorruptions = true;
                   const fallback = SPELLS_LIST.find((s) => s.id === 'explosao_de_chamas');
                   if (fallback) {
+                    // Registra no audit log que uma magia corrompida foi substituída
+                    logService.addChangeLog({
+                      characterId: char.id,
+                      characterName: char.name,
+                      userName: 'Sistema',
+                      changeType: 'magias',
+                      title: 'Magia Corrompida Recuperada (Auto-Reparo)',
+                      description: `Uma magia com dados inválidos (id: ${sp?.id || 'desconhecido'}) foi detectada e substituída por "${fallback.name}" para evitar perda de dados. Revise seu grimório.`,
+                    });
                     return { ...fallback, learnedFrom: sp?.learnedFrom || 'classe' };
                   }
                 }
@@ -56,16 +66,35 @@ export const storageService = {
   },
 
   saveCharacter(char: CharacterSheet): void {
-    const list = this.loadCharacters();
-    const index = list.findIndex((c) => c.id === char.id);
     char.updatedAt = new Date().toISOString();
 
-    if (index >= 0) {
-      list[index] = char;
-    } else {
-      list.unshift(char);
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const list: CharacterSheet[] = JSON.parse(raw);
+        const index = list.findIndex((c) => c.id === char.id);
+        if (index >= 0) {
+          list[index] = char;
+        } else {
+          list.unshift(char);
+        }
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+      } else {
+        // Não há dados — salva como novo array
+        localStorage.setItem(STORAGE_KEY, JSON.stringify([char]));
+      }
+    } catch (e) {
+      console.error('Erro ao salvar personagem:', e);
+      // Fallback: carrega e salva tudo (seguro mas lento)
+      const list = this.loadCharacters();
+      const index = list.findIndex((c) => c.id === char.id);
+      if (index >= 0) {
+        list[index] = char;
+      } else {
+        list.unshift(char);
+      }
+      this.saveAll(list);
     }
-    this.saveAll(list);
   },
 
   deleteCharacter(id: string): void {

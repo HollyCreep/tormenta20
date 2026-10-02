@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { CharacterSheet } from '../../types/character';
 import { StatBreakdownBadge } from '../common/StatBreakdownBadge';
+import { ClassBadge } from '../common/T20Badge';
+import { getClassTheme } from '../../styles/classTheme';
 import {
   Plus,
   Upload,
@@ -161,34 +163,44 @@ export const CharacterList: React.FC<CharacterListProps> = ({
             gap: '1.25rem',
           }}
         >
-          {filteredCharacters.map((char) => (
-            <div
-              key={char.id}
-              className="t20-card"
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-                padding: '1.25rem',
-                gap: '1rem',
-                transition: 'var(--transition)',
-              }}
-            >
-              <div>
-                {/* Header do Card */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.4rem' }}>
-                  <div>
-                    <h3 style={{ fontSize: '1.3rem', color: '#ffffff', margin: 0 }}>
-                      {char.name}
-                    </h3>
-                    <div style={{ fontSize: '0.85rem', color: 'var(--t20-gold-light)', fontWeight: 600 }}>
-                      {char.raceId.toUpperCase()} {char.classId.toUpperCase()} • Nível {char.level}
+          {filteredCharacters.map((char) => {
+            const classTokens = getClassTheme(char.classId);
+            return (
+              <div
+                key={char.id}
+                className="t20-card"
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  padding: '1.25rem',
+                  gap: '1rem',
+                  transition: 'var(--transition)',
+                  borderLeft: `4px solid ${classTokens.primary}`,
+                  background: `linear-gradient(155deg, ${classTokens.surface}2e 0%, rgba(17, 24, 39, 0.95) 100%)`,
+                }}
+              >
+                <div>
+                  {/* Header do Card */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.4rem', gap: '0.5rem' }}>
+                    <div>
+                      <h3 style={{ fontSize: '1.3rem', color: '#ffffff', margin: 0 }}>
+                        {char.name}
+                      </h3>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginTop: '0.35rem', flexWrap: 'wrap' }}>
+                        <ClassBadge classIdOrName={char.classId} />
+                        <span className="badge badge-gold" style={{ fontSize: '0.72rem' }}>
+                          Nv. {char.level}
+                        </span>
+                        <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)' }}>
+                          • {char.raceId.toUpperCase()}
+                        </span>
+                      </div>
                     </div>
+                    <span className="badge badge-ruby" style={{ fontSize: '0.7rem' }}>
+                      {char.originId.toUpperCase()}
+                    </span>
                   </div>
-                  <span className="badge badge-ruby" style={{ fontSize: '0.7rem' }}>
-                    {char.originId.toUpperCase()}
-                  </span>
-                </div>
 
                 {char.concept && (
                   <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontStyle: 'italic', margin: '0.25rem 0 0.75rem 0' }}>
@@ -308,7 +320,8 @@ export const CharacterList: React.FC<CharacterListProps> = ({
                 </div>
               </div>
             </div>
-          ))}
+          );
+        })}
         </div>
       )}
 

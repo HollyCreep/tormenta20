@@ -14,7 +14,10 @@ import {
   Award,
   Clock,
   Target,
+  Crown,
+  ShieldCheck,
 } from 'lucide-react';
+import { getClassTheme, normalizeClassId } from '../../styles/classTheme';
 
 export interface SchoolBadgeProps {
   school?: string;
@@ -296,3 +299,117 @@ export const RangeBadge: React.FC<{ range?: string; className?: string; style?: 
     </span>
   );
 };
+
+export interface ClassBadgeProps {
+  classIdOrName?: string;
+  className?: string;
+  isSelected?: boolean;
+  showIcon?: boolean;
+  style?: React.CSSProperties;
+  onClick?: () => void;
+  label?: string;
+}
+
+export const ClassBadge: React.FC<ClassBadgeProps> = ({
+  classIdOrName,
+  className = '',
+  isSelected = false,
+  showIcon = true,
+  style,
+  onClick,
+  label: customLabel,
+}) => {
+  const normId = normalizeClassId(classIdOrName);
+  const theme = getClassTheme(classIdOrName);
+  const displayLabel =
+    customLabel || (normId ? normId.toUpperCase() : classIdOrName ? classIdOrName.toUpperCase() : 'TODAS');
+
+  // Ícone temático da classe
+  let IconComponent = Award;
+  switch (normId) {
+    case 'arcanista':
+      IconComponent = Sparkles;
+      break;
+    case 'barbaro':
+      IconComponent = Flame;
+      break;
+    case 'bardo':
+      IconComponent = Sparkles;
+      break;
+    case 'bucaneiro':
+      IconComponent = Compass;
+      break;
+    case 'cacador':
+      IconComponent = Target;
+      break;
+    case 'cavaleiro':
+      IconComponent = Shield;
+      break;
+    case 'clerigo':
+      IconComponent = Award;
+      break;
+    case 'druida':
+      IconComponent = Sparkles;
+      break;
+    case 'guerreiro':
+      IconComponent = Sword;
+      break;
+    case 'inventor':
+      IconComponent = Clock;
+      break;
+    case 'ladino':
+      IconComponent = Eye;
+      break;
+    case 'lutador':
+      IconComponent = Activity;
+      break;
+    case 'nobre':
+      IconComponent = Crown;
+      break;
+    case 'paladino':
+      IconComponent = ShieldCheck;
+      break;
+    default:
+      IconComponent = Award;
+      break;
+  }
+
+  const badgeStyle: React.CSSProperties = {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '0.3rem',
+    padding: '0.25rem 0.65rem',
+    borderRadius: '9999px',
+    fontSize: '0.72rem',
+    fontWeight: 700,
+    letterSpacing: '0.03em',
+    textTransform: 'uppercase',
+    cursor: onClick ? 'pointer' : 'default',
+    userSelect: 'none',
+    border: `1px solid ${isSelected ? theme.hover : theme.border}`,
+    backgroundColor: isSelected ? theme.primary : theme.surface,
+    color: isSelected ? theme.background : theme.secondary,
+    boxShadow: isSelected
+      ? `0 0 12px ${theme.glow}, 0 2px 4px rgba(0, 0, 0, 0.4)`
+      : `0 0 4px ${theme.glow}`,
+    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+    ...style,
+  };
+
+  const Component = onClick ? 'button' : 'span';
+
+  return (
+    <Component
+      type={onClick ? 'button' : undefined}
+      onClick={onClick}
+      className={`badge-class ${className}`}
+      style={badgeStyle}
+    >
+      {showIcon && (
+        <IconComponent size={12} style={{ color: isSelected ? theme.background : theme.primary }} />
+      )}
+      <span>{displayLabel}</span>
+    </Component>
+  );
+};
+
