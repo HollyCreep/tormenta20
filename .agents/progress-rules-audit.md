@@ -14,7 +14,7 @@ Ferramentas: `.agents/tools/book_extract.py` (extrai blocos do livro por título
 - [x] 1. Origens — reconstruir de "Itens./Benefícios." + poder único (Cap. 1, págs. 85–95)
 - [x] 2. Raças — reescrever atributos, tamanho, deslocamento e habilidades (Cap. 1, págs. 18–31)
 - [x] 3. Poderes gerais — combate, destino, magia, concedidos e Tormenta (Cap. 2, págs. 124–137)
-- [ ] 4. Pré-requisitos — validador genérico que interpreta o texto do livro (sem switch manual)
+- [x] 4. Pré-requisitos — validador genérico que interpreta o texto do livro (sem switch manual)
 - [ ] 5. Motor — condições (Apêndice), registro de efeitos passivos, carga, sobrecarga, armadura, deslocamento, Defesa, PV, PM, perícias, magias, ataque
 - [ ] 6. Classes — PV/PM, perícias, proficiências, habilidades por nível, magias iniciais, kit (Espólio/Protótipo)
 - [ ] 7. Poderes de classe — textos e pré-requisitos
@@ -47,3 +47,5 @@ Ferramentas: `.agents/tools/book_extract.py` (extrai blocos do livro por título
 | 18 | Raças | Golem escolhe origem | Propósito de Criação: sem origem, +1 poder geral (pág. 27) | corrigido (etapa 2) |
 | 19 | Raças | Sem escolhas de elemento/magias (Qareen, Golem, Sereia, Sílfide) e perícia do Kliren | Escolhas guardadas em racialChoices; magias raciais salvas com atributo-chave próprio | corrigido (etapa 2) |
 | 20 | Poderes | Nomes divergentes (Enciclopédico, Amedrontador, Presas) e textos com ruído do PDF | Conhecimento Enciclopédico, Olhar Amedrontador, Presas Primordiais; textos literais | corrigido (etapa 3) |
+| 21 | Pré-requisitos | Switch manual com requisitos errados (Acrobático pedia Acrobacia; Atlético For 1 + Atletismo...) e sem níveis, poderes, devoção | Texto do livro interpretado (atributo, treino, nível, poder, "ou", Tormenta, devoto); poderes de magia exigem lançar magias (pág. 131) e concedidos exigem devoção (pág. 132) | corrigido (etapa 4) |
+| 22 | Magias | calculateSpellCircleUnlocked igual para todas as classes | Por classe (págs. 37, 44, 57, 61) | corrigido (etapa 4) |

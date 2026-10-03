@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
+  checkPowerPrerequisites,
+  checkPrerequisiteText,
   findDuplicatePowers,
   isRepeatablePower,
   powersWithUnmetPrerequisites,
@@ -50,6 +52,41 @@ describe('Pré-requisitos perdidos (Cap. 1, pág. 85)', () => {
 
   it('acusa o poder quando a perícia exigida deixa de ser treinada', () => {
     const res = powersWithUnmetPrerequisites(['Medicina', 'Poder único da origem'], ctx([]));
-    expect(res).toEqual([{ name: 'Medicina', unmet: ['Treinado em Cura'] }]);
+    expect(res).toEqual([{ name: 'Medicina', unmet: ['treinado em Cura'] }]);
+  });
+});
+
+describe('Pré-requisitos lidos do texto do livro (Cap. 2)', () => {
+  const base: PrerequisiteContext = { attributes: { for: 2, des: 2, con: 1, int: 0, sab: 1, car: 0 }, trainedSkillIds: ['luta'] };
+
+  it('atributos, treinamento e alternativas com "ou"', () => {
+    expect(checkPrerequisiteText('Des 2, treinado em Luta', base).isMet).toBe(true);
+    expect(checkPrerequisiteText('Des 3, treinado em Luta', base).unmetRequirements).toEqual(['Des 3 (atual: 2)']);
+    expect(checkPrerequisiteText('treinado em Luta ou Pontaria', base).isMet).toBe(true);
+    expect(checkPrerequisiteText('Estilo de Disparo ou Estilo de Arremesso', { ...base, powerNames: ['Estilo de Arremesso'] }).isMet).toBe(true);
+  });
+
+  it('níveis de personagem e de classe', () => {
+    expect(checkPrerequisiteText('6º nível de personagem', { ...base, level: 5 }).isMet).toBe(false);
+    expect(checkPrerequisiteText('5º nível de bardo', { ...base, level: 5, classId: 'bardo' }).isMet).toBe(true);
+    expect(checkPrerequisiteText('5º nível de bardo', { ...base, level: 5, classId: 'guerreiro' }).isMet).toBe(false);
+  });
+
+  it('poderes da Tormenta contam os poderes já possuídos', () => {
+    const ctx = { ...base, powerNames: ['Antenas', 'Carapaça', 'Dentes Afiados'] };
+    expect(checkPrerequisiteText('três outros poderes da Tormenta', ctx).isMet).toBe(true);
+    expect(checkPrerequisiteText('quatro outros poderes da Tormenta', ctx).isMet).toBe(false);
+  });
+
+  it('Acrobático exige só Des 2 e Atlético exige For 2 (pág. 128)', () => {
+    expect(checkPowerPrerequisites('Acrobático', base).isMet).toBe(true);
+    expect(checkPowerPrerequisites('Atlético', base).isMet).toBe(true);
+    expect(checkPowerPrerequisites('Atlético', { ...base, attributes: { ...base.attributes, for: 1 } }).isMet).toBe(false);
+  });
+
+  it('poderes de magia exigem lançar magias; concedidos exigem ser devoto do deus', () => {
+    expect(checkPowerPrerequisites('Magia Ampliada', base).unmetRequirements).toContain('lançar magias');
+    expect(checkPowerPrerequisites('Bênção do Mana', { ...base, deityId: 'wynna' }).isMet).toBe(true);
+    expect(checkPowerPrerequisites('Bênção do Mana', { ...base, deityId: 'khalmyr' }).isMet).toBe(false);
   });
 });

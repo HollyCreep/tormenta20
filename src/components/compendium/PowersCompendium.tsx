@@ -1,13 +1,13 @@
 import React, { useMemo, useState } from 'react';
 import { BookOpen, Swords } from 'lucide-react';
 import { GENERAL_POWERS_LIST } from '../../data/generalPowers';
-import { CLASSES_LIST } from '../../data/classes';
 import { RULES_CITATIONS } from '../../data/rulesCitations';
 import type { GeneralPower } from '../../types/rules';
 import type { CharacterSheet } from '../../types/character';
 import { DetailModal, type DetailModalData } from '../common/DetailModal';
 import { POWER_CATEGORY_META, PowerCategoryBadge } from '../common/T20Badge';
 import { checkPowerPrerequisites, type PrerequisiteContext } from '../../utils/rulesValidation';
+import { prerequisiteContextFor } from '../../utils/characterContext';
 import { cleanT20Text, getGeneralPowerRuleCitation } from '../../utils/textUtils';
 import { EmptyState, SearchField, SelectField, ToggleRow } from '../ui/controls';
 import { ActiveFilters, FilterButton, FilterSheet, normalizeSearch } from './FilterSheet';
@@ -21,20 +21,8 @@ interface PowersCompendiumProps {
 
 const CATEGORIES = ['combate', 'destino', 'magia', 'concedido', 'tormenta'] as const;
 
-/** Contexto de pré-requisitos a partir da ficha (proficiências e conjuração vêm da definição da classe). */
-const contextFor = (char: CharacterSheet): PrerequisiteContext => {
-  const cls = CLASSES_LIST.find((c) => c.id === char.classId);
-  return {
-    attributes: char.totalAttributes,
-    trainedSkillIds: Object.values(char.skills)
-      .filter((s) => s.isTrained)
-      .map((s) => s.id),
-    proficiencies: cls
-      ? { weapons: cls.proficiencies.weapons, armor: cls.proficiencies.armor, shields: cls.proficiencies.shields }
-      : undefined,
-    isSpellcaster: Boolean(cls?.spellcaster) || (char.spells || []).length > 0,
-  };
-};
+/** Contexto de pré-requisitos a partir da ficha (níveis, poderes, divindade, conjuração). */
+const contextFor = (char: CharacterSheet): PrerequisiteContext => prerequisiteContextFor(char);
 
 export const PowersCompendium: React.FC<PowersCompendiumProps> = ({ switcher, activeCharacter, characters = [] }) => {
   const [search, setSearch] = useState('');

@@ -252,6 +252,12 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
     trainedSkillIds,
     proficiencies: currentClass.proficiencies,
     isSpellcaster,
+    maxSpellCircle: isSpellcaster ? 1 : 0,
+    level: 1,
+    classId,
+    classSubclass,
+    powerNames: [...currentRace.abilities.map((a) => a.name), ...currentClass.abilitiesLevel1.map((a) => a.name)],
+    deityId,
   };
 
   // Ao mudar perícias ou atributos, poderes que deixam de cumprir os pré-requisitos saem

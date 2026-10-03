@@ -14,6 +14,18 @@ export interface PrerequisiteContext {
     shields?: boolean;
   };
   isSpellcaster?: boolean;
+  /** Maior círculo de magia que o personagem pode lançar (0 = não conjura). */
+  maxSpellCircle?: number;
+  /** Nível de personagem (padrão 1). */
+  level?: number;
+  /** Níveis por classe (padrão: classId no nível do personagem). */
+  classLevels?: Record<string, number>;
+  classId?: string;
+  classSubclass?: string;
+  /** Nomes de poderes e habilidades que o personagem já possui. */
+  powerNames?: string[];
+  /** Divindade ('nenhum' se não for devoto). */
+  deityId?: string;
 }
 
 export interface PrerequisiteResult {
@@ -21,142 +33,140 @@ export interface PrerequisiteResult {
   unmetRequirements: string[];
 }
 
+const ATTR_KEYS: Record<string, keyof CharacterAttributes> = { for: 'for', des: 'des', con: 'con', int: 'int', sab: 'sab', car: 'car' };
+const NUMBER_WORDS: Record<string, number> = { um: 1, uma: 1, outro: 1, dois: 2, duas: 2, tres: 3, quatro: 4, cinco: 5 };
+
+const normalizeText = (s: string) =>
+  s
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+const SKILL_IDS: Record<string, string> = {
+  acrobacia: 'acrobacia', adestramento: 'adestramento', atletismo: 'atletismo', atuacao: 'atuacao', cavalgar: 'cavalgar',
+  conhecimento: 'conhecimento', cura: 'cura', diplomacia: 'diplomacia', enganacao: 'enganacao', fortitude: 'fortitude',
+  furtividade: 'furtividade', guerra: 'guerra', iniciativa: 'iniciativa', intimidacao: 'intimidacao', intuicao: 'intuicao',
+  investigacao: 'investigacao', jogatina: 'jogatina', ladinagem: 'ladinagem', luta: 'luta', misticismo: 'misticismo',
+  nobreza: 'nobreza', oficio: 'oficio', percepcao: 'percepcao', pilotagem: 'pilotagem', pontaria: 'pontaria',
+  reflexos: 'reflexos', religiao: 'religiao', sobrevivencia: 'sobrevivencia', vontade: 'vontade',
+};
+
+/** Perícia citada num pré-requisito ("Ofício (alquimista)" → oficio). */
+const skillIdFromName = (name: string): string | undefined => SKILL_IDS[normalizeText(name.replace(/\(.*\)/, ''))];
+
+const CLASS_NAME_TO_ID: Record<string, string> = {
+  arcanista: 'arcanista', barbaro: 'barbaro', bardo: 'bardo', bucaneiro: 'bucaneiro', cacador: 'cacador',
+  cavaleiro: 'cavaleiro', clerigo: 'clerigo', druida: 'druida', guerreiro: 'guerreiro', inventor: 'inventor',
+  ladino: 'ladino', lutador: 'lutador', nobre: 'nobre', paladino: 'paladino',
+};
+
 /**
- * Valida estritamente os pré-requisitos de um poder geral segundo o livro T20 Jogo do Ano v1.3.
+ * Avalia um único requisito (texto do livro) contra o contexto.
+ * Retorna null se cumprido, ou o texto do requisito não cumprido (com o valor atual quando útil).
  */
-export function checkPowerPrerequisites(
-  powerIdOrName: string,
-  context: PrerequisiteContext
-): PrerequisiteResult {
-  const unmet: string[] = [];
-  const skillsSet = new Set(
-    Array.isArray(context.trainedSkillIds)
-      ? context.trainedSkillIds
-      : Array.from(context.trainedSkillIds || [])
-  );
-  const attrs = context.attributes || { for: 0, des: 0, con: 0, int: 0, sab: 0, car: 0 };
-  const hasShield = Boolean(context.proficiencies?.shields);
-  const hasHeavyArmor = Boolean(context.proficiencies?.armor?.includes('pesadas'));
-  const hasSpells = Boolean(context.isSpellcaster);
-
-  // Normaliza o identificador
-  const normalized = powerIdOrName.toLowerCase().replace(/\s+/g, '_');
-
-  switch (normalized) {
-    case 'estilo_uma_arma':
-    case 'estilo_de_uma_arma':
-      if (!skillsSet.has('luta')) unmet.push('Treinado em Luta');
-      break;
-
-    case 'estilo_duas_armas':
-    case 'estilo_de_duas_armas':
-      if (attrs.des < 2) unmet.push(`Des 2 (atual: ${attrs.des})`);
-      if (!skillsSet.has('luta')) unmet.push('Treinado em Luta');
-      break;
-
-    case 'estilo_disparo':
-    case 'estilo_de_disparo':
-      if (!skillsSet.has('pontaria')) unmet.push('Treinado em Pontaria');
-      break;
-
-    case 'estilo_arma_escudo':
-    case 'estilo_de_arma_e_escudo':
-      if (!skillsSet.has('luta')) unmet.push('Treinado em Luta');
-      if (!hasShield) unmet.push('Proficiência com Escudos');
-      break;
-
-    case 'ataque_poderoso':
-      if (attrs.for < 1) unmet.push(`For 1 (atual: ${attrs.for})`);
-      break;
-
-    case 'ataque_preciso':
-      if (attrs.des < 1) unmet.push(`Des 1 (atual: ${attrs.des})`);
-      if (!skillsSet.has('luta') && !skillsSet.has('pontaria')) {
-        unmet.push('Treinado em Luta ou Pontaria');
-      }
-      break;
-
-    case 'esquiva':
-      if (attrs.des < 1) unmet.push(`Des 1 (atual: ${attrs.des})`);
-      break;
-
-    case 'combate_defensivo':
-      if (attrs.int < 1) unmet.push(`Int 1 (atual: ${attrs.int})`);
-      break;
-
-    case 'vitalidade':
-      if (attrs.con < 1) unmet.push(`Con 1 (atual: ${attrs.con})`);
-      break;
-
-    case 'saque_rapido':
-      if (!skillsSet.has('iniciativa')) unmet.push('Treinado em Iniciativa');
-      break;
-
-    case 'disparo_certeiro':
-      if (!skillsSet.has('pontaria')) unmet.push('Treinado em Pontaria');
-      break;
-
-    case 'encouracado':
-    case 'encouraçado':
-      if (!hasHeavyArmor) unmet.push('Proficiência com Armaduras Pesadas');
-      break;
-
-    case 'acrobatico':
-    case 'acrobático':
-      if (attrs.des < 2) unmet.push(`Des 2 (atual: ${attrs.des})`);
-      if (!skillsSet.has('acrobacia')) unmet.push('Treinado em Acrobacia');
-      break;
-
-    case 'aparencia_inofensiva':
-    case 'aparência_inofensiva':
-    case 'atraente':
-    case 'comandar':
-    case 'torcida':
-      if (attrs.car < 1) unmet.push(`Car 1 (atual: ${attrs.car})`);
-      break;
-
-    case 'medico_de_campo':
-    case 'médico_de_campo':
-    case 'medicina':
-      if (attrs.sab < 1) unmet.push(`Sab 1 (atual: ${attrs.sab})`);
-      if (!skillsSet.has('cura')) unmet.push('Treinado em Cura');
-      break;
-
-    case 'negociacao':
-    case 'negociação':
-      if (!skillsSet.has('diplomacia')) unmet.push('Treinado em Diplomacia');
-      break;
-
-    case 'vontade_de_ferro':
-      if (attrs.sab < 1) unmet.push(`Sab 1 (atual: ${attrs.sab})`);
-      break;
-
-    case 'atletico':
-    case 'atlético':
-      if (attrs.for < 1) unmet.push(`For 1 (atual: ${attrs.for})`);
-      if (!skillsSet.has('atletismo')) unmet.push('Treinado em Atletismo');
-      break;
-
-    case 'veneficio':
-    case 'venefício':
-      if (!skillsSet.has('oficio')) unmet.push('Treinado em Ofício');
-      break;
-
-    case 'foco_em_magia':
-    case 'magia_ampliada':
-    case 'magia_discreta':
-    case 'magia_ilimitada':
-      if (!hasSpells) unmet.push('Habilidade de classe Magias');
-      break;
-
-    default:
-      break;
+function checkRequirement(req: string, ctx: PrerequisiteContext): string | null {
+  const r = req.trim().replace(/\.$/, '');
+  if (!r) return null;
+  const n = normalizeText(r);
+  // Alternativas: "Estilo de Disparo ou Estilo de Arremesso", "Bruxo ou Mago", "treinado em Luta ou Pontaria"
+  if (/\sou\s/.test(n)) {
+    const tm = /^treinad[oa] em (.+)$/i.exec(r);
+    const parts = tm ? tm[1].split(/\s+ou\s+/).map((x) => `treinado em ${x}`) : r.split(/\s+ou\s+/);
+    return parts.some((p) => checkRequirement(p, ctx) === null) ? null : r;
   }
+  const attrs = ctx.attributes || { for: 0, des: 0, con: 0, int: 0, sab: 0, car: 0 };
+  const skills = new Set(Array.isArray(ctx.trainedSkillIds) ? ctx.trainedSkillIds : Array.from(ctx.trainedSkillIds || []));
+  const level = ctx.level || 1;
+  const powers = new Set((ctx.powerNames || []).map(normalizeText));
 
-  return {
-    isMet: unmet.length === 0,
-    unmetRequirements: unmet,
-  };
+  // Atributo: "Des 2", "For 1", "Int –1"
+  let m = /^(for|des|con|int|sab|car)\s+([-–]?\d+)$/.exec(n);
+  if (m) {
+    const v = parseInt(m[2].replace('–', '-'), 10);
+    const cur = attrs[ATTR_KEYS[m[1]]];
+    return cur >= v ? null : `${r} (atual: ${cur})`;
+  }
+  // "treinado na perícia escolhida" depende da escolha feita no próprio poder
+  if (/^treinad[oa] na pericia escolhida/.test(n)) return null;
+  // Treinamento: "treinado em Luta", "treinado em Ofício (alquimista)"
+  m = /^treinad[oa] em (.+)$/.exec(n);
+  if (m) {
+    const id = skillIdFromName(m[1]);
+    if (!id) return null;
+    return skills.has(id) ? null : r;
+  }
+  // Nível: "6º nível de personagem", "5º nível de bardo"
+  m = /^(\d+)\s*[º°o]?\s*nivel de (personagem|[a-z]+)/.exec(n);
+  if (m) {
+    const need = parseInt(m[1], 10);
+    if (m[2] === 'personagem') return level >= need ? null : `${r} (atual: ${level}º)`;
+    const cid = CLASS_NAME_TO_ID[m[2]];
+    const cl = ctx.classLevels?.[cid] ?? (ctx.classId === cid ? level : 0);
+    return cl >= need ? null : r;
+  }
+  // Magias
+  if (/^(habilidade de classe magias|lancar magias)$/.test(n)) return ctx.isSpellcaster ? null : r;
+  m = /^lancar magias de (\d)\s*[º°o]? circulo$/.exec(n);
+  if (m) return (ctx.maxSpellCircle ?? (ctx.isSpellcaster ? 1 : 0)) >= parseInt(m[1], 10) ? null : r;
+  // Proficiências
+  if (n === 'proficiencia com armaduras pesadas') return ctx.proficiencies?.armor?.includes('pesadas') ? null : r;
+  if (n === 'proficiencia com escudos') return ctx.proficiencies?.shields ? null : r;
+  if (n === 'proficiencia com a arma') return null; // depende da arma escolhida no poder
+  // Devoção
+  if (n === 'devoto de um deus maior') return ctx.deityId && ctx.deityId !== 'nenhum' ? null : r;
+  // Contagem de poderes da Tormenta: "quatro outros poderes da Tormenta", "um poder da Tormenta"
+  m = /^(um|uma|outro|dois|duas|tres|quatro|cinco|\d+)\s+(?:outros?\s+)?poder(?:es)? da tormenta$/.exec(n);
+  if (m) {
+    const need = NUMBER_WORDS[m[1]] ?? parseInt(m[1], 10);
+    const have = GENERAL_POWERS_LIST.filter((p) => p.category === 'tormenta' && powers.has(normalizeText(p.name))).length;
+    return have >= need ? null : `${r} (possui ${have})`;
+  }
+  // Grupos de poderes: "um poder de armadilha", "qualquer poder de Missa"
+  m = /^(?:um|qualquer) poder de (.+)$/.exec(n);
+  if (m) {
+    const group = m[1];
+    return [...powers].some((p) => p.includes(group)) ? null : r;
+  }
+  // Subclasse (Caminho do Arcanista etc.)
+  if (ctx.classSubclass && normalizeText(ctx.classSubclass) === n) return null;
+  // Demais: nome de poder ou habilidade ("Estilo de Arremesso", "Música: Balada Fascinante")
+  const plain = n.replace(/^[a-z ]+:\s*/, '');
+  return powers.has(n) || powers.has(plain) ? null : r;
+}
+
+/** Avalia uma linha de pré-requisitos do livro ("Des 2, treinado em Luta"). */
+export function checkPrerequisiteText(text: string | undefined, ctx: PrerequisiteContext): PrerequisiteResult {
+  if (!text) return { isMet: true, unmetRequirements: [] };
+  // ignora observações após um ponto ("... Magias lançadas como rituais não podem ...")
+  const main = text.split(/\.\s+(?=[A-ZÀ-Ú])/)[0];
+  const unmet = main
+    .split(/,\s*/)
+    .map((req) => checkRequirement(req, ctx))
+    .filter((x): x is string => !!x);
+  return { isMet: unmet.length === 0, unmetRequirements: unmet };
+}
+
+/**
+ * Valida os pré-requisitos de um poder geral segundo o texto do livro (T20 JdA v1.3, Cap. 2).
+ * Além do texto, aplica os requisitos implícitos de cada grupo:
+ * - Poderes de magia: "Todos os poderes deste grupo possuem como pré-requisito lançar magias" (pág. 131).
+ * - Poderes concedidos: ser devoto de um dos deuses indicados (pág. 132).
+ * "Você pode escolher um poder no nível em que atinge seus pré-requisitos" (Cap. 1, pág. 33).
+ */
+export function checkPowerPrerequisites(powerIdOrName: string, context: PrerequisiteContext): PrerequisiteResult {
+  const power = GENERAL_POWERS_LIST.find((p) => p.id === powerIdOrName || p.name === powerIdOrName);
+  if (!power) return { isMet: true, unmetRequirements: [] };
+  const unmet = [...checkPrerequisiteText(power.prerequisites, context).unmetRequirements];
+  if (power.category === 'magia' && !context.isSpellcaster && !unmet.includes('lançar magias')) unmet.unshift('lançar magias');
+  if (power.category === 'concedido' && power.deities?.length && context.deityId !== undefined) {
+    const deity = DEITIES_LIST.find((d) => d.id === context.deityId);
+    if (!deity || !power.deities.some((d) => normalizeText(d) === normalizeText(deity.name))) {
+      unmet.unshift(`devoto de ${power.deities.join(' ou ')}`);
+    }
+  }
+  return { isMet: unmet.length === 0, unmetRequirements: unmet };
 }
 
 /**

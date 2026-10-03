@@ -21,6 +21,7 @@ import { GENERAL_POWERS_LIST } from '../../data/generalPowers';
 import { SPELLS_LIST } from '../../data/spells';
 import { calculateSpellCircleUnlocked, recalculateFullCharacterSheet } from '../../utils/rulesEngine';
 import { checkPowerPrerequisites } from '../../utils/rulesValidation';
+import { prerequisiteContextFor } from '../../utils/characterContext';
 import { cleanT20Text, getClassPowerCitation, getGeneralPowerCitation, getSpellCitation } from '../../utils/textUtils';
 import { PowerCategoryBadge, SchoolBadge } from '../common/T20Badge';
 import { DetailModal, type DetailModalData } from '../common/DetailModal';
@@ -82,28 +83,25 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
   const trainingIncreased = trainingOf(nextTotalLevel) > trainingOf(currentTotalLevel);
 
   const isSpellcaster = Boolean(chosenClassDef.spellcaster);
-  const nextCircle = calculateSpellCircleUnlocked(nextClassLevel);
-  const unlockedNewCircle = isSpellcaster && nextCircle > calculateSpellCircleUnlocked(currentClassLevel);
+  const nextCircle = calculateSpellCircleUnlocked(nextClassLevel, selectedClassId);
+  const unlockedNewCircle = isSpellcaster && nextCircle > calculateSpellCircleUnlocked(currentClassLevel, selectedClassId);
 
   const steps: Step[] = isSpellcaster ? ['classe', 'poder', 'magia'] : ['classe', 'poder'];
   const stepIndex = Math.max(0, steps.indexOf(step));
   const isLast = stepIndex === steps.length - 1;
 
+  // Pré-requisitos avaliados no novo nível: "você pode escolher um poder no nível em que
+  // atinge seus pré-requisitos" (Cap. 1, pág. 33)
   const validationContext = useMemo(() => {
-    const trainedIds = Object.values(character.skills)
-      .filter((s) => s.isTrained)
-      .map((s) => s.id);
+    const ctx = prerequisiteContextFor(character);
     return {
-      attributes: character.totalAttributes,
-      trainedSkillIds: trainedIds,
-      proficiencies: {
-        weapons: chosenClassDef.proficiencies.weapons,
-        armor: chosenClassDef.proficiencies.armor,
-        shields: chosenClassDef.proficiencies.shields,
-      },
-      isSpellcaster: isSpellcaster || Boolean(character.spells && character.spells.length > 0),
+      ...ctx,
+      level: (character.level || 1) + 1,
+      classLevels: { ...(ctx.classLevels || {}), [selectedClassId]: nextClassLevel },
+      isSpellcaster: ctx.isSpellcaster || isSpellcaster,
+      maxSpellCircle: Math.max(ctx.maxSpellCircle || 0, isSpellcaster ? nextCircle : 0),
     };
-  }, [character, chosenClassDef, isSpellcaster]);
+  }, [character, selectedClassId, nextClassLevel, isSpellcaster, nextCircle]);
 
   const currentPowerNames = useMemo(
     () => new Set((character.powers || []).map((p) => p.name.toLowerCase())),

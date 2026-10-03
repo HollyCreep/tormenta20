@@ -771,15 +771,18 @@ export function calculateMaxSpellCost(
 }
 
 /**
- * Retorna o círculo máximo de magias que uma classe conjuradora atinge com base no seu nível.
- * Referência Oficial T20 JDA (Cap. 1 e Cap. 4, pág. 178):
- * 1º ao 4º nível: 1º círculo
- * 5º ao 8º nível: 2º círculo
- * 9º ao 12º nível: 3º círculo
- * 13º ao 16º nível: 4º círculo
- * 17º ao 20º nível: 5º círculo
+ * Círculo máximo de magias que a classe pode lançar no nível de classe informado.
+ * - Arcanista e Clérigo: 1º círculo; "a cada quatro níveis, um círculo maior" — 2º no 5º nível,
+ *   3º no 9º, 4º no 13º, 5º no 17º (Cap. 1, págs. 37 e 57).
+ * - Bardo e Druida: 2º círculo no 6º nível, 3º no 10º e 4º no 14º (máximo 4º) (Cap. 1, págs. 44 e 61).
  */
-export function calculateSpellCircleUnlocked(classLevel: number): 1 | 2 | 3 | 4 | 5 {
+export function calculateSpellCircleUnlocked(classLevel: number, classId?: string): 1 | 2 | 3 | 4 | 5 {
+  if (classId === 'bardo' || classId === 'druida') {
+    if (classLevel >= 14) return 4;
+    if (classLevel >= 10) return 3;
+    if (classLevel >= 6) return 2;
+    return 1;
+  }
   if (classLevel >= 17) return 5;
   if (classLevel >= 13) return 4;
   if (classLevel >= 9) return 3;
