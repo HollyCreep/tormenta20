@@ -3,6 +3,8 @@ import { AlertTriangle, ChevronDown, Dices, Gauge, Sparkles, Wand2, Zap } from '
 import type { CharacterSheet, CharacterSpell } from '../../types/character';
 import { calculateMaxSpellCost, calculateSpellSaveDc, spellKeyAttribute, spellLevelLimit } from '../../utils/rulesEngine';
 import { cleanT20Text } from '../../utils/textUtils';
+import { spellCostReductions } from '../../utils/powerSpells';
+import { bloodlineSpellMods } from '../../utils/bloodline';
 import { ExecutionBadge, RangeBadge, SchoolBadge, SpellTypeBadge } from '../common/T20Badge';
 import { CalcSheet } from '../common/StatBreakdownBadge';
 import { Sheet } from '../ui/Sheet';
@@ -35,8 +37,11 @@ export const SpellCastModal: React.FC<SpellCastModalProps> = ({ spell, character
   // Reduções de poderes ("caso aprenda novamente essa magia, seu custo diminui em –1 PM"; Sopro do Mar).
   // "Uma habilidade nunca pode ter seu custo reduzido para menos de 1 PM" (Cap. 5, pág. 226).
   const circleCost = BASE_COST_BY_CIRCLE[spell?.circle || 1] || 1;
-  const costReduction = (spell?.costReducedBy || []).length;
+  const reductions = spell ? spellCostReductions(spell, character) : [];
+  const costReduction = reductions.length;
   const baseCost = Math.max(1, circleCost - costReduction);
+  // Linhagem (Cap. 1, pág. 39): Feérica aprimorada CD +2; Dracônica aprimorada +1 de dano por dado
+  const lineage = spell ? bloodlineSpellMods(character, spell) : { dcBonus: 0, damagePerDie: 0, sources: [] as string[] };
   // Atributo-chave: o da magia (raciais, ex.: Tatuagem Mística — Cap. 1, pág. 26) ou o da classe que a fornece
   const keyAttrKey = spellKeyAttribute(character, spell);
   // Limite de PM: nível na classe que fornece a magia; raça, origem, poderes gerais e outras fontes:
@@ -55,8 +60,15 @@ export const SpellCastModal: React.FC<SpellCastModalProps> = ({ spell, character
   const [calc, setCalc] = useState<'dc' | 'limit' | null>(null);
 
   const saveDc = useMemo(
-    () => calculateSpellSaveDc(character.level, keyAttrMod, keyAttrName, customDcModifier, 'Modificador manual'),
-    [character.level, keyAttrMod, keyAttrName, customDcModifier]
+    () =>
+      calculateSpellSaveDc(
+        character.level,
+        keyAttrMod,
+        keyAttrName,
+        customDcModifier + lineage.dcBonus,
+        lineage.dcBonus ? `Linhagem Feérica (+${lineage.dcBonus})${customDcModifier ? ' e manual' : ''}` : 'Modificador manual'
+      ),
+    [character.level, keyAttrMod, keyAttrName, customDcModifier, lineage.dcBonus]
   );
   const maxPm = useMemo(
     () => calculateMaxSpellCost(limit.level, hasUnlimitedMagic, keyAttrMod, limit.label),
@@ -91,8 +103,10 @@ export const SpellCastModal: React.FC<SpellCastModalProps> = ({ spell, character
         if (extra && parseInt(extra[2], 10) === sides) count += parseInt(extra[1], 10) * qty;
       }
     });
-    return { count, sides, mod, label: `${count}d${sides}${mod > 0 ? `+${mod}` : ''}` };
-  }, [spell?.description, spell?.upgrades, selectedUpgrades]);
+    // Dracônica aprimorada: +1 ponto de dano por dado
+    const total = mod + lineage.damagePerDie * count;
+    return { count, sides, mod: total, label: `${count}d${sides}${total > 0 ? `+${total}` : ''}` };
+  }, [spell?.description, spell?.upgrades, selectedUpgrades, lineage.damagePerDie]);
 
   const setUpgrade = (idx: number, qty: number) =>
     setSelectedUpgrades((prev) => {
@@ -161,7 +175,7 @@ export const SpellCastModal: React.FC<SpellCastModalProps> = ({ spell, character
               </span>
               <span className="t-xs t-3">
                 Base {circleCost}
-                {costReduction ? ` − ${costReduction} (${spell.costReducedBy!.join(', ')})` : ''}
+                {costReduction ? ` − ${costReduction} (${reductions.join(', ')})` : ''}
                 {upgradesCost ? ` + aprimoramentos ${upgradesCost}` : ''}
                 {customCostModifier ? ` ${formatSigned(customCostModifier)} manual` : ''}
               </span>

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Backpack, Crosshair, Dices, Flame, Info, Sword, Target, Zap } from 'lucide-react';
 import type { CharacterInventoryItem, CharacterSheet } from '../../../types/character';
-import { calculateWeaponAttack, calculateWeaponDamage } from '../../../utils/rulesEngine';
+import { calculateWeaponAttack, calculateWeaponDamage, rulesInputFromCharacter } from '../../../utils/rulesEngine';
+import { collectPassiveEffects } from '../../../utils/passiveEffects';
 import { RULES_CITATIONS } from '../../../data/rulesCitations';
 import { EmptyState, SectionHeader } from '../../ui/controls';
 import { CalcSheet } from '../../common/StatBreakdownBadge';
@@ -37,6 +38,10 @@ export const CombatTab: React.FC<CombatTabProps> = ({
   const [calcFor, setCalcFor] = useState<CharacterInventoryItem | null>(null);
   const equippedWeapons = character.inventory.filter((item) => item.isEquipped && item.category.startsWith('arma_'));
   const calcAttack = calcFor ? calculateWeaponAttack(character, calcFor) : null;
+  // Reduções de dano e imunidades de efeitos passivos (ex.: Linhagem Dracônica — Cap. 1, pág. 39)
+  const resistances = collectPassiveEffects(rulesInputFromCharacter(character)).flatMap((c) =>
+    (c.resistances || []).map((r) => ({ text: r, source: c.source, citation: c.citation }))
+  );
 
   return (
     <div className="stack-lg">
@@ -66,6 +71,19 @@ export const CombatTab: React.FC<CombatTabProps> = ({
           })}
         </div>
       </section>
+
+      {resistances.length > 0 && (
+        <section className="stack-sm">
+          <SectionHeader title="Reduções e imunidades" as="h3" />
+          <div className="chip-wrap">
+            {resistances.map((r) => (
+              <span key={r.text} className="badge badge-lg" title={`${r.source} — ${r.citation}`}>
+                {r.text} · {r.source}
+              </span>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Armas */}
       <section className="stack-sm">

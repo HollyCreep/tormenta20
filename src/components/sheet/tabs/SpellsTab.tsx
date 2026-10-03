@@ -14,7 +14,7 @@ import {
   spellLevelLimit,
 } from '../../../utils/rulesEngine';
 import { ATTRIBUTES_LIST } from '../../../data/attributes';
-import { formulasOf, SCRIBE_GRANT, scribeCost, spellBaseCost } from '../../../utils/powerSpells';
+import { formulasOf, SCRIBE_GRANT, scribeCost, spellBaseCost, spellCostReductions } from '../../../utils/powerSpells';
 import { PowerSpellPicker } from '../PowerSpellPicker';
 
 // Custo canônico base por círculo (T20 JDA, Cap. 4: Magia, pág. 178)
@@ -74,12 +74,12 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({ character, onCastStandardS
   }, [character.spells, q]);
 
   const openDetail = (sp: CharacterSpell) => {
-    const baseCost = spellBaseCost(sp);
+    const baseCost = spellBaseCost(sp, character);
     onSetModalDetail({
       title: cleanT20Text(sp.name),
       category: `${sp.isFormula ? 'Fórmula' : 'Magia'} ${sp.type} · ${sp.circle || 1}º círculo${sp.sourcePower ? ` · ${sp.sourcePower}` : ''}`,
       subtitle: `${sp.school} · ${sp.execution}`,
-      cost: `${baseCost} PM${sp.costReducedBy?.length ? ` (−${sp.costReducedBy.length}: ${sp.costReducedBy.join(', ')})` : ''}`,
+      cost: `${baseCost} PM${spellCostReductions(sp, character).length ? ` (−${spellCostReductions(sp, character).length}: ${spellCostReductions(sp, character).join(', ')})` : ''}`,
       execution: sp.execution,
       range: sp.range,
       duration: sp.duration,
@@ -142,7 +142,7 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({ character, onCastStandardS
             </div>
             <div className="list">
               {spells.map((sp, idx) => {
-                const baseCost = spellBaseCost(sp);
+                const baseCost = spellBaseCost(sp, character);
                 const canCast = character.stats.currentMp >= baseCost;
                 return (
                   <div key={sp.id || `${sp.name}-${idx}`} className="row spell-row">

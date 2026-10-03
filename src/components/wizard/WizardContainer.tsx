@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { CharacterSheet, CharacterAttributes, CharacterInventoryItem, CharacterPower, CharacterSpell } from '../../types/character';
+import { CharacterSheet, CharacterAttributes, CharacterInventoryItem, CharacterPower, CharacterSpell, CharacterBloodline } from '../../types/character';
 import { AttributeKey } from '../../types/rules';
 import { RACES_LIST } from '../../data/races';
 import { CLASSES_LIST } from '../../data/classes';
@@ -45,7 +45,11 @@ import { useBackHandler } from '../ui/backStack';
 import { useFeedback } from '../ui/Feedback';
 import { osteonFormer } from '../../utils/raceAbilities';
 import { spellGrantFor } from '../../data/powerSpellGrants';
-import { withFixedGrants } from '../../utils/powerSpells';
+import { spellsFromGrant, withFixedGrants } from '../../utils/powerSpells';
+import { BloodlinePicker } from './BloodlinePicker';
+import { StepIntro } from './wizardUi';
+import { bloodlineDef } from '../../data/bloodlines';
+import { bloodlinePower, FEERICA_SPELL_GRANT, tormentaLossAttribute } from '../../utils/bloodline';
 
 interface WizardContainerProps {
   initialCharacter?: CharacterSheet | null;
@@ -147,6 +151,8 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
 
   // Divindade
   const [deityId, setDeityId] = useState(initialCharacter?.deityId || 'arsenal');
+  // Feiticeiro: linhagem sobrenatural (Cap. 1, pág. 39)
+  const [bloodline, setBloodline] = useState<CharacterBloodline | undefined>(initialCharacter?.bloodline);
   // Magias escolhidas para poderes que as concedem (Centelha Mágica — Cap. 2, pág. 132)
   const [powerSpells, setPowerSpells] = useState<CharacterSpell[]>(
     () => (initialCharacter?.spells || []).filter((sp) => sp.sourcePower && spellGrantFor(sp.sourcePower)?.choose)
@@ -223,6 +229,11 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
   // Amnésico recebe Lembranças Graduais além dos dois benefícios (Cap. 1, pág. 86)
   const originFixedPowers = currentOrigin.benefitRule === 'amnesico' ? currentOrigin.powers : [];
 
+  // Só o caminho do feiticeiro tem linhagem
+  const isSorcerer = classId === 'arcanista' && classSubclass === 'feiticeiro';
+  const sorcererBloodline = isSorcerer ? bloodline : undefined;
+  const feericaSkill = sorcererBloodline?.id === 'feerica' ? ['enganacao'] : [];
+
   // Lista de poderes ativos para regras de cálculo
   const powerNames: string[] = [
     ...currentRace.abilities.map((a) => a.name),
@@ -230,6 +241,9 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
     ...selectedOriginBenefits.filter((b) => b.type === 'poder').map((b) => b.name),
     ...originFixedPowers.map((p) => p.name),
     ...selectedDeityPowers,
+    // Linhagem: a própria herança e o poder da Tormenta da Linhagem Rubra
+    ...(sorcererBloodline ? [bloodlineDef(sorcererBloodline.id)!.name] : []),
+    ...(sorcererBloodline?.id === 'rubra' && sorcererBloodline.tormentaPower ? [sorcererBloodline.tormentaPower] : []),
   ];
 
   // Poderes da Tormenta custam Carisma (Cap. 2, pág. 136); o poder da Deformidade do lefou não conta (pág. 24)
@@ -244,10 +258,13 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
     powerNames,
     selectedRacialSkills: raceId === 'lefou' ? selectedRacialSkills : [],
     racialChoices,
+    bloodline: sorcererBloodline,
   };
   const charismaLoss = tormentaCharismaLoss(baseRulesInput, racialGeneralPower?.name);
+  // Linhagem Rubra: pode perder outro atributo em vez de Carisma (pág. 39)
+  const lossAttr = tormentaLossAttribute(sorcererBloodline);
   const totalAttributes = charismaLoss
-    ? { ...attributesBeforeTormenta, car: attributesBeforeTormenta.car - charismaLoss }
+    ? { ...attributesBeforeTormenta, [lossAttr]: attributesBeforeTormenta[lossAttr] - charismaLoss }
     : attributesBeforeTormenta;
   const rulesInput: RulesInput = { ...baseRulesInput, attributes: totalAttributes };
 
@@ -263,6 +280,7 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
     ...(racialChoices.kliren_hibrido || []), // Kliren — Híbrido (pág. 28)
     ...selectedOriginBenefits.filter((b) => b.type === 'pericia').map((b) => b.name),
     ...selectedIntSkills,
+    ...feericaSkill, // Linhagem Feérica: treinado em Enganação (pág. 39)
   ]);
 
   const isSpellcaster = Boolean(currentClass.spellcaster);
@@ -331,6 +349,8 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
     selectedOriginBenefits,
     deityId,
     selectedDeityPowers,
+    bloodline: sorcererBloodline,
+    isSorcerer,
     powerSpellCounts: powerSpells.reduce<Record<string, number>>((acc, sp) => ({ ...acc, [sp.sourcePower!]: (acc[sp.sourcePower!] || 0) + 1 }), {}),
     attributeMethod,
     baseAttributes,
@@ -359,6 +379,7 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
   const steps = [
     { num: 1, title: 'Raça' },
     { num: 2, title: 'Classe' },
+    ...(isSorcerer ? [{ num: 10, title: 'Linhagem' }] : []),
     ...(currentRace.noOrigin ? [] : [{ num: 3, title: 'Origem' }]),
     { num: 4, title: 'Divindade' },
     { num: 5, title: 'Atributos' },
@@ -373,8 +394,8 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
 
   // Se a classe deixar de ser conjuradora estando no passo de magias, avança
   useEffect(() => {
-    if (!steps.some((st) => st.num === currentStep)) setCurrentStep(8);
-  }, [isSpellcaster]); // eslint-disable-line react-hooks/exhaustive-deps
+    if (!steps.some((st) => st.num === currentStep)) setCurrentStep(currentStep === 10 ? 2 : 8);
+  }, [isSpellcaster, isSorcerer]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const goToStep = (num: number) => {
     setVisited((prev) => new Set(prev).add(currentStep));
@@ -433,6 +454,22 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
               type: formerRace.ability.type,
             },
           ]
+        : []),
+      // Linhagem sobrenatural e o poder da Tormenta da herança rubra
+      ...(sorcererBloodline ? [bloodlinePower(sorcererBloodline, (initialCharacter?.powers || []).map((p) => p.name))] : []),
+      ...(sorcererBloodline?.id === 'rubra' && sorcererBloodline.tormentaPower
+        ? (() => {
+            const tp = GENERAL_POWERS_LIST.find((gp) => gp.name === sorcererBloodline.tormentaPower);
+            return [
+              {
+                id: `linhagem_rubra_${tp?.id || sorcererBloodline.tormentaPower}`,
+                name: sorcererBloodline.tormentaPower,
+                source: 'geral' as const,
+                description: `${tp?.description || ''} (Linhagem Rubra, herança básica.)`,
+                type: 'tormenta',
+              },
+            ];
+          })()
         : []),
       ...(racialGeneralPower
         ? [
@@ -512,6 +549,9 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
     const baseSpells = [...classSpells, ...racialSpells.filter((rs) => !classSpells.some((cs) => cs.id === rs.id))];
     // Magias de poderes: as escolhidas (só de poderes ainda selecionados) e as fixas (ex.: Dedo Verde)
     const chosenPowerSpells = powerSpells.filter((sp) => allPowers.some((p) => p.name === sp.sourcePower));
+    // Linhagem Feérica: magia de encantamento ou ilusão (pág. 39)
+    const feericaSpell = sorcererBloodline?.id === 'feerica' ? SPELLS_LIST.find((sp) => sp.id === sorcererBloodline.spellId) : undefined;
+    if (feericaSpell && !baseSpells.some((sp) => sp.id === feericaSpell.id)) chosenPowerSpells.push(...spellsFromGrant(FEERICA_SPELL_GRANT, [feericaSpell]));
     const finalSpells = withFixedGrants(allPowers, [...baseSpells, ...chosenPowerSpells]);
 
     const newCharacter: CharacterSheet = {
@@ -535,6 +575,7 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
       selectedOriginBenefits,
       deityId,
       selectedDeityPowers,
+      bloodline: sorcererBloodline,
       attributeMethod,
       baseAttributes,
       racialModifiers,
@@ -710,6 +751,28 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
               onOpenDetail={setModalDetail}
             />
           )}
+          {currentStep === 10 && isSorcerer && (
+            <div className="stack-lg">
+              <StepIntro
+                title="Linhagem"
+                description="O poder do feiticeiro vem do sangue de um antepassado sobrenatural. Escolha sua linhagem e a herança básica (Cap. 1, pág. 39)."
+              />
+              <BloodlinePicker
+                value={bloodline}
+                onChange={setBloodline}
+                spellOwner={{
+                  classId,
+                  level: 1,
+                  spells: selectedSpells
+                    .map((id) => SPELLS_LIST.find((sp) => sp.id === id))
+                    .filter((sp) => !!sp)
+                    .map((sp) => ({ ...sp!, learnedFrom: 'classe' as const })),
+                }}
+                prerequisiteContext={prereqContext}
+                ownedPowers={powerNames.filter((n) => n !== bloodline?.tormentaPower)}
+              />
+            </div>
+          )}
           {currentStep === 3 && (
             <StepOrigin
               selectedOriginId={originId}
@@ -717,7 +780,7 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
               raceSkills={selectedRacialSkills}
               classSkills={[...currentClass.mandatorySkills, ...selectedClassSkills]}
               intSkills={selectedIntSkills}
-              alreadyTrainedSkills={[...selectedRacialSkills, ...currentClass.mandatorySkills, ...selectedClassSkills, ...selectedIntSkills]}
+              alreadyTrainedSkills={[...selectedRacialSkills, ...currentClass.mandatorySkills, ...selectedClassSkills, ...selectedIntSkills, ...feericaSkill]}
               prerequisiteContext={prereqContext}
               onSelectOrigin={setOriginId}
               onSelectOriginBenefits={setSelectedOriginBenefits}
@@ -759,7 +822,7 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
             <StepSkills
               totalAttributes={totalAttributes}
               raceSkills={raceId === 'humano' || raceId === 'osteon' ? selectedRacialSkills : []}
-              classSkills={[...currentClass.mandatorySkills, ...selectedClassSkills]}
+              classSkills={[...currentClass.mandatorySkills, ...selectedClassSkills, ...feericaSkill]}
               originSkills={selectedOriginBenefits.filter((b) => b.type === 'pericia').map((b) => b.name)}
               selectedIntSkills={selectedIntSkills}
               onSelectIntSkills={setSelectedIntSkills}

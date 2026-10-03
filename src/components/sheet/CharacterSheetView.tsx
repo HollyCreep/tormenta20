@@ -195,7 +195,7 @@ export const CharacterSheetView: React.FC<CharacterSheetViewProps> = ({
   };
 
   const handleCastStandardSpell = (sp: CharacterSpell) => {
-    const baseCost = spellBaseCost(sp);
+    const baseCost = spellBaseCost(sp, character);
     if (character.stats.currentMp < baseCost) {
       toast(`PM insuficientes para ${sp.name}: custa ${baseCost} PM, você tem ${character.stats.currentMp}.`, { tone: 'warning' });
       return;

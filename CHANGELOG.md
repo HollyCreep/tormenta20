@@ -21,6 +21,7 @@ Todas as alterações notáveis deste projeto serão documentadas neste arquivo.
 - Teurgista Místico (uma magia do outro tipo por círculo), Sopro do Mar (Sopro das Uivantes divina, –1 PM) e redução de –1 PM ao aprender de novo magias de poderes concedidos; custo mínimo de 1 PM — Cap. 2, págs. 133–136; Cap. 5, pág. 226.
 - Inventor: livro de fórmulas (Alquimista Iniciado, fórmula por nível, Conhecimento de Fórmulas, Mestre Alquimista) separado das magias lançáveis — Cap. 1, págs. 68–70.
 - Escriba Arcano: copiar magia na ficha, cobrando T$ 250 por PM e registrando os dias de trabalho — Cap. 1, pág. 38.
+- Linhagens do feiticeiro (Dracônica, Feérica e Rubra) com passo próprio no criador e escolha na subida de nível; heranças aprimorada e superior pelos poderes Herança Aprimorada/Superior, com PV, PM, custos, CD, dano, reduções/imunidades, perícia, magia, poder da Tormenta e atributo perdido aplicados na ficha — Cap. 1, pág. 39.
 - Citações de `rulesCitations.ts` verificadas literalmente; servidor MCP e documentação `.agents/rules` atualizados.
 
 ---

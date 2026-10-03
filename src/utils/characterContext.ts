@@ -2,6 +2,7 @@ import { CLASSES_LIST } from '../data/classes';
 import type { CharacterSheet } from '../types/character';
 import { calculateSpellCircleUnlocked } from './rulesEngine';
 import type { PrerequisiteContext } from './rulesValidation';
+import { bloodlineTormentaBonus } from './bloodline';
 
 /** Níveis por classe da ficha (multiclasse) ou a classe única no nível do personagem. */
 export function classLevelsOf(char: Pick<CharacterSheet, 'classId' | 'level' | 'classes'>): Record<string, number> {
@@ -36,6 +37,8 @@ export function prerequisiteContextFor(char: CharacterSheet, extraPowerNames: st
     classLevels: levels,
     classId: char.classId,
     classSubclass: char.classSubclass,
+    subclasses: [char.classSubclass, ...(char.classes || []).map((c) => c.subclass)].filter((x): x is string => !!x),
+    extraTormentaPowers: bloodlineTormentaBonus(char.bloodline, (char.powers || []).map((p) => p.name)),
     powerNames: [...(char.powers || []).map((p) => p.name), ...extraPowerNames],
     deityId: char.deityId || 'nenhum',
   };

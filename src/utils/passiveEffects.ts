@@ -5,10 +5,11 @@
  * "quando tem a torcida a seu favor"...) NÃO entram nos totais da ficha; aparecem só no texto.
  * Bônus de perícia por poderes da Tormenta escalam com "cada dois outros poderes da Tormenta".
  */
-import type { CharacterAttributes, CharacterInventoryItem } from '../types/character';
+import type { CharacterAttributes, CharacterBloodline, CharacterInventoryItem } from '../types/character';
 import type { AttributeKey } from '../types/rules';
 import { GENERAL_POWERS_LIST } from '../data/generalPowers';
 import { effectiveSize, hasRaceAbility, osteonFormer } from './raceAbilities';
+import { bloodlineResistances, bloodlineTormentaBonus, hasTier } from './bloodline';
 
 export interface RulesInput {
   level: number;
@@ -26,6 +27,8 @@ export interface RulesInput {
   /** Lefou (Deformidade): perícias com +2. */
   selectedRacialSkills?: string[];
   racialChoices?: Record<string, string[]>;
+  /** Feiticeiro: linhagem sobrenatural (Cap. 1, pág. 39). */
+  bloodline?: CharacterBloodline;
 }
 
 export interface Contribution {
@@ -46,6 +49,8 @@ export interface Contribution {
   defenseAttribute?: AttributeKey;
   /** Usa outro atributo como atributo-chave da perícia (ex.: Destreza em Atletismo). */
   skillAttribute?: Partial<Record<string, AttributeKey>>;
+  /** Reduções de dano e imunidades (texto para a ficha). */
+  resistances?: string[];
 }
 
 const has = (input: RulesInput, name: string) => (input.powerNames || []).includes(name);
@@ -59,7 +64,9 @@ export const wearsHeavyArmor = (inv: CharacterInventoryItem[]) => equippedArmor(
 
 /** Quantos poderes da Tormenta o personagem possui. */
 export const tormentaPowerCount = (input: RulesInput) =>
-  GENERAL_POWERS_LIST.filter((p) => p.category === 'tormenta' && has(input, p.name)).length;
+  GENERAL_POWERS_LIST.filter((p) => p.category === 'tormenta' && has(input, p.name)).length +
+  // Linhagem Rubra: heranças aprimorada e superior contam como poderes da Tormenta (pág. 39)
+  bloodlineTormentaBonus(input.bloodline, input.powerNames);
 
 /** "+1, mais +1 para cada dois outros poderes da Tormenta que você possui" (Cap. 2, pág. 136). */
 const tormentaScaling = (input: RulesInput) => 1 + Math.floor(Math.max(0, tormentaPowerCount(input) - 1) / 2);
@@ -73,6 +80,8 @@ export function tormentaCharismaLoss(input: RulesInput, racialPowerName?: string
   let n = tormentaPowerCount(input);
   if (input.raceId === 'lefou' && racialPowerName && GENERAL_POWERS_LIST.some((p) => p.name === racialPowerName && p.category === 'tormenta')) n -= 1;
   if (has(input, 'Afinidade com a Tormenta')) n -= 1;
+  // ...exceto para perda de Carisma (Linhagem Rubra, pág. 39)
+  n -= bloodlineTormentaBonus(input.bloodline, input.powerNames);
   return n > 0 ? 1 + Math.floor((n - 1) / 2) : 0;
 }
 
@@ -239,6 +248,21 @@ export function collectPassiveEffects(input: RulesInput): Contribution[] {
   // Mochila de aventureiro: vestida, aumenta a capacidade de carga em 2 espaços (Cap. 3, pág. 157)
   if (input.inventory.some((it) => it.isEquipped && /mochila de aventureiro/i.test(it.name))) {
     out.push({ source: 'Mochila de aventureiro', citation: 'Cap. 3, pág. 157', spaces: 2 });
+  }
+  // Linhagens sobrenaturais do feiticeiro (Cap. 1, pág. 39)
+  const bl = input.bloodline;
+  if (bl?.id === 'draconica') {
+    const superior = hasTier(input.powerNames, 'superior');
+    const car = input.attributes.car || 0;
+    out.push({
+      source: `Linhagem Dracônica (${superior ? 'superior' : 'básica'})`,
+      citation: 'Cap. 1, pág. 39',
+      hp: superior ? 2 * car : car,
+      resistances: bloodlineResistances(bl, input.powerNames),
+    });
+  }
+  if (bl?.id === 'rubra' && hasTier(input.powerNames, 'superior')) {
+    out.push({ source: 'Linhagem Rubra (superior)', citation: 'Cap. 1, pág. 39', mp: 4 * tormentaPowerCount(input) });
   }
   const size = effectiveSize(input);
   const stealth = SIZE_STEALTH[size] || 0;

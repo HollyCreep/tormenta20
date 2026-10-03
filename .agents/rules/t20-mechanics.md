@@ -60,6 +60,15 @@ itens em `src/utils/passiveEffects.ts` (cada efeito cita a página); condições
   bardo e druida — 2º no 6º, 3º no 10º, 4º no 14º (máximo 4º); bardo e druida escolhem **três escolas**.
   Magias iniciais: arcanista 3 (Mago 4), bardo 2, clérigo 3, druida 2.
 - Habilidades de 1º nível e progressão em `src/data/classes.ts` (texto do livro).
+- **Linhagens do feiticeiro** (pág. 39; `src/data/bloodlines.ts`, `src/utils/bloodline.ts`): Dracônica,
+  Feérica e Rubra. Herança básica ao escolher o caminho; aprimorada e superior pelos poderes Herança
+  Aprimorada (Feiticeiro, 6º nível de arcanista) e Herança Superior (11º nível).
+  Dracônica: +Car nos PV iniciais (dobro na superior), RD 5 ao tipo (imunidade na superior); aprimorada
+  –1 PM e +1 dano/dado nas magias do tipo. Feérica: treinado em Enganação + magia de 1º círculo de
+  encantamento/ilusão; aprimorada CD +2 e –1 PM nessas escolas; superior +2 Car. Rubra: um poder da
+  Tormenta e pode perder outro atributo em vez de Car; aprimorada –1 PM numa magia por poder da Tormenta;
+  superior +4 PM por poder da Tormenta; as heranças aprimorada/superior contam como poderes da Tormenta,
+  exceto para perda de Carisma.
 
 ## 4. Origens (Cap. 1, págs. 85–95)
 

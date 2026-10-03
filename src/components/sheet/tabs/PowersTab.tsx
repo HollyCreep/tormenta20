@@ -12,6 +12,10 @@ import { classColorVars } from '../../common/ClassSigil';
 import { applyFixedGrants, grantForPower, pendingFixedGrants, pendingSpellGrants } from '../../../utils/powerSpells';
 import type { PowerSpellGrant } from '../../../data/powerSpellGrants';
 import { PowerSpellPicker } from '../PowerSpellPicker';
+import { hasTier, RUBRA_SPELL_SOURCE } from '../../../utils/bloodline';
+import { tormentaPowerCount } from '../../../utils/passiveEffects';
+import { rulesInputFromCharacter } from '../../../utils/rulesEngine';
+import { OptionPickerSheet } from '../../wizard/wizardUi';
 
 export type SheetPowersSubTab = 'gerais' | 'classe';
 
@@ -27,6 +31,19 @@ const CATEGORY_ORDER = ['combate', 'destino', 'magia', 'concedido', 'tormenta', 
 
 export const PowersTab: React.FC<PowersTabProps> = ({ character, onSetModalDetail, onNavigateToCompendium, onUpdateSpells }) => {
   const [spellPicker, setSpellPicker] = useState<{ grant: PowerSpellGrant; remaining: number } | null>(null);
+  // Linhagem Rubra (aprimorada): uma magia com –1 PM por poder da Tormenta (Cap. 1, pág. 39)
+  const [rubraOpen, setRubraOpen] = useState(false);
+  const [rubraSel, setRubraSel] = useState<string[]>([]);
+  const powerNamesAll = (character.powers || []).map((p) => p.name);
+  const rubraNeeded =
+    character.bloodline?.id === 'rubra' && hasTier(powerNamesAll, 'aprimorada') ? tormentaPowerCount(rulesInputFromCharacter(character)) : 0;
+  const rubraHave = (character.spells || []).filter((sp) => sp.costReducedBy?.includes(RUBRA_SPELL_SOURCE)).length;
+  const rubraPending = Math.max(0, rubraNeeded - rubraHave);
+  const sorcererWithoutBloodline =
+    !character.bloodline &&
+    [{ classId: character.classId, subclass: character.classSubclass }, ...(character.classes || [])].some(
+      (c) => c.classId === 'arcanista' && c.subclass === 'feiticeiro'
+    );
   // Poderes que concedem magias (Cap. 4, pág. 170): escolhas pendentes e magias fixas que faltam na ficha
   const pending = useMemo(() => pendingSpellGrants(character.powers || [], character.spells), [character.powers, character.spells]);
   const missingFixed = useMemo(() => pendingFixedGrants(character.powers || [], character.spells), [character.powers, character.spells]);
@@ -232,6 +249,29 @@ export const PowersTab: React.FC<PowersTabProps> = ({ character, onSetModalDetai
               {cleanT20Text(pow.description)}
             </p>
             {renderGrantedSpells(pow)}
+            {pow.id === 'arcanista_linhagem_rubra' && rubraNeeded > 0 && (
+              <div className="stack-xs">
+                <span className="t-label">
+                  Magias com –1 PM ({rubraHave}/{rubraNeeded})
+                </span>
+                <div className="chip-wrap">
+                  {(character.spells || [])
+                    .filter((sp) => sp.costReducedBy?.includes(RUBRA_SPELL_SOURCE))
+                    .map((sp) => (
+                      <span key={sp.id} className="badge badge-mp">
+                        <Wand2 size={12} />
+                        {cleanT20Text(sp.name)}
+                      </span>
+                    ))}
+                </div>
+                {onUpdateSpells && rubraPending > 0 && (
+                  <button type="button" className="btn btn-tonal btn-sm" onClick={() => setRubraOpen(true)}>
+                    <Wand2 size={16} />
+                    Escolher {rubraPending} magia{rubraPending > 1 ? 's' : ''} com –1 PM
+                  </button>
+                )}
+              </div>
+            )}
             <button type="button" className="btn btn-ghost btn-sm" onClick={() => handleOpenDetail(pow, isClass)}>
               <Info size={16} />
               Detalhes e regra
@@ -247,6 +287,18 @@ export const PowersTab: React.FC<PowersTabProps> = ({ character, onSetModalDetai
 
   return (
     <div className="stack">
+      {sorcererWithoutBloodline && (
+        <div className="callout callout-warning">
+          <AlertTriangle size={18} />
+          <span>Feiticeiro sem linhagem sobrenatural: escolha-a ao subir de nível como arcanista (Cap. 1, pág. 39).</span>
+        </div>
+      )}
+      {onUpdateSpells && rubraPending > 0 && (
+        <div className="callout callout-warning">
+          <AlertTriangle size={18} />
+          <span>Linhagem Rubra: escolha {rubraPending} magia{rubraPending > 1 ? 's' : ''} com –1 PM (uma por poder da Tormenta).</span>
+        </div>
+      )}
       {onUpdateSpells && (pending.length > 0 || missingFixed.length > 0) && (
         <div className="callout callout-warning">
           <AlertTriangle size={18} />
@@ -321,6 +373,32 @@ export const PowersTab: React.FC<PowersTabProps> = ({ character, onSetModalDetai
         <div className="stack-sm">{list.map((pow, idx) => renderPower(pow, subTab === 'classe', idx))}</div>
       )}
 
+      {rubraOpen && onUpdateSpells && (
+        <OptionPickerSheet
+          open
+          multiple
+          max={rubraPending}
+          title="Linhagem Rubra: magias com –1 PM"
+          subtitle="Uma magia para cada poder da Tormenta (Cap. 1, pág. 39)"
+          options={(character.spells || [])
+            .filter((sp) => !sp.isFormula && !sp.costReducedBy?.includes(RUBRA_SPELL_SOURCE))
+            .map((sp) => ({ id: sp.id, title: cleanT20Text(sp.name), subtitle: `${sp.circle}º círculo · ${sp.school}` }))}
+          value={rubraSel}
+          onChange={setRubraSel}
+          onClose={() => {
+            if (rubraSel.length) {
+              onUpdateSpells(
+                (character.spells || []).map((sp) =>
+                  rubraSel.includes(sp.id) && !sp.isFormula ? { ...sp, costReducedBy: [...(sp.costReducedBy || []), RUBRA_SPELL_SOURCE] } : sp
+                ),
+                `Linhagem Rubra: –1 PM em ${(character.spells || []).filter((sp) => rubraSel.includes(sp.id)).map((sp) => sp.name).join(', ')}.`
+              );
+            }
+            setRubraSel([]);
+            setRubraOpen(false);
+          }}
+        />
+      )}
       {spellPicker && onUpdateSpells && (
         <PowerSpellPicker
           open

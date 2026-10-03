@@ -8,6 +8,8 @@ import { CLASS_POWERS_LIST } from '../data/classPowers';
 import { SPELLS_LIST } from '../data/spells';
 import { OSTEON_FORMER_KEY, osteonFormer } from './raceAbilities';
 import { spellGrantFor } from '../data/powerSpellGrants';
+import { bloodlineErrors } from './bloodline';
+import type { CharacterBloodline } from '../types/character';
 
 export interface PrerequisiteContext {
   attributes: CharacterAttributes;
@@ -26,6 +28,10 @@ export interface PrerequisiteContext {
   classLevels?: Record<string, number>;
   classId?: string;
   classSubclass?: string;
+  /** Subclasses de todas as classes (multiclasse: ex. arcanista feiticeiro como segunda classe). */
+  subclasses?: string[];
+  /** Poderes que contam como poderes da Tormenta além dos gerais (Linhagem Rubra, pág. 39). */
+  extraTormentaPowers?: number;
   /** Nomes de poderes e habilidades que o personagem já possui. */
   powerNames?: string[];
   /** Divindade ('nenhum' se não for devoto). */
@@ -124,7 +130,8 @@ function checkRequirement(req: string, ctx: PrerequisiteContext): string | null 
   m = /^(um|uma|outro|dois|duas|tres|quatro|cinco|\d+)\s+(?:outros?\s+)?poder(?:es)? da tormenta$/.exec(n);
   if (m) {
     const need = NUMBER_WORDS[m[1]] ?? parseInt(m[1], 10);
-    const have = GENERAL_POWERS_LIST.filter((p) => p.category === 'tormenta' && powers.has(normalizeText(p.name))).length;
+    const have =
+      GENERAL_POWERS_LIST.filter((p) => p.category === 'tormenta' && powers.has(normalizeText(p.name))).length + (ctx.extraTormentaPowers || 0);
     return have >= need ? null : `${r} (possui ${have})`;
   }
   // Grupos de poderes: "um poder de armadilha", "qualquer poder de Missa"
@@ -135,6 +142,7 @@ function checkRequirement(req: string, ctx: PrerequisiteContext): string | null 
   }
   // Subclasse (Caminho do Arcanista etc.)
   if (ctx.classSubclass && normalizeText(ctx.classSubclass) === n) return null;
+  if (ctx.subclasses?.some((sc) => normalizeText(sc) === n)) return null;
   // Demais: nome de poder ou habilidade ("Estilo de Arremesso", "Música: Balada Fascinante")
   const plain = n.replace(/^[a-z ]+:\s*/, '');
   return powers.has(n) || powers.has(plain) ? null : r;
@@ -298,6 +306,9 @@ export interface WizardValidationInput {
   selectedOriginBenefits: { type: 'pericia' | 'poder'; name: string }[];
   deityId: string;
   selectedDeityPowers: string[];
+  /** Feiticeiro (arcanista, caminho do feiticeiro) e sua linhagem (Cap. 1, pág. 39). */
+  isSorcerer?: boolean;
+  bloodline?: CharacterBloodline;
   /** Quantas magias foram escolhidas para cada poder que concede magias (nome do poder → quantidade). */
   powerSpellCounts?: Record<string, number>;
   attributeMethod: 'point_buy' | 'standard' | 'roll' | 'free';
@@ -539,6 +550,25 @@ export function validateAllWizardSteps(input: WizardValidationInput): Record<num
       errors,
       warnings,
     };
+  }
+
+  // PASSO 10: LINHAGEM (feiticeiro — Cap. 1, pág. 39)
+  if (input.isSorcerer) {
+    const errors = bloodlineErrors(input.bloodline);
+    // Linhagem Feérica treina Enganação: a perícia não pode ter sido escolhida em outro benefício
+    if (input.bloodline?.id === 'feerica') {
+      const chosen = [
+        ...input.selectedClassSkills,
+        ...input.selectedIntSkills,
+        ...input.selectedOriginBenefits.filter((b) => b.type === 'pericia').map((b) => b.name),
+      ];
+      if (chosen.includes('enganacao')) errors.push('Enganação já é treinada pela Linhagem Feérica: troque essa escolha de perícia (Cap. 2, pág. 114).');
+    }
+    if (input.bloodline?.id === 'rubra' && input.bloodline.tormentaPower) {
+      const prereq = checkPowerPrerequisites(input.bloodline.tormentaPower, prereqContext);
+      if (!prereq.isMet) errors.push(`${input.bloodline.tormentaPower}: falta ${prereq.unmetRequirements.join(', ')}.`);
+    }
+    results[10] = { step: 10, isValid: errors.length === 0, isIncomplete: errors.length > 0, hasError: errors.length > 0, errors, warnings: [] };
   }
 
   // PASSO 5: ATRIBUTOS

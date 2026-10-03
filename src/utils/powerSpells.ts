@@ -5,6 +5,7 @@ import { spellGrantFor, type PowerSpellGrant } from '../data/powerSpellGrants';
 import type { CharacterPower, CharacterSpell } from '../types/character';
 import type { Spell } from '../types/rules';
 import { calculateSpellCircleUnlocked } from './rulesEngine';
+import { bloodlineSpellMods } from './bloodline';
 
 type SpellType = 'arcana' | 'divina';
 
@@ -263,5 +264,13 @@ const CIRCLE_COST: Record<number, number> = { 1: 1, 2: 3, 3: 6, 4: 10, 5: 15 };
  * Custo base de uma magia já com as reduções de poderes (Tabela 4-1, pág. 170). "Uma habilidade nunca
  * pode ter seu custo reduzido para menos de 1 PM" (Cap. 5, pág. 226).
  */
-export const spellBaseCost = (sp: Pick<CharacterSpell, 'circle' | 'costReducedBy'>) =>
-  Math.max(1, (CIRCLE_COST[sp.circle || 1] || 1) - spellCostReduction(sp));
+export const spellBaseCost = (
+  sp: Pick<CharacterSpell, 'circle' | 'costReducedBy'> & Partial<Pick<CharacterSpell, 'description' | 'school'>>,
+  owner?: Parameters<typeof bloodlineSpellMods>[0]
+) => Math.max(1, (CIRCLE_COST[sp.circle || 1] || 1) - spellCostReductions(sp, owner).length);
+
+/** Fontes de redução de custo da magia: poderes registrados na magia e a linhagem do feiticeiro. */
+export const spellCostReductions = (
+  sp: Pick<CharacterSpell, 'costReducedBy'> & Partial<Pick<CharacterSpell, 'description' | 'school'>>,
+  owner?: Parameters<typeof bloodlineSpellMods>[0]
+): string[] => [...(sp.costReducedBy || []), ...(owner ? bloodlineSpellMods(owner, sp).sources : [])];

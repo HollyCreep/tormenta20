@@ -84,6 +84,19 @@ export interface CharacterSpell extends Spell {
   keyAttribute?: AttributeKey;
 }
 
+/** Linhagem sobrenatural do feiticeiro (Cap. 1, pág. 39). A herança (básica/aprimorada/superior) vem dos poderes. */
+export interface CharacterBloodline {
+  id: 'draconica' | 'feerica' | 'rubra';
+  /** Dracônica: tipo de dano escolhido. */
+  damageType?: 'acido' | 'eletricidade' | 'fogo' | 'frio';
+  /** Feérica (básica): magia de 1º círculo de encantamento ou ilusão aprendida (id). */
+  spellId?: string;
+  /** Rubra (básica): poder da Tormenta recebido. */
+  tormentaPower?: string;
+  /** Rubra (básica): atributo perdido pelos poderes da Tormenta, em vez de Carisma. */
+  tormentaAttribute?: AttributeKey;
+}
+
 export interface CharacterClassLevel {
   classId: string;
   className: string;
@@ -156,6 +169,8 @@ export interface CharacterSheet {
   // Magias (se aplicável)
   spells: CharacterSpell[];
   spellSchools?: string[];
+  /** Feiticeiro: linhagem sobrenatural (Cap. 1, pág. 39). */
+  bloodline?: CharacterBloodline;
 
   // Inventário
   inventory: CharacterInventoryItem[];

@@ -621,6 +621,7 @@ export function rulesInputFromCharacter(character: any): RulesInput {
     activeConditions: character.activeConditions || [],
     selectedRacialSkills: character.raceId === 'lefou' ? character.selectedRacialSkills || [] : [],
     racialChoices: character.racialChoices,
+    bloodline: character.bloodline,
   };
 }
 

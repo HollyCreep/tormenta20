@@ -13,7 +13,7 @@ import {
   TrendingUp,
   Zap,
 } from 'lucide-react';
-import type { CharacterPower, CharacterSheet, CharacterSpell } from '../../types/character';
+import type { CharacterBloodline, CharacterPower, CharacterSheet, CharacterSpell } from '../../types/character';
 import type { AttributeKey, ClassPower, GeneralPower, Spell } from '../../types/rules';
 import { ATTRIBUTES_LIST } from '../../data/attributes';
 import { CLASSES_LIST } from '../../data/classes';
@@ -23,7 +23,7 @@ import { calculateSpellCircleUnlocked, recalculateFullCharacterSheet, rulesInput
 import { tormentaCharismaLoss } from '../../utils/passiveEffects';
 import { checkPowerPrerequisites } from '../../utils/rulesValidation';
 import { prerequisiteContextFor } from '../../utils/characterContext';
-import { asClassSpell, grantForPower, learnableClassSpells, withFixedGrants } from '../../utils/powerSpells';
+import { asClassSpell, grantForPower, learnableClassSpells, spellsFromGrant, withFixedGrants } from '../../utils/powerSpells';
 import { FORMULA_BOOK, type PowerSpellGrant } from '../../data/powerSpellGrants';
 import { PowerSpellPicker } from './PowerSpellPicker';
 import { cleanT20Text, getClassPowerCitation, getGeneralPowerCitation, getSpellCitation } from '../../utils/textUtils';
@@ -32,6 +32,10 @@ import { DetailModal, type DetailModalData } from '../common/DetailModal';
 import { ClassSigil, classColorVars } from '../common/ClassSigil';
 import { Sheet } from '../ui/Sheet';
 import { EmptyState, SearchField, Segmented, SelectField } from '../ui/controls';
+import { BloodlinePicker } from '../wizard/BloodlinePicker';
+import { HERANCA_APRIMORADA, HERANCA_SUPERIOR, bloodlineDef } from '../../data/bloodlines';
+import { bloodlineErrors, bloodlinePower, FEERICA_SPELL_GRANT, tormentaLossAttribute } from '../../utils/bloodline';
+import { SPELLS_LIST } from '../../data/spells';
 
 interface LevelUpModalProps {
   character: CharacterSheet;
@@ -91,6 +95,8 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
   const [formulaPickerOpen, setFormulaPickerOpen] = useState(false);
   // Multiclasse em arcanista: escolhe o caminho (Cap. 1, pág. 37)
   const [newSubclass, setNewSubclass] = useState('');
+  // Feiticeiro sem linhagem (multiclasse ou ficha antiga): escolhe a linhagem (Cap. 1, pág. 39)
+  const [newBloodline, setNewBloodline] = useState<CharacterBloodline | undefined>(undefined);
   // Multiclasse em bardo/druida: três escolas (Cap. 1, págs. 44 e 61)
   const [newSchools, setNewSchools] = useState<string[]>([]);
   const [spellSearch, setSpellSearch] = useState('');
@@ -123,6 +129,7 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
     newSubclass ||
     existingClasses.find((c) => c.classId === selectedClassId)?.subclass ||
     (selectedClassId === character.classId ? character.classSubclass : undefined);
+  const needsBloodline = selectedClassId === 'arcanista' && subclassForSpells === 'feiticeiro' && !character.bloodline;
   const needsSchools = nextClassLevel === 1 && !!chosenClassDef.spellcaster?.schoolsCount && !character.spellSchools?.length;
   const knownSchools = needsSchools ? newSchools : character.spellSchools;
   // Magias por nível: 1º nível da classe → magias iniciais; arcanista e clérigo → uma por nível;
@@ -244,7 +251,8 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
   };
   const spellsRequired = Math.min(spellsToLearn, availableSpells.length + selectedSpells.length);
   const blockNext =
-    (step === 'classe' && ((!!subclassOptions && !newSubclass) || (needsSchools && newSchools.length !== 3))) ||
+    (step === 'classe' &&
+      ((!!subclassOptions && !newSubclass) || (needsSchools && newSchools.length !== 3) || (needsBloodline && bloodlineErrors(newBloodline).length > 0))) ||
     (step === 'poder' && (!selectedPower || (selectedPower.name === 'Aumento de Atributo' && !increaseAttr) || powerSpells.length < grantNeeded)) ||
     (step === 'magia' && selectedSpells.length < spellsRequired) ||
     (step === 'formula' && levelFormula.length < 1);
@@ -273,17 +281,42 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
       });
     }
 
-    // Poder da Tormenta: perde Carisma conforme a contagem (Cap. 2, pág. 136)
+    // Linhagem sobrenatural recebida agora (feiticeiro): herança básica (Cap. 1, pág. 39)
+    const bloodline = needsBloodline ? newBloodline : character.bloodline;
+    if (needsBloodline && newBloodline?.id === 'rubra' && newBloodline.tormentaPower) {
+      const tp = GENERAL_POWERS_LIST.find((g) => g.name === newBloodline.tormentaPower);
+      updatedPowers.push({
+        id: `linhagem_rubra_${tp?.id || newBloodline.tormentaPower}`,
+        name: newBloodline.tormentaPower,
+        source: 'geral',
+        description: `${tp?.description || ''} (Linhagem Rubra, herança básica.)`,
+        type: 'tormenta',
+      });
+    }
+    // O poder da linhagem mostra as heranças recebidas (aprimorada/superior vêm dos poderes)
+    if (bloodline) {
+      const lp = bloodlinePower(bloodline, updatedPowers.map((p) => p.name));
+      const i = updatedPowers.findIndex((p) => p.id === lp.id);
+      if (i >= 0) updatedPowers[i] = lp;
+      else updatedPowers.push(lp);
+    }
+
+    // Poder da Tormenta: perde Carisma conforme a contagem (Cap. 2, pág. 136);
+    // a Linhagem Rubra pode perder outro atributo (pág. 39)
     const inputBefore = rulesInputFromCharacter(character);
-    const inputAfter = { ...inputBefore, powerNames: updatedPowers.map((p) => p.name) };
+    const inputAfter = { ...inputBefore, bloodline, powerNames: updatedPowers.map((p) => p.name) };
     const racialPower = character.selectedRacialPower;
     const carLoss = tormentaCharismaLoss(inputAfter, racialPower) - tormentaCharismaLoss(inputBefore, racialPower);
-    const totalAttributes = carLoss > 0 ? { ...character.totalAttributes, car: character.totalAttributes.car - carLoss } : character.totalAttributes;
+    const lossAttr = tormentaLossAttribute(bloodline);
+    let totalAttributes = carLoss > 0 ? { ...character.totalAttributes, [lossAttr]: character.totalAttributes[lossAttr] - carLoss } : character.totalAttributes;
+    // Linhagem Feérica superior: +2 em Carisma (pág. 39)
+    if (bloodline?.id === 'feerica' && selectedPower?.name === HERANCA_SUPERIOR) totalAttributes = { ...totalAttributes, car: totalAttributes.car + 2 };
 
     const isIncrease = selectedPower?.name === 'Aumento de Atributo' && increaseAttr;
     if (isIncrease) {
-      const last = updatedPowers[updatedPowers.length - 1];
-      updatedPowers[updatedPowers.length - 1] = {
+      const lastIdx = updatedPowers.map((p) => p.name).lastIndexOf('Aumento de Atributo');
+      const last = updatedPowers[lastIdx];
+      updatedPowers[lastIdx] = {
         ...last,
         id: `aumento_atributo_${increaseAttr}_${nextTotalLevel}`,
         description: `+1 em ${ATTRIBUTES_LIST.find((a) => a.key === increaseAttr)?.name} (${nextTotalLevel}º nível). ${last.description}`,
@@ -295,6 +328,9 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
     selectedSpells.forEach((sp) => updatedSpells.push(asClassSpell(sp, selectedClassId, ownerForSpells)));
     // Magias concedidas pelo poder escolhido e fórmula do nível
     updatedSpells.push(...powerSpells, ...levelFormula);
+    // Linhagem Feérica (básica): magia de encantamento ou ilusão
+    const feericaSpell = needsBloodline && newBloodline?.id === 'feerica' ? SPELLS_LIST.find((sp) => sp.id === newBloodline.spellId) : undefined;
+    if (feericaSpell && !updatedSpells.some((sp) => sp.id === feericaSpell.id)) updatedSpells.push(...spellsFromGrant(FEERICA_SPELL_GRANT, [feericaSpell]));
     // Magias fixas de poderes (ex.: Elo com a Natureza); repetidas de poder concedido ficam –1 PM
     const finalSpells = withFixedGrants(updatedPowers, updatedSpells);
 
@@ -306,6 +342,11 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
         classes: updatedClasses,
         powers: updatedPowers,
         spells: finalSpells,
+        bloodline,
+        // Linhagem Feérica (básica): treinado em Enganação
+        ...(needsBloodline && newBloodline?.id === 'feerica'
+          ? { skills: { ...character.skills, enganacao: { ...(character.skills?.enganacao || {}), isTrained: true } as CharacterSheet['skills'][string] } }
+          : {}),
         ...(needsSchools ? { spellSchools: newSchools } : {}),
       })
     );
@@ -541,6 +582,16 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
               />
             )}
 
+            {needsBloodline && (
+              <BloodlinePicker
+                value={newBloodline}
+                onChange={setNewBloodline}
+                spellOwner={ownerForSpells}
+                prerequisiteContext={validationContext}
+                ownedPowers={(character.powers || []).map((p) => p.name)}
+              />
+            )}
+
             {needsSchools && (
               <div className="card stack-sm">
                 <span className="t-label">Escolas de magia ({newSchools.length}/3)</span>
@@ -669,6 +720,18 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
                 <Zap size={18} />
                 <span>
                   Você aprende {selectedGrant.fixed.join(', ')} (pág. {selectedGrant.page}).
+                </span>
+              </div>
+            )}
+            {character.bloodline && (selectedPower?.name === HERANCA_APRIMORADA || selectedPower?.name === HERANCA_SUPERIOR) && (
+              <div className="callout callout-accent" style={{ margin: 16 }}>
+                <Star size={18} />
+                <span>
+                  {bloodlineDef(character.bloodline.id)?.name} — herança {selectedPower.name === HERANCA_SUPERIOR ? 'superior' : 'aprimorada'}:{' '}
+                  {bloodlineDef(character.bloodline.id)?.tiers[selectedPower.name === HERANCA_SUPERIOR ? 'superior' : 'aprimorada']}
+                  {character.bloodline.id === 'rubra' && selectedPower.name === HERANCA_APRIMORADA
+                    ? ' Escolha as magias com –1 PM na aba Poderes da ficha.'
+                    : ''}
                 </span>
               </div>
             )}
