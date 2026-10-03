@@ -5,6 +5,7 @@ import { ORIGINS_LIST } from '../data/origins';
 import { DEITIES_LIST } from '../data/deities';
 import { GENERAL_POWERS_LIST } from '../data/generalPowers';
 import { CLASS_POWERS_LIST } from '../data/classPowers';
+import { SPELLS_LIST } from '../data/spells';
 
 export interface PrerequisiteContext {
   attributes: CharacterAttributes;
@@ -299,6 +300,7 @@ export interface WizardValidationInput {
   totalAttributes: CharacterAttributes;
   selectedIntSkills: string[];
   selectedSpells: string[];
+  spellSchools?: string[];
   currentSpaces: number;
   maxSpaces: number;
   characterName: string;
@@ -563,6 +565,15 @@ export function validateAllWizardSteps(input: WizardValidationInput): Record<num
     const warnings: string[] = [];
 
     if (isSpellcaster) {
+      const schoolsNeeded = currentClass.spellcaster?.schoolsCount || 0;
+      if (schoolsNeeded) {
+        const schools = input.spellSchools || [];
+        if (schools.length !== schoolsNeeded) errors.push(`Escolha ${schoolsNeeded} escolas de magia (atualmente ${schools.length}).`);
+        const outside = input.selectedSpells
+          .map((id) => SPELLS_LIST.find((sp) => sp.id === id))
+          .filter((sp) => sp && !schools.includes(sp.school));
+        if (outside.length) errors.push(`Magias fora das escolas escolhidas: ${outside.map((sp) => sp!.name).join(', ')}.`);
+      }
       if (input.selectedSpells.length !== allowedSpellsCount) {
         errors.push(`Escolha ${allowedSpellsCount} magias de 1º círculo (atualmente ${input.selectedSpells.length}).`);
       }

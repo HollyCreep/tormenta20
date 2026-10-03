@@ -65,7 +65,10 @@ export const SpellCastModal: React.FC<SpellCastModalProps> = ({ spell, character
     (sum, upg, idx) => sum + parseUpgradeCost(upg.cost) * (selectedUpgrades[idx] || 0),
     0
   );
-  const totalCost = Math.max(1, baseCost + upgradesCost + customCostModifier + alquebrado);
+  // Truque: custo zero e não combina com outros aprimoramentos (Cap. 4, pág. 171)
+  const truqueIdx = (spell?.upgrades || []).findIndex((u) => /truque/i.test(u.cost));
+  const usingTruque = truqueIdx >= 0 && (selectedUpgrades[truqueIdx] || 0) > 0;
+  const totalCost = usingTruque ? alquebrado : Math.max(1, baseCost + upgradesCost + customCostModifier + alquebrado);
   const exceedsMaxPm = totalCost > maxPm.maxCost;
   const exceedsCurrentPm = totalCost > character.stats.currentMp;
   const canCast = !exceedsMaxPm && !exceedsCurrentPm;
@@ -87,7 +90,14 @@ export const SpellCastModal: React.FC<SpellCastModalProps> = ({ spell, character
     return { count, sides, mod, label: `${count}d${sides}${mod > 0 ? `+${mod}` : ''}` };
   }, [spell?.description, spell?.upgrades, selectedUpgrades]);
 
-  const setUpgrade = (idx: number, qty: number) => setSelectedUpgrades((prev) => ({ ...prev, [idx]: Math.max(0, qty) }));
+  const setUpgrade = (idx: number, qty: number) =>
+    setSelectedUpgrades((prev) => {
+      // Truque é exclusivo: ao ativá-lo, os demais aprimoramentos são desligados (e vice-versa)
+      if (idx === truqueIdx && qty > 0) return { [idx]: 1 };
+      const next = { ...prev, [idx]: Math.max(0, qty) };
+      if (idx !== truqueIdx && qty > 0 && truqueIdx >= 0) delete next[truqueIdx];
+      return next;
+    });
 
   const handleCast = () => {
     if (!canCast || !spell) return;

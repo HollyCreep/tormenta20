@@ -11,6 +11,10 @@ interface StepSpellsProps {
   isSpellcaster: boolean;
   spellcasterType?: 'arcana' | 'divina';
   allowedCount: number;
+  /** Bardo e Druida: escolhem três escolas e só lançam magias delas (Cap. 1, págs. 44 e 61). */
+  schoolsCount?: number;
+  selectedSchools?: string[];
+  onSelectSchools?: (schools: string[]) => void;
   selectedSpells: string[];
   onSelectSpells: (spells: string[]) => void;
   onOpenDetail: (data: DetailModalData) => void;
@@ -23,6 +27,9 @@ export const StepSpells: React.FC<StepSpellsProps> = ({
   isSpellcaster,
   spellcasterType = 'arcana',
   allowedCount,
+  schoolsCount = 0,
+  selectedSchools = [],
+  onSelectSchools,
   selectedSpells,
   onSelectSpells,
   onOpenDetail,
@@ -32,10 +39,13 @@ export const StepSpells: React.FC<StepSpellsProps> = ({
 
   const available = useMemo(
     () =>
-      SPELLS_LIST.filter((s) => s.circle === 1 && (s.type === 'universal' || s.type === spellcasterType)).sort((a, b) =>
-        a.name.localeCompare(b.name, 'pt-BR')
-      ),
-    [spellcasterType]
+      SPELLS_LIST.filter(
+        (s) =>
+          s.circle === 1 &&
+          (s.type === 'universal' || s.type === spellcasterType) &&
+          (!schoolsCount || selectedSchools.includes(s.school))
+      ).sort((a, b) => a.name.localeCompare(b.name, 'pt-BR')),
+    [spellcasterType, schoolsCount, selectedSchools]
   );
 
   const visible = available.filter((s) => {
@@ -54,6 +64,15 @@ export const StepSpells: React.FC<StepSpellsProps> = ({
     );
   }
 
+  const toggleSchool = (sc: string) => {
+    if (!onSelectSchools) return;
+    if (selectedSchools.includes(sc)) {
+      onSelectSchools(selectedSchools.filter((x) => x !== sc));
+      // magias de uma escola desmarcada deixam de ser válidas
+      onSelectSpells(selectedSpells.filter((id) => SPELLS_LIST.find((x) => x.id === id)?.school !== sc));
+    } else if (selectedSchools.length < schoolsCount) onSelectSchools([...selectedSchools, sc]);
+  };
+
   const toggle = (id: string) => {
     if (selectedSpells.includes(id)) onSelectSpells(selectedSpells.filter((x) => x !== id));
     else if (selectedSpells.length < allowedCount) onSelectSpells([...selectedSpells, id]);
@@ -67,6 +86,29 @@ export const StepSpells: React.FC<StepSpellsProps> = ({
         title="Magias"
         description={`Escolha ${allowedCount} magias ${spellcasterType === 'divina' ? 'divinas' : 'arcanas'} (ou universais) de 1º círculo. Cada uma custa 1 PM.`}
       />
+
+      {schoolsCount > 0 && (
+        <div className="card stack-sm">
+          <div className="hstack between">
+            <span className="t-semibold">Escolas de magia (definitivas)</span>
+            <Counter value={selectedSchools.length} total={schoolsCount} />
+          </div>
+          <span className="t-xs t-3">Escolha {schoolsCount} escolas; você só pode lançar magias delas (Cap. 1, págs. 44 e 61).</span>
+          <div className="chip-wrap">
+            {SCHOOLS.map((sc) => (
+              <button
+                key={sc}
+                type="button"
+                className={`chip chip-sm${selectedSchools.includes(sc) ? ' is-active' : ''}`}
+                aria-pressed={selectedSchools.includes(sc)}
+                onClick={() => toggleSchool(sc)}
+              >
+                {sc}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="card stack-sm spell-tray">
         <div className="hstack between">

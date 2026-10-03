@@ -167,6 +167,9 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
   );
 
   // Equipamento & Inventário
+  // Bardo e Druida: três escolas de magia (Cap. 1, págs. 44 e 61)
+  const [spellSchools, setSpellSchools] = useState<string[]>(initialCharacter?.spellSchools || []);
+
   // Equipamento: o kit inicial (Cap. 3, pág. 140) e os itens da origem entram pela etapa 8
   const [inventory, setInventory] = useState<CharacterInventoryItem[]>(initialCharacter?.inventory || []);
   // Fichas antigas não marcam os itens do kit; nelas o kit não é adicionado sozinho (evita duplicar)
@@ -325,6 +328,7 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
     totalAttributes,
     selectedIntSkills,
     selectedSpells,
+    spellSchools,
     currentSpaces,
     maxSpaces: maxSpaces.value,
     characterName: name,
@@ -519,6 +523,7 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
       skills: fullSkillsRecord,
       powers: allPowers,
       spells: finalSpells,
+      spellSchools: currentClass.spellcaster?.schoolsCount ? spellSchools : undefined,
       inventory,
       tibares,
       activeConditions: [],
@@ -726,6 +731,9 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
               isSpellcaster={isSpellcaster}
               spellcasterType={currentClass.spellcaster?.type}
               allowedCount={allowedSpellsCount}
+              schoolsCount={currentClass.spellcaster?.schoolsCount}
+              selectedSchools={spellSchools}
+              onSelectSchools={setSpellSchools}
               selectedSpells={selectedSpells}
               onSelectSpells={setSelectedSpells}
               onOpenDetail={setModalDetail}

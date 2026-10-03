@@ -19,7 +19,7 @@ Ferramentas: `.agents/tools/book_extract.py` (extrai blocos do livro por título
 - [x] 6. Classes — PV/PM, perícias, proficiências, habilidades por nível, magias iniciais, kit (Espólio/Protótipo)
 - [x] 7. Poderes de classe — textos e pré-requisitos
 - [x] 8. Divindades — devotos, poderes concedidos, obrigações
-- [ ] 9. Magias — círculo, escola, execução, alcance, duração, resistência, aprimoramentos
+- [x] 9. Magias — círculo, escola, execução, alcance, duração, resistência, aprimoramentos
 - [ ] 10. Equipamentos — Tabelas 3-x (armas, armaduras, itens), melhorias, materiais
 - [ ] 11. Documentação: `.agents/rules/*.md`, `.agents/mcp_config.json`, `rulesCitations.ts`, CHANGELOG
 
@@ -63,3 +63,6 @@ Ferramentas: `.agents/tools/book_extract.py` (extrai blocos do livro por título
 | 32 | Poderes de classe | Efeitos passivos ignorados (Pele de Ferro, Totem Espiritual, Sarado...) | Registrados em passiveEffects.ts com citação | corrigido (etapa 7) |
 | 33 | Divindades | Poderes concedidos com textos inventados (ex.: Afinidade com a Tormenta) e descrições/obrigações parafraseadas | Texto do livro; poderes vinculados aos de generalPowers (Cap. 1, págs. 96–105) | corrigido (etapa 8) |
 | 34 | Devoção | Clérigo recebia todos os poderes; sem checagem de quem pode ser devoto | 2 poderes para clérigo/druida, 1 para os demais; raça/classe em Devotos (humanos e clérigos exceção); druida/paladino com deuses próprios (pág. 96) | corrigido (etapa 8) |
+| 35 | Magias | Nomes truncados (Fantasmagórico, Mortos-Vivos, Caleidoscópica...); Manto de Sombras ausente; textos parafraseados | 198 magias com execução, alcance, alvo, duração, resistência, texto e aprimoramentos do livro (Cap. 4) | corrigido (etapa 9) |
+| 36 | Magias | Truque somava custo mínimo de 1 PM e combinava com aprimoramentos | Custo zero e exclusivo (Cap. 4, pág. 171) | corrigido (etapa 9) |
+| 37 | Magias | Bardo/Druida sem escolha das três escolas | Escolas escolhidas no criador e magias restritas a elas (págs. 44 e 61) | corrigido (etapa 9) |

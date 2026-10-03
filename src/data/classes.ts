@@ -1116,6 +1116,7 @@ export const CLASSES_LIST: ClassDefinition[] = [
     "spellcaster": {
       "type": "divina",
       "circle1Count": 2,
+      "schoolsCount": 3,
       "keyAttribute": "sab"
     },
     "progression": [

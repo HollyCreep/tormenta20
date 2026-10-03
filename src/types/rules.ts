@@ -189,6 +189,8 @@ export interface Spell {
     cost: string;
     description: string;
   }[];
+  /** Página do livro (T20 JdA v1.3). */
+  page?: number;
 }
 
 export interface EquipmentItem {
