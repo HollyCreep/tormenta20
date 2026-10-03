@@ -521,6 +521,16 @@ export function calculateSpellCircleUnlocked(classLevel: number, classId?: strin
   return 1;
 }
 
+/**
+ * Magias de 1º círculo no 1º nível: Arcanista 3 (Mago 4), Bardo 2, Clérigo 3, Druida 2
+ * (Cap. 1, págs. 37, 44, 57 e 61).
+ */
+export function startingSpellCount(classId: string, subclass?: string): number {
+  const cls = CLASSES_LIST.find((c) => c.id === classId);
+  const base = cls?.spellcaster?.circle1Count || 0;
+  return classId === 'arcanista' && subclass === 'mago' ? base + 1 : base;
+}
+
 /* ==========================================================================
    Ficha completa
    ========================================================================== */

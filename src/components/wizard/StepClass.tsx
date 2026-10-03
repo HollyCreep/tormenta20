@@ -52,7 +52,9 @@ export const StepClass: React.FC<StepClassProps> = ({
     searchText: c.description,
   }));
 
-  const skillOptions: PickerOption[] = cls.skillOptions
+  // Total de escolhas: a lista da classe + a alternativa obrigatória ("Luta ou Pontaria")
+  const totalChoices = cls.skillChoicesCount + (cls.skillAlternative ? 1 : 0);
+  const skillOptions: PickerOption[] = [...new Set([...(cls.skillAlternative || []), ...cls.skillOptions])]
     .filter((id) => !cls.mandatorySkills.includes(id))
     .map((id) => ({
       id,
@@ -125,8 +127,10 @@ export const StepClass: React.FC<StepClassProps> = ({
 
       <ChoiceSection
         title="Perícias de classe"
-        description={`Obrigatórias: ${cls.mandatorySkills.map(skillName).join(', ')}. Escolha mais ${cls.skillChoicesCount}.`}
-        count={{ value: selectedClassSkills.length, total: cls.skillChoicesCount }}
+        description={`Obrigatórias: ${cls.mandatorySkills.map(skillName).join(', ')}${
+          cls.skillAlternative ? ` e ${cls.skillAlternative.map(skillName).join(' ou ')}` : ''
+        }. Escolha mais ${cls.skillChoicesCount} da lista (Cap. 1, pág. ${cls.page}).`}
+        count={{ value: selectedClassSkills.length, total: totalChoices }}
         action={
           <button
             type="button"
@@ -155,7 +159,7 @@ export const StepClass: React.FC<StepClassProps> = ({
         </div>
         <SelectedChips
           labels={selectedClassSkills.map((id) => ({ id, label: skillName(id) }))}
-          placeholder={`Escolher ${cls.skillChoicesCount} perícias`}
+          placeholder={`Escolher ${totalChoices} perícias`}
           onOpen={() => setPicker('skills')}
           onRemove={(id) => onSelectClassSkills(selectedClassSkills.filter((s) => s !== id))}
         />
@@ -196,12 +200,12 @@ export const StepClass: React.FC<StepClassProps> = ({
         open={picker === 'skills'}
         onClose={() => setPicker(null)}
         title="Perícias de classe"
-        subtitle={`Escolha ${cls.skillChoicesCount} da lista de ${cls.name}`}
+        subtitle={cls.skillAlternative ? `Inclua ${cls.skillAlternative.map(skillName).join(' ou ')} e mais ${cls.skillChoicesCount}` : `Escolha ${cls.skillChoicesCount} da lista de ${cls.name}`}
         options={skillOptions}
         value={selectedClassSkills}
         onChange={onSelectClassSkills}
         multiple
-        max={cls.skillChoicesCount}
+        max={totalChoices}
         searchPlaceholder="Buscar perícia…"
       />
     </div>

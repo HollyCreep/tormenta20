@@ -23,6 +23,7 @@ import {
   calculateTotalAttributes,
   calculateSkillBonus,
   computeDerivedStats,
+  startingSpellCount,
   type RulesInput,
 } from '../../utils/rulesEngine';
 import { tormentaCharismaLoss } from '../../utils/passiveEffects';
@@ -255,7 +256,7 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
   ]);
 
   const isSpellcaster = Boolean(currentClass.spellcaster);
-  const allowedSpellsCount = currentClass.spellcaster?.circle1Count || 0;
+  const allowedSpellsCount = startingSpellCount(classId, classSubclass);
 
   // Contexto de pré-requisitos para validação de poderes
   const prereqContext: PrerequisiteContext = {
@@ -313,6 +314,7 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
     racialChoices,
     subraceId,
     classId,
+    classSubclass,
     selectedClassSkills,
     originId,
     selectedOriginBenefits,

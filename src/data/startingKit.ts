@@ -218,6 +218,11 @@ function classSlots(cls: ClassDefinition): KitSlot[] {
     slots.push(choice('c_armadura', 'Armadura', armor));
   }
   if (cls.proficiencies.shields) slots.push(fixed('c_escudo', opt('escudo_leve')));
+  // Nobre — Espólio: um item a sua escolha com preço de até T$ 2.000 (Cap. 1, pág. 79)
+  if (cls.id === 'nobre') slots.push({ id: 'c_espolio', label: 'Espólio: item de até T$ 2.000', options: [], budget: { max: 2000 } });
+  // Inventor — Protótipo: um item superior ou 10 itens alquímicos, total de até T$ 500 (Cap. 1, pág. 68)
+  if (cls.id === 'inventor')
+    slots.push({ id: 'c_prototipo', label: 'Protótipo: itens somando até T$ 500', options: [], budget: { max: 500, multiple: true } });
   return slots;
 }
 

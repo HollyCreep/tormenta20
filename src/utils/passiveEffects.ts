@@ -116,6 +116,8 @@ const RACE_EFFECTS: Record<string, EffectFn[]> = {
 
 /** Efeitos de classe (habilidades automáticas por nível). */
 const CLASS_EFFECTS: EffectFn[] = [
+  // Caçador — Rastreador: +2 em Sobrevivência (Cap. 1, pág. 50)
+  (i) => (classLevelOf(i, 'cacador') >= 1 ? { source: 'Rastreador (Caçador)', citation: 'Cap. 1, pág. 50', skills: { sobrevivencia: 2 } } : null),
   // Bárbaro — Instinto Selvagem: 3º nível +1 em dano, Percepção e Reflexos; +1 a cada seis níveis (pág. 42)
   (i) => {
     const lv = classLevelOf(i, 'barbaro');

@@ -16,7 +16,7 @@ Ferramentas: `.agents/tools/book_extract.py` (extrai blocos do livro por título
 - [x] 3. Poderes gerais — combate, destino, magia, concedidos e Tormenta (Cap. 2, págs. 124–137)
 - [x] 4. Pré-requisitos — validador genérico que interpreta o texto do livro (sem switch manual)
 - [x] 5. Motor — condições (Apêndice), registro de efeitos passivos, carga, sobrecarga, armadura, deslocamento, Defesa, PV, PM, perícias, magias, ataque
-- [ ] 6. Classes — PV/PM, perícias, proficiências, habilidades por nível, magias iniciais, kit (Espólio/Protótipo)
+- [x] 6. Classes — PV/PM, perícias, proficiências, habilidades por nível, magias iniciais, kit (Espólio/Protótipo)
 - [ ] 7. Poderes de classe — textos e pré-requisitos
 - [ ] 8. Divindades — devotos, poderes concedidos, obrigações
 - [ ] 9. Magias — círculo, escola, execução, alcance, duração, resistência, aprimoramentos
@@ -37,7 +37,7 @@ Ferramentas: `.agents/tools/book_extract.py` (extrai blocos do livro por título
 | 8 | Magias | Mesma progressão de círculos para todos | Bardo/Druida: 2º no 6º, 3º no 10º, 4º no 14º (máx. 4º) | etapa 5 |
 | 9 | Perícias | Pilotagem com penalidade de armadura | Tabela 2-1: sem penalidade (pág. 115) | corrigido (etapa 5) |
 | 10 | Condições | "Imóvel" dá –5 Defesa; penalidades de ataque somam | Imóvel só zera deslocamento; mesmos efeitos não acumulam (pág. 394) | corrigido (etapa 5) |
-| 11 | Proficiências | Ladino com armas marciais; Arcanista sem armaduras leves | Ladino: nenhuma; todos usam armas simples e armaduras leves (pág. 32) | etapa 6 |
+| 11 | Proficiências | Ladino com armas marciais; Arcanista sem armaduras leves | Ladino: nenhuma; todos usam armas simples e armaduras leves (pág. 32) | corrigido (etapa 6) |
 | 12 | Raças | Habilidades parafraseadas/erradas (Goblin, Hynne, Kliren, Golem, Medusa, Sílfide, Sereia, Trog, Osteon...) | Cap. 1, págs. 19–31 | corrigido (etapa 2) |
 | 13 | Poderes | Atlético +1,5m; Estilo de Arma e Escudo +1; Carapaça +2; Bênção do Mana +1/nível | +3m; +2; +1 (+1 a cada 2 outros poderes da Tormenta); +1 PM a cada nível ímpar | corrigido (etapa 5) |
 | 14 | Poderes concedidos | Faltam vários (Escamas Dracônicas, Mente Vazia, Talento Artístico, Rejeição Divina, Voz da Civilização, Êxtase da Loucura...) | Cap. 2, págs. 132–135 | corrigido (etapa 3) |
@@ -55,4 +55,6 @@ Ferramentas: `.agents/tools/book_extract.py` (extrai blocos do livro por título
 
 ## Notas
 - Pendente (etapa 7): ao ganhar poder da Tormenta no Subir de Nível, reduzir Carisma (tormentaCharismaLoss).
-- Pendente (etapa 6): descrições de perícias em skills.ts são resumos; Espólio (Nobre) e Protótipo (Inventor) no kit.
+| 26 | Classes | Perícias "Luta ou Pontaria" contadas como escolha livre; habilidades de 1º nível parafraseadas | Campo skillAlternative validado; textos e progressão por nível do livro | corrigido (etapa 6) |
+| 27 | Classes | Mago começava com 3 magias; Espólio/Protótipo ausentes; Rastreador sem efeito | Mago 4 (pág. 37); Espólio até T$ 2.000 (pág. 79); Protótipo até T$ 500 (pág. 68); +2 Sobrevivência (pág. 50) | corrigido (etapa 6) |
+| 28 | Perícias | Descrições parafraseadas | Texto de abertura de cada perícia (Cap. 2, págs. 115–123) | corrigido (etapa 6) |

@@ -1,5 +1,6 @@
 import { Skill } from '../types/rules';
 
+/** Perícias — Tabela 2-1 e descrições (T20 JdA v1.3, Cap. 2, págs. 114–123). */
 export const SKILLS_LIST: Skill[] = [
   {
     id: 'acrobacia',
@@ -7,7 +8,7 @@ export const SKILLS_LIST: Skill[] = [
     attribute: 'des',
     trainedOnly: false,
     armorPenalty: true,
-    description: 'Você consegue fazer proezas acrobáticas como amortecer queda (reduz dano de queda), equilibrar-se em superfícies precárias ou estreitas, escapar de amarras ou redes, passar por espaço apertado e levantar-se rapidamente do chão sem gastar ação de movimento (se treinado).',
+    description: "Você consegue fazer proezas acrobáticas.",
   },
   {
     id: 'adestramento',
@@ -15,7 +16,7 @@ export const SKILLS_LIST: Skill[] = [
     attribute: 'car',
     trainedOnly: true,
     armorPenalty: false,
-    description: 'Você sabe cuidar de animais e treiná-los para realizar truques, acalmá-los em situações de perigo ou comandá-los em combate. Pode também ser usado para cavalgar montarias exóticas ou selvagens.',
+    description: "Você sabe lidar com animais.",
   },
   {
     id: 'atletismo',
@@ -23,7 +24,7 @@ export const SKILLS_LIST: Skill[] = [
     attribute: 'for',
     trainedOnly: false,
     armorPenalty: false,
-    description: 'Você pode realizar façanhas atléticas como correr em velocidade máxima, dar saltos em distância ou em altura, escalar paredes e penhascos, e nadar em águas calmas ou violentas (neste caso, a penalidade de armadura se aplica à natação).',
+    description: "Você pode realizar façanhas atléticas.",
   },
   {
     id: 'atuacao',
@@ -31,7 +32,7 @@ export const SKILLS_LIST: Skill[] = [
     attribute: 'car',
     trainedOnly: true,
     armorPenalty: false,
-    description: 'Você sabe cantar, dançar, recitar poesia, tocar instrumentos musicais ou encenar. Pode entreter uma audiência para ganhar sustento ou impressionar nobres, além de servir de base para magias e habilidades de Bardo.',
+    description: "Você sabe fazer apresentações artísticas, incluindo música, dança e dramaturgia.",
   },
   {
     id: 'cavalgar',
@@ -39,7 +40,7 @@ export const SKILLS_LIST: Skill[] = [
     attribute: 'des',
     trainedOnly: false,
     armorPenalty: false,
-    description: 'Você sabe conduzir animais de montaria comuns em marcha ou em combate, galopar por terreno difícil, controlar montarias assustadas e saltar com a montaria sobre obstáculos.',
+    description: "Você sabe conduzir animais de montaria, como cavalos, trobos e grifos. Ações simples não exigem testes — você pode encilhar, montar, cavalgar em terreno plano e desmontar automaticamente. Ações perigosas, entretanto, exigem testes da perícia.",
   },
   {
     id: 'conhecimento',
@@ -47,7 +48,7 @@ export const SKILLS_LIST: Skill[] = [
     attribute: 'int',
     trainedOnly: true,
     armorPenalty: false,
-    description: 'Você adquiriu educação formal e estudos gerais sobre história, geografia, arquitetura, ciências e lendas de Arton. Permite lembrar fatos obscuros, decifrar inscrições antigas e identificar culturas e heraldica.',
+    description: "Você estudou diversos campos do saber, como aritmética, astronomia, dialética, geografia, história...",
   },
   {
     id: 'cura',
@@ -55,7 +56,7 @@ export const SKILLS_LIST: Skill[] = [
     attribute: 'sab',
     trainedOnly: false,
     armorPenalty: false,
-    description: 'Você sabe cuidar de ferimentos e tratar enfermidades. Pode estabilizar personagens morrendo (CD 15), prestar primeiros socorros para restaurar PVs ou tratar os efeitos prolongados de venenos e doenças.',
+    description: "Você sabe tratar ferimentos, doenças e venenos.",
   },
   {
     id: 'diplomacia',
@@ -63,7 +64,7 @@ export const SKILLS_LIST: Skill[] = [
     attribute: 'car',
     trainedOnly: false,
     armorPenalty: false,
-    description: 'Você convence pessoas com lábia, empatia e argumentação lógica. Permite mudar a atitude de uma pessoa (de hostil para indiferente, ou de amistoso para prestativo), negociar acordos e obter favores.',
+    description: "Você convence pessoas com lábia e argumentação.",
   },
   {
     id: 'enganacao',
@@ -71,7 +72,7 @@ export const SKILLS_LIST: Skill[] = [
     attribute: 'car',
     trainedOnly: false,
     armorPenalty: false,
-    description: 'Você sabe mentir com convicção, disfarçar-se, falsificar documentos, criar distrações para se esconder e fintar em combate para pegar o oponente desprevenido contra o seu próximo ataque.',
+    description: "Você manipula pessoas com blefes e trapaças.",
   },
   {
     id: 'fortitude',
@@ -79,7 +80,7 @@ export const SKILLS_LIST: Skill[] = [
     attribute: 'con',
     trainedOnly: false,
     armorPenalty: false,
-    description: 'Mede o vigor e resistência física do seu corpo contra venenos, doenças, toxinas, fadiga, privação de sono, fome, sede e temperaturas extremas.',
+    description: "Você usa esta perícia para resistir a efeitos que exigem vitalidade, como doenças e venenos.",
   },
   {
     id: 'furtividade',
@@ -87,7 +88,7 @@ export const SKILLS_LIST: Skill[] = [
     attribute: 'des',
     trainedOnly: false,
     armorPenalty: true,
-    description: 'Você sabe se mover silenciosamente e se esconder nas sombras ou atrás de coberturas para não ser notado por guardas e criaturas.',
+    description: "Você sabe ser discreto e sorrateiro.",
   },
   {
     id: 'guerra',
@@ -95,7 +96,7 @@ export const SKILLS_LIST: Skill[] = [
     attribute: 'int',
     trainedOnly: true,
     armorPenalty: false,
-    description: 'Você foi instruído em táticas militares, logística, cerco e liderança de tropas. Pode analisar o terreno para obter vantagem tática, coordenar manobras em grupo e prever movimentos do inimigo.',
+    description: "Você foi educado em tática, estratégia e logística.",
   },
   {
     id: 'iniciativa',
@@ -103,7 +104,7 @@ export const SKILLS_LIST: Skill[] = [
     attribute: 'des',
     trainedOnly: false,
     armorPenalty: false,
-    description: 'Mede sua rapidez de reação quando o combate ou o perigo iminente começa, determinando a ordem de turnos de todos os participantes.',
+    description: "Esta perícia determina sua velocidade de reação em situações de perigo. Quando uma cena de ação começa, cada personagem envolvido faz um teste de Iniciativa. Eles então agem em ordem decrescente dos resultados.",
   },
   {
     id: 'intimidacao',
@@ -111,7 +112,7 @@ export const SKILLS_LIST: Skill[] = [
     attribute: 'car',
     trainedOnly: false,
     armorPenalty: false,
-    description: 'Você pode assustar ou coagir outras pessoas usando força física, ameaças veladas ou imponência, forçando-as a colaborar temporariamente ou desmoralizando inimigos em combate.',
+    description: "Você pode assustar ou coagir outras pessoas.",
   },
   {
     id: 'intuicao',
@@ -119,7 +120,7 @@ export const SKILLS_LIST: Skill[] = [
     attribute: 'sab',
     trainedOnly: false,
     armorPenalty: false,
-    description: 'Seu sexto sentido para ler a linguagem corporal e intenções das pessoas. Usado para perceber quando alguém está mentindo, pressentir más intenções ou pressentir emboscadas.',
+    description: "Esta perícia mede sua empatia e “sexto sentido”.",
   },
   {
     id: 'investigacao',
@@ -127,7 +128,7 @@ export const SKILLS_LIST: Skill[] = [
     attribute: 'int',
     trainedOnly: false,
     armorPenalty: false,
-    description: 'Você sabe vasculhar uma cena de crime ou biblioteca em busca de pistas, interrogar testemunhas e deduzir o paradeiro de objetos ou pessoas escondidas.',
+    description: "Você sabe encontrar pistas e informações.",
   },
   {
     id: 'jogatina',
@@ -135,7 +136,7 @@ export const SKILLS_LIST: Skill[] = [
     attribute: 'car',
     trainedOnly: true,
     armorPenalty: false,
-    description: 'Você conhece regras de jogos de azar populares em Arton (como wyrt e dados do taverneiro), sabe calcular probabilidades e blefar para ganhar tibares em mesas de aposta.',
+    description: "Você sabe jogar jogos de azar.",
   },
   {
     id: 'ladinagem',
@@ -143,7 +144,7 @@ export const SKILLS_LIST: Skill[] = [
     attribute: 'des',
     trainedOnly: true,
     armorPenalty: true,
-    description: 'Você domina truques de mãos como bater carteiras, arrombar fechaduras com gazua, desarmar armadilhas mecânicas e sabotar mecanismos sem ser notado.',
+    description: "Você sabe exercer atividades ilícitas.",
   },
   {
     id: 'luta',
@@ -151,7 +152,7 @@ export const SKILLS_LIST: Skill[] = [
     attribute: 'for',
     trainedOnly: false,
     armorPenalty: false,
-    description: 'Sua habilidade em combates corpo a corpo. Usada para desferir ataques com espadas, machados, lanças, garras ou punhos desarmados, além de manobras de combate (agarrar, derrubar, desarmar, empurrar e quebrar).',
+    description: "Você usa Luta para fazer ataques corpo a corpo. A CD é a Defesa do alvo. Se você acertar, causa dano de acordo com a arma utilizada.",
   },
   {
     id: 'misticismo',
@@ -159,7 +160,7 @@ export const SKILLS_LIST: Skill[] = [
     attribute: 'int',
     trainedOnly: true,
     armorPenalty: false,
-    description: 'Você compreende as leis e segredos da magia e dos planos. Usado para identificar magias que estão sendo lançadas, discernir auras mágicas, decifrar pergaminhos e entender itens encantados.',
+    description: "Esta perícia envolve o conhecimento de magias, itens mágicos e fenômenos sobrenaturais.",
   },
   {
     id: 'nobreza',
@@ -167,7 +168,7 @@ export const SKILLS_LIST: Skill[] = [
     attribute: 'int',
     trainedOnly: true,
     armorPenalty: false,
-    description: 'Você conhece as linhagens aristocráticas, etiqueta de corte, protocolo real, leis civis e intrigas políticas dos reinos do continente.',
+    description: "Você recebeu a educação de um nobre.",
   },
   {
     id: 'oficio',
@@ -175,7 +176,7 @@ export const SKILLS_LIST: Skill[] = [
     attribute: 'int',
     trainedOnly: true,
     armorPenalty: false,
-    description: 'Você domina um ofício manual ou comercial (como Alquimia, Armeiro, Culinária, Carpintaria, Engenhoqueiro, Joalheria). Usado para fabricar e consertar itens superiores ou alquímicos.',
+    description: "Ofício na verdade são várias perícias diferentes. Cada uma permite fabricar itens de certas categorias.",
   },
   {
     id: 'percepcao',
@@ -183,7 +184,7 @@ export const SKILLS_LIST: Skill[] = [
     attribute: 'sab',
     trainedOnly: false,
     armorPenalty: false,
-    description: 'Sua atenção visual, auditiva e sensorial ao ambiente. Permite enxergar detalhes à distância, ouvir passos sorrateiros de inimigos furtivos e notar passagens secretas.',
+    description: "Você nota coisas usando seus sentidos.",
   },
   {
     id: 'pilotagem',
@@ -191,7 +192,7 @@ export const SKILLS_LIST: Skill[] = [
     attribute: 'des',
     trainedOnly: true,
     armorPenalty: false, // Tabela 2-1 (Cap. 2, pág. 115): Pilotagem não sofre penalidade de armadura
-    description: 'Você sabe conduzir veículos não-vivos complexos, como carroças, carruagens de corrida, barcos a remo, veleiros, galeões de guerra e engenhos voadores.',
+    description: "Você sabe operar veículos como carroças, barcos e balões. Ações simples não exigem testes; conduzir um veículo em situações ruins exige testes da perícia.",
   },
   {
     id: 'pontaria',
@@ -199,7 +200,7 @@ export const SKILLS_LIST: Skill[] = [
     attribute: 'des',
     trainedOnly: false,
     armorPenalty: false,
-    description: 'Sua coordenação motora para ataques à distância, seja disparando arcos, bestas, fundas, armas de fogo ou arremessando facas, dardos e lanças.',
+    description: "Você usa Pontaria para fazer ataques à distância. A CD é a Defesa do alvo. Se você acertar, causa dano de acordo com a arma utilizada.",
   },
   {
     id: 'reflexos',
@@ -207,7 +208,7 @@ export const SKILLS_LIST: Skill[] = [
     attribute: 'des',
     trainedOnly: false,
     armorPenalty: false,
-    description: 'Mede a velocidade dos seus reflexos e capacidade de se esquivar de perigos repentinos, como explosões de bolas de fogo, relâmpagos mágicos e armadilhas de lâminas.',
+    description: "Você usa esta perícia para resistir a efeitos que exigem reação rápida, como armadilhas e explosões.",
   },
   {
     id: 'religiao',
@@ -215,7 +216,7 @@ export const SKILLS_LIST: Skill[] = [
     attribute: 'sab',
     trainedOnly: true,
     armorPenalty: false,
-    description: 'Você estudou os dogmas, lendas, ritos e mistérios dos vinte deuses do Panteão e de cultos ancestrais, além de compreender planos divinos e mortos-vivos.',
+    description: "Você possui conhecimento sobre os deuses e as religiões de Arton.",
   },
   {
     id: 'sobrevivencia',
@@ -223,7 +224,7 @@ export const SKILLS_LIST: Skill[] = [
     attribute: 'sab',
     trainedOnly: false,
     armorPenalty: false,
-    description: 'Você é versado na vida selvagem. Usado para rastrear pegadas na floresta ou deserto, montar acampamentos seguros, encontrar comida e água na natureza e prever o clima.',
+    description: "Você está em casa nos ermos.",
   },
   {
     id: 'vontade',
@@ -231,6 +232,6 @@ export const SKILLS_LIST: Skill[] = [
     attribute: 'sab',
     trainedOnly: false,
     armorPenalty: false,
-    description: 'Mede sua força mental, determinação e sanidade contra feitiços de controle mental, medo, ilusões e efeitos de dominação mágica.',
+    description: "Você usa esta perícia para resistir a efeitos que exigem determinação, como intimidação e encantamentos.",
   },
 ];

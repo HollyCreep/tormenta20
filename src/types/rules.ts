@@ -89,8 +89,14 @@ export interface ClassDefinition {
     shields: boolean;
   };
   mandatorySkills: string[];
+  /** "Luta ou Pontaria": uma das duas é obrigatória, além de skillChoicesCount perícias da lista. */
+  skillAlternative?: string[];
   skillChoicesCount: number;
   skillOptions: string[];
+  /** Habilidades por nível (tabela da classe). */
+  progression?: { level: number; features: string }[];
+  /** Página do livro (T20 JdA v1.3). */
+  page?: number;
   abilitiesLevel1: ClassAbility[];
   spellcaster?: {
     type: 'arcana' | 'divina';

@@ -253,6 +253,7 @@ export interface WizardValidationInput {
   racialChoices?: Record<string, string[]>;
   subraceId?: string;
   classId: string;
+  classSubclass?: string;
   selectedClassSkills: string[];
   originId: string;
   selectedOriginBenefits: { type: 'pericia' | 'poder'; name: string }[];
@@ -277,7 +278,7 @@ export function validateAllWizardSteps(input: WizardValidationInput): Record<num
   const currentRace = RACES_LIST.find((r) => r.id === input.raceId) || RACES_LIST[0];
   const currentClass = CLASSES_LIST.find((c) => c.id === input.classId) || CLASSES_LIST[0];
   const isSpellcaster = Boolean(currentClass.spellcaster);
-  const allowedSpellsCount = currentClass.spellcaster?.circle1Count || 0;
+  const allowedSpellsCount = (currentClass.spellcaster?.circle1Count || 0) + (input.classId === 'arcanista' && input.classSubclass === 'mago' ? 1 : 0);
 
   // Contexto para pré-requisitos de poderes
   const allTrainedSkillsSet = new Set<string>([
@@ -369,10 +370,14 @@ export function validateAllWizardSteps(input: WizardValidationInput): Record<num
   {
     const errors: string[] = [];
     const warnings: string[] = [];
-    const requiredSkills = currentClass.skillChoicesCount;
+    const alt = currentClass.skillAlternative;
+    const requiredSkills = currentClass.skillChoicesCount + (alt ? 1 : 0);
 
     if (input.selectedClassSkills.length !== requiredSkills) {
-      errors.push(`Escolha ${requiredSkills} perícias opcionais da lista de classe (atualmente ${input.selectedClassSkills.length}).`);
+      errors.push(`Escolha ${requiredSkills} perícias da classe (atualmente ${input.selectedClassSkills.length}).`);
+    }
+    if (alt && !alt.some((s) => input.selectedClassSkills.includes(s))) {
+      errors.push(`Escolha ${alt.map((s) => s.charAt(0).toUpperCase() + s.slice(1)).join(' ou ')} (obrigatória da classe).`);
     }
 
     // Checa duplicação com raça
