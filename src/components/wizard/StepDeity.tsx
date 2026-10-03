@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
-import { AlertTriangle, Check, Info, Sun, UserX } from 'lucide-react';
+import { AlertTriangle, Check, Info, Sun, UserX, Zap } from 'lucide-react';
 import { DEITIES_LIST } from '../../data/deities';
 import { canBeDevotee, grantedPowerCount } from '../../utils/rulesValidation';
 import type { DetailModalData } from '../common/DetailModal';
 import { Segmented } from '../ui/controls';
 import { ChoiceCard, ChoiceSection, OptionPickerSheet, StepIntro, type PickerOption } from './wizardUi';
+import type { CharacterSpell } from '../../types/character';
+import { spellGrantFor, type PowerSpellGrant } from '../../data/powerSpellGrants';
+import type { SpellGrantOwner } from '../../utils/powerSpells';
+import { PowerSpellPicker } from '../sheet/PowerSpellPicker';
 
 interface StepDeityProps {
   selectedDeityId: string;
@@ -16,6 +20,10 @@ interface StepDeityProps {
   /** Poderes já escolhidos em outros benefícios (nome → fonte). */
   takenPowers?: Map<string, string>;
   onOpenDetail: (data: DetailModalData) => void;
+  /** Magias escolhidas para poderes concedidos que deixam escolher (Centelha Mágica). */
+  powerSpells?: CharacterSpell[];
+  onChangePowerSpells?: (spells: CharacterSpell[]) => void;
+  spellOwner?: SpellGrantOwner;
 }
 
 export const StepDeity: React.FC<StepDeityProps> = ({
@@ -27,8 +35,12 @@ export const StepDeity: React.FC<StepDeityProps> = ({
   onSelectDeityPowers,
   onOpenDetail,
   takenPowers,
+  powerSpells = [],
+  onChangePowerSpells,
+  spellOwner,
 }) => {
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [grantPicker, setGrantPicker] = useState<PowerSpellGrant | null>(null);
   const deity = DEITIES_LIST.find((d) => d.id === selectedDeityId);
   const isDevout = !!deity;
   const isCleric = characterClassId === 'clerigo';
@@ -186,8 +198,56 @@ export const StepDeity: React.FC<StepDeityProps> = ({
                 );
               })}
             </div>
+            {selectedDeityPowers.map((name) => {
+              const g = spellGrantFor(name);
+              if (!g) return null;
+              const chosen = powerSpells.filter((sp) => sp.sourcePower === name);
+              const needed = g.choose?.count || (g.options ? 1 : 0);
+              return (
+                <div key={name} className="card stack-xs">
+                  <span className="t-label">
+                    {name}: magia{(g.fixed?.length || needed) > 1 ? 's' : ''} (pág. {g.page})
+                  </span>
+                  {g.fixed ? (
+                    <span className="t-sm t-2">
+                      Você aprende e pode lançar {g.fixed.join(', ')} (atributo-chave {g.keyAttribute === 'car' ? 'Carisma' : 'Sabedoria'}).
+                    </span>
+                  ) : (
+                    <>
+                      {chosen.length > 0 && (
+                        <div className="chip-wrap">
+                          {chosen.map((sp) => (
+                            <span key={sp.id} className="badge badge-mp">
+                              <Zap size={12} />
+                              {sp.name}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                      {onChangePowerSpells && spellOwner && (
+                        <button type="button" className={`btn btn-sm ${chosen.length < needed ? 'btn-primary' : 'btn-tonal'}`} onClick={() => setGrantPicker(g)}>
+                          <Zap size={16} />
+                          {chosen.length ? 'Trocar magia' : 'Escolher magia'} ({chosen.length}/{needed})
+                        </button>
+                      )}
+                    </>
+                  )}
+                </div>
+              );
+            })}
           </ChoiceSection>
         </>
+      )}
+
+      {grantPicker && spellOwner && onChangePowerSpells && (
+        <PowerSpellPicker
+          open
+          grant={grantPicker}
+          owner={{ ...spellOwner, spells: [...(spellOwner.spells || []), ...powerSpells.filter((sp) => sp.sourcePower !== grantPicker.power)] }}
+          remaining={grantPicker.choose?.count || 1}
+          onClose={() => setGrantPicker(null)}
+          onConfirm={(spells) => onChangePowerSpells([...powerSpells.filter((sp) => sp.sourcePower !== grantPicker.power), ...spells])}
+        />
       )}
 
       <OptionPickerSheet

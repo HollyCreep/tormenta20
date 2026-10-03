@@ -7,6 +7,7 @@ import { GENERAL_POWERS_LIST } from '../data/generalPowers';
 import { CLASS_POWERS_LIST } from '../data/classPowers';
 import { SPELLS_LIST } from '../data/spells';
 import { OSTEON_FORMER_KEY, osteonFormer } from './raceAbilities';
+import { spellGrantFor } from '../data/powerSpellGrants';
 
 export interface PrerequisiteContext {
   attributes: CharacterAttributes;
@@ -297,6 +298,8 @@ export interface WizardValidationInput {
   selectedOriginBenefits: { type: 'pericia' | 'poder'; name: string }[];
   deityId: string;
   selectedDeityPowers: string[];
+  /** Quantas magias foram escolhidas para cada poder que concede magias (nome do poder → quantidade). */
+  powerSpellCounts?: Record<string, number>;
   attributeMethod: 'point_buy' | 'standard' | 'roll' | 'free';
   baseAttributes: CharacterAttributes;
   totalAttributes: CharacterAttributes;
@@ -333,6 +336,17 @@ export function validateAllWizardSteps(input: WizardValidationInput): Record<num
     trainedSkillIds: allTrainedSkillsSet,
     proficiencies: currentClass.proficiencies,
     isSpellcaster,
+    level: 1,
+    classId: input.classId,
+    deityId: input.deityId,
+    // Poderes escolhidos em qualquer benefício contam como pré-requisito dos demais (Cap. 1, pág. 33)
+    powerNames: [
+      ...currentRace.abilities.map((a) => a.name),
+      ...currentClass.abilitiesLevel1.map((a) => a.name),
+      ...(input.selectedRacialPower ? [resolvePowerName(input.selectedRacialPower)] : []),
+      ...input.selectedOriginBenefits.filter((b) => b.type === 'poder').map((b) => resolvePowerName(b.name)),
+      ...input.selectedDeityPowers,
+    ],
   };
 
   const powerSources: PowerSource[] = [
@@ -500,6 +514,12 @@ export function validateAllWizardSteps(input: WizardValidationInput): Record<num
       }
       const elig = canBeDevotee(input.deityId, input.raceId, input.classId);
       if (!elig.ok) errors.push(elig.reason!);
+      // Poderes concedidos que deixam escolher a magia (Centelha Mágica, pág. 132)
+      input.selectedDeityPowers.forEach((name) => {
+        const g = spellGrantFor(name);
+        const need = g?.choose?.count || (g?.options ? 1 : 0);
+        if (need && (input.powerSpellCounts?.[name] || 0) < need) errors.push(`${name}: escolha ${need > 1 ? `${need} magias` : 'a magia'} (pág. ${g!.page}).`);
+      });
     } else if (['clerigo', 'druida', 'paladino'].includes(input.classId)) {
       // Clérigos, druidas e paladinos são devotos automaticamente (pág. 96)
       errors.push('Sua classe é devota: escolha uma divindade (Cap. 1, pág. 96).');

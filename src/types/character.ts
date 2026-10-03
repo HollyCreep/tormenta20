@@ -69,6 +69,10 @@ export interface CharacterPower {
 
 export interface CharacterSpell extends Spell {
   learnedFrom: 'classe' | 'raca' | 'origem' | 'poder';
+  /** Classe que concedeu a magia (magias de classe). Define o limite de PM e o atributo-chave. */
+  sourceClassId?: string;
+  /** Poder que concedeu a magia (ex.: Centelha Mágica, Conhecimento Mágico). */
+  sourcePower?: string;
   /** Atributo-chave próprio (magias raciais: ex. Tatuagem Mística usa Carisma). */
   keyAttribute?: AttributeKey;
 }

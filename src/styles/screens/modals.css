@@ -127,3 +127,26 @@
 /* Adicionar item */
 .add-item-footer { flex: 1 1 auto; display: flex; flex-direction: column; gap: var(--sp-2); min-width: 0; }
 .add-item-footer .seg-btn { font-size: var(--fs-xs); }
+
+/* Tabela da classe na subida de nível (Cap. 1, tabelas 1-5 a 1-18) */
+.class-table {
+  width: 100%;
+  margin-top: var(--sp-3, 12px);
+  border-collapse: collapse;
+  font-size: var(--fs-sm);
+}
+.class-table th,
+.class-table td {
+  padding: 6px 8px;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+.class-table th { color: var(--text-3); font-weight: 600; font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: 0.04em; }
+.class-table td:first-child { width: 3.5em; color: var(--text-2); font-variant-numeric: tabular-nums; }
+.class-table tr.is-done td { color: var(--text-3); }
+.class-table tr.is-current td {
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  color: var(--text-1);
+  font-weight: 600;
+}

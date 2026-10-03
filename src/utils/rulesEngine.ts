@@ -4,7 +4,7 @@
  * Toda fórmula cita o livro. Efeitos passivos de raças, classes e poderes ficam em
  * ./passiveEffects.ts; efeitos de condições, em ./conditionEffects.ts.
  */
-import type { CharacterAttributes, StatBreakdown, TrainedSkillData, CharacterInventoryItem } from '../types/character';
+import type { CharacterAttributes, StatBreakdown, TrainedSkillData, CharacterInventoryItem, CharacterSpell } from '../types/character';
 import type { AttributeKey } from '../types/rules';
 import { RACES_LIST } from '../data/races';
 import { CLASSES_LIST } from '../data/classes';
@@ -514,9 +514,10 @@ export function calculateSpellSaveDc(
 export function calculateMaxSpellCost(
   levelLimit: number,
   hasUnlimitedMagic: boolean = false,
-  keyAttrMod: number = 0
+  keyAttrMod: number = 0,
+  levelLabel = 'Nível'
 ): { maxCost: number; breakdown: StatBreakdown } {
-  const components: StatBreakdown['components'] = [{ label: `Nível (${levelLimit})`, value: levelLimit }];
+  const components: StatBreakdown['components'] = [{ label: `${levelLabel} (${levelLimit})`, value: levelLimit }];
   let maxCost = levelLimit;
   if (hasUnlimitedMagic && keyAttrMod > 0) {
     maxCost += keyAttrMod;
@@ -524,6 +525,48 @@ export function calculateMaxSpellCost(
   }
   const b = breakdown(components, maxCost, ' PM por magia');
   return { maxCost, breakdown: b };
+}
+
+/** Ficha mínima para resolver a classe de origem de uma magia. */
+interface SpellOwner {
+  classId: string;
+  classSubclass?: string;
+  level: number;
+  classes?: { classId: string; level: number; subclass?: string }[];
+}
+
+/**
+ * Classe que fornece uma magia de classe. Fichas antigas não guardam `sourceClassId`: nesse caso,
+ * usa a classe conjuradora do personagem cujo tipo de magia (arcana/divina) combina com a magia.
+ */
+export function spellSourceClass(owner: SpellOwner, spell: Pick<CharacterSpell, 'learnedFrom' | 'sourceClassId' | 'type'>): string | undefined {
+  if (spell.learnedFrom !== 'classe') return undefined;
+  if (spell.sourceClassId) return spell.sourceClassId;
+  const ids = owner.classes?.length ? owner.classes.map((c) => c.classId) : [owner.classId];
+  const casters = ids.filter((id) => classDef(id)?.spellcaster);
+  return casters.find((id) => spell.type === 'universal' || classDef(id)?.spellcaster?.type === spell.type) || casters[0] || owner.classId;
+}
+
+/**
+ * Limite de PM por uso de uma magia (Cap. 5, pág. 224): "o máximo de PM que você pode gastar por uso
+ * é igual ao seu nível na classe que fornece a habilidade (mas você sempre pode usar a habilidade em seu
+ * custo mínimo). Para habilidades de raça, origem ou outras fontes e poderes gerais, o limite é o seu
+ * nível de personagem."
+ */
+export function spellLevelLimit(owner: SpellOwner, spell: Pick<CharacterSpell, 'learnedFrom' | 'sourceClassId' | 'type'>): { level: number; label: string; classId?: string } {
+  const classId = spellSourceClass(owner, spell);
+  if (!classId) return { level: owner.level, label: 'Nível de personagem' };
+  const entry = owner.classes?.find((c) => c.classId === classId);
+  const level = entry?.level ?? (classId === owner.classId ? owner.level : 1);
+  return { level, label: `Nível de ${classDef(classId)?.name || classId}`, classId };
+}
+
+/** Atributo-chave da magia: o próprio da magia (racial) ou o da classe que a fornece. */
+export function spellKeyAttribute(owner: SpellOwner, spell: Pick<CharacterSpell, 'learnedFrom' | 'sourceClassId' | 'type' | 'keyAttribute'>): AttributeKey {
+  if (spell.keyAttribute) return spell.keyAttribute;
+  const classId = spellSourceClass(owner, spell) || owner.classId;
+  const subclass = owner.classes?.find((c) => c.classId === classId)?.subclass ?? (classId === owner.classId ? owner.classSubclass : undefined);
+  return getSpellcastingKeyAttribute(classId, subclass);
 }
 
 /**

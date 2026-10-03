@@ -14,6 +14,10 @@ Todas as alterações notáveis deste projeto serão documentadas neste arquivo.
 - Magias: Truque custa 0 e é exclusivo; bardo e druida escolhem três escolas; limite de PM por nível da classe.
 - Herança pode ser escolhida duas vezes (item de até T$ 2.000) e o item herdado pode ter melhorias, desde que o preço total caiba no limite — Cap. 1, pág. 91 (vale também para Espólio e Protótipo).
 - Osteon: Memória Póstuma permite ser osteon de outra raça humanoide (exceto humano), herdando uma habilidade dela e o tamanho, se não for Médio — Cap. 1, pág. 29. Os efeitos raciais agora são ligados a cada habilidade.
+- Pré-requisitos no criador consideram todos os poderes já escolhidos (ex.: Estilo de Arma e Escudo da raça libera Bloqueio com Escudo na origem) — Cap. 1, pág. 33.
+- Subir de nível segue a tabela da classe: sem poder no 1º nível de uma nova classe; mostra a tabela e o texto das habilidades ganhas (Ataque Especial, Fúria, Durão...); magias iniciais ao entrar numa classe conjuradora, uma por nível (bardo e druida só nos níveis pares e das suas escolas); caminho do arcanista e escolas na multiclasse.
+- Limite de PM por magia usa o nível na classe que fornece a magia (raça, origem e poderes: nível de personagem), com o custo mínimo sempre permitido — Cap. 5, pág. 224.
+- Poderes que concedem magias (Centelha Mágica, Conhecimento Mágico, Aumentar Repertório, Orar, Truque Mágico, Aspectos do druida, Totem Espiritual e os de magia fixa) agora pedem/registram a magia no criador, na subida de nível e na ficha — Cap. 4, pág. 170; Cap. 2, pág. 132.
 - Citações de `rulesCitations.ts` verificadas literalmente; servidor MCP e documentação `.agents/rules` atualizados.
 
 ---

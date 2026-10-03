@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import { BookOpen, ChevronDown, Info, Sparkles, Sword } from 'lucide-react';
-import type { CharacterPower, CharacterSheet } from '../../../types/character';
+import { AlertTriangle, BookOpen, ChevronDown, Info, Sparkles, Sword, Wand2 } from 'lucide-react';
+import type { CharacterPower, CharacterSheet, CharacterSpell } from '../../../types/character';
 import { cleanT20Text, getClassPowerRuleCitation, getGeneralPowerRuleCitation } from '../../../utils/textUtils';
 import { POWER_CATEGORY_META, PowerCategoryBadge } from '../../common/T20Badge';
 import type { DetailModalData } from '../../common/DetailModal';
@@ -9,6 +9,9 @@ import { CLASS_POWERS_LIST } from '../../../data/classPowers';
 import { CLASSES_LIST } from '../../../data/classes';
 import { EmptyState, SearchField, Segmented, SelectField } from '../../ui/controls';
 import { classColorVars } from '../../common/ClassSigil';
+import { fixedSpellsForPowers, grantForPower, pendingSpellGrants } from '../../../utils/powerSpells';
+import type { PowerSpellGrant } from '../../../data/powerSpellGrants';
+import { PowerSpellPicker } from '../PowerSpellPicker';
 
 export type SheetPowersSubTab = 'gerais' | 'classe';
 
@@ -16,11 +19,17 @@ interface PowersTabProps {
   character: CharacterSheet;
   onSetModalDetail: (data: DetailModalData) => void;
   onNavigateToCompendium?: (tab: 'poderes', subTab?: 'gerais' | 'classe') => void;
+  /** Salva a ficha (magias escolhidas por poderes). */
+  onAddSpells?: (spells: CharacterSpell[], reason: string) => void;
 }
 
 const CATEGORY_ORDER = ['combate', 'destino', 'magia', 'concedido', 'tormenta', 'raca', 'origem', 'geral'];
 
-export const PowersTab: React.FC<PowersTabProps> = ({ character, onSetModalDetail, onNavigateToCompendium }) => {
+export const PowersTab: React.FC<PowersTabProps> = ({ character, onSetModalDetail, onNavigateToCompendium, onAddSpells }) => {
+  const [spellPicker, setSpellPicker] = useState<{ grant: PowerSpellGrant; remaining: number } | null>(null);
+  // Poderes que concedem magias (Cap. 4, pág. 170): escolhas pendentes e magias fixas que faltam na ficha
+  const pending = useMemo(() => pendingSpellGrants(character.powers || [], character.spells), [character.powers, character.spells]);
+  const missingFixed = useMemo(() => fixedSpellsForPowers(character.powers || [], character.spells), [character.powers, character.spells]);
   const [subTab, setSubTab] = useState<SheetPowersSubTab>('gerais');
   const [search, setSearch] = useState('');
   const [generalCategory, setGeneralCategory] = useState<string>('todas');
@@ -131,6 +140,57 @@ export const PowersTab: React.FC<PowersTabProps> = ({ character, onSetModalDetai
     });
   };
 
+  const pendingOf = (pow: CharacterPower) => {
+    const g = grantForPower(pow);
+    return g ? pending.find((p) => p.grant === g) : undefined;
+  };
+
+  /** Magias concedidas pelo poder: as já aprendidas, as pendentes de escolha e as fixas que faltam. */
+  const renderGrantedSpells = (pow: CharacterPower) => {
+    const grant = grantForPower(pow);
+    if (!grant) return null;
+    const learned = (character.spells || []).filter((sp) => sp.sourcePower === grant.power && (!grant.classId || sp.sourceClassId === grant.classId));
+    const pend = pendingOf(pow);
+    const fixedMissing = missingFixed.filter((sp) => sp.sourcePower === grant.power);
+    return (
+      <div className="stack-xs">
+        <span className="t-label">Magias concedidas</span>
+        {learned.length > 0 ? (
+          <div className="chip-wrap">
+            {learned.map((sp) => (
+              <span key={sp.id} className="badge badge-mp">
+                <Wand2 size={12} />
+                {cleanT20Text(sp.name)}
+              </span>
+            ))}
+          </div>
+        ) : (
+          !pend && fixedMissing.length === 0 && <span className="t-xs t-3">Nenhuma ainda.</span>
+        )}
+        {onAddSpells && pend && (
+          <button
+            type="button"
+            className="btn btn-tonal btn-sm"
+            onClick={() => setSpellPicker({ grant: pend.grant, remaining: pend.needed - pend.have })}
+          >
+            <Wand2 size={16} />
+            {grant.options ? 'Escolher animal totêmico' : `Escolher magias (${pend.have}/${pend.needed})`}
+          </button>
+        )}
+        {onAddSpells && fixedMissing.length > 0 && (
+          <button
+            type="button"
+            className="btn btn-tonal btn-sm"
+            onClick={() => onAddSpells(fixedMissing, `${grant.power}: aprendeu ${fixedMissing.map((s) => s.name).join(', ')}.`)}
+          >
+            <Wand2 size={16} />
+            Adicionar {fixedMissing.map((s) => s.name).join(', ')} às magias
+          </button>
+        )}
+      </div>
+    );
+  };
+
   const renderPower = (pow: CharacterPower, isClass: boolean, idx: number) => {
     const key = `${pow.id}-${idx}`;
     const isOpen = expanded === key;
@@ -151,6 +211,12 @@ export const PowersTab: React.FC<PowersTabProps> = ({ character, onSetModalDetai
                 <PowerCategoryBadge category={resolvePowerCategory(pow)} />
               )}
               {pow.cost && <span className="badge badge-mp">{pow.cost}</span>}
+              {pendingOf(pow) && (
+                <span className="badge badge-warning">
+                  <Wand2 size={12} />
+                  Escolher magia
+                </span>
+              )}
             </span>
           </span>
           <ChevronDown size={20} className="power-chevron" />
@@ -160,6 +226,7 @@ export const PowersTab: React.FC<PowersTabProps> = ({ character, onSetModalDetai
             <p className="t-sm t-2 pre-line" style={{ lineHeight: 1.6 }}>
               {cleanT20Text(pow.description)}
             </p>
+            {renderGrantedSpells(pow)}
             <button type="button" className="btn btn-ghost btn-sm" onClick={() => handleOpenDetail(pow, isClass)}>
               <Info size={16} />
               Detalhes e regra
@@ -175,6 +242,16 @@ export const PowersTab: React.FC<PowersTabProps> = ({ character, onSetModalDetai
 
   return (
     <div className="stack">
+      {onAddSpells && (pending.length > 0 || missingFixed.length > 0) && (
+        <div className="callout callout-warning">
+          <AlertTriangle size={18} />
+          <span>
+            Poderes com magias a receber:{' '}
+            {[...new Set([...pending.map((p) => p.grant.power), ...missingFixed.map((s) => s.sourcePower)])].join(', ')}. Abra o poder para
+            escolher (Cap. 4, pág. 170).
+          </span>
+        </div>
+      )}
       <Segmented<SheetPowersSubTab>
         value={subTab}
         onChange={(v) => {
@@ -237,6 +314,17 @@ export const PowersTab: React.FC<PowersTabProps> = ({ character, onSetModalDetai
         />
       ) : (
         <div className="stack-sm">{list.map((pow, idx) => renderPower(pow, subTab === 'classe', idx))}</div>
+      )}
+
+      {spellPicker && onAddSpells && (
+        <PowerSpellPicker
+          open
+          grant={spellPicker.grant}
+          owner={character}
+          remaining={spellPicker.remaining}
+          onClose={() => setSpellPicker(null)}
+          onConfirm={(spells) => onAddSpells(spells, `${spellPicker.grant.power}: aprendeu ${spells.map((s) => s.name).join(', ')}.`)}
+        />
       )}
     </div>
   );

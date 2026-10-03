@@ -50,7 +50,12 @@ itens em `src/utils/passiveEffects.ts` (cada efeito cita a página); condições
   bárbaro, bardo, bucaneiro, caçador, cavaleiro, guerreiro, nobre, paladino (pág. 142). Ladino,
   arcanista, clérigo, druida, inventor e lutador não têm armas marciais.
 - **Multiclasse** (pág. 35): nova classe dá PV de nível subsequente, soma os PM, não concede perícias
-  nem proficiências.
+  nem proficiências. Nível de classe ≠ nível de personagem (arcanista 3/guerreiro 2 = personagem de 5º).
+- **Tabela da classe:** o que cada nível concede vem da tabela (`progression` em `classes.ts`). Poder de
+  classe só nos níveis com "poder de <classe>" — o 1º nível de nenhuma classe concede poder. Habilidades
+  automáticas de todos os níveis (Durão, Ataque Extra, Fúria Titânica...) estão em `abilities`.
+- **Magias por nível:** 1º nível da classe → magias iniciais; arcanista e clérigo → uma por nível;
+  bardo e druida → uma nos níveis pares, só das três escolas escolhidas (págs. 37, 44, 57 e 61).
 - **Magias por classe:** arcanista e clérigo — 2º círculo no 5º nível, 3º no 9º, 4º no 13º, 5º no 17º;
   bardo e druida — 2º no 6º, 3º no 10º, 4º no 14º (máximo 4º); bardo e druida escolhem **três escolas**.
   Magias iniciais: arcanista 3 (Mago 4), bardo 2, clérigo 3, druida 2.
@@ -115,8 +120,13 @@ Nobre: Espólio, item de até T$ 2.000 (pág. 79). Inventor: Protótipo, até T$
 
 - Custo por círculo (Tabela 4-1, pág. 170): 1 / 3 / 6 / 10 / 15 PM.
 - CD = 10 + metade do nível + atributo-chave (pág. 173).
-- Limite de PM por uso = nível na classe que fornece a habilidade; para raça, origem e poderes gerais,
-  nível de personagem (Cap. 5, pág. 224). Magia Ilimitada soma o atributo-chave.
+- Limite de PM por uso = nível na classe que fornece a habilidade; para raça, origem, poderes gerais e
+  outras fontes, nível de personagem; sempre se pode usar o custo mínimo (Cap. 5, pág. 224). Magia
+  Ilimitada soma o atributo-chave. Cada magia de classe guarda `sourceClassId`.
+- **Poderes que concedem magias** (`src/data/powerSpellGrants.ts`): magia fixa (Dedo Verde, Elo com a
+  Natureza...) ou à escolha (Centelha Mágica, Conhecimento Mágico, Orar, Truque Mágico, Aspectos,
+  Totem Espiritual). Sem magia definida: qualquer magia de tipo e círculo que a classe possa lançar
+  (Cap. 4, pág. 170). Poderes concedidos usam Sabedoria como atributo-chave (Cap. 2, pág. 132).
 - **Truque:** custo zero e não combina com outros aprimoramentos (pág. 171).
 
 ## 12. Poderes (Cap. 1, pág. 33; Cap. 2)
@@ -125,6 +135,7 @@ Nobre: Espólio, item de até T$ 2.000 (pág. 79). Inventor: Protótipo, até T$
   se atinge o pré-requisito. Não se escolhe o mesmo poder duas vezes, salvo indicação (repetíveis:
   Foco em Arma, Foco em Magia, Foco em Perícia, Proficiência, Treinamento em Perícia).
 - Poderes de magia exigem lançar magias (pág. 131); concedidos exigem ser devoto do deus (pág. 132).
+- Um poder escolhido em qualquer benefício (raça, origem, divindade) conta como pré-requisito dos demais.
 - **Poderes da Tormenta:** –1 Car pelo primeiro e –1 a cada dois outros (pág. 136).
 
 ## 13. Condições (Apêndice, págs. 394–395)

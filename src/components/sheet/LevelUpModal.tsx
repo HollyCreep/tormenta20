@@ -20,10 +20,12 @@ import { CLASSES_LIST } from '../../data/classes';
 import { CLASS_POWERS_LIST } from '../../data/classPowers';
 import { GENERAL_POWERS_LIST } from '../../data/generalPowers';
 import { SPELLS_LIST } from '../../data/spells';
-import { calculateSpellCircleUnlocked, recalculateFullCharacterSheet, rulesInputFromCharacter } from '../../utils/rulesEngine';
+import { calculateSpellCircleUnlocked, recalculateFullCharacterSheet, rulesInputFromCharacter, startingSpellCount } from '../../utils/rulesEngine';
 import { tormentaCharismaLoss } from '../../utils/passiveEffects';
 import { checkPowerPrerequisites } from '../../utils/rulesValidation';
 import { prerequisiteContextFor } from '../../utils/characterContext';
+import { fixedSpellsForPowers, grantForPower } from '../../utils/powerSpells';
+import { PowerSpellPicker } from './PowerSpellPicker';
 import { cleanT20Text, getClassPowerCitation, getGeneralPowerCitation, getSpellCitation } from '../../utils/textUtils';
 import { PowerCategoryBadge, SchoolBadge } from '../common/T20Badge';
 import { DetailModal, type DetailModalData } from '../common/DetailModal';
@@ -42,6 +44,7 @@ type Step = 'classe' | 'poder' | 'magia';
 type AnyPower = ClassPower | GeneralPower;
 
 const BASE_COST_BY_CIRCLE: Record<number, number> = { 1: 1, 2: 3, 3: 6, 4: 10, 5: 15 };
+const SPELL_SCHOOLS = ['Abjuração', 'Adivinhação', 'Convocação', 'Encantamento', 'Evocação', 'Ilusão', 'Necromancia', 'Transmutação'];
 
 /** Subida de nível em 3 passos: classe (ou multiclasse), poder e magia. Cap. 1, págs. 36–37. */
 export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, onClose, onSaveLevelUp }) => {
@@ -69,7 +72,14 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
   const [selectedPower, setSelectedPower] = useState<AnyPower | null>(null);
   // Aumento de Atributo: +1 em um atributo, uma vez por patamar para o mesmo atributo (Cap. 1, págs. 35 e 38)
   const [increaseAttr, setIncreaseAttr] = useState<AttributeKey | null>(null);
-  const [selectedSpell, setSelectedSpell] = useState<Spell | null>(null);
+  const [selectedSpells, setSelectedSpells] = useState<Spell[]>([]);
+  // Magias escolhidas para um poder que concede magias (Conhecimento Mágico, Orar...)
+  const [powerSpells, setPowerSpells] = useState<CharacterSpell[]>([]);
+  const [powerSpellPickerOpen, setPowerSpellPickerOpen] = useState(false);
+  // Multiclasse em arcanista: escolhe o caminho (Cap. 1, pág. 37)
+  const [newSubclass, setNewSubclass] = useState('');
+  // Multiclasse em bardo/druida: três escolas (Cap. 1, págs. 44 e 61)
+  const [newSchools, setNewSchools] = useState<string[]>([]);
   const [spellSearch, setSpellSearch] = useState('');
   const [spellCircleFilter, setSpellCircleFilter] = useState('0');
   const [modalDetail, setModalDetail] = useState<DetailModalData | null>(null);
@@ -90,7 +100,31 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
   const nextCircle = calculateSpellCircleUnlocked(nextClassLevel, selectedClassId);
   const unlockedNewCircle = isSpellcaster && nextCircle > calculateSpellCircleUnlocked(currentClassLevel, selectedClassId);
 
-  const steps: Step[] = isSpellcaster ? ['classe', 'poder', 'magia'] : ['classe', 'poder'];
+  // Tabela da classe: o que o novo nível concede. Poderes de classe só nos níveis em que a tabela
+  // indica "poder de <classe>" — no 1º nível de qualquer classe não há poder (tabelas do Cap. 1).
+  const progressionRow = chosenClassDef.progression?.find((p) => p.level === nextClassLevel);
+  const grantsPower = /poder d/i.test(progressionRow?.features || '');
+  const newAbilities = (chosenClassDef.abilities || chosenClassDef.abilitiesLevel1).filter((a) => a.level === nextClassLevel);
+  const subclassOptions = nextClassLevel === 1 && selectedClassId !== character.classId ? chosenClassDef.subclasses?.options : undefined;
+  const subclassForSpells =
+    newSubclass ||
+    existingClasses.find((c) => c.classId === selectedClassId)?.subclass ||
+    (selectedClassId === character.classId ? character.classSubclass : undefined);
+  const needsSchools = nextClassLevel === 1 && !!chosenClassDef.spellcaster?.schoolsCount && !character.spellSchools?.length;
+  const knownSchools = needsSchools ? newSchools : character.spellSchools;
+  // Magias por nível: 1º nível da classe → magias iniciais; arcanista e clérigo → uma por nível;
+  // bardo e druida → uma nos níveis pares (Cap. 1, págs. 37, 44, 57 e 61)
+  const spellsToLearn = !isSpellcaster
+    ? 0
+    : nextClassLevel === 1
+      ? startingSpellCount(selectedClassId, subclassForSpells)
+      : selectedClassId === 'bardo' || selectedClassId === 'druida'
+        ? nextClassLevel % 2 === 0
+          ? 1
+          : 0
+        : 1;
+
+  const steps: Step[] = ['classe', ...(grantsPower ? (['poder'] as Step[]) : []), ...(spellsToLearn > 0 ? (['magia'] as Step[]) : [])];
   const stepIndex = Math.max(0, steps.indexOf(step));
   const isLast = stepIndex === steps.length - 1;
 
@@ -144,7 +178,7 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
     );
   }, [powerTypeTab, availableClassPowers, availableGeneralPowers, powerSearch]);
 
-  const availableSpells = useMemo(() => {
+  const availableSpells = (() => {
     if (!isSpellcaster) return [];
     const type = chosenClassDef.spellcaster?.type || 'arcana';
     const circle = parseInt(spellCircleFilter, 10);
@@ -154,10 +188,12 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
       const withinCircle = s.circle <= nextCircle;
       const circleMatches = circle === 0 || s.circle === circle;
       const matchesQuery = !q || s.name.toLowerCase().includes(q) || s.description.toLowerCase().includes(q);
-      const alreadyKnown = character.spells.some((cs) => cs.id === s.id);
-      return matchesType && withinCircle && circleMatches && matchesQuery && !alreadyKnown;
+      const alreadyKnown = character.spells.some((cs) => cs.id === s.id) || powerSpells.some((ps) => ps.id === s.id);
+      // Bardo e druida só aprendem magias das três escolas escolhidas
+      const inSchools = !chosenClassDef.spellcaster?.schoolsCount || !knownSchools?.length || knownSchools.includes(s.school);
+      return matchesType && withinCircle && circleMatches && matchesQuery && !alreadyKnown && inSchools;
     }).sort((a, b) => a.circle - b.circle || a.name.localeCompare(b.name, 'pt-BR'));
-  }, [isSpellcaster, chosenClassDef, nextCircle, spellCircleFilter, spellSearch, character.spells]);
+  })();
 
   const tierOf = (lv: number) => (lv <= 4 ? 1 : lv <= 10 ? 2 : lv <= 16 ? 3 : 4);
   const increasedInTier = (attr: AttributeKey) =>
@@ -167,19 +203,46 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
     });
   const selectedPowerPrereq = selectedPower ? checkPowerPrerequisites(selectedPower.name, validationContext) : null;
 
+  // Poder escolhido que concede magias à escolha: precisa escolher antes de avançar (Cap. 4, pág. 170)
+  const selectedGrant = selectedPower ? grantForPower({ id: selectedPower.id, name: selectedPower.name }) : undefined;
+  const grantNeeded = selectedGrant?.choose ? selectedGrant.choose.count : selectedGrant?.options ? 1 : 0;
+  // Ficha como ficará no novo nível, para o círculo máximo das magias do poder
+  const ownerAfter = {
+    ...character,
+    level: nextTotalLevel,
+    classes: existingClasses.some((c) => c.classId === selectedClassId)
+      ? existingClasses.map((c) => (c.classId === selectedClassId ? { ...c, level: c.level + 1 } : c))
+      : [...existingClasses, { classId: selectedClassId, className: chosenClassDef.name, level: 1 }],
+    spellSchools: knownSchools,
+    spells: [...(character.spells || []), ...selectedSpells.map((sp) => ({ ...sp, learnedFrom: 'classe' as const }))],
+  };
+  const choosePower = (pow: AnyPower | null) => {
+    setSelectedPower(pow);
+    setPowerSpells([]);
+  };
+  const spellsRequired = Math.min(spellsToLearn, availableSpells.length + selectedSpells.length);
+  const blockNext =
+    (step === 'classe' && ((!!subclassOptions && !newSubclass) || (needsSchools && newSchools.length !== 3))) ||
+    (step === 'poder' && (!selectedPower || (selectedPower.name === 'Aumento de Atributo' && !increaseAttr) || powerSpells.length < grantNeeded)) ||
+    (step === 'magia' && selectedSpells.length < spellsRequired);
+
   const handleConfirmLevelUp = () => {
     const existingIndex = existingClasses.findIndex((c) => c.classId === selectedClassId);
     const updatedClasses = [...existingClasses];
     if (existingIndex >= 0) {
       updatedClasses[existingIndex] = { ...updatedClasses[existingIndex], level: updatedClasses[existingIndex].level + 1 };
     } else {
-      updatedClasses.push({ classId: selectedClassId, className: chosenClassDef.name, level: 1 });
+      updatedClasses.push({ classId: selectedClassId, className: chosenClassDef.name, level: 1, ...(newSubclass ? { subclass: newSubclass } : {}) });
     }
 
-    const updatedPowers: CharacterPower[] = [...(character.powers || [])];
+    // Habilidades automáticas do novo nível da classe (tabela da classe)
+    const abilityPowers: CharacterPower[] = newAbilities
+      .filter((a) => !(character.powers || []).some((p) => p.id === a.id))
+      .map((a) => ({ id: a.id, name: a.name, source: 'classe', description: a.description, cost: a.cost, type: a.type }));
+    const updatedPowers: CharacterPower[] = [...(character.powers || []), ...abilityPowers];
     if (selectedPower) {
       updatedPowers.push({
-        id: selectedPower.id || `pow_${Date.now()}`,
+        id: selectedPower.id || selectedPower.name,
         name: selectedPower.name,
         source: powerTypeTab === 'classe' ? 'classe' : 'geral',
         description: selectedPower.description,
@@ -206,7 +269,10 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
     const finalAttributes = isIncrease ? { ...totalAttributes, [increaseAttr!]: totalAttributes[increaseAttr!] + 1 } : totalAttributes;
 
     const updatedSpells: CharacterSpell[] = [...(character.spells || [])];
-    if (selectedSpell) updatedSpells.push({ ...selectedSpell, learnedFrom: 'classe' });
+    selectedSpells.forEach((sp) => updatedSpells.push({ ...sp, learnedFrom: 'classe', sourceClassId: selectedClassId }));
+    // Magias concedidas pelo poder escolhido: as escolhidas e as fixas (ex.: Elo com a Natureza)
+    updatedSpells.push(...powerSpells);
+    updatedSpells.push(...fixedSpellsForPowers(updatedPowers, updatedSpells));
 
     onSaveLevelUp(
       recalculateFullCharacterSheet({
@@ -216,6 +282,7 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
         classes: updatedClasses,
         powers: updatedPowers,
         spells: updatedSpells,
+        ...(needsSchools ? { spellSchools: newSchools } : {}),
       })
     );
     onClose();
@@ -291,7 +358,7 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
                   value={powerTypeTab}
                   onChange={(v) => {
                     setPowerTypeTab(v);
-                    setSelectedPower(null);
+                    choosePower(null);
                   }}
                   ariaLabel="Tipo de poder"
                   options={[
@@ -320,7 +387,7 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
         }
         footer={
           <div className="levelup-footer">
-            {(selectedPower || selectedSpell) && (
+            {(selectedPower || selectedSpells.length > 0) && (
               <div className="levelup-picks">
                 {selectedPower && (
                   <span className="badge badge-accent badge-lg">
@@ -328,12 +395,12 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
                     {selectedPower.name}
                   </span>
                 )}
-                {selectedSpell && (
-                  <span className="badge badge-mp badge-lg">
+                {[...powerSpells, ...selectedSpells].map((sp) => (
+                  <span key={sp.id} className="badge badge-mp badge-lg">
                     <Zap size={12} />
-                    {selectedSpell.name}
+                    {sp.name}
                   </span>
-                )}
+                ))}
               </div>
             )}
             <div className="hstack">
@@ -343,7 +410,7 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
                   Voltar
                 </button>
               )}
-              <button type="button" className="btn btn-primary grow" onClick={goNext} disabled={step === 'poder' && selectedPower?.name === 'Aumento de Atributo' && !increaseAttr}>
+              <button type="button" className="btn btn-primary grow" onClick={goNext} disabled={blockNext}>
                 {isLast ? (
                   <>
                     <TrendingUp size={18} />
@@ -371,8 +438,10 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
                 } else {
                   setIsMulticlass(true);
                 }
-                setSelectedPower(null);
-                setSelectedSpell(null);
+                choosePower(null);
+                setSelectedSpells([]);
+                setNewSubclass('');
+                setNewSchools([]);
               }}
               ariaLabel="Classe do novo nível"
               size="lg"
@@ -388,8 +457,10 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
                 value={selectedClassId}
                 onChange={(v) => {
                   setSelectedClassId(v);
-                  setSelectedPower(null);
-                  setSelectedSpell(null);
+                  choosePower(null);
+                  setSelectedSpells([]);
+                  setNewSubclass('');
+                  setNewSchools([]);
                 }}
                 options={CLASSES_LIST.map((cls) => {
                   const lvl = existingClasses.find((c) => c.classId === cls.id)?.level;
@@ -434,6 +505,95 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
               </div>
             </div>
 
+            {subclassOptions && (
+              <SelectField
+                label={`${chosenClassDef.subclasses!.title} (1º nível de ${chosenClassDef.name})`}
+                value={newSubclass}
+                onChange={(v) => {
+                  setNewSubclass(v);
+                  setSelectedSpells([]);
+                }}
+                options={[{ value: '', label: 'Escolha…' }, ...subclassOptions.map((o) => ({ value: o.id, label: o.name }))]}
+              />
+            )}
+
+            {needsSchools && (
+              <div className="card stack-sm">
+                <span className="t-label">Escolas de magia ({newSchools.length}/3)</span>
+                <span className="t-xs t-3">
+                  {chosenClassDef.name}: escolha três escolas de magia; você só aprende magias delas (Cap. 1, pág. {chosenClassDef.page}).
+                </span>
+                <div className="chip-wrap">
+                  {SPELL_SCHOOLS.map((sc) => {
+                    const on = newSchools.includes(sc);
+                    return (
+                      <button
+                        key={sc}
+                        type="button"
+                        className="chip"
+                        aria-pressed={on}
+                        disabled={!on && newSchools.length >= 3}
+                        onClick={() => {
+                          setNewSchools(on ? newSchools.filter((x) => x !== sc) : [...newSchools, sc]);
+                          setSelectedSpells([]);
+                        }}
+                      >
+                        {sc}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            <section className="stack-sm">
+              <span className="eyebrow">Habilidades de {chosenClassDef.name} no {nextClassLevel}º nível</span>
+              {progressionRow && <span className="t-sm t-2">{progressionRow.features}</span>}
+              {newAbilities.length > 0 ? (
+                <div className="stack-sm">
+                  {newAbilities.map((a) => (
+                    <article key={a.id} className="card stack-xs">
+                      <span className="row-title hstack-xs wrap">
+                        {a.name}
+                        {a.cost && <span className="badge badge-mp">{a.cost}</span>}
+                      </span>
+                      <p className="t-sm t-2 pre-line">{cleanT20Text(a.description)}</p>
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                !grantsPower && <span className="t-xs t-3">Nenhuma habilidade nova neste nível.</span>
+              )}
+              <span className="t-xs t-3">
+                {grantsPower
+                  ? `Este nível concede um poder de ${chosenClassDef.name.toLowerCase()} (ou um poder geral) — próxima etapa.`
+                  : `Sem poder neste nível: na tabela da classe, o ${nextClassLevel}º nível não concede poder de ${chosenClassDef.name.toLowerCase()}.`}
+                {spellsToLearn > 0 ? ` Você aprende ${spellsToLearn} magia${spellsToLearn > 1 ? 's' : ''}.` : ''}
+              </span>
+            </section>
+
+            {chosenClassDef.progression && (
+              <details className="card" open>
+                <summary className="t-sm t-semibold">Tabela: {chosenClassDef.name} (Cap. 1, pág. {chosenClassDef.page})</summary>
+                <table className="class-table">
+                  <thead>
+                    <tr>
+                      <th>Nível</th>
+                      <th>Habilidades de Classe</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {chosenClassDef.progression.map((row) => (
+                      <tr key={row.level} className={row.level === nextClassLevel ? 'is-current' : row.level <= currentClassLevel ? 'is-done' : undefined}>
+                        <td>{row.level}º</td>
+                        <td>{row.features}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </details>
+            )}
+
             {unlockedNewCircle && (
               <div className="callout callout-accent">
                 <Zap size={18} />
@@ -456,6 +616,35 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
                 <AlertTriangle size={18} />
                 <span>
                   Pré-requisitos não atendidos: {selectedPowerPrereq.unmetRequirements.join(', ')}. Um poder só pode ser escolhido quando os pré-requisitos são cumpridos (Cap. 1, pág. 33).
+                </span>
+              </div>
+            )}
+            {selectedGrant && grantNeeded > 0 && (
+              <div className="card stack-sm" style={{ margin: 16 }}>
+                <span className="t-label">
+                  {selectedGrant.options ? 'Animal totêmico' : `Magias de ${selectedPower?.name}`} ({powerSpells.length}/{grantNeeded})
+                </span>
+                {powerSpells.length > 0 && (
+                  <div className="chip-wrap">
+                    {powerSpells.map((sp) => (
+                      <span key={sp.id} className="badge badge-mp">
+                        <Zap size={12} />
+                        {sp.name}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <button type="button" className="btn btn-tonal btn-sm" onClick={() => setPowerSpellPickerOpen(true)}>
+                  <Zap size={16} />
+                  {powerSpells.length ? 'Trocar escolha' : selectedGrant.options ? 'Escolher animal' : 'Escolher magias'}
+                </button>
+              </div>
+            )}
+            {selectedGrant?.fixed && (
+              <div className="callout callout-accent" style={{ margin: 16 }}>
+                <Zap size={18} />
+                <span>
+                  Você aprende {selectedGrant.fixed.join(', ')} (pág. {selectedGrant.page}).
                 </span>
               </div>
             )}
@@ -500,7 +689,7 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
                         aria-checked={isSelected}
                         className="pick-main"
                         disabled={!prereq.isMet && !isSelected}
-                        onClick={() => setSelectedPower(isSelected ? null : pow)}
+                        onClick={() => choosePower(isSelected ? null : pow)}
                       >
                         <span className={`mark mark-radio${isSelected ? ' is-on' : ''}`}>{isSelected && <Check size={14} strokeWidth={3} />}</span>
                         <span className="row-main">
@@ -536,19 +725,30 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
                 <EmptyState icon={<BookOpen size={24} />} title="Nenhuma magia disponível" description="Ajuste o círculo ou a busca." />
               </div>
             ) : (
-              <div className="list list-plain" role="radiogroup" aria-label="Magias disponíveis">
+              <div className="list list-plain" role="group" aria-label="Magias disponíveis">
+                <p className="t-xs t-3" style={{ padding: '12px 16px 0' }}>
+                  Escolha {spellsToLearn} magia{spellsToLearn > 1 ? 's' : ''} ({selectedSpells.length}/{spellsToLearn}).
+                </p>
                 {availableSpells.map((sp) => {
-                  const isSelected = selectedSpell?.id === sp.id;
+                  const isSelected = selectedSpells.some((x) => x.id === sp.id);
+                  const full = !isSelected && selectedSpells.length >= spellsToLearn;
                   return (
                     <div key={sp.id} className={`row pick-row${isSelected ? ' is-selected' : ''}`}>
                       <button
                         type="button"
-                        role="radio"
+                        role="checkbox"
                         aria-checked={isSelected}
+                        aria-disabled={full || undefined}
                         className="pick-main"
-                        onClick={() => setSelectedSpell(isSelected ? null : sp)}
+                        onClick={() =>
+                          isSelected
+                            ? setSelectedSpells(selectedSpells.filter((x) => x.id !== sp.id))
+                            : spellsToLearn === 1
+                              ? setSelectedSpells([sp])
+                              : !full && setSelectedSpells([...selectedSpells, sp])
+                        }
                       >
-                        <span className={`mark mark-radio${isSelected ? ' is-on' : ''}`}>{isSelected && <Check size={14} strokeWidth={3} />}</span>
+                        <span className={`mark${spellsToLearn === 1 ? ' mark-radio' : ''}${isSelected ? ' is-on' : ''}`}>{isSelected && <Check size={14} strokeWidth={3} />}</span>
                         <span className="row-main">
                           <span className="row-title">{cleanT20Text(sp.name)}</span>
                           <span className="hstack-xs wrap">
@@ -570,6 +770,16 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
       </Sheet>
 
       <DetailModal data={modalDetail} onClose={() => setModalDetail(null)} />
+      {selectedGrant && powerSpellPickerOpen && (
+        <PowerSpellPicker
+          open
+          grant={selectedGrant}
+          owner={ownerAfter}
+          remaining={grantNeeded}
+          onClose={() => setPowerSpellPickerOpen(false)}
+          onConfirm={setPowerSpells}
+        />
+      )}
     </>
   );
 };

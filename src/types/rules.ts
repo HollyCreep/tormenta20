@@ -98,6 +98,8 @@ export interface ClassDefinition {
   /** Página do livro (T20 JdA v1.3). */
   page?: number;
   abilitiesLevel1: ClassAbility[];
+  /** Habilidades automáticas de todos os níveis da tabela da classe (inclui as de 1º nível). */
+  abilities?: ClassAbility[];
   spellcaster?: {
     type: 'arcana' | 'divina';
     circle1Count: number;

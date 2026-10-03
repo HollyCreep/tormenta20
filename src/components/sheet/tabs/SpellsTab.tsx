@@ -10,6 +10,8 @@ import {
   calculateMaxSpellCost,
   calculateSpellSaveDc,
   getSpellcastingKeyAttribute,
+  spellKeyAttribute,
+  spellLevelLimit,
 } from '../../../utils/rulesEngine';
 import { ATTRIBUTES_LIST } from '../../../data/attributes';
 
@@ -39,10 +41,14 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({ character, onCastStandardS
   const [search, setSearch] = useState('');
   const [calc, setCalc] = useState<'dc' | 'limit' | null>(null);
 
-  const keyAttr = getSpellcastingKeyAttribute(character.classId, character.classSubclass);
+  // Resumo pela classe conjuradora principal: limite = nível nessa classe (Cap. 5, pág. 224)
+  const classSpell = (character.spells || []).find((sp) => sp.learnedFrom === 'classe');
+  const keyAttr = classSpell ? spellKeyAttribute(character, classSpell) : getSpellcastingKeyAttribute(character.classId, character.classSubclass);
   const keyAttrName = ATTRIBUTES_LIST.find((a) => a.key === keyAttr)?.name || keyAttr.toUpperCase();
   const dc = calculateSpellSaveDc(character.level, character.totalAttributes[keyAttr] || 0, keyAttrName);
-  const limit = calculateMaxSpellCost(character.level);
+  const levelLimit = classSpell ? spellLevelLimit(character, classSpell) : { level: character.level, label: 'Nível de personagem' };
+  const hasUnlimitedMagic = (character.powers || []).some((p) => p.name === 'Magia Ilimitada');
+  const limit = calculateMaxSpellCost(levelLimit.level, hasUnlimitedMagic, character.totalAttributes[keyAttr] || 0, levelLimit.label);
 
   const q = normalize(search.trim());
   const grouped = useMemo(() => {

@@ -79,15 +79,19 @@ def parse_table(t):
         if 1 <= lv <= 20 and lv not in rows:
             rows[lv] = m.group(2).strip()
     if 20 in rows:  # corta o texto que vem depois da tabela
-        rows[20] = re.split(r'(?<=[a-zà-ú)]) (?=[A-ZÀ-Ú][a-zà-ú]+ [a-zà-ú])', rows[20])[0]
-        rows[20] = ', '.join(x.strip() for x in rows[20].split(',')[:2])
+        # lista de opções de poder (•) e o título "Bravatas" do bucaneiro vêm logo depois da tabela no PDF
+        rows[20] = re.sub(r'\s*•.*$| Bravatas.*$', '', rows[20])
+        parts = [x.strip() for x in rows[20].split(',')[:2]]
+        # "poder de <classe>" tem sempre três palavras; o que segue é texto de outra coluna do PDF
+        parts = [' '.join(x.split()[:3]) if x.lower().startswith('poder de') else x for x in parts]
+        rows[20] = ', '.join(parts)
     return rows
 
 
 def ability_names(entry):
     names = []
     for part in entry.split(','):
-        p = re.sub(r'\s*\(.*?\)|\s*[+–-]\s*\d.*$|\s+\d+d\d+.*$', '', part).strip()
+        p = re.sub(r'\s*\(.*?\)|\s*[+–-]\s*\d.*$|\s+\d+d\d+.*$|\s+\d+$', '', part).strip()
         if p and not p.lower().startswith('poder de') and not p.lower().startswith('aumento de atributo'):
             names.append(p)
     return names
@@ -101,7 +105,11 @@ for cid, a in app.items():
     full = strip_captions(join_text([l[2] for l in load_lines(*RANGES[cid])]))
     lvl1 = []
     all_names = sorted({n for lv in table.values() for n in ability_names(lv)}, key=len, reverse=True)
-    for n in ability_names(table.get(1, '')):
+    first_level = {}
+    for lv in sorted(table):
+        for n in ability_names(table[lv]):
+            first_level.setdefault(n.lower(), (lv, n))
+    for lv, n in sorted(first_level.values()):
         base = full.find('Habilidades de Classe')
         m = re.search(r'(?<![\w])' + re.escape(n) + r'\. ', full[base:], re.I)
         if not m:
@@ -113,19 +121,28 @@ for cid, a in app.items():
             j = re.search(r' ' + re.escape(other) + r'\. ', txt, re.I)
             if j and other.lower() != n.lower():
                 cut = min(cut, j.start())
-        txt = re.sub(r'\s+e$', '', txt[:cut].strip())  # ícone de magia "e"
+        txt = txt[:cut]
+        if lv == 20:
+            # A habilidade de 20º nível é um parágrafo só; no PDF ela é seguida por um quadro
+            # ("Linhagens Sobrenaturais", "• Golpe…", "e Missas") ou pela abertura da próxima classe.
+            end = re.search(r'(?<=[.)]) (?=•|e [A-ZÀ-Ú•]|[A-ZÀ-Ú][\wà-ú]+ [A-ZÀ-Ú]|Efeitos do )', txt)
+            if end:
+                txt = txt[:end.start()]
+        txt = re.sub(r'\s+e$', '', txt.strip())  # ícone de magia "e"
         rep = re.match(r'^(.{30,}?)\s+$', txt, re.S)  # o PDF repete alguns parágrafos
         if rep:
             txt = rep.group(1)
         cost = re.search(r'(?:gastar|pagar)[^.]{0,40}?(\d+ PM)', txt)
-        lvl1.append({'id': f'{cid}_{slug(n)}', 'name': n[0].upper() + n[1:], 'level': 1, 'description': txt,
+        lvl1.append({'id': f'{cid}_{slug(n)}', 'name': n[0].upper() + n[1:], 'level': lv, 'description': txt,
                      'type': 'ativa' if cost else 'passiva', **({'cost': cost.group(1)} if cost else {})})
     rec = dict(a)
     rec.update({
         'hpInitial': h['hpInitial'], 'hpPerLevel': h['hpPerLevel'], 'mpInitial': h['mp'], 'mpPerLevel': h['mp'],
         'proficiencies': h['proficiencies'], 'mandatorySkills': h['mandatory'],
         'skillChoicesCount': h['choices'], 'skillOptions': h['options'],
-        'abilitiesLevel1': lvl1,
+        'abilitiesLevel1': [x for x in lvl1 if x['level'] == 1],
+        # Habilidades automáticas de todos os níveis (tabela da classe), com o nível em que aparecem
+        'abilities': lvl1,
         'progression': [{'level': lv, 'features': table[lv]} for lv in sorted(table)],
         'page': PAGES[cid],
     })
@@ -135,13 +152,13 @@ for cid, a in app.items():
         rec.pop('skillAlternative', None)
     out.append(rec)
     print(cid, 'PV', h['hpInitial'], h['hpPerLevel'], 'PM', h['mp'], 'obr', h['mandatory'], 'alt', h['alternative'],
-          'esc', h['choices'], len(h['options']), h['proficiencies'], '| 1º:', [x['name'] for x in lvl1])
+          'esc', h['choices'], len(h['options']), h['proficiencies'], '|', [(x['level'], x['name']) for x in lvl1])
 
 header = '''import { ClassDefinition } from '../types/rules';
 
 /**
  * Classes — T20 JdA v1.3, Capítulo 1, págs. 36–84.
- * PV, PM, perícias, proficiências, habilidades de 1º nível e progressão gerados a partir do livro
+ * PV, PM, perícias, proficiências, habilidades automáticas (por nível) e progressão gerados a partir do livro
  * por .agents/tools/gen_classes.py. Todos os personagens sabem usar armas simples e armaduras leves (pág. 32).
  */
 export const CLASSES_LIST: ClassDefinition[] = '''

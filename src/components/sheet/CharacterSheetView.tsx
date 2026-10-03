@@ -536,7 +536,16 @@ export const CharacterSheetView: React.FC<CharacterSheetViewProps> = ({
                 <SkillsTab character={character} onRollSkill={handleRollSkill} onSetModalDetail={setModalDetail} />
               )}
               {currentTab === 'poderes' && (
-                <PowersTab character={character} onSetModalDetail={setModalDetail} onNavigateToCompendium={onNavigateToCompendium} />
+                <PowersTab
+                  character={character}
+                  onSetModalDetail={setModalDetail}
+                  onNavigateToCompendium={onNavigateToCompendium}
+                  onAddSpells={(spells, reason) =>
+                    onUpdateCharacter(recalculateFullCharacterSheet({ ...character, spells: [...(character.spells || []), ...spells] }), {
+                      actionReason: reason,
+                    })
+                  }
+                />
               )}
               {currentTab === 'magias' && (
                 <SpellsTab

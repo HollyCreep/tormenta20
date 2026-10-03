@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { CharacterSheet, CharacterAttributes, CharacterInventoryItem, CharacterPower } from '../../types/character';
+import { CharacterSheet, CharacterAttributes, CharacterInventoryItem, CharacterPower, CharacterSpell } from '../../types/character';
 import { AttributeKey } from '../../types/rules';
 import { RACES_LIST } from '../../data/races';
 import { CLASSES_LIST } from '../../data/classes';
@@ -44,6 +44,8 @@ import { Sheet } from '../ui/Sheet';
 import { useBackHandler } from '../ui/backStack';
 import { useFeedback } from '../ui/Feedback';
 import { osteonFormer } from '../../utils/raceAbilities';
+import { spellGrantFor } from '../../data/powerSpellGrants';
+import { fixedSpellsForPowers } from '../../utils/powerSpells';
 
 interface WizardContainerProps {
   initialCharacter?: CharacterSheet | null;
@@ -145,6 +147,10 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
 
   // Divindade
   const [deityId, setDeityId] = useState(initialCharacter?.deityId || 'arsenal');
+  // Magias escolhidas para poderes que as concedem (Centelha Mágica — Cap. 2, pág. 132)
+  const [powerSpells, setPowerSpells] = useState<CharacterSpell[]>(
+    () => (initialCharacter?.spells || []).filter((sp) => sp.sourcePower && spellGrantFor(sp.sourcePower)?.choose)
+  );
   const [selectedDeityPowers, setSelectedDeityPowers] = useState<string[]>(
     initialCharacter?.selectedDeityPowers || ['Sangue de Ferro']
   );
@@ -272,13 +278,14 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
     level: 1,
     classId,
     classSubclass,
-    powerNames: [...currentRace.abilities.map((a) => a.name), ...currentClass.abilitiesLevel1.map((a) => a.name)],
+    // Todos os poderes já escolhidos (raça, poder geral racial, origem, divindade) contam como pré-requisito
+    powerNames: [...powerNames, ...currentClass.abilitiesLevel1.map((a) => a.name)],
     deityId,
   };
 
   // Ao mudar perícias ou atributos, poderes que deixam de cumprir os pré-requisitos saem
   // da ficha — o personagem precisa cumpri-los para ter o poder (Cap. 1, págs. 33 e 85).
-  const prereqKey = JSON.stringify([totalAttributes, [...trainedSkillIds].sort(), isSpellcaster, classId]);
+  const prereqKey = JSON.stringify([totalAttributes, [...trainedSkillIds].sort(), isSpellcaster, classId, [...powerNames].sort()]);
   useEffect(() => {
     const lost: string[] = [];
     if (selectedRacialPower) {
@@ -324,6 +331,7 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
     selectedOriginBenefits,
     deityId,
     selectedDeityPowers,
+    powerSpellCounts: powerSpells.reduce<Record<string, number>>((acc, sp) => ({ ...acc, [sp.sourcePower!]: (acc[sp.sourcePower!] || 0) + 1 }), {}),
     attributeMethod,
     baseAttributes,
     totalAttributes,
@@ -487,6 +495,7 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
           return {
             ...spDef,
             learnedFrom: 'classe' as const,
+            sourceClassId: classId,
           };
         })
       : [];
@@ -500,7 +509,11 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
         .filter((sp): sp is (typeof SPELLS_LIST)[number] => !!sp)
         .map((sp) => ({ ...sp, learnedFrom: 'raca' as const, keyAttribute: key }));
     });
-    const finalSpells = [...classSpells, ...racialSpells.filter((rs) => !classSpells.some((cs) => cs.id === rs.id))];
+    const baseSpells = [...classSpells, ...racialSpells.filter((rs) => !classSpells.some((cs) => cs.id === rs.id))];
+    // Magias de poderes: as escolhidas (só de poderes ainda selecionados) e as fixas (ex.: Dedo Verde)
+    const chosenPowerSpells = powerSpells.filter((sp) => allPowers.some((p) => p.name === sp.sourcePower));
+    const finalSpells = [...baseSpells, ...chosenPowerSpells];
+    finalSpells.push(...fixedSpellsForPowers(allPowers, finalSpells));
 
     const newCharacter: CharacterSheet = {
       id: initialCharacter?.id || 'char_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7),
@@ -717,6 +730,14 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
             <StepDeity
               selectedDeityId={deityId}
               selectedDeityPowers={selectedDeityPowers}
+              powerSpells={powerSpells}
+              onChangePowerSpells={setPowerSpells}
+              spellOwner={{
+                classId,
+                level: 1,
+                spellSchools,
+                spells: selectedSpells.map((id) => SPELLS_LIST.find((sp) => sp.id === id)).filter((sp) => !!sp).map((sp) => ({ ...sp!, learnedFrom: 'classe' as const })),
+              }}
               characterClassId={classId}
               characterRaceId={raceId}
               onSelectDeity={setDeityId}

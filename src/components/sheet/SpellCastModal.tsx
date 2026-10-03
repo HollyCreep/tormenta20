@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { AlertTriangle, ChevronDown, Dices, Gauge, Sparkles, Wand2, Zap } from 'lucide-react';
 import type { CharacterSheet, CharacterSpell } from '../../types/character';
-import { calculateMaxSpellCost, calculateSpellSaveDc, getSpellcastingKeyAttribute } from '../../utils/rulesEngine';
+import { calculateMaxSpellCost, calculateSpellSaveDc, spellKeyAttribute, spellLevelLimit } from '../../utils/rulesEngine';
 import { cleanT20Text } from '../../utils/textUtils';
 import { ExecutionBadge, RangeBadge, SchoolBadge, SpellTypeBadge } from '../common/T20Badge';
 import { CalcSheet } from '../common/StatBreakdownBadge';
@@ -33,13 +33,11 @@ const parseUpgradeCost = (costStr?: string): number => {
 /** Lançamento de magia com aprimoramentos, limite de PM por nível e CD (Cap. 4, pág. 178). */
 export const SpellCastModal: React.FC<SpellCastModalProps> = ({ spell, character, isOpen, onClose, onCastSpell }) => {
   const baseCost = BASE_COST_BY_CIRCLE[spell?.circle || 1] || 1;
-  // Magias raciais usam o atributo-chave da habilidade (ex.: Tatuagem Mística, Carisma — Cap. 1, pág. 26)
-  const keyAttrKey = spell?.keyAttribute || getSpellcastingKeyAttribute(character.classId, character.classSubclass);
-  // Limite de PM: nível na classe que fornece a magia; raça/origem/poderes: nível de personagem (Cap. 5, pág. 224)
-  const levelLimit =
-    spell?.learnedFrom === 'classe'
-      ? character.classes?.find((c) => c.classId === character.classId)?.level ?? character.level
-      : character.level;
+  // Atributo-chave: o da magia (raciais, ex.: Tatuagem Mística — Cap. 1, pág. 26) ou o da classe que a fornece
+  const keyAttrKey = spellKeyAttribute(character, spell);
+  // Limite de PM: nível na classe que fornece a magia; raça, origem, poderes gerais e outras fontes:
+  // nível de personagem (Cap. 5, pág. 224). Ex.: arcanista 3/guerreiro 2 → magias de arcanista até 3 PM.
+  const limit = spellLevelLimit(character, spell);
   // Alquebrado: custo em PM das habilidades +1 (Apêndice, pág. 394)
   const alquebrado = (character.activeConditions || []).includes('alquebrado') ? 1 : 0;
   const keyAttrMod = character.totalAttributes[keyAttrKey] || 0;
@@ -57,8 +55,8 @@ export const SpellCastModal: React.FC<SpellCastModalProps> = ({ spell, character
     [character.level, keyAttrMod, keyAttrName, customDcModifier]
   );
   const maxPm = useMemo(
-    () => calculateMaxSpellCost(levelLimit, hasUnlimitedMagic, keyAttrMod),
-    [levelLimit, hasUnlimitedMagic, keyAttrMod]
+    () => calculateMaxSpellCost(limit.level, hasUnlimitedMagic, keyAttrMod, limit.label),
+    [limit.level, limit.label, hasUnlimitedMagic, keyAttrMod]
   );
 
   const upgradesCost = (spell?.upgrades || []).reduce(
@@ -69,7 +67,9 @@ export const SpellCastModal: React.FC<SpellCastModalProps> = ({ spell, character
   const truqueIdx = (spell?.upgrades || []).findIndex((u) => /truque/i.test(u.cost));
   const usingTruque = truqueIdx >= 0 && (selectedUpgrades[truqueIdx] || 0) > 0;
   const totalCost = usingTruque ? alquebrado : Math.max(1, baseCost + upgradesCost + customCostModifier + alquebrado);
-  const exceedsMaxPm = totalCost > maxPm.maxCost;
+  // "...mas você sempre pode usar a habilidade em seu custo mínimo" (Cap. 5, pág. 224)
+  const minimumCost = usingTruque ? alquebrado : baseCost + alquebrado;
+  const exceedsMaxPm = totalCost > Math.max(maxPm.maxCost, minimumCost);
   const exceedsCurrentPm = totalCost > character.stats.currentMp;
   const canCast = !exceedsMaxPm && !exceedsCurrentPm;
 
@@ -187,7 +187,11 @@ export const SpellCastModal: React.FC<SpellCastModalProps> = ({ spell, character
             <div className="callout callout-danger">
               <AlertTriangle size={18} />
               <span>
-                O custo ({totalCost} PM) passa do limite por magia ({maxPm.maxCost} PM), que é igual ao seu nível (Cap. 4, pág. 178).
+                O custo ({totalCost} PM) passa do limite por magia ({maxPm.maxCost} PM):{' '}
+                {limit.classId
+                  ? `seu nível na classe que fornece a magia (${limit.label.replace('Nível de ', '')} ${limit.level})`
+                  : `seu nível de personagem (${limit.level}), pois a magia vem de raça, origem ou poder`}
+                . Você sempre pode lançá-la no custo mínimo (Cap. 5, pág. 224).
               </span>
             </div>
           )}
