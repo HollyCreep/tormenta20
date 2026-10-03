@@ -4,7 +4,13 @@ Todas as alterações notáveis deste projeto serão documentadas neste arquivo.
 
 ---
 
-## [Não lançado] — Auditoria completa das regras (T20 JdA v1.3)
+## [0.6.0] - 2026-10-03 — Edição livre da ficha e auditoria completa das regras
+
+### ✏️ Edição livre (auditada)
+- Novo item "Edição livre" no menu da ficha: altera nome, jogador, conceito, XP, tibares, classes e nível, biografia, atributos, treino e ajuste de cada perícia, ajustes de PV/PM máximos, Defesa, deslocamento, carga e penalidade de armadura, PV/PM atuais e temporários, poderes (do livro ou personalizados), magias e itens (quantidade, adicionar e remover).
+- As alterações ficam num rascunho com prévia; ao salvar, informe o motivo. Ajustes manuais aparecem como "Ajuste manual" no detalhamento dos valores.
+- Auditoria completa: toda alteração da ficha é registrada (identidade, nível/classes, atributos, perícias, ajustes, poderes e magias adicionados ou removidos, quantidades, condições, dinheiro, biografia e notas), inclusive as feitas pelo criador de personagem. A aba Auditoria marca "Edição livre", mostra o motivo e filtra por origem (ações de jogo, edição livre, criador).
+
 
 ### 📖 Regras conferidas com o livro
 - Catálogos regenerados a partir do texto do livro: origens, poderes gerais, classes (PV/PM, proficiências, habilidades e progressão), 298 poderes de classe, divindades, 198 magias, armas/armaduras/itens (Tabelas 3-3 a 3-6), melhorias e materiais (Tabela 3-9), encantos (Tabelas 8-8 e 8-10) e 35 condições (Apêndice, págs. 394–395).
