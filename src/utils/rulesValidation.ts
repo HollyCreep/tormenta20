@@ -4,6 +4,7 @@ import { CLASSES_LIST } from '../data/classes';
 import { ORIGINS_LIST } from '../data/origins';
 import { DEITIES_LIST } from '../data/deities';
 import { GENERAL_POWERS_LIST } from '../data/generalPowers';
+import { CLASS_POWERS_LIST } from '../data/classPowers';
 
 export interface PrerequisiteContext {
   attributes: CharacterAttributes;
@@ -157,7 +158,11 @@ export function checkPrerequisiteText(text: string | undefined, ctx: Prerequisit
  */
 export function checkPowerPrerequisites(powerIdOrName: string, context: PrerequisiteContext): PrerequisiteResult {
   const power = GENERAL_POWERS_LIST.find((p) => p.id === powerIdOrName || p.name === powerIdOrName);
-  if (!power) return { isMet: true, unmetRequirements: [] };
+  if (!power) {
+    // Poderes de classe (Cap. 1): o pré-requisito vem do texto do livro
+    const cp = CLASS_POWERS_LIST.find((p) => p.id === powerIdOrName || p.name === powerIdOrName);
+    return checkPrerequisiteText(cp?.prerequisites, context);
+  }
   const unmet = [...checkPrerequisiteText(power.prerequisites, context).unmetRequirements];
   if (power.category === 'magia' && !context.isSpellcaster && !unmet.includes('lançar magias')) unmet.unshift('lançar magias');
   if (power.category === 'concedido' && power.deities?.length && context.deityId !== undefined) {

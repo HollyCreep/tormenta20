@@ -14,12 +14,14 @@ import {
   Zap,
 } from 'lucide-react';
 import type { CharacterPower, CharacterSheet, CharacterSpell } from '../../types/character';
-import type { ClassPower, GeneralPower, Spell } from '../../types/rules';
+import type { AttributeKey, ClassPower, GeneralPower, Spell } from '../../types/rules';
+import { ATTRIBUTES_LIST } from '../../data/attributes';
 import { CLASSES_LIST } from '../../data/classes';
 import { CLASS_POWERS_LIST } from '../../data/classPowers';
 import { GENERAL_POWERS_LIST } from '../../data/generalPowers';
 import { SPELLS_LIST } from '../../data/spells';
-import { calculateSpellCircleUnlocked, recalculateFullCharacterSheet } from '../../utils/rulesEngine';
+import { calculateSpellCircleUnlocked, recalculateFullCharacterSheet, rulesInputFromCharacter } from '../../utils/rulesEngine';
+import { tormentaCharismaLoss } from '../../utils/passiveEffects';
 import { checkPowerPrerequisites } from '../../utils/rulesValidation';
 import { prerequisiteContextFor } from '../../utils/characterContext';
 import { cleanT20Text, getClassPowerCitation, getGeneralPowerCitation, getSpellCitation } from '../../utils/textUtils';
@@ -65,6 +67,8 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
   const [powerTypeTab, setPowerTypeTab] = useState<'classe' | 'geral'>('classe');
   const [powerSearch, setPowerSearch] = useState('');
   const [selectedPower, setSelectedPower] = useState<AnyPower | null>(null);
+  // Aumento de Atributo: +1 em um atributo, uma vez por patamar para o mesmo atributo (Cap. 1, págs. 35 e 38)
+  const [increaseAttr, setIncreaseAttr] = useState<AttributeKey | null>(null);
   const [selectedSpell, setSelectedSpell] = useState<Spell | null>(null);
   const [spellSearch, setSpellSearch] = useState('');
   const [spellCircleFilter, setSpellCircleFilter] = useState('0');
@@ -155,6 +159,12 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
     }).sort((a, b) => a.circle - b.circle || a.name.localeCompare(b.name, 'pt-BR'));
   }, [isSpellcaster, chosenClassDef, nextCircle, spellCircleFilter, spellSearch, character.spells]);
 
+  const tierOf = (lv: number) => (lv <= 4 ? 1 : lv <= 10 ? 2 : lv <= 16 ? 3 : 4);
+  const increasedInTier = (attr: AttributeKey) =>
+    (character.powers || []).some((p) => {
+      const m = /^aumento_atributo_([a-z]+)_(\d+)$/.exec(p.id);
+      return m && m[1] === attr && tierOf(parseInt(m[2], 10)) === tierOf(nextTotalLevel);
+    });
   const selectedPowerPrereq = selectedPower ? checkPowerPrerequisites(selectedPower.name, validationContext) : null;
 
   const handleConfirmLevelUp = () => {
@@ -177,6 +187,24 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
       });
     }
 
+    // Poder da Tormenta: perde Carisma conforme a contagem (Cap. 2, pág. 136)
+    const inputBefore = rulesInputFromCharacter(character);
+    const inputAfter = { ...inputBefore, powerNames: updatedPowers.map((p) => p.name) };
+    const racialPower = character.selectedRacialPower;
+    const carLoss = tormentaCharismaLoss(inputAfter, racialPower) - tormentaCharismaLoss(inputBefore, racialPower);
+    const totalAttributes = carLoss > 0 ? { ...character.totalAttributes, car: character.totalAttributes.car - carLoss } : character.totalAttributes;
+
+    const isIncrease = selectedPower?.name === 'Aumento de Atributo' && increaseAttr;
+    if (isIncrease) {
+      const last = updatedPowers[updatedPowers.length - 1];
+      updatedPowers[updatedPowers.length - 1] = {
+        ...last,
+        id: `aumento_atributo_${increaseAttr}_${nextTotalLevel}`,
+        description: `+1 em ${ATTRIBUTES_LIST.find((a) => a.key === increaseAttr)?.name} (${nextTotalLevel}º nível). ${last.description}`,
+      };
+    }
+    const finalAttributes = isIncrease ? { ...totalAttributes, [increaseAttr!]: totalAttributes[increaseAttr!] + 1 } : totalAttributes;
+
     const updatedSpells: CharacterSpell[] = [...(character.spells || [])];
     if (selectedSpell) updatedSpells.push({ ...selectedSpell, learnedFrom: 'classe' });
 
@@ -184,6 +212,7 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
       recalculateFullCharacterSheet({
         ...character,
         level: nextTotalLevel,
+        totalAttributes: finalAttributes,
         classes: updatedClasses,
         powers: updatedPowers,
         spells: updatedSpells,
@@ -314,7 +343,7 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
                   Voltar
                 </button>
               )}
-              <button type="button" className="btn btn-primary grow" onClick={goNext}>
+              <button type="button" className="btn btn-primary grow" onClick={goNext} disabled={step === 'poder' && selectedPower?.name === 'Aumento de Atributo' && !increaseAttr}>
                 {isLast ? (
                   <>
                     <TrendingUp size={18} />
@@ -426,8 +455,32 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
               <div className="callout callout-warning" style={{ margin: 16 }}>
                 <AlertTriangle size={18} />
                 <span>
-                  Pré-requisitos não atendidos: {selectedPowerPrereq.unmetRequirements.join(', ')}. Confirme com o mestre.
+                  Pré-requisitos não atendidos: {selectedPowerPrereq.unmetRequirements.join(', ')}. Um poder só pode ser escolhido quando os pré-requisitos são cumpridos (Cap. 1, pág. 33).
                 </span>
+              </div>
+            )}
+            {selectedPower?.name === 'Aumento de Atributo' && (
+              <div className="card stack-sm" style={{ margin: 16 }}>
+                <span className="t-label">Atributo que recebe +1</span>
+                <div className="attr-chips">
+                  {ATTRIBUTES_LIST.map((attr) => {
+                    const used = increasedInTier(attr.key);
+                    return (
+                      <button
+                        key={attr.key}
+                        type="button"
+                        className="attr-chip"
+                        aria-pressed={increaseAttr === attr.key}
+                        disabled={used}
+                        title={used ? 'Já aumentado neste patamar (Cap. 1, pág. 35)' : attr.name}
+                        onClick={() => setIncreaseAttr(attr.key)}
+                      >
+                        <span className="attr-chip-key">{attr.shortName}</span>
+                        <span className="attr-chip-sub">{used ? 'neste patamar' : `${character.totalAttributes[attr.key]} → ${character.totalAttributes[attr.key] + 1}`}</span>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             )}
             {filteredPowers.length === 0 ? (
@@ -446,6 +499,7 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
                         role="radio"
                         aria-checked={isSelected}
                         className="pick-main"
+                        disabled={!prereq.isMet && !isSelected}
                         onClick={() => setSelectedPower(isSelected ? null : pow)}
                       >
                         <span className={`mark mark-radio${isSelected ? ' is-on' : ''}`}>{isSelected && <Check size={14} strokeWidth={3} />}</span>

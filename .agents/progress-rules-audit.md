@@ -17,7 +17,7 @@ Ferramentas: `.agents/tools/book_extract.py` (extrai blocos do livro por título
 - [x] 4. Pré-requisitos — validador genérico que interpreta o texto do livro (sem switch manual)
 - [x] 5. Motor — condições (Apêndice), registro de efeitos passivos, carga, sobrecarga, armadura, deslocamento, Defesa, PV, PM, perícias, magias, ataque
 - [x] 6. Classes — PV/PM, perícias, proficiências, habilidades por nível, magias iniciais, kit (Espólio/Protótipo)
-- [ ] 7. Poderes de classe — textos e pré-requisitos
+- [x] 7. Poderes de classe — textos e pré-requisitos
 - [ ] 8. Divindades — devotos, poderes concedidos, obrigações
 - [ ] 9. Magias — círculo, escola, execução, alcance, duração, resistência, aprimoramentos
 - [ ] 10. Equipamentos — Tabelas 3-x (armas, armaduras, itens), melhorias, materiais
@@ -54,7 +54,10 @@ Ferramentas: `.agents/tools/book_extract.py` (extrai blocos do livro por título
 | 25 | Magias | Magia racial usava atributo da classe; limite sempre pelo nível de personagem | Atributo da habilidade; limite pelo nível da classe que concede (Cap. 5, pág. 224) | corrigido (etapa 5) |
 
 ## Notas
-- Pendente (etapa 7): ao ganhar poder da Tormenta no Subir de Nível, reduzir Carisma (tormentaCharismaLoss).
 | 26 | Classes | Perícias "Luta ou Pontaria" contadas como escolha livre; habilidades de 1º nível parafraseadas | Campo skillAlternative validado; textos e progressão por nível do livro | corrigido (etapa 6) |
 | 27 | Classes | Mago começava com 3 magias; Espólio/Protótipo ausentes; Rastreador sem efeito | Mago 4 (pág. 37); Espólio até T$ 2.000 (pág. 79); Protótipo até T$ 500 (pág. 68); +2 Sobrevivência (pág. 50) | corrigido (etapa 6) |
 | 28 | Perícias | Descrições parafraseadas | Texto de abertura de cada perícia (Cap. 2, págs. 115–123) | corrigido (etapa 6) |
+| 29 | Poderes de classe | 349 entradas com habilidades automáticas e notas misturadas; pré-requisitos dentro da descrição | 298 poderes do livro (págs. 37–84), pré-requisito em campo próprio e validado | corrigido (etapa 7) |
+| 30 | Subir de nível | Aumento de Atributo não alterava atributo; requisito não cumprido só avisava | +1 no atributo, uma vez por patamar (págs. 35 e 38); poderes sem requisito bloqueados (pág. 33) | corrigido (etapa 7) |
+| 31 | Subir de nível | Poder da Tormenta não reduzia Carisma | Perda de Carisma aplicada (Cap. 2, pág. 136) | corrigido (etapa 7) |
+| 32 | Poderes de classe | Efeitos passivos ignorados (Pele de Ferro, Totem Espiritual, Sarado...) | Registrados em passiveEffects.ts com citação | corrigido (etapa 7) |

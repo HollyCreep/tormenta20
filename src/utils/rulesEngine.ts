@@ -281,6 +281,14 @@ export function calculateDefense(input: RulesInput, effects = collectPassiveEffe
       total += e.defense!;
       components.push({ label: e.source, value: e.defense! });
     });
+  // Atributo extra na Defesa, limitado pelo nível (Braços Calejados); não soma o mesmo atributo duas vezes
+  effects
+    .filter((e) => e.defenseAttribute && e.defenseAttribute !== defAttr && a[e.defenseAttribute] > 0)
+    .forEach((e) => {
+      const v = Math.min(a[e.defenseAttribute!], input.level);
+      total += v;
+      components.push({ label: e.source, value: v });
+    });
 
   // Condições: mesmo efeito não acumula, vale o mais severo (Apêndice, pág. 394)
   if (cond.defense) {
@@ -334,6 +342,13 @@ export function calculateMaxHp(input: RulesInput, effects = collectPassiveEffect
       total += e.hp!;
       components.push({ label: e.source, value: e.hp! });
     });
+  // Sarado: soma Força no total de PV (Cap. 1, pág. 77)
+  effects
+    .filter((e) => e.hpAttribute)
+    .forEach((e) => {
+      total += input.attributes[e.hpAttribute!];
+      components.push({ label: e.source, value: input.attributes[e.hpAttribute!] });
+    });
   return breakdown(components, Math.max(1, total));
 }
 
@@ -371,6 +386,14 @@ export function calculateMaxMp(input: RulesInput, effects = collectPassiveEffect
     .forEach((e) => {
       total += e.mp!;
       components.push({ label: e.source, value: e.mp! });
+    });
+  // Poderes que somam atributo nos PM (Totem Espiritual, Elo com a Natureza): mesmo atributo não acumula
+  effects
+    .filter((e) => e.mpAttribute && !summedAttrs.has(e.mpAttribute))
+    .forEach((e) => {
+      summedAttrs.add(e.mpAttribute!);
+      total += input.attributes[e.mpAttribute!];
+      components.push({ label: e.source, value: input.attributes[e.mpAttribute!] });
     });
   return breakdown(components, Math.max(0, total));
 }

@@ -39,6 +39,11 @@ export interface Contribution {
   speed?: number;
   spaces?: number;
   armorPenalty?: number;
+  /** Soma um atributo no total de PM / PV (uma vez por atributo — "mesmo atributo não acumula"). */
+  mpAttribute?: AttributeKey;
+  hpAttribute?: AttributeKey;
+  /** Soma um atributo na Defesa, limitado pelo nível. */
+  defenseAttribute?: AttributeKey;
   /** Usa outro atributo como atributo-chave da perícia (ex.: Destreza em Atletismo). */
   skillAttribute?: Partial<Record<string, AttributeKey>>;
 }
@@ -200,6 +205,21 @@ const POWER_EFFECTS: Record<string, EffectFn> = {
     return { source: 'Mãos Membranosas', citation: 'Cap. 2, pág. 137', skills: { atletismo: b, fortitude: b } };
   },
   'Olhos Vermelhos': (i) => ({ source: 'Olhos Vermelhos', citation: 'Cap. 2, pág. 137', skills: { intimidacao: tormentaScaling(i) } }),
+  // Poderes de classe (Cap. 1)
+  'Pele de Ferro': (i) =>
+    wearsHeavyArmor(i.inventory) ? null : { source: 'Pele de Ferro', citation: 'Cap. 1, pág. 42', defense: 4 },
+  'Totem Espiritual': () => ({ source: 'Totem Espiritual', citation: 'Cap. 1, pág. 42', mpAttribute: 'sab' }),
+  'Poder Mágico': (i) => ({ source: 'Poder Mágico', citation: 'Cap. 1, pág. 38', mp: classLevelOf(i, 'arcanista') }),
+  'Pernas do Mar': () => ({ source: 'Pernas do Mar', citation: 'Cap. 1, pág. 48', skills: { acrobacia: 2, atletismo: 2 } }),
+  'Elo com a Natureza': () => ({ source: 'Elo com a Natureza', citation: 'Cap. 1, pág. 51', mpAttribute: 'sab' }),
+  Pajem: () => ({ source: 'Pajem', citation: 'Cap. 1, pág. 54', skills: { diplomacia: 2 } }),
+  'Força dos Penhascos': () => ({ source: 'Força dos Penhascos', citation: 'Cap. 1, pág. 62', skills: { fortitude: 2 } }),
+  Gatuno: () => ({ source: 'Gatuno', citation: 'Cap. 1, pág. 74', skills: { atletismo: 2 } }),
+  Sombra: () => ({ source: 'Sombra', citation: 'Cap. 1, pág. 74', skills: { furtividade: 2 } }),
+  'Braços Calejados': (i) =>
+    equippedArmor(i.inventory) ? null : { source: 'Braços Calejados', citation: 'Cap. 1, pág. 76', defenseAttribute: 'for' },
+  Sarado: (i) => ({ source: 'Sarado', citation: 'Cap. 1, pág. 77', hpAttribute: 'for', skills: { fortitude: i.attributes.for } }),
+  'Voz Poderosa': () => ({ source: 'Voz Poderosa', citation: 'Cap. 1, pág. 80', skills: { diplomacia: 2, intimidacao: 2 } }),
   // Origem (Cap. 1, págs. 85–95)
   'Coração Heroico': (i) => ({
     source: 'Coração Heroico',
