@@ -301,4 +301,6 @@ export interface Condition {
   name: string;
   description: string;
   effects: string[];
+  /** Tipo de efeito (Medo, Mental, Movimento...) — Cap. 5, pág. 228. */
+  effectType?: string;
 }
