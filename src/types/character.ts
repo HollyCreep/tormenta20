@@ -73,6 +73,13 @@ export interface CharacterSpell extends Spell {
   sourceClassId?: string;
   /** Poder que concedeu a magia (ex.: Centelha Mágica, Conhecimento Mágico). */
   sourcePower?: string;
+  /**
+   * Poderes que reduzem o custo desta magia em –1 PM cada: "Caso aprenda novamente essa magia, seu custo
+   * diminui em –1 PM" (poderes concedidos, Cap. 2) e Sopro do Mar (Sopro das Uivantes, pág. 135).
+   */
+  costReducedBy?: string[];
+  /** Fórmula do livro de fórmulas do inventor: não é lançada, serve para fabricar poções (pág. 70). */
+  isFormula?: boolean;
   /** Atributo-chave próprio (magias raciais: ex. Tatuagem Mística usa Carisma). */
   keyAttribute?: AttributeKey;
 }

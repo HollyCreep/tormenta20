@@ -18,6 +18,9 @@ Todas as alterações notáveis deste projeto serão documentadas neste arquivo.
 - Subir de nível segue a tabela da classe: sem poder no 1º nível de uma nova classe; mostra a tabela e o texto das habilidades ganhas (Ataque Especial, Fúria, Durão...); magias iniciais ao entrar numa classe conjuradora, uma por nível (bardo e druida só nos níveis pares e das suas escolas); caminho do arcanista e escolas na multiclasse.
 - Limite de PM por magia usa o nível na classe que fornece a magia (raça, origem e poderes: nível de personagem), com o custo mínimo sempre permitido — Cap. 5, pág. 224.
 - Poderes que concedem magias (Centelha Mágica, Conhecimento Mágico, Aumentar Repertório, Orar, Truque Mágico, Aspectos do druida, Totem Espiritual e os de magia fixa) agora pedem/registram a magia no criador, na subida de nível e na ficha — Cap. 4, pág. 170; Cap. 2, pág. 132.
+- Teurgista Místico (uma magia do outro tipo por círculo), Sopro do Mar (Sopro das Uivantes divina, –1 PM) e redução de –1 PM ao aprender de novo magias de poderes concedidos; custo mínimo de 1 PM — Cap. 2, págs. 133–136; Cap. 5, pág. 226.
+- Inventor: livro de fórmulas (Alquimista Iniciado, fórmula por nível, Conhecimento de Fórmulas, Mestre Alquimista) separado das magias lançáveis — Cap. 1, págs. 68–70.
+- Escriba Arcano: copiar magia na ficha, cobrando T$ 250 por PM e registrando os dias de trabalho — Cap. 1, pág. 38.
 - Citações de `rulesCitations.ts` verificadas literalmente; servidor MCP e documentação `.agents/rules` atualizados.
 
 ---

@@ -604,6 +604,19 @@ export function validateAllWizardSteps(input: WizardValidationInput): Record<num
           .filter((sp) => sp && !schools.includes(sp.school));
         if (outside.length) errors.push(`Magias fora das escolas escolhidas: ${outside.map((sp) => sp!.name).join(', ')}.`);
       }
+      // Tipo da classe (ou universal); Teurgista Místico permite uma do outro tipo por círculo (Cap. 2, pág. 135)
+      const classType = currentClass.spellcaster?.type;
+      const offType = input.selectedSpells
+        .map((id) => SPELLS_LIST.find((sp) => sp.id === id))
+        .filter((sp) => sp && sp.type !== 'universal' && sp.type !== classType);
+      const teurgist = input.selectedDeityPowers.includes('Teurgista Místico');
+      if (offType.length > (teurgist ? 1 : 0)) {
+        errors.push(
+          teurgist
+            ? `Teurgista Místico permite só uma magia ${classType === 'arcana' ? 'divina' : 'arcana'} de 1º círculo.`
+            : `Magias que não são ${classType}s: ${offType.map((sp) => sp!.name).join(', ')}.`
+        );
+      }
       if (input.selectedSpells.length !== allowedSpellsCount) {
         errors.push(`Escolha ${allowedSpellsCount} magias de 1º círculo (atualmente ${input.selectedSpells.length}).`);
       }

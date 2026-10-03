@@ -32,7 +32,11 @@ const parseUpgradeCost = (costStr?: string): number => {
 
 /** Lançamento de magia com aprimoramentos, limite de PM por nível e CD (Cap. 4, pág. 178). */
 export const SpellCastModal: React.FC<SpellCastModalProps> = ({ spell, character, isOpen, onClose, onCastSpell }) => {
-  const baseCost = BASE_COST_BY_CIRCLE[spell?.circle || 1] || 1;
+  // Reduções de poderes ("caso aprenda novamente essa magia, seu custo diminui em –1 PM"; Sopro do Mar).
+  // "Uma habilidade nunca pode ter seu custo reduzido para menos de 1 PM" (Cap. 5, pág. 226).
+  const circleCost = BASE_COST_BY_CIRCLE[spell?.circle || 1] || 1;
+  const costReduction = (spell?.costReducedBy || []).length;
+  const baseCost = Math.max(1, circleCost - costReduction);
   // Atributo-chave: o da magia (raciais, ex.: Tatuagem Mística — Cap. 1, pág. 26) ou o da classe que a fornece
   const keyAttrKey = spellKeyAttribute(character, spell);
   // Limite de PM: nível na classe que fornece a magia; raça, origem, poderes gerais e outras fontes:
@@ -156,7 +160,8 @@ export const SpellCastModal: React.FC<SpellCastModalProps> = ({ spell, character
                 <small> PM</small>
               </span>
               <span className="t-xs t-3">
-                Base {baseCost}
+                Base {circleCost}
+                {costReduction ? ` − ${costReduction} (${spell.costReducedBy!.join(', ')})` : ''}
                 {upgradesCost ? ` + aprimoramentos ${upgradesCost}` : ''}
                 {customCostModifier ? ` ${formatSigned(customCostModifier)} manual` : ''}
               </span>

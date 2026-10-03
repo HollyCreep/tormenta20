@@ -18,6 +18,8 @@ interface StepSpellsProps {
   selectedSpells: string[];
   onSelectSpells: (spells: string[]) => void;
   onOpenDetail: (data: DetailModalData) => void;
+  /** Teurgista Místico: uma magia de cada círculo pode ser do outro tipo (Cap. 2, pág. 135). */
+  teurgist?: boolean;
 }
 
 const SCHOOLS = ['Abjuração', 'Adivinhação', 'Convocação', 'Encantamento', 'Evocação', 'Ilusão', 'Necromancia', 'Transmutação'];
@@ -33,8 +35,11 @@ export const StepSpells: React.FC<StepSpellsProps> = ({
   selectedSpells,
   onSelectSpells,
   onOpenDetail,
+  teurgist = false,
 }) => {
   const [school, setSchool] = useState('todas');
+  const otherType = spellcasterType === 'arcana' ? 'divina' : 'arcana';
+  const otherChosen = selectedSpells.filter((id) => SPELLS_LIST.find((s) => s.id === id)?.type === otherType);
   const [search, setSearch] = useState('');
 
   const available = useMemo(
@@ -42,10 +47,13 @@ export const StepSpells: React.FC<StepSpellsProps> = ({
       SPELLS_LIST.filter(
         (s) =>
           s.circle === 1 &&
-          (s.type === 'universal' || s.type === spellcasterType) &&
+          (s.type === 'universal' ||
+            s.type === spellcasterType ||
+            // Teurgista Místico: uma magia do outro tipo neste círculo
+            (teurgist && s.type === otherType && (otherChosen.length === 0 || otherChosen.includes(s.id)))) &&
           (!schoolsCount || selectedSchools.includes(s.school))
       ).sort((a, b) => a.name.localeCompare(b.name, 'pt-BR')),
-    [spellcasterType, schoolsCount, selectedSchools]
+    [spellcasterType, schoolsCount, selectedSchools, teurgist, otherType, otherChosen]
   );
 
   const visible = available.filter((s) => {
@@ -84,7 +92,9 @@ export const StepSpells: React.FC<StepSpellsProps> = ({
     <div className="stack-lg">
       <StepIntro
         title="Magias"
-        description={`Escolha ${allowedCount} magias ${spellcasterType === 'divina' ? 'divinas' : 'arcanas'} (ou universais) de 1º círculo. Cada uma custa 1 PM.`}
+        description={`Escolha ${allowedCount} magias ${spellcasterType === 'divina' ? 'divinas' : 'arcanas'} (ou universais) de 1º círculo. Cada uma custa 1 PM.${
+          teurgist ? ` Teurgista Místico: uma delas pode ser ${otherType}.` : ''
+        }`}
       />
 
       {schoolsCount > 0 && (

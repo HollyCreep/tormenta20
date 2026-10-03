@@ -127,6 +127,13 @@ Nobre: Espólio, item de até T$ 2.000 (pág. 79). Inventor: Protótipo, até T$
   Natureza...) ou à escolha (Centelha Mágica, Conhecimento Mágico, Orar, Truque Mágico, Aspectos,
   Totem Espiritual). Sem magia definida: qualquer magia de tipo e círculo que a classe possa lançar
   (Cap. 4, pág. 170). Poderes concedidos usam Sabedoria como atributo-chave (Cap. 2, pág. 132).
+- **Custo reduzido:** "caso aprenda novamente essa magia, seu custo diminui em –1 PM" (concedidos) e Sopro
+  do Mar (Sopro das Uivantes como divina, –1 PM). Nenhuma habilidade custa menos de 1 PM (Cap. 5, pág. 226).
+- **Teurgista Místico** (pág. 135): uma magia de cada círculo aprendido pode ser do outro tipo.
+- **Fórmulas** (Inventor, pág. 70): magias arcanas ou divinas (Int) só para fabricar poções, não lançadas.
+  Alquimista Iniciado dá 3 de 1º círculo; +1 a cada nível de inventor seguinte; 2º círculo no 6º nível;
+  Mestre Alquimista +1 círculo no 10º, 14º e 18º. Conhecimento de Fórmulas: +3.
+- **Escriba Arcano** (pág. 38): copiar magia custa 1 dia e T$ 250 por PM.
 - **Truque:** custo zero e não combina com outros aprimoramentos (pág. 171).
 
 ## 12. Poderes (Cap. 1, pág. 33; Cap. 2)

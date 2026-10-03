@@ -45,7 +45,7 @@ import { useBackHandler } from '../ui/backStack';
 import { useFeedback } from '../ui/Feedback';
 import { osteonFormer } from '../../utils/raceAbilities';
 import { spellGrantFor } from '../../data/powerSpellGrants';
-import { fixedSpellsForPowers } from '../../utils/powerSpells';
+import { withFixedGrants } from '../../utils/powerSpells';
 
 interface WizardContainerProps {
   initialCharacter?: CharacterSheet | null;
@@ -512,8 +512,7 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
     const baseSpells = [...classSpells, ...racialSpells.filter((rs) => !classSpells.some((cs) => cs.id === rs.id))];
     // Magias de poderes: as escolhidas (só de poderes ainda selecionados) e as fixas (ex.: Dedo Verde)
     const chosenPowerSpells = powerSpells.filter((sp) => allPowers.some((p) => p.name === sp.sourcePower));
-    const finalSpells = [...baseSpells, ...chosenPowerSpells];
-    finalSpells.push(...fixedSpellsForPowers(allPowers, finalSpells));
+    const finalSpells = withFixedGrants(allPowers, [...baseSpells, ...chosenPowerSpells]);
 
     const newCharacter: CharacterSheet = {
       id: initialCharacter?.id || 'char_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7),
@@ -778,6 +777,7 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
               selectedSpells={selectedSpells}
               onSelectSpells={setSelectedSpells}
               onOpenDetail={setModalDetail}
+              teurgist={selectedDeityPowers.includes('Teurgista Místico')}
             />
           )}
           {currentStep === 8 && (

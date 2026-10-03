@@ -9,7 +9,7 @@ import { CLASS_POWERS_LIST } from '../../../data/classPowers';
 import { CLASSES_LIST } from '../../../data/classes';
 import { EmptyState, SearchField, Segmented, SelectField } from '../../ui/controls';
 import { classColorVars } from '../../common/ClassSigil';
-import { fixedSpellsForPowers, grantForPower, pendingSpellGrants } from '../../../utils/powerSpells';
+import { applyFixedGrants, grantForPower, pendingFixedGrants, pendingSpellGrants } from '../../../utils/powerSpells';
 import type { PowerSpellGrant } from '../../../data/powerSpellGrants';
 import { PowerSpellPicker } from '../PowerSpellPicker';
 
@@ -19,17 +19,18 @@ interface PowersTabProps {
   character: CharacterSheet;
   onSetModalDetail: (data: DetailModalData) => void;
   onNavigateToCompendium?: (tab: 'poderes', subTab?: 'gerais' | 'classe') => void;
-  /** Salva a ficha (magias escolhidas por poderes). */
-  onAddSpells?: (spells: CharacterSpell[], reason: string) => void;
+  /** Salva a lista completa de magias da ficha (magias concedidas por poderes). */
+  onUpdateSpells?: (spells: CharacterSpell[], reason: string) => void;
 }
 
 const CATEGORY_ORDER = ['combate', 'destino', 'magia', 'concedido', 'tormenta', 'raca', 'origem', 'geral'];
 
-export const PowersTab: React.FC<PowersTabProps> = ({ character, onSetModalDetail, onNavigateToCompendium, onAddSpells }) => {
+export const PowersTab: React.FC<PowersTabProps> = ({ character, onSetModalDetail, onNavigateToCompendium, onUpdateSpells }) => {
   const [spellPicker, setSpellPicker] = useState<{ grant: PowerSpellGrant; remaining: number } | null>(null);
   // Poderes que concedem magias (Cap. 4, pág. 170): escolhas pendentes e magias fixas que faltam na ficha
   const pending = useMemo(() => pendingSpellGrants(character.powers || [], character.spells), [character.powers, character.spells]);
-  const missingFixed = useMemo(() => fixedSpellsForPowers(character.powers || [], character.spells), [character.powers, character.spells]);
+  const missingFixed = useMemo(() => pendingFixedGrants(character.powers || [], character.spells), [character.powers, character.spells]);
+  const addSpells = (spells: CharacterSpell[], reason: string) => onUpdateSpells?.([...(character.spells || []), ...spells], reason);
   const [subTab, setSubTab] = useState<SheetPowersSubTab>('gerais');
   const [search, setSearch] = useState('');
   const [generalCategory, setGeneralCategory] = useState<string>('todas');
@@ -149,9 +150,12 @@ export const PowersTab: React.FC<PowersTabProps> = ({ character, onSetModalDetai
   const renderGrantedSpells = (pow: CharacterPower) => {
     const grant = grantForPower(pow);
     if (!grant) return null;
-    const learned = (character.spells || []).filter((sp) => sp.sourcePower === grant.power && (!grant.classId || sp.sourceClassId === grant.classId));
+    const learned = (character.spells || []).filter(
+      (sp) => (sp.sourcePower === grant.power && (!grant.classId || sp.sourceClassId === grant.classId || sp.isFormula)) || sp.costReducedBy?.includes(grant.power)
+    );
     const pend = pendingOf(pow);
-    const fixedMissing = missingFixed.filter((sp) => sp.sourcePower === grant.power);
+    const fixedMissing = missingFixed.filter((a) => a.power === grant.power);
+    const fixedLabel = fixedMissing.map((a) => (a.kind === 'learn' ? a.spell.name : `${a.spell.name} (–1 PM)`)).join(', ');
     return (
       <div className="stack-xs">
         <span className="t-label">Magias concedidas</span>
@@ -161,13 +165,14 @@ export const PowersTab: React.FC<PowersTabProps> = ({ character, onSetModalDetai
               <span key={sp.id} className="badge badge-mp">
                 <Wand2 size={12} />
                 {cleanT20Text(sp.name)}
+                {sp.isFormula ? ' (fórmula)' : sp.sourcePower !== grant.power ? ' (–1 PM)' : ''}
               </span>
             ))}
           </div>
         ) : (
           !pend && fixedMissing.length === 0 && <span className="t-xs t-3">Nenhuma ainda.</span>
         )}
-        {onAddSpells && pend && (
+        {onUpdateSpells && pend && (
           <button
             type="button"
             className="btn btn-tonal btn-sm"
@@ -177,14 +182,14 @@ export const PowersTab: React.FC<PowersTabProps> = ({ character, onSetModalDetai
             {grant.options ? 'Escolher animal totêmico' : `Escolher magias (${pend.have}/${pend.needed})`}
           </button>
         )}
-        {onAddSpells && fixedMissing.length > 0 && (
+        {onUpdateSpells && fixedMissing.length > 0 && (
           <button
             type="button"
             className="btn btn-tonal btn-sm"
-            onClick={() => onAddSpells(fixedMissing, `${grant.power}: aprendeu ${fixedMissing.map((s) => s.name).join(', ')}.`)}
+            onClick={() => onUpdateSpells(applyFixedGrants(character.spells || [], fixedMissing), `${grant.power}: ${fixedLabel}.`)}
           >
             <Wand2 size={16} />
-            Adicionar {fixedMissing.map((s) => s.name).join(', ')} às magias
+            Aplicar às magias: {fixedLabel}
           </button>
         )}
       </div>
@@ -242,12 +247,12 @@ export const PowersTab: React.FC<PowersTabProps> = ({ character, onSetModalDetai
 
   return (
     <div className="stack">
-      {onAddSpells && (pending.length > 0 || missingFixed.length > 0) && (
+      {onUpdateSpells && (pending.length > 0 || missingFixed.length > 0) && (
         <div className="callout callout-warning">
           <AlertTriangle size={18} />
           <span>
             Poderes com magias a receber:{' '}
-            {[...new Set([...pending.map((p) => p.grant.power), ...missingFixed.map((s) => s.sourcePower)])].join(', ')}. Abra o poder para
+            {[...new Set([...pending.map((p) => p.grant.power), ...missingFixed.map((a) => a.power)])].join(', ')}. Abra o poder para
             escolher (Cap. 4, pág. 170).
           </span>
         </div>
@@ -316,14 +321,14 @@ export const PowersTab: React.FC<PowersTabProps> = ({ character, onSetModalDetai
         <div className="stack-sm">{list.map((pow, idx) => renderPower(pow, subTab === 'classe', idx))}</div>
       )}
 
-      {spellPicker && onAddSpells && (
+      {spellPicker && onUpdateSpells && (
         <PowerSpellPicker
           open
           grant={spellPicker.grant}
           owner={character}
           remaining={spellPicker.remaining}
           onClose={() => setSpellPicker(null)}
-          onConfirm={(spells) => onAddSpells(spells, `${spellPicker.grant.power}: aprendeu ${spells.map((s) => s.name).join(', ')}.`)}
+          onConfirm={(spells) => addSpells(spells, `${spellPicker.grant.power}: aprendeu ${spells.map((s) => s.name).join(', ')}.`)}
         />
       )}
     </div>

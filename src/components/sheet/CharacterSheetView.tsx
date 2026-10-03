@@ -29,7 +29,7 @@ import { CharacterAttributes } from './CharacterAttributes';
 import { CombatTab } from './tabs/CombatTab';
 import { SkillsTab } from './tabs/SkillsTab';
 import { PowersTab } from './tabs/PowersTab';
-import { SpellsTab, BASE_SPELL_COST_BY_CIRCLE } from './tabs/SpellsTab';
+import { SpellsTab } from './tabs/SpellsTab';
 import { InventoryTab } from './tabs/InventoryTab';
 import { BioTab } from './tabs/BioTab';
 import { LogsTab } from './LogsTab';
@@ -48,6 +48,7 @@ import { RULES_CITATIONS } from '../../data/rulesCitations';
 import { EQUIPMENT_LIST } from '../../data/equipment';
 import { heroLine, skillName } from '../../utils/displayNames';
 import { effectiveSize, osteonFormer } from '../../utils/raceAbilities';
+import { scribeCost, spellBaseCost } from '../../utils/powerSpells';
 
 const SpellCastModal = lazy(() => import('./SpellCastModal').then((m) => ({ default: m.SpellCastModal })));
 const LevelUpModal = lazy(() => import('./LevelUpModal').then((m) => ({ default: m.LevelUpModal })));
@@ -194,7 +195,7 @@ export const CharacterSheetView: React.FC<CharacterSheetViewProps> = ({
   };
 
   const handleCastStandardSpell = (sp: CharacterSpell) => {
-    const baseCost = BASE_SPELL_COST_BY_CIRCLE[sp.circle || 1] || 1;
+    const baseCost = spellBaseCost(sp);
     if (character.stats.currentMp < baseCost) {
       toast(`PM insuficientes para ${sp.name}: custa ${baseCost} PM, você tem ${character.stats.currentMp}.`, { tone: 'warning' });
       return;
@@ -540,8 +541,8 @@ export const CharacterSheetView: React.FC<CharacterSheetViewProps> = ({
                   character={character}
                   onSetModalDetail={setModalDetail}
                   onNavigateToCompendium={onNavigateToCompendium}
-                  onAddSpells={(spells, reason) =>
-                    onUpdateCharacter(recalculateFullCharacterSheet({ ...character, spells: [...(character.spells || []), ...spells] }), {
+                  onUpdateSpells={(spells, reason) =>
+                    onUpdateCharacter(recalculateFullCharacterSheet({ ...character, spells }), {
                       actionReason: reason,
                     })
                   }
@@ -550,6 +551,14 @@ export const CharacterSheetView: React.FC<CharacterSheetViewProps> = ({
               {currentTab === 'magias' && (
                 <SpellsTab
                   character={character}
+                  onScribeSpell={(sp) => {
+                    // Escriba Arcano (pág. 38): um dia de trabalho e T$ 250 por PM da magia
+                    const c = scribeCost(sp.circle);
+                    onUpdateCharacter(
+                      recalculateFullCharacterSheet({ ...character, tibares: character.tibares - c.tibares, spells: [...(character.spells || []), sp] }),
+                      { actionReason: `Escriba Arcano: copiou ${sp.name} (${c.days} dia${c.days > 1 ? 's' : ''} de trabalho, T$ ${c.tibares.toLocaleString('pt-BR')}).` }
+                    );
+                  }}
                   onCastStandardSpell={handleCastStandardSpell}
                   onSelectCastSpell={setSelectedCastSpell}
                   onSetModalDetail={setModalDetail}

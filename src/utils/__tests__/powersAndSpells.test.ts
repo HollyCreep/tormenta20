@@ -1,7 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import { validateAllWizardSteps, type WizardValidationInput } from '../rulesValidation';
 import { spellLevelLimit, spellKeyAttribute } from '../rulesEngine';
-import { pendingSpellGrants, spellOptionsForGrant, fixedSpellsForPowers } from '../powerSpells';
+import {
+  formulaMaxCircle,
+  learnableClassSpells,
+  pendingSpellGrants,
+  scribeCost,
+  spellBaseCost,
+  spellOptionsForGrant,
+  spellsFromGrant,
+  withFixedGrants,
+} from '../powerSpells';
+import { SPELLS_LIST } from '../../data/spells';
 import { spellGrantFor } from '../../data/powerSpellGrants';
 import { CLASSES_LIST } from '../../data/classes';
 import type { CharacterSpell } from '../../types/character';
@@ -107,9 +117,83 @@ describe('Poderes que concedem magias', () => {
   });
 
   it('poder concedido com magia fixa entra automaticamente (Dedo Verde)', () => {
-    const [sp] = fixedSpellsForPowers([{ id: 'dedo_verde', name: 'Dedo Verde' }]);
+    const [sp] = withFixedGrants([{ id: 'dedo_verde', name: 'Dedo Verde' }], []);
     expect(sp.name).toBe('Controlar Plantas');
     expect(sp.learnedFrom).toBe('poder');
     expect(sp.keyAttribute).toBe('sab');
+  });
+
+  it('aprender de novo pelo poder concedido reduz o custo em –1 PM, sem duplicar', () => {
+    const augurio = { ...SPELLS_LIST.find((s) => s.name === 'Augúrio')!, learnedFrom: 'classe' as const, sourceClassId: 'clerigo' };
+    const out = withFixedGrants([{ id: 'dom_da_profecia', name: 'Dom da Profecia' }], [augurio]);
+    expect(out).toHaveLength(1);
+    expect(out[0].costReducedBy).toEqual(['Dom da Profecia']);
+    expect(spellBaseCost(out[0])).toBe(2);
+    // reaplicar não reduz de novo
+    expect(withFixedGrants([{ id: 'dom_da_profecia', name: 'Dom da Profecia' }], out)[0].costReducedBy).toHaveLength(1);
+  });
+
+  it('custo nunca fica abaixo de 1 PM (Cap. 5, pág. 226)', () => {
+    expect(spellBaseCost({ circle: 1, costReducedBy: ['A', 'B'] })).toBe(1);
+  });
+});
+
+describe('Teurgista Místico (pág. 135)', () => {
+  const owner = { classId: 'arcanista', level: 5, powers: [{ id: 'teurgista_mistico', name: 'Teurgista Místico' }], spells: [] };
+
+  it('arcanista vê magias divinas, uma por círculo', () => {
+    const list = learnableClassSpells(owner, 'arcanista', { maxCircle: 2 });
+    expect(list.some((s) => s.type === 'divina' && s.circle === 1)).toBe(true);
+    const cure = SPELLS_LIST.find((s) => s.type === 'divina' && s.circle === 1)!;
+    const after = learnableClassSpells(owner, 'arcanista', { maxCircle: 2, selected: [cure] });
+    expect(after.filter((s) => s.type === 'divina' && s.circle === 1).map((s) => s.id)).toEqual([cure.id]);
+    expect(after.some((s) => s.type === 'divina' && s.circle === 2)).toBe(true);
+  });
+
+  it('sem o poder, só o tipo da classe', () => {
+    expect(learnableClassSpells({ ...owner, powers: [] }, 'arcanista', { maxCircle: 2 }).some((s) => s.type === 'divina')).toBe(false);
+  });
+});
+
+describe('Sopro do Mar (pág. 135)', () => {
+  it('clérigo pode aprender Sopro das Uivantes como divina, com –1 PM', () => {
+    const owner = { classId: 'clerigo', level: 5, powers: [{ id: 'sopro_do_mar', name: 'Sopro do Mar' }], spells: [] };
+    const sp = learnableClassSpells(owner, 'clerigo', { maxCircle: 2 }).find((s) => s.name === 'Sopro das Uivantes');
+    expect(sp?.type).toBe('divina');
+    const g = spellGrantFor('Conhecimento Mágico', 'clerigo')!;
+    const [learned] = spellsFromGrant(g, [sp!], owner);
+    expect(learned.costReducedBy).toEqual(['Sopro do Mar']);
+    expect(spellBaseCost(learned)).toBe(2);
+  });
+
+  it('não aparece antes do 2º círculo', () => {
+    const owner = { classId: 'clerigo', level: 1, powers: [{ id: 'sopro_do_mar', name: 'Sopro do Mar' }], spells: [] };
+    expect(learnableClassSpells(owner, 'clerigo', { maxCircle: 1 }).some((s) => s.name === 'Sopro das Uivantes')).toBe(false);
+  });
+});
+
+describe('Fórmulas do inventor (pág. 70)', () => {
+  it('círculo máximo: 1º; 2º no 6º nível; Mestre Alquimista +1 no 10º, 14º e 18º', () => {
+    expect(formulaMaxCircle({ classId: 'inventor', level: 5 })).toBe(1);
+    expect(formulaMaxCircle({ classId: 'inventor', level: 6 })).toBe(2);
+    expect(formulaMaxCircle({ classId: 'inventor', level: 10 })).toBe(2);
+    expect(formulaMaxCircle({ classId: 'inventor', level: 14, powers: [{ id: 'inventor_mestre_alquimista', name: 'Mestre Alquimista' }] })).toBe(4);
+  });
+
+  it('Alquimista Iniciado: três fórmulas de 1º círculo, arcanas ou divinas, que não são lançadas', () => {
+    const g = spellGrantFor('Alquimista Iniciado', 'inventor')!;
+    expect(g.choose?.count).toBe(3);
+    const opts = spellOptionsForGrant(g, { classId: 'inventor', level: 2 });
+    expect(opts.every((s) => s.circle === 1)).toBe(true);
+    expect(new Set(opts.map((s) => s.type))).toEqual(new Set(['arcana', 'divina', 'universal']));
+    const [f] = spellsFromGrant(g, [opts[0]]);
+    expect(f.isFormula).toBe(true);
+    expect(f.keyAttribute).toBe('int');
+  });
+});
+
+describe('Escriba Arcano (pág. 38)', () => {
+  it('um dia e T$ 250 por PM', () => {
+    expect(scribeCost(3)).toEqual({ pm: 6, days: 6, tibares: 1500 });
   });
 });

@@ -19,12 +19,12 @@ import { ATTRIBUTES_LIST } from '../../data/attributes';
 import { CLASSES_LIST } from '../../data/classes';
 import { CLASS_POWERS_LIST } from '../../data/classPowers';
 import { GENERAL_POWERS_LIST } from '../../data/generalPowers';
-import { SPELLS_LIST } from '../../data/spells';
 import { calculateSpellCircleUnlocked, recalculateFullCharacterSheet, rulesInputFromCharacter, startingSpellCount } from '../../utils/rulesEngine';
 import { tormentaCharismaLoss } from '../../utils/passiveEffects';
 import { checkPowerPrerequisites } from '../../utils/rulesValidation';
 import { prerequisiteContextFor } from '../../utils/characterContext';
-import { fixedSpellsForPowers, grantForPower } from '../../utils/powerSpells';
+import { asClassSpell, grantForPower, learnableClassSpells, withFixedGrants } from '../../utils/powerSpells';
+import { FORMULA_BOOK, type PowerSpellGrant } from '../../data/powerSpellGrants';
 import { PowerSpellPicker } from './PowerSpellPicker';
 import { cleanT20Text, getClassPowerCitation, getGeneralPowerCitation, getSpellCitation } from '../../utils/textUtils';
 import { PowerCategoryBadge, SchoolBadge } from '../common/T20Badge';
@@ -40,8 +40,18 @@ interface LevelUpModalProps {
   onSaveLevelUp: (updatedCharacter: CharacterSheet) => void;
 }
 
-type Step = 'classe' | 'poder' | 'magia';
+type Step = 'classe' | 'poder' | 'magia' | 'formula';
 type AnyPower = ClassPower | GeneralPower;
+
+/** Fórmula aprendida a cada nível de inventor com Alquimista Iniciado (Livro de Fórmulas, pág. 70). */
+const LEVEL_FORMULA: PowerSpellGrant = {
+  power: FORMULA_BOOK,
+  classId: 'inventor',
+  choose: { count: 1, circle: 'formula', types: ['arcana', 'divina'] },
+  keyAttribute: 'int',
+  formula: true,
+  page: 70,
+};
 
 const BASE_COST_BY_CIRCLE: Record<number, number> = { 1: 1, 2: 3, 3: 6, 4: 10, 5: 15 };
 const SPELL_SCHOOLS = ['Abjuração', 'Adivinhação', 'Convocação', 'Encantamento', 'Evocação', 'Ilusão', 'Necromancia', 'Transmutação'];
@@ -76,6 +86,9 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
   // Magias escolhidas para um poder que concede magias (Conhecimento Mágico, Orar...)
   const [powerSpells, setPowerSpells] = useState<CharacterSpell[]>([]);
   const [powerSpellPickerOpen, setPowerSpellPickerOpen] = useState(false);
+  // Fórmula do nível (inventor com Alquimista Iniciado)
+  const [levelFormula, setLevelFormula] = useState<CharacterSpell[]>([]);
+  const [formulaPickerOpen, setFormulaPickerOpen] = useState(false);
   // Multiclasse em arcanista: escolhe o caminho (Cap. 1, pág. 37)
   const [newSubclass, setNewSubclass] = useState('');
   // Multiclasse em bardo/druida: três escolas (Cap. 1, págs. 44 e 61)
@@ -124,7 +137,16 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
           : 0
         : 1;
 
-  const steps: Step[] = ['classe', ...(grantsPower ? (['poder'] as Step[]) : []), ...(spellsToLearn > 0 ? (['magia'] as Step[]) : [])];
+  // "Você começa com três fórmulas de 1º círculo. A cada nível além do 1º, aprende uma fórmula adicional"
+  // (pág. 70): a fórmula do nível vale a partir do nível seguinte ao que recebeu Alquimista Iniciado.
+  const learnsFormula = selectedClassId === 'inventor' && (character.powers || []).some((p) => p.name === 'Alquimista Iniciado');
+
+  const steps: Step[] = [
+    'classe',
+    ...(grantsPower ? (['poder'] as Step[]) : []),
+    ...(spellsToLearn > 0 ? (['magia'] as Step[]) : []),
+    ...(learnsFormula ? (['formula'] as Step[]) : []),
+  ];
   const stepIndex = Math.max(0, steps.indexOf(step));
   const isLast = stepIndex === steps.length - 1;
 
@@ -178,23 +200,6 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
     );
   }, [powerTypeTab, availableClassPowers, availableGeneralPowers, powerSearch]);
 
-  const availableSpells = (() => {
-    if (!isSpellcaster) return [];
-    const type = chosenClassDef.spellcaster?.type || 'arcana';
-    const circle = parseInt(spellCircleFilter, 10);
-    const q = spellSearch.toLowerCase();
-    return SPELLS_LIST.filter((s) => {
-      const matchesType = s.type === type || s.type === 'universal';
-      const withinCircle = s.circle <= nextCircle;
-      const circleMatches = circle === 0 || s.circle === circle;
-      const matchesQuery = !q || s.name.toLowerCase().includes(q) || s.description.toLowerCase().includes(q);
-      const alreadyKnown = character.spells.some((cs) => cs.id === s.id) || powerSpells.some((ps) => ps.id === s.id);
-      // Bardo e druida só aprendem magias das três escolas escolhidas
-      const inSchools = !chosenClassDef.spellcaster?.schoolsCount || !knownSchools?.length || knownSchools.includes(s.school);
-      return matchesType && withinCircle && circleMatches && matchesQuery && !alreadyKnown && inSchools;
-    }).sort((a, b) => a.circle - b.circle || a.name.localeCompare(b.name, 'pt-BR'));
-  })();
-
   const tierOf = (lv: number) => (lv <= 4 ? 1 : lv <= 10 ? 2 : lv <= 16 ? 3 : 4);
   const increasedInTier = (attr: AttributeKey) =>
     (character.powers || []).some((p) => {
@@ -216,6 +221,23 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
     spellSchools: knownSchools,
     spells: [...(character.spells || []), ...selectedSpells.map((sp) => ({ ...sp, learnedFrom: 'classe' as const }))],
   };
+  // Poderes no novo nível (o escolhido agora conta: Teurgista Místico, Mestre Alquimista...)
+  const powersAfter = [...(character.powers || []), ...(selectedPower ? [{ id: selectedPower.id || selectedPower.name, name: selectedPower.name }] : [])];
+  const ownerForSpells = { ...ownerAfter, powers: powersAfter, spells: [...(character.spells || []), ...powerSpells] };
+
+  // Magias da classe no novo nível: tipo da classe (+ Teurgista Místico e Sopro do Mar), círculo e
+  // escolas do bardo/druida (Cap. 4, pág. 170; Cap. 2, pág. 135)
+  const availableSpells = (() => {
+    if (!isSpellcaster) return [];
+    const circle = parseInt(spellCircleFilter, 10);
+    const q = spellSearch.toLowerCase();
+    return learnableClassSpells(ownerForSpells, selectedClassId, {
+      maxCircle: nextCircle,
+      schools: chosenClassDef.spellcaster?.schoolsCount ? knownSchools : undefined,
+      selected: selectedSpells,
+    }).filter((s) => (circle === 0 || s.circle === circle) && (!q || s.name.toLowerCase().includes(q) || s.description.toLowerCase().includes(q)));
+  })();
+
   const choosePower = (pow: AnyPower | null) => {
     setSelectedPower(pow);
     setPowerSpells([]);
@@ -224,7 +246,8 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
   const blockNext =
     (step === 'classe' && ((!!subclassOptions && !newSubclass) || (needsSchools && newSchools.length !== 3))) ||
     (step === 'poder' && (!selectedPower || (selectedPower.name === 'Aumento de Atributo' && !increaseAttr) || powerSpells.length < grantNeeded)) ||
-    (step === 'magia' && selectedSpells.length < spellsRequired);
+    (step === 'magia' && selectedSpells.length < spellsRequired) ||
+    (step === 'formula' && levelFormula.length < 1);
 
   const handleConfirmLevelUp = () => {
     const existingIndex = existingClasses.findIndex((c) => c.classId === selectedClassId);
@@ -269,10 +292,11 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
     const finalAttributes = isIncrease ? { ...totalAttributes, [increaseAttr!]: totalAttributes[increaseAttr!] + 1 } : totalAttributes;
 
     const updatedSpells: CharacterSpell[] = [...(character.spells || [])];
-    selectedSpells.forEach((sp) => updatedSpells.push({ ...sp, learnedFrom: 'classe', sourceClassId: selectedClassId }));
-    // Magias concedidas pelo poder escolhido: as escolhidas e as fixas (ex.: Elo com a Natureza)
-    updatedSpells.push(...powerSpells);
-    updatedSpells.push(...fixedSpellsForPowers(updatedPowers, updatedSpells));
+    selectedSpells.forEach((sp) => updatedSpells.push(asClassSpell(sp, selectedClassId, ownerForSpells)));
+    // Magias concedidas pelo poder escolhido e fórmula do nível
+    updatedSpells.push(...powerSpells, ...levelFormula);
+    // Magias fixas de poderes (ex.: Elo com a Natureza); repetidas de poder concedido ficam –1 PM
+    const finalSpells = withFixedGrants(updatedPowers, updatedSpells);
 
     onSaveLevelUp(
       recalculateFullCharacterSheet({
@@ -281,7 +305,7 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
         totalAttributes: finalAttributes,
         classes: updatedClasses,
         powers: updatedPowers,
-        spells: updatedSpells,
+        spells: finalSpells,
         ...(needsSchools ? { spellSchools: newSchools } : {}),
       })
     );
@@ -322,7 +346,7 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
     });
   };
 
-  const stepLabels: Record<Step, string> = { classe: 'Classe', poder: 'Poder', magia: 'Magia' };
+  const stepLabels: Record<Step, string> = { classe: 'Classe', poder: 'Poder', magia: 'Magia', formula: 'Fórmula' };
 
   return (
     <>
@@ -387,7 +411,7 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
         }
         footer={
           <div className="levelup-footer">
-            {(selectedPower || selectedSpells.length > 0) && (
+            {(selectedPower || selectedSpells.length > 0 || levelFormula.length > 0) && (
               <div className="levelup-picks">
                 {selectedPower && (
                   <span className="badge badge-accent badge-lg">
@@ -395,7 +419,7 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
                     {selectedPower.name}
                   </span>
                 )}
-                {[...powerSpells, ...selectedSpells].map((sp) => (
+                {[...powerSpells, ...selectedSpells, ...levelFormula].map((sp) => (
                   <span key={sp.id} className="badge badge-mp badge-lg">
                     <Zap size={12} />
                     {sp.name}
@@ -718,6 +742,32 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
           </div>
         )}
 
+        {step === 'formula' && (
+          <div className="stack-lg animate-in">
+            <div className="callout callout-accent">
+              <BookOpen size={18} />
+              <span>
+                Livro de Fórmulas: a cada nível de inventor você aprende uma fórmula adicional (pág. 70). Uma fórmula é uma magia
+                arcana ou divina (atributo-chave Inteligência) que só serve para fabricar poções.
+              </span>
+            </div>
+            {levelFormula.length > 0 && (
+              <div className="chip-wrap">
+                {levelFormula.map((sp) => (
+                  <span key={sp.id} className="badge badge-mp badge-lg">
+                    <BookOpen size={12} />
+                    {sp.name}
+                  </span>
+                ))}
+              </div>
+            )}
+            <button type="button" className="btn btn-tonal" onClick={() => setFormulaPickerOpen(true)}>
+              <BookOpen size={18} />
+              {levelFormula.length ? 'Trocar fórmula' : 'Escolher fórmula'}
+            </button>
+          </div>
+        )}
+
         {step === 'magia' && (
           <div className="animate-in">
             {availableSpells.length === 0 ? (
@@ -770,11 +820,21 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({ character, isOpen, o
       </Sheet>
 
       <DetailModal data={modalDetail} onClose={() => setModalDetail(null)} />
+      {formulaPickerOpen && (
+        <PowerSpellPicker
+          open
+          grant={LEVEL_FORMULA}
+          owner={ownerForSpells}
+          remaining={1}
+          onClose={() => setFormulaPickerOpen(false)}
+          onConfirm={setLevelFormula}
+        />
+      )}
       {selectedGrant && powerSpellPickerOpen && (
         <PowerSpellPicker
           open
           grant={selectedGrant}
-          owner={ownerAfter}
+          owner={ownerForSpells}
           remaining={grantNeeded}
           onClose={() => setPowerSpellPickerOpen(false)}
           onConfirm={setPowerSpells}

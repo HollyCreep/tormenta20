@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Gauge, Sparkles, Wand2, Zap } from 'lucide-react';
+import { BookOpen, Feather, Gauge, Sparkles, Wand2, Zap } from 'lucide-react';
 import type { CharacterSheet, CharacterSpell } from '../../../types/character';
 import { cleanT20Text } from '../../../utils/textUtils';
 import { ExecutionBadge, SchoolBadge } from '../../common/T20Badge';
@@ -14,9 +14,11 @@ import {
   spellLevelLimit,
 } from '../../../utils/rulesEngine';
 import { ATTRIBUTES_LIST } from '../../../data/attributes';
+import { formulasOf, SCRIBE_GRANT, scribeCost, spellBaseCost } from '../../../utils/powerSpells';
+import { PowerSpellPicker } from '../PowerSpellPicker';
 
 // Custo canônico base por círculo (T20 JDA, Cap. 4: Magia, pág. 178)
-export const BASE_SPELL_COST_BY_CIRCLE: Record<number, number> = {
+const BASE_SPELL_COST_BY_CIRCLE: Record<number, number> = {
   1: 1,
   2: 3,
   3: 6,
@@ -29,6 +31,8 @@ interface SpellsTabProps {
   onCastStandardSpell: (spell: CharacterSpell) => void;
   onSelectCastSpell: (spell: CharacterSpell) => void;
   onSetModalDetail: (data: DetailModalData) => void;
+  /** Escriba Arcano: aprende a magia copiada, pagando T$ 250 por PM (pág. 38). */
+  onScribeSpell?: (spell: CharacterSpell) => void;
 }
 
 const normalize = (s: string) =>
@@ -37,7 +41,11 @@ const normalize = (s: string) =>
     .normalize('NFD')
     .replace(/[̀-ͯ]/g, '');
 
-export const SpellsTab: React.FC<SpellsTabProps> = ({ character, onCastStandardSpell, onSelectCastSpell, onSetModalDetail }) => {
+export const SpellsTab: React.FC<SpellsTabProps> = ({ character, onCastStandardSpell, onSelectCastSpell, onSetModalDetail, onScribeSpell }) => {
+  const [scribeOpen, setScribeOpen] = useState(false);
+  const isScribe = (character.powers || []).some((p) => p.name === 'Escriba Arcano');
+  // Livro de fórmulas do inventor: fórmulas não são lançadas, servem para fabricar poções (pág. 70)
+  const formulas = formulasOf(character).sort((a, b) => a.circle - b.circle || a.name.localeCompare(b.name, 'pt-BR'));
   const [search, setSearch] = useState('');
   const [calc, setCalc] = useState<'dc' | 'limit' | null>(null);
 
@@ -53,7 +61,7 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({ character, onCastStandardS
   const q = normalize(search.trim());
   const grouped = useMemo(() => {
     const spells = (character.spells || []).filter(
-      (sp) => !q || normalize(`${sp.name} ${sp.school} ${sp.description}`).includes(q)
+      (sp) => !sp.isFormula && (!q || normalize(`${sp.name} ${sp.school} ${sp.description}`).includes(q))
     );
     const byCircle = new Map<number, CharacterSpell[]>();
     spells.forEach((sp) => {
@@ -66,12 +74,12 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({ character, onCastStandardS
   }, [character.spells, q]);
 
   const openDetail = (sp: CharacterSpell) => {
-    const baseCost = BASE_SPELL_COST_BY_CIRCLE[sp.circle || 1] || 1;
+    const baseCost = spellBaseCost(sp);
     onSetModalDetail({
       title: cleanT20Text(sp.name),
-      category: `Magia ${sp.type} · ${sp.circle || 1}º círculo`,
+      category: `${sp.isFormula ? 'Fórmula' : 'Magia'} ${sp.type} · ${sp.circle || 1}º círculo${sp.sourcePower ? ` · ${sp.sourcePower}` : ''}`,
       subtitle: `${sp.school} · ${sp.execution}`,
-      cost: `${baseCost} PM`,
+      cost: `${baseCost} PM${sp.costReducedBy?.length ? ` (−${sp.costReducedBy.length}: ${sp.costReducedBy.join(', ')})` : ''}`,
       execution: sp.execution,
       range: sp.range,
       duration: sp.duration,
@@ -116,8 +124,15 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({ character, onCastStandardS
 
       {(character.spells || []).length > 6 && <SearchField value={search} onChange={setSearch} placeholder="Buscar magia…" />}
 
+      {isScribe && onScribeSpell && (
+        <button type="button" className="btn btn-secondary" onClick={() => setScribeOpen(true)}>
+          <Feather size={18} />
+          Copiar magia (Escriba Arcano)
+        </button>
+      )}
+
       {grouped.length === 0 ? (
-        <EmptyState icon={<Zap size={24} />} title="Nenhuma magia encontrada" description="Ajuste a busca para ver o grimório." />
+        formulas.length > 0 && !q ? null : <EmptyState icon={<Zap size={24} />} title="Nenhuma magia encontrada" description="Ajuste a busca para ver o grimório." />
       ) : (
         grouped.map(([circle, spells]) => (
           <section key={circle} className="stack-sm">
@@ -127,7 +142,7 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({ character, onCastStandardS
             </div>
             <div className="list">
               {spells.map((sp, idx) => {
-                const baseCost = BASE_SPELL_COST_BY_CIRCLE[sp.circle || 1] || 1;
+                const baseCost = spellBaseCost(sp);
                 const canCast = character.stats.currentMp >= baseCost;
                 return (
                   <div key={sp.id || `${sp.name}-${idx}`} className="row spell-row">
@@ -166,6 +181,49 @@ export const SpellsTab: React.FC<SpellsTabProps> = ({ character, onCastStandardS
             </div>
           </section>
         ))
+      )}
+
+      {formulas.length > 0 && (
+        <section className="stack-sm">
+          <div className="section-head">
+            <h3 className="section-title t-md">
+              <BookOpen size={16} /> Livro de fórmulas
+            </h3>
+            <span className="badge">{formulas.length}</span>
+          </div>
+          <p className="t-xs t-3">Fórmulas servem para fabricar poções; não são lançadas (Cap. 1, pág. 70).</p>
+          <div className="list">
+            {formulas.map((sp) => (
+              <button key={sp.id} type="button" className="row has-detail" onClick={() => openDetail(sp)}>
+                <span className="row-main">
+                  <span className="row-title">{cleanT20Text(sp.name)}</span>
+                  <span className="hstack-xs wrap">
+                    <span className="badge badge-mp">{sp.circle}º círculo</span>
+                    <SchoolBadge school={sp.school} />
+                  </span>
+                </span>
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {scribeOpen && onScribeSpell && (
+        <PowerSpellPicker
+          open
+          grant={SCRIBE_GRANT}
+          owner={character}
+          remaining={1}
+          onClose={() => setScribeOpen(false)}
+          extraInfo={(sp) => {
+            const c = scribeCost(sp.circle);
+            return `${c.days} dia${c.days > 1 ? 's' : ''}, T$ ${c.tibares.toLocaleString('pt-BR')}`;
+          }}
+          isBlocked={(sp) =>
+            character.tibares < scribeCost(sp.circle).tibares ? `Faltam T$ ${(scribeCost(sp.circle).tibares - character.tibares).toLocaleString('pt-BR')}` : undefined
+          }
+          onConfirm={([sp]) => sp && onScribeSpell(sp)}
+        />
       )}
 
       {calc && (

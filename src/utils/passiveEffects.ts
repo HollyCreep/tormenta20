@@ -8,7 +8,6 @@
 import type { CharacterAttributes, CharacterInventoryItem } from '../types/character';
 import type { AttributeKey } from '../types/rules';
 import { GENERAL_POWERS_LIST } from '../data/generalPowers';
-import { RACES_LIST } from '../data/races';
 import { effectiveSize, hasRaceAbility, osteonFormer } from './raceAbilities';
 
 export interface RulesInput {
