@@ -69,7 +69,6 @@ const weapons = (groups: WeaponGroup[], reach?: 'distancia' | 'corpo') =>
   EQUIPMENT_LIST.filter(
     (e) =>
       groups.includes(e.category as WeaponGroup) &&
-      e.id !== 'escudo_leve_ataque' &&
       (!reach || (reach === 'distancia' ? e.subcategory === 'distancia' : e.subcategory !== 'distancia'))
   ).map((e) => opt(e.id));
 

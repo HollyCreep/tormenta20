@@ -247,6 +247,8 @@ export interface ItemModifier {
   )[];
   requirementText?: string;
   incompatibleWith?: string[];
+  /** Encantos marcados com * nas Tabelas 8-8/8-10 contam como dois encantos. */
+  countsAs?: number;
   description: string;
   effect: {
     attackBonus?: number;

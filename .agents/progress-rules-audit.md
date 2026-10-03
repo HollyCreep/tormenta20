@@ -20,7 +20,7 @@ Ferramentas: `.agents/tools/book_extract.py` (extrai blocos do livro por título
 - [x] 7. Poderes de classe — textos e pré-requisitos
 - [x] 8. Divindades — devotos, poderes concedidos, obrigações
 - [x] 9. Magias — círculo, escola, execução, alcance, duração, resistência, aprimoramentos
-- [ ] 10. Equipamentos — Tabelas 3-x (armas, armaduras, itens), melhorias, materiais
+- [x] 10. Equipamentos — Tabelas 3-x (armas, armaduras, itens), melhorias, materiais
 - [ ] 11. Documentação: `.agents/rules/*.md`, `.agents/mcp_config.json`, `rulesCitations.ts`, CHANGELOG
 
 ## Divergências encontradas (livro × app)
@@ -41,7 +41,7 @@ Ferramentas: `.agents/tools/book_extract.py` (extrai blocos do livro por título
 | 12 | Raças | Habilidades parafraseadas/erradas (Goblin, Hynne, Kliren, Golem, Medusa, Sílfide, Sereia, Trog, Osteon...) | Cap. 1, págs. 19–31 | corrigido (etapa 2) |
 | 13 | Poderes | Atlético +1,5m; Estilo de Arma e Escudo +1; Carapaça +2; Bênção do Mana +1/nível | +3m; +2; +1 (+1 a cada 2 outros poderes da Tormenta); +1 PM a cada nível ímpar | corrigido (etapa 5) |
 | 14 | Poderes concedidos | Faltam vários (Escamas Dracônicas, Mente Vazia, Talento Artístico, Rejeição Divina, Voz da Civilização, Êxtase da Loucura...) | Cap. 2, págs. 132–135 | corrigido (etapa 3) |
-| 15 | Equipamento | Armadura completa T$ 1.500 | T$ 3.000 (Tabela 3-5, pág. 153) | etapa 10 |
+| 15 | Equipamento | Armadura completa T$ 1.500 | T$ 3.000 (Tabela 3-5, pág. 153) | corrigido (etapa 10) |
 | 16 | Raças | Kliren Des +1 | Int +2, Car +1, For –1 (Tabela 1-2, pág. 18) | corrigido (etapa 2) |
 | 17 | Raças | Lefou: "2 perícias OU 1 poder" | +2 em 2 perícias; pode trocar UM bônus por poder da Tormenta (pág. 24) | corrigido (etapa 2) |
 | 18 | Raças | Golem escolhe origem | Propósito de Criação: sem origem, +1 poder geral (pág. 27) | corrigido (etapa 2) |
@@ -66,3 +66,7 @@ Ferramentas: `.agents/tools/book_extract.py` (extrai blocos do livro por título
 | 35 | Magias | Nomes truncados (Fantasmagórico, Mortos-Vivos, Caleidoscópica...); Manto de Sombras ausente; textos parafraseados | 198 magias com execução, alcance, alvo, duração, resistência, texto e aprimoramentos do livro (Cap. 4) | corrigido (etapa 9) |
 | 36 | Magias | Truque somava custo mínimo de 1 PM e combinava com aprimoramentos | Custo zero e exclusivo (Cap. 4, pág. 171) | corrigido (etapa 9) |
 | 37 | Magias | Bardo/Druida sem escolha das três escolas | Escolas escolhidas no criador e magias restritas a elas (págs. 44 e 61) | corrigido (etapa 9) |
+| 38 | Armas | Armas de suplementos (Adaga táurica, Katar, Nunchaku, Espada de duas lâminas, Escudo leve golpe); faltavam Katana, Machado anão, Marreta, Gadanho; Chicote/Rede marciais; Besta leve 2 espaços | Tabela 3-3 (págs. 144–145) | corrigido (etapa 10) |
+| 39 | Itens gerais | Nomes e preços inventados (Kit de Ladrão, Tenda, Odre; Cajado arcano T$ 100, Orbe T$ 75, Tomo T$ 150...) | Tabela 3-6 e descrições (págs. 156–163); Mochila de aventureiro +2 espaços | corrigido (etapa 10) |
+| 40 | Melhorias/materiais | Melhorias inexistentes (Alongada, Recarregável, Macia, Abundante, Resistente), faltavam 11; preços de materiais e efeitos errados (Matéria Vermelha +2/+2, Gelo Eterno +1d6, Reforçada sem penalidade) | Tabelas 3-8 e 3-9 e textos (págs. 164–167) | corrigido (etapa 10) |
+| 41 | Encantos | "Guardiã" inventada; faltavam Lancinante e Piedosa; encantos que contam como dois | Tabelas 8-8 e 8-10 (Cap. 8, págs. 336–339) | corrigido (etapa 10) |

@@ -234,6 +234,10 @@ const POWER_EFFECTS: Record<string, EffectFn> = {
 /** Todos os efeitos passivos aplicáveis ao personagem. */
 export function collectPassiveEffects(input: RulesInput): Contribution[] {
   const out: Contribution[] = [];
+  // Mochila de aventureiro: vestida, aumenta a capacidade de carga em 2 espaços (Cap. 3, pág. 157)
+  if (input.inventory.some((it) => it.isEquipped && /mochila de aventureiro/i.test(it.name))) {
+    out.push({ source: 'Mochila de aventureiro', citation: 'Cap. 3, pág. 157', spaces: 2 });
+  }
   const race = RACES_LIST.find((r) => r.id === input.raceId);
   const stealth = race ? SIZE_STEALTH[race.size] || 0 : 0;
   if (stealth) out.push({ source: `Tamanho ${race!.size}`, citation: 'Tabela 1-21, Cap. 1, pág. 107', skills: { furtividade: stealth } });
