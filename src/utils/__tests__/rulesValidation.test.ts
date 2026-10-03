@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import {
   checkPowerPrerequisites,
   checkPrerequisiteText,
+  canBeDevotee,
+  grantedPowerCount,
   findDuplicatePowers,
   isRepeatablePower,
   powersWithUnmetPrerequisites,
@@ -88,5 +90,19 @@ describe('Pré-requisitos lidos do texto do livro (Cap. 2)', () => {
     expect(checkPowerPrerequisites('Magia Ampliada', base).unmetRequirements).toContain('lançar magias');
     expect(checkPowerPrerequisites('Bênção do Mana', { ...base, deityId: 'wynna' }).isMet).toBe(true);
     expect(checkPowerPrerequisites('Bênção do Mana', { ...base, deityId: 'khalmyr' }).isMet).toBe(false);
+  });
+});
+
+describe('Devotos (Cap. 1, pág. 96)', () => {
+  it('raça ou classe precisa constar em Devotos; humanos e clérigos são exceção', () => {
+    expect(canBeDevotee('allihanna', 'elfo', 'guerreiro').ok).toBe(true);
+    expect(canBeDevotee('allihanna', 'anao', 'guerreiro').ok).toBe(false);
+    expect(canBeDevotee('allihanna', 'humano', 'guerreiro').ok).toBe(true);
+    expect(canBeDevotee('allihanna', 'anao', 'clerigo').ok).toBe(true);
+  });
+  it('druidas só seguem Allihanna, Megalokk ou Oceano; clérigos e druidas recebem 2 poderes', () => {
+    expect(canBeDevotee('khalmyr', 'humano', 'druida').ok).toBe(false);
+    expect(grantedPowerCount('druida')).toBe(2);
+    expect(grantedPowerCount('guerreiro')).toBe(1);
   });
 });

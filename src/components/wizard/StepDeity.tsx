@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { AlertTriangle, Check, Info, Sun, UserX } from 'lucide-react';
 import { DEITIES_LIST } from '../../data/deities';
+import { canBeDevotee, grantedPowerCount } from '../../utils/rulesValidation';
 import type { DetailModalData } from '../common/DetailModal';
 import { Segmented } from '../ui/controls';
 import { ChoiceCard, ChoiceSection, OptionPickerSheet, StepIntro, type PickerOption } from './wizardUi';
@@ -21,6 +22,7 @@ export const StepDeity: React.FC<StepDeityProps> = ({
   selectedDeityId,
   selectedDeityPowers,
   characterClassId,
+  characterRaceId,
   onSelectDeity,
   onSelectDeityPowers,
   onOpenDetail,
@@ -30,13 +32,15 @@ export const StepDeity: React.FC<StepDeityProps> = ({
   const deity = DEITIES_LIST.find((d) => d.id === selectedDeityId);
   const isDevout = !!deity;
   const isCleric = characterClassId === 'clerigo';
-  const powerLimit = isCleric ? deity?.grantedPowers.length || 1 : 1;
+  // Devoto recebe 1 poder concedido; clérigos e druidas recebem 2 (Cap. 1, págs. 57, 61 e 96)
+  const powerLimit = grantedPowerCount(characterClassId);
 
   const chooseDeity = (id: string) => {
     const d = DEITIES_LIST.find((x) => x.id === id);
     onSelectDeity(id);
     // Clérigos recebem todos os poderes concedidos; demais devotos começam com o primeiro
-    onSelectDeityPowers(d ? (isCleric ? d.grantedPowers.map((p) => p.name) : [d.grantedPowers[0]?.name].filter(Boolean)) : []);
+    onSelectDeityPowers([]);
+    void d;
   };
 
   const togglePower = (name: string) => {
@@ -49,13 +53,18 @@ export const StepDeity: React.FC<StepDeityProps> = ({
     else if (selectedDeityPowers.length < powerLimit) onSelectDeityPowers([...selectedDeityPowers, name]);
   };
 
-  const options: PickerOption[] = DEITIES_LIST.map((d) => ({
-    id: d.id,
-    title: d.name,
-    subtitle: d.title,
-    meta: <span className="badge">Energia {d.energyChannel}</span>,
-    searchText: d.description,
-  }));
+  const options: PickerOption[] = DEITIES_LIST.map((d) => {
+    const elig = canBeDevotee(d.id, characterRaceId || '', characterClassId || '');
+    return {
+      id: d.id,
+      title: d.name,
+      subtitle: d.title || d.allowedDevoteesText,
+      meta: <span className="badge">Energia {d.energyChannel}</span>,
+      searchText: `${d.description} ${d.allowedDevoteesText}`,
+      disabled: !elig.ok,
+      disabledReason: elig.reason,
+    };
+  });
 
   return (
     <div className="stack-lg">
@@ -131,7 +140,7 @@ export const StepDeity: React.FC<StepDeityProps> = ({
 
           <ChoiceSection
             title="Poderes concedidos"
-            description={isCleric ? 'Clérigos recebem os poderes concedidos do seu deus.' : 'Escolha 1 poder concedido.'}
+            description={powerLimit > 1 ? `${isCleric ? 'Clérigos' : 'Druidas'} escolhem 2 poderes concedidos (em vez de 1).` : 'Escolha 1 poder concedido.'}
             count={{ value: selectedDeityPowers.length, total: powerLimit }}
           >
             <div className="list">

@@ -174,6 +174,36 @@ export function checkPowerPrerequisites(powerIdOrName: string, context: Prerequi
   return { isMet: unmet.length === 0, unmetRequirements: unmet };
 }
 
+/** Deuses disponíveis por classe (Cap. 1: druida pág. 61, paladino pág. 82). */
+const CLASS_DEITIES: Record<string, string[]> = {
+  druida: ['allihanna', 'megalokk', 'oceano'],
+  paladino: ['azgher', 'khalmyr', 'lena', 'lin_wu', 'marah', 'tanna_toh', 'thyatis', 'valkaria'],
+};
+
+/**
+ * Pode ser devoto? "Para ser devoto de um deus, sua raça ou sua classe devem estar listadas na seção
+ * Devotos do deus em questão. Humanos e clérigos são exceção" (Cap. 1, pág. 96). Druidas e paladinos
+ * só podem seguir os deuses disponíveis para a classe.
+ */
+export function canBeDevotee(deityId: string, raceId: string, classId: string): { ok: boolean; reason?: string } {
+  const deity = DEITIES_LIST.find((d) => d.id === deityId);
+  if (!deity) return { ok: true };
+  const restricted = CLASS_DEITIES[classId];
+  if (restricted && !restricted.includes(deityId)) {
+    return { ok: false, reason: `${classId === 'druida' ? 'Druidas' : 'Paladinos'} só podem ser devotos de ${restricted.map((id) => DEITIES_LIST.find((d) => d.id === id)?.name).join(', ')}.` };
+  }
+  if (raceId === 'humano' || classId === 'clerigo') return { ok: true };
+  const races = deity.allowedRaces || [];
+  const classes = deity.allowedClasses || [];
+  // Listas vazias: "Quaisquer", "membros de todas as classes", "qualquer duyshidakk"
+  if (!races.length && !classes.length) return { ok: true };
+  if (races.includes(raceId) || classes.includes(classId)) return { ok: true };
+  return { ok: false, reason: `Sua raça ou classe não está entre os devotos de ${deity.name} (${deity.allowedDevoteesText}).` };
+}
+
+/** Quantos poderes concedidos o devoto recebe: 1; clérigos e druidas recebem 2 (Cap. 1, págs. 57 e 61). */
+export const grantedPowerCount = (classId: string) => (classId === 'clerigo' || classId === 'druida' ? 2 : 1);
+
 /**
  * Poderes que o livro permite escolher mais de uma vez (sempre com alvos diferentes).
  * Regra geral: "A menos que especificado o contrário, você não pode escolher um mesmo
@@ -452,9 +482,15 @@ export function validateAllWizardSteps(input: WizardValidationInput): Record<num
     const warnings: string[] = [];
 
     if (input.deityId !== 'nenhum') {
-      if (input.selectedDeityPowers.length === 0) {
-        errors.push('Escolha pelo menos 1 poder concedido pela sua divindade.');
+      const need = grantedPowerCount(input.classId);
+      if (input.selectedDeityPowers.length !== need) {
+        errors.push(`Escolha ${need} poder${need > 1 ? 'es' : ''} concedido${need > 1 ? 's' : ''} pela sua divindade (Cap. 1, pág. 96).`);
       }
+      const elig = canBeDevotee(input.deityId, input.raceId, input.classId);
+      if (!elig.ok) errors.push(elig.reason!);
+    } else if (['clerigo', 'druida', 'paladino'].includes(input.classId)) {
+      // Clérigos, druidas e paladinos são devotos automaticamente (pág. 96)
+      errors.push('Sua classe é devota: escolha uma divindade (Cap. 1, pág. 96).');
     }
 
     findDuplicatePowers(powerSources)

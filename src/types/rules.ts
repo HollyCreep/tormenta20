@@ -158,6 +158,8 @@ export interface Deity {
   allowedDevoteesText: string;
   allowedClasses?: string[];
   allowedRaces?: string[];
+  /** Crenças e Objetivos (texto do livro). */
+  beliefs?: string;
   grantedPowers: DeityPower[];
   obligations: string;
 }
