@@ -150,3 +150,29 @@
   color: var(--text-1);
   font-weight: 600;
 }
+
+/* Edição livre */
+.free-edit-changes {
+  max-height: 30vh;
+  overflow: auto;
+  margin: 0;
+  padding: 8px 12px 8px 28px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md, 12px);
+  font-size: var(--fs-sm);
+  display: grid;
+  gap: 4px;
+}
+.free-edit-reason { width: 100%; }
+.free-edit-skill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line);
+}
+.free-edit-skill:last-child { border-bottom: 0; }
+@media (max-width: 420px) {
+  .free-edit-skill { flex-wrap: wrap; }
+  .free-edit-skill > .grow { flex-basis: 100%; }
+}

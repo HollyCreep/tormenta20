@@ -5,7 +5,7 @@
  * "quando tem a torcida a seu favor"...) NÃO entram nos totais da ficha; aparecem só no texto.
  * Bônus de perícia por poderes da Tormenta escalam com "cada dois outros poderes da Tormenta".
  */
-import type { CharacterAttributes, CharacterBloodline, CharacterInventoryItem } from '../types/character';
+import type { CharacterAttributes, CharacterBloodline, CharacterInventoryItem, CustomAdjustments } from '../types/character';
 import type { AttributeKey } from '../types/rules';
 import { GENERAL_POWERS_LIST } from '../data/generalPowers';
 import { effectiveSize, hasRaceAbility, osteonFormer } from './raceAbilities';
@@ -29,6 +29,8 @@ export interface RulesInput {
   racialChoices?: Record<string, string[]>;
   /** Feiticeiro: linhagem sobrenatural (Cap. 1, pág. 39). */
   bloodline?: CharacterBloodline;
+  /** Edição livre: ajustes manuais da ficha. */
+  customAdjustments?: CustomAdjustments;
 }
 
 export interface Contribution {
@@ -248,6 +250,23 @@ export function collectPassiveEffects(input: RulesInput): Contribution[] {
   // Mochila de aventureiro: vestida, aumenta a capacidade de carga em 2 espaços (Cap. 3, pág. 157)
   if (input.inventory.some((it) => it.isEquipped && /mochila de aventureiro/i.test(it.name))) {
     out.push({ source: 'Mochila de aventureiro', citation: 'Cap. 3, pág. 157', spaces: 2 });
+  }
+  // Edição livre: ajustes manuais do jogador (auditados no registro da ficha)
+  const adj = input.customAdjustments;
+  if (adj) {
+    const skills = Object.fromEntries(Object.entries(adj.skills || {}).filter(([, v]) => v));
+    const c: Contribution = {
+      source: 'Ajuste manual',
+      citation: 'Edição livre',
+      ...(adj.defense ? { defense: adj.defense } : {}),
+      ...(adj.maxHp ? { hp: adj.maxHp } : {}),
+      ...(adj.maxMp ? { mp: adj.maxMp } : {}),
+      ...(adj.speed ? { speed: adj.speed } : {}),
+      ...(adj.spaces ? { spaces: adj.spaces } : {}),
+      ...(adj.armorPenalty ? { armorPenalty: adj.armorPenalty } : {}),
+      ...(Object.keys(skills).length ? { skills } : {}),
+    };
+    if (Object.keys(c).length > 2) out.push(c);
   }
   // Linhagens sobrenaturais do feiticeiro (Cap. 1, pág. 39)
   const bl = input.bloodline;

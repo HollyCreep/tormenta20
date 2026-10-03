@@ -55,6 +55,21 @@ export const CharacterProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   );
 
   const saveCharacter = useCallback((char: CharacterSheet) => {
+    // Auditoria: criação ou edição pelo criador de personagem
+    const previous = storageService.loadCharacters().find((c) => c.id === char.id);
+    if (previous) {
+      logService.diffAndLogChanges(previous, char, char.playerName || 'Jogador', { origin: 'Criador de personagem' });
+    } else {
+      logService.addChangeLog({
+        characterId: char.id,
+        characterName: char.name,
+        userName: char.playerName || 'Jogador',
+        changeType: 'geral',
+        title: `Personagem criado: ${char.name}`,
+        description: `Criado no nível ${char.level}.`,
+        origin: 'Criador de personagem',
+      });
+    }
     storageService.saveCharacter(char);
     const updated = storageService.loadCharacters();
     setCharacters(updated);

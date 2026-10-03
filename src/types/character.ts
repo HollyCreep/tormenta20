@@ -97,6 +97,21 @@ export interface CharacterBloodline {
   tormentaAttribute?: AttributeKey;
 }
 
+/**
+ * Ajustes manuais da edição livre. Somam-se aos valores calculados pelas regras e aparecem no detalhamento
+ * como "Ajuste manual"; toda alteração fica na auditoria.
+ */
+export interface CustomAdjustments {
+  /** Bônus/penalidade extra por perícia (id → valor). */
+  skills?: Record<string, number>;
+  maxHp?: number;
+  maxMp?: number;
+  defense?: number;
+  speed?: number;
+  spaces?: number;
+  armorPenalty?: number;
+}
+
 export interface CharacterClassLevel {
   classId: string;
   className: string;
@@ -171,6 +186,9 @@ export interface CharacterSheet {
   spellSchools?: string[];
   /** Feiticeiro: linhagem sobrenatural (Cap. 1, pág. 39). */
   bloodline?: CharacterBloodline;
+
+  /** Edição livre: ajustes manuais sobre os valores calculados. */
+  customAdjustments?: CustomAdjustments;
 
   // Inventário
   inventory: CharacterInventoryItem[];
@@ -247,7 +265,7 @@ export interface CharacterChangeLogEntry {
   timestamp: string; // ISO 8601
   timeFormatted: string; // HH:mm:ss
   dateFormatted: string; // DD/MM/YYYY
-  changeType: 'recursos' | 'atributos' | 'pericias' | 'poderes' | 'magias' | 'inventario' | 'nivel' | 'condicoes' | 'notas' | 'geral';
+  changeType: 'recursos' | 'atributos' | 'pericias' | 'poderes' | 'magias' | 'inventario' | 'nivel' | 'condicoes' | 'notas' | 'geral' | 'estatisticas';
   title: string;
   description: string;
   diff?: {
@@ -256,5 +274,11 @@ export interface CharacterChangeLogEntry {
     to: string | number;
   }[];
   annotation?: string; // Anotação personalizada do usuário
+  /** Alteração feita pela edição livre da ficha (fora das regras automáticas). */
+  freeEdit?: boolean;
+  /** Origem da alteração (ex.: "Edição livre", "Criador de personagem"). */
+  origin?: string;
+  /** Motivo informado ao salvar. */
+  reason?: string;
 }
 

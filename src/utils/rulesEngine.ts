@@ -622,6 +622,7 @@ export function rulesInputFromCharacter(character: any): RulesInput {
     selectedRacialSkills: character.raceId === 'lefou' ? character.selectedRacialSkills || [] : [],
     racialChoices: character.racialChoices,
     bloodline: character.bloodline,
+    customAdjustments: character.customAdjustments,
   };
 }
 

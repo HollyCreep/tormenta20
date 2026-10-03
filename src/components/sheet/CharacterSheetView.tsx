@@ -8,6 +8,7 @@ import {
   FileText,
   MoreVertical,
   Pencil,
+  SlidersHorizontal,
   Printer,
   ScrollText,
   Sparkles,
@@ -51,6 +52,7 @@ import { effectiveSize, osteonFormer } from '../../utils/raceAbilities';
 import { scribeCost, spellBaseCost } from '../../utils/powerSpells';
 
 const SpellCastModal = lazy(() => import('./SpellCastModal').then((m) => ({ default: m.SpellCastModal })));
+const FreeEditSheet = lazy(() => import('./FreeEditSheet').then((m) => ({ default: m.FreeEditSheet })));
 const LevelUpModal = lazy(() => import('./LevelUpModal').then((m) => ({ default: m.LevelUpModal })));
 const AddItemModal = lazy(() => import('./AddItemModal').then((m) => ({ default: m.AddItemModal })));
 const ItemModifierModal = lazy(() =>
@@ -84,6 +86,7 @@ export const CharacterSheetView: React.FC<CharacterSheetViewProps> = ({
   const [modalDetail, setModalDetail] = useState<DetailModalData | null>(null);
   const [selectedCastSpell, setSelectedCastSpell] = useState<CharacterSpell | null>(null);
   const [isLevelUpOpen, setIsLevelUpOpen] = useState(false);
+  const [isFreeEditOpen, setIsFreeEditOpen] = useState(false);
   const [isAddItemOpen, setIsAddItemOpen] = useState(false);
   const [customizingItem, setCustomizingItem] = useState<CharacterInventoryItem | null>(null);
   const [isMoneyOpen, setIsMoneyOpen] = useState(false);
@@ -604,6 +607,13 @@ export const CharacterSheetView: React.FC<CharacterSheetViewProps> = ({
             onSelect: () => setIsLevelUpOpen(true),
           },
           {
+            id: 'free-edit',
+            label: 'Edição livre',
+            description: 'Altera qualquer valor; tudo vai para a auditoria',
+            icon: <SlidersHorizontal size={20} />,
+            onSelect: () => setIsFreeEditOpen(true),
+          },
+          {
             id: 'edit',
             label: 'Editar no criador',
             description: 'Refaz as escolhas de 1º nível',
@@ -644,6 +654,18 @@ export const CharacterSheetView: React.FC<CharacterSheetViewProps> = ({
             isOpen={Boolean(selectedCastSpell)}
             onClose={() => setSelectedCastSpell(null)}
             onCastSpell={handleCastSpellFromModal}
+          />
+        )}
+
+        {isFreeEditOpen && (
+          <FreeEditSheet
+            character={character}
+            onClose={() => setIsFreeEditOpen(false)}
+            onSave={(updated, reason) => {
+              onUpdateCharacter(recalculateFullCharacterSheet(updated), { freeEdit: true, actionReason: reason || undefined });
+              setIsFreeEditOpen(false);
+              toast('Ficha atualizada. As alterações estão na auditoria (Registro).', { tone: 'success' });
+            }}
           />
         )}
 
