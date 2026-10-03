@@ -33,7 +33,15 @@ const parseUpgradeCost = (costStr?: string): number => {
 /** Lançamento de magia com aprimoramentos, limite de PM por nível e CD (Cap. 4, pág. 178). */
 export const SpellCastModal: React.FC<SpellCastModalProps> = ({ spell, character, isOpen, onClose, onCastSpell }) => {
   const baseCost = BASE_COST_BY_CIRCLE[spell?.circle || 1] || 1;
-  const keyAttrKey = getSpellcastingKeyAttribute(character.classId, character.classSubclass);
+  // Magias raciais usam o atributo-chave da habilidade (ex.: Tatuagem Mística, Carisma — Cap. 1, pág. 26)
+  const keyAttrKey = spell?.keyAttribute || getSpellcastingKeyAttribute(character.classId, character.classSubclass);
+  // Limite de PM: nível na classe que fornece a magia; raça/origem/poderes: nível de personagem (Cap. 5, pág. 224)
+  const levelLimit =
+    spell?.learnedFrom === 'classe'
+      ? character.classes?.find((c) => c.classId === character.classId)?.level ?? character.level
+      : character.level;
+  // Alquebrado: custo em PM das habilidades +1 (Apêndice, pág. 394)
+  const alquebrado = (character.activeConditions || []).includes('alquebrado') ? 1 : 0;
   const keyAttrMod = character.totalAttributes[keyAttrKey] || 0;
   const keyAttrName = keyAttrKey.toUpperCase();
   const hasUnlimitedMagic = (character.powers || []).some((p) => p.name === 'Magia Ilimitada');
@@ -49,15 +57,15 @@ export const SpellCastModal: React.FC<SpellCastModalProps> = ({ spell, character
     [character.level, keyAttrMod, keyAttrName, customDcModifier]
   );
   const maxPm = useMemo(
-    () => calculateMaxSpellCost(character.level, hasUnlimitedMagic, keyAttrMod),
-    [character.level, hasUnlimitedMagic, keyAttrMod]
+    () => calculateMaxSpellCost(levelLimit, hasUnlimitedMagic, keyAttrMod),
+    [levelLimit, hasUnlimitedMagic, keyAttrMod]
   );
 
   const upgradesCost = (spell?.upgrades || []).reduce(
     (sum, upg, idx) => sum + parseUpgradeCost(upg.cost) * (selectedUpgrades[idx] || 0),
     0
   );
-  const totalCost = Math.max(1, baseCost + upgradesCost + customCostModifier);
+  const totalCost = Math.max(1, baseCost + upgradesCost + customCostModifier + alquebrado);
   const exceedsMaxPm = totalCost > maxPm.maxCost;
   const exceedsCurrentPm = totalCost > character.stats.currentMp;
   const canCast = !exceedsMaxPm && !exceedsCurrentPm;

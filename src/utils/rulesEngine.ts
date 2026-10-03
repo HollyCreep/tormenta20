@@ -1,18 +1,40 @@
-import {
-  CharacterAttributes,
-  StatBreakdown,
-  TrainedSkillData,
-  CharacterInventoryItem,
-} from '../types/character';
+/**
+ * Motor de regras — Tormenta 20: Edição Jogo do Ano (v1.3).
+ *
+ * Toda fórmula cita o livro. Efeitos passivos de raças, classes e poderes ficam em
+ * ./passiveEffects.ts; efeitos de condições, em ./conditionEffects.ts.
+ */
+import type { CharacterAttributes, StatBreakdown, TrainedSkillData, CharacterInventoryItem } from '../types/character';
+import type { AttributeKey } from '../types/rules';
 import { RACES_LIST } from '../data/races';
 import { CLASSES_LIST } from '../data/classes';
 import { SKILLS_LIST } from '../data/skills';
-import { DEITIES_LIST } from '../data/deities';
-import { AttributeKey } from '../types/rules';
+import { getConditionEffects } from './conditionEffects';
+import {
+  type Contribution,
+  type RulesInput,
+  classLevelOf,
+  collectPassiveEffects,
+  equippedArmor,
+  equippedShield,
+  skillAttributeFor,
+  wearsHeavyArmor,
+} from './passiveEffects';
 
-/**
- * Retorna os modificadores de atributos baseados na raça e escolhas do jogador.
- */
+export type { RulesInput } from './passiveEffects';
+
+const signed = (n: number) => (n >= 0 ? `+${n}` : `${n}`);
+
+function breakdown(components: StatBreakdown['components'], total: number, suffix = ''): StatBreakdown {
+  const formula = components.map((c) => `${c.value} (${c.label})`).join(' + ').replace(/\+ -/g, '- ');
+  return { value: total, formula: `${formula} = ${total}${suffix}`, components };
+}
+
+/* ==========================================================================
+   Atributos
+   ========================================================================== */
+
+/** Modificadores raciais (Tabela 1-2, Cap. 1, pág. 18). */
 export function calculateRacialModifiers(
   raceId: string,
   subraceId?: string,
@@ -21,47 +43,29 @@ export function calculateRacialModifiers(
   const mods: CharacterAttributes = { for: 0, des: 0, con: 0, int: 0, sab: 0, car: 0 };
   const race = RACES_LIST.find((r) => r.id === raceId);
   if (!race) return mods;
-
-  // Modificadores fixos da raça
   Object.entries(race.attributeModifiers).forEach(([key, val]) => {
-    if (val !== undefined && key in mods) {
-      mods[key as AttributeKey] += val;
-    }
+    if (val !== undefined && key in mods) mods[key as AttributeKey] += val;
   });
-
-  // Atributos selecionáveis (Humano, Lefou, Osteon, Sereia)
+  // +1 em três atributos diferentes (Humano, Lefou exceto Car, Osteon exceto Con, Sereia)
   if (race.isSelectableAttributes && selectedRacialAttributes) {
     const bonus = race.selectableAttributesBonus || 1;
-    selectedRacialAttributes.forEach((attrKey) => {
-      if (attrKey in mods) {
-        mods[attrKey] += bonus;
-      }
+    selectedRacialAttributes
+      .filter((k) => !race.selectableAttributesExclude?.includes(k))
+      .forEach((k) => {
+        if (k in mods) mods[k] += bonus;
+      });
+  }
+  if (race.customSelections?.requiresSubrace) {
+    const sub = race.customSelections.subraces?.find((s) => s.id === subraceId) || race.customSelections.subraces?.[0];
+    Object.entries(sub?.attributeModifiers || {}).forEach(([key, val]) => {
+      if (val !== undefined && key in mods) mods[key as AttributeKey] += val;
     });
   }
-
-  // Sub-raças (ex: Suraggel - Aggelus / Sulfure)
-  if (race.customSelections?.requiresSubrace && subraceId) {
-    const subrace = race.customSelections.subraces?.find((s) => s.id === subraceId);
-    if (subrace) {
-      Object.entries(subrace.attributeModifiers).forEach(([key, val]) => {
-        if (val !== undefined && key in mods) {
-          mods[key as AttributeKey] += val;
-        }
-      });
-    }
-  }
-
   return mods;
 }
 
-/**
- * Calcula os atributos totais somando a base e os modificadores raciais.
- * No Tormenta 20 Edição Jogo do Ano, o valor do atributo É o próprio modificador!
- */
-export function calculateTotalAttributes(
-  base: CharacterAttributes,
-  racial: CharacterAttributes
-): CharacterAttributes {
+/** O valor do atributo É o modificador (Cap. 1, pág. 17). */
+export function calculateTotalAttributes(base: CharacterAttributes, racial: CharacterAttributes): CharacterAttributes {
   return {
     for: (base.for || 0) + (racial.for || 0),
     des: (base.des || 0) + (racial.des || 0),
@@ -72,709 +76,436 @@ export function calculateTotalAttributes(
   };
 }
 
+/* ==========================================================================
+   Carga — Cap. 3, pág. 141
+   ========================================================================== */
+
+/** Espaços ocupados (cada item × quantidade). */
+export const currentSpacesOf = (inventory: CharacterInventoryItem[]) =>
+  inventory.reduce((acc, item) => acc + (item.spaces || 0) * (item.quantity || 1), 0);
+
 /**
- * Calcula a Penalidade de Armadura total com base nos itens equipados.
+ * "Você pode carregar 10 espaços +2 por ponto de Força (ou –1 por ponto de Força negativo)."
+ * A mochila não ocupa nem concede espaço. Máximo absoluto: o dobro do limite (pág. 141).
  */
-export function calculateArmorPenalty(
-  inventory: CharacterInventoryItem[],
-  activeConditions: string[] = []
-): StatBreakdown {
-  let penalty = 0;
-  const components: { label: string; value: number }[] = [];
-
-  inventory.forEach((item) => {
-    if (item.isEquipped && item.armorPenalty && item.armorPenalty !== 0) {
-      penalty += item.armorPenalty;
-      components.push({
-        label: item.name,
-        value: item.armorPenalty,
-      });
-    }
-  });
-
-  // Condição: Sobrecarregado (-5 penalidade de armadura e -3m deslocamento, pág. 395)
-  if (activeConditions.includes('sobrecarregado')) {
-    penalty -= 5;
-    components.push({
-      label: 'Condição: Sobrecarregado',
-      value: -5,
+export function calculateMaxSpaces(input: RulesInput, effects = collectPassiveEffects(input)): StatBreakdown {
+  const f = input.attributes.for || 0;
+  const base = 10 + (f >= 0 ? 2 * f : f);
+  const components: StatBreakdown['components'] = [{ label: `Base (10 ${f >= 0 ? `+ 2×For` : '– 1 por For negativa'} [${f}])`, value: base }];
+  let total = base;
+  effects
+    .filter((e) => e.spaces)
+    .forEach((e) => {
+      total += e.spaces!;
+      components.push({ label: e.source, value: e.spaces! });
     });
-  }
-
-  if (components.length === 0) {
-    return {
-      value: 0,
-      formula: '0 (Sem penalidade de armaduras ou escudos)',
-      components: [{ label: 'Nenhuma armadura com penalidade', value: 0 }],
-    };
-  }
-
-  const formulaParts = components.map((c) => `${c.value} (${c.label})`);
-  return {
-    value: penalty,
-    formula: `${formulaParts.join(' + ').replace(/\+ -/g, '- ')} = ${penalty}`,
-    components,
-  };
+  return breakdown(components, total, ' espaços');
 }
 
-/**
- * Calcula a Defesa do personagem com fórmula e somatória detalhada.
- * Defesa = 10 + Des (se não usar armadura pesada) + Armadura + Escudo + Bônus Raciais/Classes/Poderes + Penalidades de Condições.
- * Referência: Tormenta 20 JDA Apêndice págs. 394–395.
- */
-export function calculateDefense(
-  level: number,
-  attributes: CharacterAttributes,
-  inventory: CharacterInventoryItem[],
-  raceId: string,
-  classId: string,
-  powerNames: string[] = [],
-  activeConditions: string[] = []
-): StatBreakdown {
-  const components: { label: string; value: number | string }[] = [];
-  let total = 10;
-  components.push({ label: 'Base', value: 10 });
-
-  // Verifica armadura pesada equipada
-  const equippedArmor = inventory.find(
-    (item) => item.isEquipped && (item.category === 'armadura_leve' || item.category === 'armadura_pesada')
-  );
-  const isHeavyArmor = equippedArmor?.category === 'armadura_pesada';
-
-  // Destreza na Defesa
-  if (isHeavyArmor) {
-    components.push({ label: `Destreza (0 por usar ${equippedArmor.name})`, value: 0 });
-  } else {
-    const desMod = attributes.des;
-    total += desMod;
-    components.push({ label: `Destreza (${desMod >= 0 ? '+' : ''}${desMod})`, value: desMod });
-  }
-
-  // Bônus de Armadura
-  if (equippedArmor && equippedArmor.defenseBonus) {
-    total += equippedArmor.defenseBonus;
-    components.push({ label: `Armadura (${equippedArmor.name})`, value: equippedArmor.defenseBonus });
-  }
-
-  // Bônus de Escudo
-  const equippedShield = inventory.find((item) => item.isEquipped && item.category === 'escudo');
-  if (equippedShield && equippedShield.defenseBonus) {
-    let shieldBonus = equippedShield.defenseBonus;
-    if (powerNames.includes('Estilo de Arma e Escudo')) {
-      shieldBonus += 1;
-      components.push({ label: `Escudo (${equippedShield.name} + Estilo)`, value: shieldBonus });
-    } else {
-      components.push({ label: `Escudo (${equippedShield.name})`, value: shieldBonus });
-    }
-    total += shieldBonus;
-  }
-
-  // Bônus Raciais de Defesa
-  if (raceId === 'minotauro') {
-    total += 1;
-    components.push({ label: 'Couro Rígido (Minotauro)', value: 1 });
-  } else if (raceId === 'trog') {
-    total += 1;
-    components.push({ label: 'Pele Escamosa (Trog)', value: 1 });
-  } else if (raceId === 'golem') {
-    total += 2;
-    components.push({ label: 'Chassi (Golem)', value: 2 });
-  } else if (raceId === 'silfide') {
-    total += 2;
-    components.push({ label: 'Tamanho Minúsculo (Sílfide)', value: 2 });
-  } else if (raceId === 'goblin' || raceId === 'hynne') {
-    total += 1;
-    components.push({ label: 'Tamanho Pequeno', value: 1 });
-  }
-
-  // Bônus de Classe de Defesa
-  if (classId === 'nobre' && !isHeavyArmor) {
-    // Nobre Autoconfiança: soma Carisma se não usar armadura pesada
-    const carMod = attributes.car;
-    if (carMod > 0) {
-      total += carMod;
-      components.push({ label: 'Autoconfiança (Nobre)', value: carMod });
-    }
-  }
-
-  // Bônus de Poderes Gerais
-  if (powerNames.includes('Esquiva')) {
-    total += 2;
-    components.push({ label: 'Esquiva', value: 2 });
-  }
-  if (powerNames.includes('Estilo de Uma Arma') && !equippedShield) {
-    total += 2;
-    components.push({ label: 'Estilo de Uma Arma', value: 2 });
-  }
-  if (isHeavyArmor && powerNames.includes('Encouraçado')) {
-    total += 2;
-    components.push({ label: 'Encouraçado', value: 2 });
-  }
-  if (powerNames.includes('Carapaça')) {
-    total += 2;
-    components.push({ label: 'Carapaça (Tormenta)', value: 2 });
-  }
-
-  // Penalidades Canônicas de Condições (T20 JDA Apêndice pág. 394–395)
-  // Regra geral de não cumulatividade: aplica a condição mais severa
-  let defenseCondPenalty = 0;
-  let defenseCondLabel = '';
-  if (activeConditions.includes('indefeso')) {
-    defenseCondPenalty = -10;
-    defenseCondLabel = 'Indefeso (-10)';
-  } else if (
-    activeConditions.includes('desprevenido') ||
-    activeConditions.includes('imovel') ||
-    activeConditions.includes('surpreendido') ||
-    activeConditions.includes('cego') ||
-    activeConditions.includes('agarrado') ||
-    activeConditions.includes('atordoado')
-  ) {
-    defenseCondPenalty = -5;
-    const condName = ['desprevenido', 'imovel', 'surpreendido', 'cego', 'agarrado', 'atordoado'].find((c) => activeConditions.includes(c)) || 'desprevenido';
-    defenseCondLabel = `${condName.charAt(0).toUpperCase() + condName.slice(1)} (-5)`;
-  } else if (
-    activeConditions.includes('vulneravel') ||
-    activeConditions.includes('enredado') ||
-    activeConditions.includes('fatigado') ||
-    activeConditions.includes('exausto')
-  ) {
-    defenseCondPenalty = -2;
-    const condName = ['vulneravel', 'enredado', 'fatigado', 'exausto'].find((c) => activeConditions.includes(c)) || 'vulneravel';
-    defenseCondLabel = `${condName.charAt(0).toUpperCase() + condName.slice(1)} (-2)`;
-  }
-
-  if (defenseCondPenalty !== 0) {
-    total += defenseCondPenalty;
-    components.push({ label: `Condição: ${defenseCondLabel}`, value: defenseCondPenalty });
-  }
-
-  const formulaParts = components.map((c) => `${c.value} (${c.label})`);
-  return {
-    value: total,
-    formula: `${formulaParts.join(' + ').replace(/\+ -/g, '- ')} = ${total}`,
-    components,
-  };
+/** Sobrecarregado: acima do limite de carga (pág. 141) ou pela condição (Apêndice, pág. 395). */
+export function isOverloaded(input: RulesInput): boolean {
+  return currentSpacesOf(input.inventory) > calculateMaxSpaces(input).value || (input.activeConditions || []).includes('sobrecarregado');
 }
 
-/**
- * Calcula os Pontos de Vida Máximos (PV) com formulação detalhada.
- */
-export function calculateMaxHp(
-  level: number,
-  attributes: CharacterAttributes,
-  classId: string,
-  raceId: string,
-  powerNames: string[] = []
-): StatBreakdown {
-  const cls = CLASSES_LIST.find((c) => c.id === classId);
-  const hpBaseClassInitial = cls ? cls.hpInitial : 16;
-  const hpPerLvl = cls ? cls.hpPerLevel : 4;
-  const conMod = attributes.con;
+/* ==========================================================================
+   Proficiências
+   ========================================================================== */
 
-  const components: { label: string; value: number | string }[] = [];
+const has = (input: RulesInput, name: string) => (input.powerNames || []).includes(name);
+const classDef = (id: string) => CLASSES_LIST.find((c) => c.id === id);
+/** Proficiências vêm só da primeira classe (Cap. 1, pág. 35). */
+const proficienciesOf = (input: RulesInput) => classDef(input.classId)?.proficiencies;
 
-  // Nível 1: PV inicial da classe + Con
-  let total = hpBaseClassInitial + conMod;
-  components.push({ label: `PV Inicial (${cls?.name || 'Classe'})`, value: hpBaseClassInitial });
-  components.push({ label: `Constituição (${conMod >= 0 ? '+' : ''}${conMod})`, value: conMod });
-
-  // Níveis adicionais (se nível > 1)
-  if (level > 1) {
-    const additionalHp = (level - 1) * (hpPerLvl + conMod);
-    total += additionalHp;
-    components.push({ label: `Níveis 2 a ${level} (${level - 1} × ${hpPerLvl + conMod})`, value: additionalHp });
-  }
-
-  // Anão: Duro como Pedra (+3 PV no 1º nível, +1 por nível seguinte)
-  if (raceId === 'anao') {
-    const dwarfBonus = 3 + (level - 1);
-    total += dwarfBonus;
-    components.push({ label: 'Duro como Pedra (Anão)', value: dwarfBonus });
-  }
-
-  // Poder Geral: Vitalidade (+1 PV por nível)
-  if (powerNames.includes('Vitalidade')) {
-    total += level;
-    components.push({ label: 'Vitalidade', value: level });
-  }
-
-  // Devoção Megalokk: Vitalidade Monstruosa (+2 PV por nível)
-  if (powerNames.includes('Vitalidade Monstruosa')) {
-    total += level * 2;
-    components.push({ label: 'Vitalidade Monstruosa (Megalokk)', value: level * 2 });
-  }
-
-  const formulaParts = components.map((c) => `${c.value} (${c.label})`);
-  return {
-    value: Math.max(1, total),
-    formula: `${formulaParts.join(' + ')} = ${total}`,
-    components,
-  };
+/** Usa armadura ou escudo sem proficiência? (Cap. 3, pág. 152) */
+export function armorNonProficiency(input: RulesInput): string[] {
+  const prof = proficienciesOf(input);
+  const out: string[] = [];
+  const armor = equippedArmor(input.inventory);
+  // Todos sabem usar armaduras leves (Cap. 1, pág. 32)
+  if (armor?.category === 'armadura_pesada' && !prof?.armor.includes('pesadas') && !has(input, 'Proficiência')) out.push(armor.name);
+  const shield = equippedShield(input.inventory);
+  if (shield && !prof?.shields && !has(input, 'Proficiência')) out.push(shield.name);
+  return out;
 }
 
-/**
- * Calcula os Pontos de Mana Máximos (PM) com formulação detalhada.
- */
-export function calculateMaxMp(
-  level: number,
-  classId: string,
-  raceId: string,
-  powerNames: string[] = []
-): StatBreakdown {
-  const cls = CLASSES_LIST.find((c) => c.id === classId);
-  const mpPerLevel = cls ? cls.mpPerLevel : 3;
-
-  const components: { label: string; value: number | string }[] = [];
-  let total = mpPerLevel * level;
-  components.push({ label: `PM da Classe (${cls?.name || 'Classe'} Nível ${level})`, value: total });
-
-  // Elfo: Sangue Mágico (+1 PM por nível)
-  if (raceId === 'elfo') {
-    total += level;
-    components.push({ label: 'Sangue Mágico (Elfo)', value: level });
-  }
-
-  // Devoção Wynna: Bênção do Mana (+1 PM por nível)
-  if (powerNames.includes('Bênção do Mana')) {
-    total += level;
-    components.push({ label: 'Bênção do Mana (Wynna)', value: level });
-  }
-
-  // Poder Geral: Vontade de Ferro (+1 PM a cada dois níveis)
-  if (powerNames.includes('Vontade de Ferro')) {
-    const ironWill = Math.floor(level / 2);
-    if (ironWill > 0) {
-      total += ironWill;
-      components.push({ label: 'Vontade de Ferro', value: ironWill });
-    }
-  }
-
-  const formulaParts = components.map((c) => `${c.value} (${c.label})`);
-  return {
-    value: Math.max(1, total),
-    formula: `${formulaParts.join(' + ')} = ${total}`,
-    components,
-  };
+/** Proficiente na arma? Simples para todos; marciais por classe; Anão e Sereia tratam algumas como simples. */
+export function isWeaponProficient(input: RulesInput, weapon: Pick<CharacterInventoryItem, 'category' | 'name' | 'equipmentId'>): boolean {
+  const cat = weapon.category;
+  if (!cat.startsWith('arma')) return true;
+  if (cat === 'arma_simples') return true;
+  const name = `${weapon.name} ${weapon.equipmentId || ''}`.toLowerCase();
+  // Tradição de Heredrimm: machados, martelos, marretas e picaretas são armas simples (pág. 20)
+  if (input.raceId === 'anao' && /machad|martel|marreta|picareta/.test(name)) return true;
+  // Mestre do Tridente: o tridente é uma arma simples (pág. 30)
+  if (input.raceId === 'sereia' && /tridente/.test(name)) return true;
+  const weapons = proficienciesOf(input)?.weapons || [];
+  if (cat === 'arma_marcial') return weapons.includes('marciais') || has(input, 'Proficiência');
+  if (cat === 'arma_fogo') return weapons.includes('fogo') || input.raceId === 'kliren' || has(input, 'Proficiência');
+  if (cat === 'arma_exotica') return weapons.includes('exoticas') || has(input, 'Proficiência');
+  return true;
 }
 
-/**
- * Calcula o Deslocamento com bônus de raça e penalidades de armadura.
- */
-export function calculateSpeed(
-  raceId: string,
-  inventory: CharacterInventoryItem[],
-  powerNames: string[] = [],
-  activeConditions: string[] = []
-): StatBreakdown {
-  const race = RACES_LIST.find((r) => r.id === raceId);
-  const baseSpeed = race ? race.speed : 9;
+/* ==========================================================================
+   Penalidade de armadura — Cap. 3, págs. 141 e 152–153
+   ========================================================================== */
 
-  let total = baseSpeed;
-  const components: { label: string; value: number | string }[] = [];
-  components.push({ label: `Raça (${race?.name || 'Base'})`, value: `${baseSpeed}m` });
-
-  // Poder Atlético (+1,5m)
-  if (powerNames.includes('Atlético')) {
-    total += 1.5;
-    components.push({ label: 'Atlético', value: '+1,5m' });
-  }
-
-  // Armadura pesada reduz deslocamento em 3m (exceto para Anão por "Devagar e Sempre")
-  const equippedArmor = inventory.find(
-    (item) => item.isEquipped && item.category === 'armadura_pesada'
-  );
-  if (equippedArmor) {
-    if (raceId === 'anao') {
-      components.push({ label: 'Devagar e Sempre (Anão ignora redução de armadura)', value: '0m' });
-    } else {
-      total -= 3;
-      components.push({ label: `Armadura pesada (${equippedArmor.name})`, value: '-3m' });
-    }
-  }
-
-  // Condições que afetam deslocamento (T20 JDA Apêndice pág. 394–395)
-  if (activeConditions.includes('imovel') || activeConditions.includes('paralisado')) {
-    total = 0;
-    components.push({ label: 'Condição: Imóvel', value: '0m' });
-  } else if (activeConditions.includes('caido')) {
-    total = 1.5;
-    components.push({ label: 'Condição: Caído', value: '1,5m' });
-  } else {
-    if (activeConditions.includes('sobrecarregado')) {
-      total = Math.max(1.5, total - 3);
-      components.push({ label: 'Condição: Sobrecarregado', value: '-3m' });
-    }
-    if (
-      activeConditions.includes('lento') ||
-      activeConditions.includes('cego') ||
-      activeConditions.includes('enredado') ||
-      activeConditions.includes('exausto')
-    ) {
-      const condName = ['lento', 'cego', 'enredado', 'exausto'].find((c) => activeConditions.includes(c)) || 'lento';
-      total = Math.max(1.5, Math.floor((total / 2) / 1.5) * 1.5);
-      components.push({ label: `Condição: ${condName.charAt(0).toUpperCase() + condName.slice(1)} (Metade)`, value: `${total}m` });
-    }
-  }
-
-  const formulaParts = components.map((c) => `${c.value} (${c.label})`);
-  return {
-    value: total,
-    formula: `${formulaParts.join(' ')} = ${total}m`,
-    components,
-  };
-}
-
-/**
- * Calcula a Capacidade de Carga (Espaços de inventário).
- * Base 10 + 3 * Força (mínimo 10). Mochila dá +2 espaços. Mochileiro dá +5.
- */
-export function calculateMaxSpaces(
-  attributes: CharacterAttributes,
-  inventory: CharacterInventoryItem[],
-  powerNames: string[] = []
-): StatBreakdown {
-  const forMod = attributes.for;
-  let baseSpaces = 10 + forMod * 3;
-  if (baseSpaces < 10) baseSpaces = 10;
-
-  let total = baseSpaces;
-  const components: { label: string; value: number | string }[] = [];
-  components.push({ label: `Base (10 + 3×FOR [${forMod}])`, value: baseSpaces });
-
-  // Mochila equipada / no inventário
-  const hasBackpack = inventory.some((item) => item.equipmentId === 'mochila');
-  if (hasBackpack) {
-    total += 2;
-    components.push({ label: 'Mochila de Aventureiro', value: 2 });
-  }
-
-  // Origem Mochileiro
-  if (powerNames.includes('Mochileiro')) {
-    total += 5;
-    components.push({ label: 'Mochileiro', value: 5 });
-  }
-
-  const formulaParts = components.map((c) => `${c.value} (${c.label})`);
-  return {
-    value: total,
-    formula: `${formulaParts.join(' + ')} = ${total} espaços`,
-    components,
-  };
-}
-
-/**
- * Calcula o bônus e breakdown completo de uma Perícia.
- * Fórmula T20 JdA:
- * Bônus = Metade do Nível + Modificador do Atributo-chave + Treinamento (+2) + Bônus Raciais/Poderes - Penalidade de Armadura (se aplicável).
- */
-export function calculateSkillBonus(
-  skillId: string,
-  level: number,
-  attributes: CharacterAttributes,
-  isTrained: boolean,
-  armorPenalty: number,
-  raceId: string,
-  powerNames: string[] = [],
-  selectedRacialSkills: string[] = [],
-  activeConditions: string[] = []
-): { total: number; breakdown: StatBreakdown } {
-  const skillDef = SKILLS_LIST.find((s) => s.id === skillId);
-  if (!skillDef) {
-    return {
-      total: 0,
-      breakdown: { value: 0, formula: '0', components: [] },
-    };
-  }
-
-  const components: { label: string; value: number | string }[] = [];
+export function calculateArmorPenalty(input: RulesInput, effects = collectPassiveEffects(input)): StatBreakdown {
+  const components: StatBreakdown['components'] = [];
   let total = 0;
+  // "Penalidades de armaduras e escudos se acumulam" (pág. 153)
+  input.inventory
+    .filter((it) => it.isEquipped && it.armorPenalty && (it.category.startsWith('armadura') || it.category === 'escudo'))
+    .forEach((it) => {
+      total += it.armorPenalty!;
+      components.push({ label: it.name, value: it.armorPenalty! });
+    });
+  effects
+    .filter((e) => e.armorPenalty)
+    .forEach((e) => {
+      total += e.armorPenalty!;
+      components.push({ label: e.source, value: e.armorPenalty! });
+    });
+  if (isOverloaded(input)) {
+    total -= 5;
+    components.push({ label: 'Sobrecarregado (Cap. 3, pág. 141)', value: -5 });
+  }
+  if (!components.length) return { value: 0, formula: '0 (sem penalidade de armadura)', components: [{ label: 'Sem penalidade', value: 0 }] };
+  return breakdown(components, total);
+}
 
-  // Metade do nível arredondado para baixo
-  const halfLevel = Math.floor(level / 2);
-  total += halfLevel;
-  components.push({ label: `Metade do Nível (Nível ${level})`, value: halfLevel });
+/* ==========================================================================
+   Deslocamento
+   ========================================================================== */
 
-  // Modificador de atributo
-  const attrMod = attributes[skillDef.attribute] || 0;
-  total += attrMod;
-  components.push({
-    label: `${skillDef.attribute.toUpperCase()} (${attrMod >= 0 ? '+' : ''}${attrMod})`,
-    value: attrMod,
+export function calculateSpeed(input: RulesInput, effects = collectPassiveEffects(input)): StatBreakdown {
+  const race = RACES_LIST.find((r) => r.id === input.raceId);
+  const base = race ? race.speed : 9;
+  const components: StatBreakdown['components'] = [{ label: `Raça (${race?.name || 'base'})`, value: `${base}m` }];
+  let total = base;
+  // Anão (Devagar e Sempre, pág. 20) e Golem (Chassi, pág. 27): não reduz por armadura nem carga
+  const immune = input.raceId === 'anao' || input.raceId === 'golem';
+
+  effects
+    .filter((e) => e.speed)
+    .forEach((e) => {
+      total += e.speed!;
+      components.push({ label: e.source, value: `${signed(e.speed!)}m` });
+    });
+  // Armadura pesada: deslocamento –3m (Cap. 3, pág. 152); Fanático anula (Cap. 2, pág. 128)
+  const armor = equippedArmor(input.inventory);
+  if (armor?.category === 'armadura_pesada') {
+    if (immune) components.push({ label: `${armor.name} (sem redução: ${race?.name})`, value: '0m' });
+    else if (has(input, 'Fanático')) components.push({ label: `${armor.name} (sem redução: Fanático)`, value: '0m' });
+    else {
+      total -= 3;
+      components.push({ label: `Armadura pesada (${armor.name})`, value: '-3m' });
+    }
+  }
+  if (isOverloaded(input)) {
+    if (immune) components.push({ label: `Sobrecarregado (sem redução: ${race?.name})`, value: '0m' });
+    else {
+      total -= 3;
+      components.push({ label: 'Sobrecarregado (Cap. 3, pág. 141)', value: '-3m' });
+    }
+  }
+  const cond = getConditionEffects(input.activeConditions);
+  if (cond.speedZero) {
+    total = 0;
+    components.push({ label: 'Imóvel', value: '0m' });
+  } else {
+    if (cond.speedProne) {
+      total = Math.min(total, 1.5);
+      components.push({ label: 'Caído (deslocamento 1,5m)', value: '1,5m' });
+    }
+    if (cond.speedHalf) {
+      // "reduzidas à metade (arredonde para baixo para o primeiro incremento de 1,5m)" (pág. 395)
+      total = Math.max(1.5, Math.floor(total / 2 / 1.5) * 1.5);
+      components.push({ label: 'Lento (metade)', value: `${total}m` });
+    }
+  }
+  total = Math.max(0, total);
+  return { value: total, formula: `${components.map((c) => `${c.value} (${c.label})`).join(' ')} = ${total}m`, components };
+}
+
+/* ==========================================================================
+   Defesa — Cap. 1, pág. 106; Cap. 3, pág. 152
+   ========================================================================== */
+
+export function calculateDefense(input: RulesInput, effects = collectPassiveEffects(input)): StatBreakdown {
+  const a = input.attributes;
+  const components: StatBreakdown['components'] = [{ label: 'Base', value: 10 }];
+  let total = 10;
+  const heavy = wearsHeavyArmor(input.inventory);
+  const cond = getConditionEffects(input.activeConditions);
+  const nobleLevel = classLevelOf(input, 'nobre');
+
+  // "Sua Defesa é 10 + sua Destreza + seu bônus de armadura e escudo"; armadura pesada não aplica atributo
+  let defAttr: AttributeKey | null = heavy ? null : 'des';
+  // Nobre — Autoconfiança: pode usar Carisma em vez de Destreza (Cap. 1, pág. 79)
+  if (defAttr && nobleLevel > 0 && a.car > a.des) defAttr = 'car';
+  if (defAttr) {
+    total += a[defAttr];
+    components.push({ label: defAttr === 'car' ? 'Carisma (Autoconfiança)' : 'Destreza', value: a[defAttr] });
+  } else {
+    components.push({ label: 'Atributo (não se aplica com armadura pesada)', value: 0 });
+  }
+
+  const armor = equippedArmor(input.inventory);
+  if (armor?.defenseBonus) {
+    total += armor.defenseBonus;
+    components.push({ label: armor.name, value: armor.defenseBonus });
+  }
+  const shield = equippedShield(input.inventory);
+  if (shield?.defenseBonus) {
+    total += shield.defenseBonus;
+    components.push({ label: shield.name, value: shield.defenseBonus });
+  }
+
+  // Bucaneiro — Insolência: soma Carisma, limitado pelo nível; não com armadura pesada nem imóvel (Cap. 1, pág. 47)
+  const bucLevel = classLevelOf(input, 'bucaneiro');
+  if (bucLevel > 0 && !heavy && !cond.speedZero && defAttr !== 'car' && a.car > 0) {
+    const v = Math.min(a.car, input.level);
+    total += v;
+    components.push({ label: 'Insolência (Bucaneiro)', value: v });
+  }
+  // Lutador — Casca Grossa: 3º nível soma Constituição, limitado pelo nível, sem armadura pesada (Cap. 1, pág. 77)
+  if (classLevelOf(input, 'lutador') >= 3 && !heavy && a.con > 0) {
+    const v = Math.min(a.con, input.level);
+    total += v;
+    components.push({ label: 'Casca Grossa — Constituição (Lutador)', value: v });
+  }
+
+  effects
+    .filter((e) => e.defense)
+    .forEach((e) => {
+      total += e.defense!;
+      components.push({ label: e.source, value: e.defense! });
+    });
+
+  // Condições: mesmo efeito não acumula, vale o mais severo (Apêndice, pág. 394)
+  if (cond.defense) {
+    total += cond.defense.value;
+    components.push({ label: `Condição: ${cond.defense.label}`, value: cond.defense.value });
+  }
+  if (cond.prone) components.push({ label: 'Caído: –5 contra corpo a corpo, +5 contra distância', value: '±5' });
+
+  return breakdown(components, total);
+}
+
+/* ==========================================================================
+   Pontos de vida e de mana — Cap. 1 (classes)
+   ========================================================================== */
+
+/** Classes em ordem: a primeira usa PV iniciais; as demais, PV por nível (Cap. 1, pág. 35). */
+function classEntries(input: RulesInput): { id: string; levels: number }[] {
+  const levels = input.classLevels && Object.keys(input.classLevels).length ? input.classLevels : { [input.classId]: input.level };
+  const first = input.classId in levels ? input.classId : Object.keys(levels)[0];
+  return [first, ...Object.keys(levels).filter((k) => k !== first)].map((id) => ({ id, levels: levels[id] }));
+}
+
+export function calculateMaxHp(input: RulesInput, effects = collectPassiveEffects(input)): StatBreakdown {
+  // Dom da Esperança: soma Sabedoria em vez de Constituição (Cap. 2, pág. 133)
+  const useSab = has(input, 'Dom da Esperança');
+  const attr = useSab ? input.attributes.sab : input.attributes.con;
+  const attrLabel = useSab ? 'Sab (Dom da Esperança)' : 'Con';
+  const components: StatBreakdown['components'] = [];
+  let total = 0;
+  classEntries(input).forEach(({ id, levels }, idx) => {
+    const cls = classDef(id);
+    if (!cls || levels <= 0) return;
+    if (idx === 0) {
+      total += cls.hpInitial + attr;
+      components.push({ label: `${cls.name} 1º nível (${cls.hpInitial} + ${attrLabel})`, value: cls.hpInitial + attr });
+      if (levels > 1) {
+        const v = (levels - 1) * (cls.hpPerLevel + attr);
+        total += v;
+        components.push({ label: `${cls.name} níveis 2–${levels} (${levels - 1} × ${cls.hpPerLevel + attr})`, value: v });
+      }
+    } else {
+      // Nova classe: PV de um nível subsequente, não do primeiro (Cap. 1, pág. 35)
+      const v = levels * (cls.hpPerLevel + attr);
+      total += v;
+      components.push({ label: `${cls.name} (${levels} × ${cls.hpPerLevel + attr})`, value: v });
+    }
   });
-
-  // Treinamento (+2 nos níveis 1-6; +4 nos níveis 7-14; +6 a partir do 15)
-  if (isTrained) {
-    let trainingBonus = 2;
-    if (level >= 15) trainingBonus = 6;
-    else if (level >= 7) trainingBonus = 4;
-
-    total += trainingBonus;
-    components.push({ label: 'Treinamento', value: trainingBonus });
-  }
-
-  // Bônus Raciais Específicos
-  if (raceId === 'elfo' && (skillId === 'percepcao' || skillId === 'misticismo')) {
-    total += 2;
-    components.push({ label: 'Sentidos Élficos (Elfo)', value: 2 });
-  } else if (raceId === 'goblin' && (skillId === 'ladinagem' || skillId === 'furtividade')) {
-    total += 2;
-    components.push({ label: 'Peste Esguia (Goblin)', value: 2 });
-  } else if (raceId === 'hynne' && (skillId === 'furtividade' || skillId === 'reflexos')) {
-    total += 2;
-    components.push({ label: 'Pequeno e Ágil (Hynne)', value: 2 });
-  } else if (raceId === 'kliren' && ['conhecimento', 'guerra', 'investigacao', 'misticismo', 'nobreza', 'oficio'].includes(skillId)) {
-    total += 2;
-    components.push({ label: 'Engenhosidade Kliren', value: 2 });
-  } else if (raceId === 'lefou' && selectedRacialSkills.includes(skillId)) {
-    total += 2;
-    components.push({ label: 'Deformidade (Lefou)', value: 2 });
-  }
-
-  // Bônus de Poderes Gerais
-  if (powerNames.includes('Esquiva') && skillId === 'reflexos') {
-    total += 2;
-    components.push({ label: 'Esquiva', value: 2 });
-  }
-  if (powerNames.includes('Vitalidade') && skillId === 'fortitude') {
-    total += 2;
-    components.push({ label: 'Vitalidade', value: 2 });
-  }
-  if (powerNames.includes('Vontade de Ferro') && skillId === 'vontade') {
-    total += 2;
-    components.push({ label: 'Vontade de Ferro', value: 2 });
-  }
-  if (powerNames.includes('Saque Rápido') && skillId === 'iniciativa') {
-    total += 2;
-    components.push({ label: 'Saque Rápido', value: 2 });
-  }
-  if (powerNames.includes('Atlético') && skillId === 'atletismo') {
-    total += 2;
-    components.push({ label: 'Atlético', value: 2 });
-  }
-
-  // Penalidade de Armadura (se perícia tem armorPenalty)
-  if (skillDef.armorPenalty && armorPenalty !== 0) {
-    total += armorPenalty; // armorPenalty já é negativo
-    components.push({ label: 'Penalidade de Armadura', value: armorPenalty });
-  }
-
-  // --- APLICAÇÃO CANÔNICA DE CONDIÇÕES (T20 JDA Apêndice págs. 394–395) ---
-  // 1. Condições Mentais (INT, SAB, CAR) - Esmorecido (-5) / Frustrado (-2)
-  if (['int', 'sab', 'car'].includes(skillDef.attribute)) {
-    if (activeConditions.includes('esmorecido')) {
-      total -= 5;
-      components.push({ label: 'Condição: Esmorecido (Mental)', value: -5 });
-    } else if (activeConditions.includes('frustrado')) {
-      total -= 2;
-      components.push({ label: 'Condição: Frustrado (Mental)', value: -2 });
-    }
-  }
-
-  // 2. Condições Físicas (FOR, DES, CON) - Debilitado/Exausto (-5) / Fraco/Fatigado (-2)
-  if (['for', 'des', 'con'].includes(skillDef.attribute)) {
-    if (activeConditions.includes('debilitado') || activeConditions.includes('exausto')) {
-      total -= 5;
-      const label = activeConditions.includes('debilitado') ? 'Debilitado' : 'Exausto';
-      components.push({ label: `Condição: ${label} (Físico)`, value: -5 });
-    } else if (activeConditions.includes('fraco') || activeConditions.includes('fatigado')) {
-      total -= 2;
-      const label = activeConditions.includes('fraco') ? 'Fraco' : 'Fatigado';
-      components.push({ label: `Condição: ${label} (Físico)`, value: -2 });
-    }
-  }
-
-  // 3. Condições de Testes de Perícia Gerais - Apavorado (-5) / Abalado (-2)
-  if (activeConditions.includes('apavorado')) {
-    total -= 5;
-    components.push({ label: 'Condição: Apavorado (Medo)', value: -5 });
-  } else if (activeConditions.includes('abalado')) {
-    total -= 2;
-    components.push({ label: 'Condição: Abalado (Medo)', value: -2 });
-  }
-
-  // 4. Condições Específicas por Perícia
-  if (skillId === 'percepcao') {
-    if (activeConditions.includes('fascinado')) {
-      total -= 5;
-      components.push({ label: 'Condição: Fascinado', value: -5 });
-    } else if (activeConditions.includes('ofuscado')) {
-      total -= 2;
-      components.push({ label: 'Condição: Ofuscado', value: -2 });
-    }
-    if (activeConditions.includes('cego')) {
-      components.push({ label: 'Condição: Cego (Impossibilitado de testes visuais)', value: '0' });
-    }
-  }
-
-  if (skillId === 'iniciativa' && activeConditions.includes('surdo')) {
-    total -= 5;
-    components.push({ label: 'Condição: Surdo', value: -5 });
-  }
-
-  if (skillId === 'reflexos') {
-    if (activeConditions.includes('indefeso')) {
-      components.push({ label: 'Condição: Indefeso (Falha automática)', value: 'Falha' });
-    } else if (activeConditions.includes('desprevenido')) {
-      total -= 5;
-      components.push({ label: 'Condição: Desprevenido', value: -5 });
-    }
-  }
-
-  if ((skillDef.attribute === 'for' || skillDef.attribute === 'des') && activeConditions.includes('cego')) {
-    // Cego: -5 em perícias físicas (se já não penalizado por debilitado)
-    if (!activeConditions.includes('debilitado') && !activeConditions.includes('exausto')) {
-      total -= 5;
-      components.push({ label: 'Condição: Cego (Perícia Física)', value: -5 });
-    }
-  }
-
-  const formulaParts = components.map((c) => `${c.value} (${c.label})`);
-  return {
-    total,
-    breakdown: {
-      value: total,
-      formula: `${formulaParts.join(' + ').replace(/\+ -/g, '- ')} = ${total >= 0 ? '+' : ''}${total}`,
-      components,
-    },
-  };
+  effects
+    .filter((e) => e.hp)
+    .forEach((e) => {
+      total += e.hp!;
+      components.push({ label: e.source, value: e.hp! });
+    });
+  return breakdown(components, Math.max(1, total));
 }
 
-/**
- * Retorna a penalidade de ataque acumulada de condições para rolagens de ataque.
- * Referência: Tormenta 20 JDA Apêndice págs. 394–395.
- */
-export function getAttackConditionPenalty(activeConditions: string[] = [], isMelee: boolean = true): { penalty: number; reasons: string[] } {
-  const reasons: string[] = [];
-  let penalty = 0;
-
-  if (activeConditions.includes('debilitado') || activeConditions.includes('exausto')) {
-    penalty -= 5;
-    reasons.push(activeConditions.includes('debilitado') ? 'Debilitado (-5)' : 'Exausto (-5)');
-  } else if (activeConditions.includes('fraco') || activeConditions.includes('fatigado')) {
-    penalty -= 2;
-    reasons.push(activeConditions.includes('fraco') ? 'Fraco (-2)' : 'Fatigado (-2)');
-  }
-
-  if (activeConditions.includes('apavorado')) {
-    penalty -= 5;
-    reasons.push('Apavorado (-5)');
-  } else if (activeConditions.includes('abalado')) {
-    penalty -= 2;
-    reasons.push('Abalado (-2)');
-  }
-
-  if (activeConditions.includes('enredado')) {
-    penalty -= 2;
-    reasons.push('Enredado (-2)');
-  }
-
-  if (activeConditions.includes('ofuscado')) {
-    penalty -= 2;
-    reasons.push('Ofuscado (-2)');
-  }
-
-  if (activeConditions.includes('agarrado')) {
-    penalty -= 2;
-    reasons.push('Agarrado (-2)');
-  }
-
-  if (isMelee && activeConditions.includes('caido')) {
-    penalty -= 5;
-    reasons.push('Caído (-5 corpo a corpo)');
-  }
-
-  return { penalty, reasons };
-}
-
-/**
- * Retorna o atributo-chave de conjuração de uma classe.
- * Referência: Tormenta 20: Edição Jogo do Ano (v1.3), Capítulo 1 e Capítulo 4.
- */
+/** Atributo-chave de magias da classe (Cap. 1: arcanista pág. 37, bardo pág. 44, clérigo pág. 57, druida pág. 61). */
 export function getSpellcastingKeyAttribute(classId: string, subclass?: string): AttributeKey {
-  const normClass = classId.toLowerCase();
-  if (normClass === 'arcanista') {
-    if (subclass && subclass.toLowerCase().includes('feiticeiro')) {
-      return 'car';
-    }
-    return 'int'; // Mago ou Bruxo
-  }
-  if (normClass === 'bardo') return 'car';
-  if (normClass === 'clerigo' || normClass === 'clérigo') return 'sab';
-  if (normClass === 'druida') return 'sab';
-  if (normClass === 'paladino') return 'car';
+  const c = classId.toLowerCase();
+  if (c === 'arcanista') return (subclass || '').toLowerCase().includes('feiticeiro') ? 'car' : 'int'; // Bruxo e Mago: Int
+  if (c === 'bardo') return 'car';
+  if (c === 'clerigo' || c === 'clérigo' || c === 'druida') return 'sab';
+  if (c === 'paladino') return 'car';
   return 'int';
 }
 
+export function calculateMaxMp(input: RulesInput, effects = collectPassiveEffects(input)): StatBreakdown {
+  const components: StatBreakdown['components'] = [];
+  let total = 0;
+  const summedAttrs = new Set<AttributeKey>();
+  classEntries(input).forEach(({ id, levels }) => {
+    const cls = classDef(id);
+    if (!cls || levels <= 0) return;
+    // "Some os PM fornecidos por cada classe" (Cap. 1, pág. 35)
+    const v = cls.mpPerLevel * levels;
+    total += v;
+    components.push({ label: `${cls.name} (${cls.mpPerLevel} × ${levels})`, value: v });
+    // Conjuradores somam o atributo-chave no total de PM; Paladino (Abençoado) soma Carisma (pág. 82)
+    const key: AttributeKey | null = cls.spellcaster ? getSpellcastingKeyAttribute(id, id === input.classId ? input.classSubclass : undefined) : id === 'paladino' ? 'car' : null;
+    if (key && !summedAttrs.has(key)) {
+      summedAttrs.add(key);
+      total += input.attributes[key];
+      components.push({ label: `${key === 'car' ? 'Carisma' : key === 'sab' ? 'Sabedoria' : 'Inteligência'} (${cls.name})`, value: input.attributes[key] });
+    }
+  });
+  effects
+    .filter((e) => e.mp)
+    .forEach((e) => {
+      total += e.mp!;
+      components.push({ label: e.source, value: e.mp! });
+    });
+  return breakdown(components, Math.max(0, total));
+}
+
+/* ==========================================================================
+   Perícias — Cap. 2, págs. 114–115
+   ========================================================================== */
+
+const FOR_DES_SKILLS = new Set(SKILLS_LIST.filter((s) => s.attribute === 'for' || s.attribute === 'des').map((s) => s.id));
+
 /**
- * Calcula a Classe de Dificuldade (CD) para resistir às magias do conjurador.
- * Fórmula Oficial T20 JDA (Cap. 4, pág. 179):
- * CD = 10 + Metade do Nível + Modificador do Atributo-Chave + Outros Modificadores
+ * Valor de perícia = metade do nível + atributo-chave + treino (+2; +4 no 7º; +6 no 15º) + outros (pág. 114).
+ * Penalidade de armadura em Acrobacia, Furtividade e Ladinagem (Tabela 2-1); sem proficiência, em todas as
+ * perícias de Força e Destreza (Cap. 3, pág. 152). Condições: Apêndice, págs. 394–395.
  */
+export function calculateSkillBonus(
+  skillId: string,
+  isTrained: boolean,
+  input: RulesInput,
+  effects = collectPassiveEffects(input)
+): { total: number; breakdown: StatBreakdown } {
+  const def = SKILLS_LIST.find((s) => s.id === skillId);
+  if (!def) return { total: 0, breakdown: { value: 0, formula: '0', components: [] } };
+  const a = input.attributes;
+  const components: StatBreakdown['components'] = [];
+  let total = 0;
+
+  const half = Math.floor(input.level / 2);
+  total += half;
+  components.push({ label: `Metade do nível (${input.level})`, value: half });
+
+  const attr = skillAttributeFor(skillId, def.attribute, effects, a);
+  total += a[attr];
+  components.push({ label: `${attr.toUpperCase()}${attr !== def.attribute ? ' (em vez de ' + def.attribute.toUpperCase() + ')' : ''}`, value: a[attr] });
+
+  if (isTrained) {
+    const t = input.level >= 15 ? 6 : input.level >= 7 ? 4 : 2;
+    total += t;
+    components.push({ label: 'Treinamento', value: t });
+  }
+
+  effects.forEach((e) => {
+    const v = e.skills?.[skillId];
+    if (v) {
+      total += v;
+      components.push({ label: e.source, value: v });
+    }
+  });
+  // Investigador: soma Inteligência em Intuição (Cap. 2, pág. 130)
+  if (skillId === 'intuicao' && has(input, 'Investigador') && a.int) {
+    total += a.int;
+    components.push({ label: 'Investigador (Int)', value: a.int });
+  }
+
+  const penalty = calculateArmorPenalty(input, effects).value;
+  const nonProf = armorNonProficiency(input).length > 0;
+  if (penalty && (def.armorPenalty || (nonProf && FOR_DES_SKILLS.has(skillId)))) {
+    total += penalty;
+    components.push({ label: nonProf && !def.armorPenalty ? 'Penalidade de armadura (sem proficiência)' : 'Penalidade de armadura', value: penalty });
+  }
+
+  const cond = getConditionEffects(input.activeConditions);
+  const add = (p: { value: number; label: string } | null) => {
+    if (!p) return;
+    total += p.value;
+    components.push({ label: `Condição: ${p.label}`, value: p.value });
+  };
+  add(cond.allSkills);
+  if (['for', 'des', 'con'].includes(attr)) {
+    // Cego (–5 em perícias de For/Des) e debilitado/fraco têm o mesmo efeito: vale o mais severo
+    const blind = cond.blindPhysical && (attr === 'for' || attr === 'des') ? { value: -5, label: 'Cego' } : null;
+    add([cond.physical, blind].filter(Boolean).sort((x, y) => x!.value - y!.value)[0] || null);
+  }
+  if (['int', 'sab', 'car'].includes(attr)) add(cond.mental);
+  if (skillId === 'percepcao') add(cond.perception);
+  if (skillId === 'iniciativa') add(cond.initiative);
+  if (skillId === 'reflexos') {
+    if (cond.reflexAutoFail) components.push({ label: 'Condição: Indefeso (falha automática)', value: 'falha' });
+    else add(cond.reflex);
+  }
+
+  return { total, breakdown: { ...breakdown(components, total), formula: `${breakdown(components, total).formula.replace(/ = -?\d+$/, '')} = ${signed(total)}` } };
+}
+
+/* ==========================================================================
+   Magias — Cap. 4
+   ========================================================================== */
+
+/** CD = 10 + metade do nível + atributo-chave da magia (Cap. 4, pág. 173). */
 export function calculateSpellSaveDc(
   level: number,
   keyAttrMod: number,
-  keyAttrName: string = 'Atributo-Chave',
+  keyAttrName: string = 'Atributo-chave',
   otherBonus: number = 0,
   otherBonusLabel: string = 'Outros'
 ): StatBreakdown {
-  const halfLevel = Math.floor(level / 2);
-  const components: { label: string; value: number | string }[] = [
+  const half = Math.floor(level / 2);
+  const components: StatBreakdown['components'] = [
     { label: 'Base', value: 10 },
-    { label: `Metade do Nível (${halfLevel})`, value: halfLevel },
-    { label: `${keyAttrName} (${keyAttrMod >= 0 ? '+' : ''}${keyAttrMod})`, value: keyAttrMod },
+    { label: `Metade do nível (${half})`, value: half },
+    { label: `${keyAttrName} (${signed(keyAttrMod)})`, value: keyAttrMod },
   ];
-
-  let total = 10 + halfLevel + keyAttrMod;
-  if (otherBonus !== 0) {
+  let total = 10 + half + keyAttrMod;
+  if (otherBonus) {
     total += otherBonus;
-    components.push({ label: `${otherBonusLabel} (${otherBonus >= 0 ? '+' : ''}${otherBonus})`, value: otherBonus });
+    components.push({ label: `${otherBonusLabel} (${signed(otherBonus)})`, value: otherBonus });
   }
-
-  const formulaParts = components.map((c) => `${c.value} (${c.label})`);
-  return {
-    value: total,
-    formula: `${formulaParts.join(' + ').replace(/\+ -/g, '- ')} = CD ${total}`,
-    components,
-  };
+  const b = breakdown(components, total);
+  return { ...b, formula: b.formula.replace(/= (\d+)$/, '= CD $1') };
 }
 
 /**
- * Calcula o limite máximo de PM que um personagem pode gastar numa mesma magia.
- * Referência Oficial T20 JDA (Cap. 4, pág. 178):
- * Limite de PM = Nível do Personagem (+ Atributo se possuir Magia Ilimitada)
+ * Limite de PM por magia: "o máximo de PM que você pode gastar por uso é igual ao seu nível na classe que
+ * fornece a habilidade"; para raça, origem e poderes gerais, o nível de personagem (Cap. 5, pág. 224;
+ * Cap. 4, pág. 171). Magia Ilimitada soma o atributo-chave (Cap. 2, pág. 131).
  */
 export function calculateMaxSpellCost(
-  characterLevel: number,
+  levelLimit: number,
   hasUnlimitedMagic: boolean = false,
   keyAttrMod: number = 0
 ): { maxCost: number; breakdown: StatBreakdown } {
-  const components: { label: string; value: number | string }[] = [
-    { label: `Nível do Personagem (${characterLevel})`, value: characterLevel },
-  ];
-  let maxCost = characterLevel;
-
+  const components: StatBreakdown['components'] = [{ label: `Nível (${levelLimit})`, value: levelLimit }];
+  let maxCost = levelLimit;
   if (hasUnlimitedMagic && keyAttrMod > 0) {
     maxCost += keyAttrMod;
-    components.push({ label: `Magia Ilimitada (+${keyAttrMod})`, value: keyAttrMod });
+    components.push({ label: `Magia Ilimitada (${signed(keyAttrMod)})`, value: keyAttrMod });
   }
-
-  const formulaParts = components.map((c) => `${c.value} (${c.label})`);
-  return {
-    maxCost,
-    breakdown: {
-      value: maxCost,
-      formula: `${formulaParts.join(' + ')} = ${maxCost} PM máximo por magia`,
-      components,
-    },
-  };
+  const b = breakdown(components, maxCost, ' PM por magia');
+  return { maxCost, breakdown: b };
 }
 
 /**
  * Círculo máximo de magias que a classe pode lançar no nível de classe informado.
- * - Arcanista e Clérigo: 1º círculo; "a cada quatro níveis, um círculo maior" — 2º no 5º nível,
- *   3º no 9º, 4º no 13º, 5º no 17º (Cap. 1, págs. 37 e 57).
- * - Bardo e Druida: 2º círculo no 6º nível, 3º no 10º e 4º no 14º (máximo 4º) (Cap. 1, págs. 44 e 61).
+ * - Arcanista e Clérigo: 2º no 5º nível, 3º no 9º, 4º no 13º, 5º no 17º (Cap. 1, págs. 37 e 57).
+ * - Bardo e Druida: 2º no 6º nível, 3º no 10º e 4º no 14º (máximo 4º) (Cap. 1, págs. 44 e 61).
  */
 export function calculateSpellCircleUnlocked(classLevel: number, classId?: string): 1 | 2 | 3 | 4 | 5 {
   if (classId === 'bardo' || classId === 'druida') {
@@ -790,116 +521,98 @@ export function calculateSpellCircleUnlocked(classLevel: number, classId?: strin
   return 1;
 }
 
-/**
- * Recalcula integralmente todas as estatísticas da ficha do personagem,
- * garantindo coerência matemática após level-up, mudanças de itens ou poderes.
- */
-export function recalculateFullCharacterSheet(character: any): any {
-  const level = character.level || 1;
-  const attrs = character.totalAttributes || { for: 0, des: 0, con: 0, int: 0, sab: 0, car: 0 };
-  const raceId = character.raceId;
-  const classId = character.classId;
-  const inventory = character.inventory || [];
-  const powerNames = (character.powers || []).map((p: any) => p.name);
-  const selectedRacialSkills = character.selectedRacialSkills || [];
-  const activeConditions = character.activeConditions || [];
+/* ==========================================================================
+   Ficha completa
+   ========================================================================== */
 
-  // Cálculos de Defesa, PV, PM, Velocidade, Penalidade e Carga (incorporando condições ativas)
-  const armorPenaltyBreakdown = calculateArmorPenalty(inventory, activeConditions);
-  const defenseBreakdown = calculateDefense(level, attrs, inventory, raceId, classId, powerNames, activeConditions);
-  const maxHpBreakdown = calculateMaxHp(level, attrs, classId, raceId, powerNames);
-  const maxMpBreakdown = calculateMaxMp(level, classId, raceId, powerNames);
-  const speedBreakdown = calculateSpeed(raceId, inventory, powerNames, activeConditions);
-  const maxSpacesBreakdown = calculateMaxSpaces(attrs, inventory, powerNames);
-
-  // Espaços ocupados atuais
-  let currentSpaces = 0;
-  inventory.forEach((item: any) => {
-    currentSpaces += (item.spaces || 0) * (item.quantity || 1);
-  });
-
-  // Recalcula todas as 29 perícias com bônus e penalidades canônicas de condições
-  const recalculatedSkills: Record<string, any> = {};
-  SKILLS_LIST.forEach((skDef) => {
-    const existing = character.skills?.[skDef.id];
-    const isTrained = Boolean(existing?.isTrained);
-    const { total, breakdown } = calculateSkillBonus(
-      skDef.id,
-      level,
-      attrs,
-      isTrained,
-      armorPenaltyBreakdown.value,
-      raceId,
-      powerNames,
-      selectedRacialSkills,
-      activeConditions
-    );
-
-    recalculatedSkills[skDef.id] = {
-      id: skDef.id,
-      name: skDef.name,
-      attribute: skDef.attribute,
-      isTrained,
-      total,
-      breakdown,
-      source: existing?.source || 'custom',
-    };
-  });
-
+/** Entrada do motor a partir de uma ficha salva. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function rulesInputFromCharacter(character: any): RulesInput {
+  const classLevels = character.classes?.length
+    ? Object.fromEntries(character.classes.map((c: { classId: string; level: number }) => [c.classId, c.level]))
+    : undefined;
   return {
-    ...character,
-    stats: {
-      ...character.stats,
-      maxHp: maxHpBreakdown,
-      currentHp: Math.min(maxHpBreakdown.value, character.stats?.currentHp ?? maxHpBreakdown.value),
-      tempHp: character.stats?.tempHp ?? 0,
-      maxMp: maxMpBreakdown,
-      currentMp: Math.min(maxMpBreakdown.value, character.stats?.currentMp ?? maxMpBreakdown.value),
-      tempMp: character.stats?.tempMp ?? 0,
-      defense: defenseBreakdown,
-      speed: speedBreakdown,
-      armorPenalty: armorPenaltyBreakdown,
-      maxSpaces: maxSpacesBreakdown,
-      currentSpaces,
-    },
-    skills: recalculatedSkills,
-    activeConditions,
-    updatedAt: new Date().toISOString(),
+    level: character.level || 1,
+    classId: character.classId,
+    classSubclass: character.classSubclass,
+    classLevels,
+    raceId: character.raceId,
+    subraceId: character.subraceId,
+    attributes: character.totalAttributes || { for: 0, des: 0, con: 0, int: 0, sab: 0, car: 0 },
+    inventory: character.inventory || [],
+    powerNames: (character.powers || []).map((p: { name: string }) => p.name),
+    activeConditions: character.activeConditions || [],
+    selectedRacialSkills: character.raceId === 'lefou' ? character.selectedRacialSkills || [] : [],
+    racialChoices: character.racialChoices,
+  };
+}
+
+/** Todas as estatísticas derivadas de uma entrada. */
+export function computeDerivedStats(input: RulesInput) {
+  const effects = collectPassiveEffects(input);
+  return {
+    effects,
+    armorPenalty: calculateArmorPenalty(input, effects),
+    defense: calculateDefense(input, effects),
+    maxHp: calculateMaxHp(input, effects),
+    maxMp: calculateMaxMp(input, effects),
+    speed: calculateSpeed(input, effects),
+    maxSpaces: calculateMaxSpaces(input, effects),
+    currentSpaces: currentSpacesOf(input.inventory),
   };
 }
 
 /**
- * Penalidades de condições que afetam SOMENTE testes de ataque (e não as perícias Luta/Pontaria).
- * As condições físicas (Debilitado/Exausto/Fraco/Fatigado) e de medo (Apavorado/Abalado) já são
- * aplicadas no valor das perícias por calculateSkillBonus — aplicá-las de novo dobraria a penalidade.
- * Referência: Tormenta 20 JDA (v1.3), Apêndice: Condições, págs. 394–395.
+ * Recalcula integralmente todas as estatísticas da ficha, garantindo coerência após subir de nível,
+ * mudanças de itens, poderes ou condições.
  */
-export function getAttackOnlyConditionPenalty(
-  activeConditions: string[] = [],
-  isMelee: boolean = true
-): { penalty: number; reasons: string[] } {
-  const reasons: string[] = [];
-  let penalty = 0;
-
-  if (activeConditions.includes('enredado')) {
-    penalty -= 2;
-    reasons.push('Enredado (-2)');
-  }
-  if (activeConditions.includes('ofuscado')) {
-    penalty -= 2;
-    reasons.push('Ofuscado (-2)');
-  }
-  if (activeConditions.includes('agarrado')) {
-    penalty -= 2;
-    reasons.push('Agarrado (-2)');
-  }
-  if (isMelee && activeConditions.includes('caido')) {
-    penalty -= 5;
-    reasons.push('Caído (-5 corpo a corpo)');
-  }
-
-  return { penalty, reasons };
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function recalculateFullCharacterSheet(character: any): any {
+  const input = rulesInputFromCharacter(character);
+  const d = computeDerivedStats(input);
+  const skills: Record<string, TrainedSkillData> = {};
+  SKILLS_LIST.forEach((sk) => {
+    const existing = character.skills?.[sk.id];
+    const isTrained = Boolean(existing?.isTrained);
+    const { total, breakdown: b } = calculateSkillBonus(sk.id, isTrained, input, d.effects);
+    skills[sk.id] = { ...(existing || {}), id: sk.id, name: sk.name, attribute: sk.attribute, isTrained, total, breakdown: b, source: existing?.source || 'custom' };
+  });
+  return {
+    ...character,
+    stats: {
+      ...character.stats,
+      maxHp: d.maxHp,
+      currentHp: Math.min(d.maxHp.value, character.stats?.currentHp ?? d.maxHp.value),
+      tempHp: character.stats?.tempHp ?? 0,
+      maxMp: d.maxMp,
+      currentMp: Math.min(d.maxMp.value, character.stats?.currentMp ?? d.maxMp.value),
+      tempMp: character.stats?.tempMp ?? 0,
+      defense: d.defense,
+      speed: d.speed,
+      armorPenalty: d.armorPenalty,
+      maxSpaces: d.maxSpaces,
+      currentSpaces: d.currentSpaces,
+    },
+    skills,
+    activeConditions: input.activeConditions,
+    updatedAt: new Date().toISOString(),
+  };
 }
+
+/* ==========================================================================
+   Ataque e dano — Cap. 3, págs. 142–143; Cap. 5, pág. 230
+   ========================================================================== */
+
+/** Penalidades exclusivas de ataque (enredado, agarrado, ofuscado –2; caído –5 corpo a corpo). Não acumulam. */
+export function getAttackOnlyConditionPenalty(activeConditions: string[] = [], isMelee: boolean = true): { penalty: number; reasons: string[] } {
+  const cond = getConditionEffects(activeConditions);
+  const options = [cond.attack, isMelee ? cond.meleeAttack : null].filter(Boolean) as { value: number; label: string }[];
+  const worst = options.sort((x, y) => x.value - y.value)[0];
+  return worst ? { penalty: worst.value, reasons: [`${worst.label} (${worst.value})`] } : { penalty: 0, reasons: [] };
+}
+
+/** Armas de disparo (arcos, bestas, funda, armas de fogo); as demais à distância são de arremesso (pág. 142). */
+const DISPARO = /arco|besta|funda|pistola|mosquete/i;
 
 /** Arma de ataque à distância (Pontaria)? */
 export function isRangedWeapon(weapon: Pick<CharacterInventoryItem, 'subcategory'>): boolean {
@@ -907,50 +620,69 @@ export function isRangedWeapon(weapon: Pick<CharacterInventoryItem, 'subcategory
 }
 
 /**
- * Armas corpo a corpo e de arremesso somam Força no dano; armas de disparo não.
- * Armas à distância que somam Força (arremesso, funda, arco longo) são identificadas pela descrição canônica.
- * Referência: Tormenta 20 JDA (v1.3), Capítulo 5: Jogando — Dano, pág. 230 (PDF pág. 236).
+ * Força no dano: armas corpo a corpo e de arremesso somam; armas de disparo não, exceto arco longo
+ * e funda (Cap. 3, págs. 142, 146 e 148).
  */
-export function weaponAddsStrengthToDamage(
-  weapon: Pick<CharacterInventoryItem, 'subcategory' | 'description'>
-): boolean {
+export function weaponAddsStrengthToDamage(weapon: Pick<CharacterInventoryItem, 'subcategory' | 'description' | 'name' | 'equipmentId'>): boolean {
   if (!isRangedWeapon(weapon)) return true;
-  return /arremess|for[çc]a/i.test(weapon.description || '');
+  const id = `${weapon.equipmentId || ''} ${weapon.name || ''}`;
+  if (!DISPARO.test(id)) return true; // arremesso
+  return /arco[ _]longo|funda/i.test(id);
 }
 
+const isAxeHammerPick = (w: { name: string; equipmentId?: string }) => /machad|martel|marreta|picareta/i.test(`${w.name} ${w.equipmentId || ''}`);
+
 /**
- * Teste de ataque com arma = perícia (Luta corpo a corpo / Pontaria à distância)
- * + bônus de ataque da arma (melhorias como Certeira/Pungente, encantos, materiais)
- * + penalidades de condições exclusivas de ataque.
- * Referência: Tormenta 20 JDA (v1.3), Capítulo 5: Jogando — Teste de Ataque, pág. 230 (PDF pág. 236);
- * Capítulo 3: Equipamento — Melhorias, págs. 164–165 (PDF págs. 170–171).
+ * Teste de ataque = Luta (corpo a corpo) ou Pontaria (à distância) + bônus da arma + bônus de poderes/raça
+ * – 5 sem proficiência (Cap. 3, pág. 142) + condições exclusivas de ataque.
  */
 export function calculateWeaponAttack(
-  character: { skills: Record<string, TrainedSkillData>; activeConditions?: string[] },
-  weapon: Pick<CharacterInventoryItem, 'subcategory' | 'attackBonus' | 'name'>
+  character: { skills: Record<string, TrainedSkillData>; activeConditions?: string[]; raceId?: string; classId?: string; powers?: { name: string }[]; inventory?: CharacterInventoryItem[]; level?: number; totalAttributes?: CharacterAttributes },
+  weapon: Pick<CharacterInventoryItem, 'subcategory' | 'attackBonus' | 'name'> & Partial<Pick<CharacterInventoryItem, 'category' | 'equipmentId' | 'description'>>
 ): StatBreakdown & { isMelee: boolean; conditionReasons: string[] } {
   const isMelee = !isRangedWeapon(weapon);
   const skillKey = isMelee ? 'luta' : 'pontaria';
-  const skill = character.skills?.[skillKey];
-  const skillTotal = skill ? skill.total : 0;
-  const itemBonus = weapon.attackBonus || 0;
+  const skillTotal = character.skills?.[skillKey]?.total ?? 0;
+  const components: StatBreakdown['components'] = [{ label: isMelee ? 'Luta' : 'Pontaria', value: skillTotal }];
+  let value = skillTotal;
+  const push = (label: string, v: number) => {
+    if (!v) return;
+    value += v;
+    components.push({ label, value: v });
+  };
+  push('Bônus da arma (melhorias)', weapon.attackBonus || 0);
+
+  const powers = (character.powers || []).map((p) => p.name);
+  const input: RulesInput | null = character.classId
+    ? {
+        level: character.level || 1,
+        classId: character.classId,
+        raceId: character.raceId || '',
+        attributes: character.totalAttributes || { for: 0, des: 0, con: 0, int: 0, sab: 0, car: 0 },
+        inventory: character.inventory || [],
+        powerNames: powers,
+      }
+    : null;
+  if (input && weapon.category) {
+    const proficient = isWeaponProficient(input, { category: weapon.category, name: weapon.name, equipmentId: weapon.equipmentId });
+    if (!proficient) push('Sem proficiência (Cap. 3, pág. 142)', -5);
+    // Tradição de Heredrimm: +2 em ataques com machados, martelos, marretas e picaretas (pág. 20)
+    if (input.raceId === 'anao' && isAxeHammerPick({ name: weapon.name, equipmentId: weapon.equipmentId })) push('Tradição de Heredrimm', 2);
+    // Armas da Ambição: +1 com armas em que é proficiente (pág. 132)
+    if (proficient && powers.includes('Armas da Ambição')) push('Armas da Ambição', 1);
+    // Estilo de Uma Arma: +2 com a arma corpo a corpo empunhada sozinha (pág. 128)
+    if (isMelee && powers.includes('Estilo de Uma Arma')) {
+      const equipped = input.inventory.filter((it) => it.isEquipped && it.category.startsWith('arma'));
+      if (equipped.length === 1 && !equippedShield(input.inventory) && weapon.subcategory !== 'duas_maos') push('Estilo de Uma Arma', 2);
+    }
+    // Estilo de Arma Longa: +2 com armas alongadas (pág. 125)
+    if (powers.includes('Estilo de Arma Longa') && /alongada/i.test(weapon.description || '')) push('Estilo de Arma Longa', 2);
+  }
+
   const { penalty, reasons } = getAttackOnlyConditionPenalty(character.activeConditions || [], isMelee);
+  if (penalty) push(`Condição: ${reasons[0].replace(/\s*\(.*\)$/, '')}`, penalty);
 
-  const components: StatBreakdown['components'] = [
-    { label: isMelee ? 'Perícia Luta' : 'Perícia Pontaria', value: skillTotal },
-  ];
-  if (itemBonus) components.push({ label: 'Bônus da arma (melhorias)', value: itemBonus });
-  reasons.forEach((r) => {
-    const m = r.match(/\((-?\d+)/);
-    components.push({ label: `Condição: ${r.replace(/\s*\(.*\)$/, '')}`, value: m ? parseInt(m[1], 10) : 0 });
-  });
-
-  const value = skillTotal + itemBonus + penalty;
-  const signed = (n: number) => (n >= 0 ? `+${n}` : `${n}`);
-  const formula = `1d20 + ${isMelee ? 'Luta' : 'Pontaria'} (${signed(skillTotal)})${
-    itemBonus ? ` + Arma (${signed(itemBonus)})` : ''
-  }${penalty ? ` + Condições (${penalty})` : ''}`;
-
+  const formula = `1d20 ${components.map((c) => `${signed(Number(c.value))} (${c.label})`).join(' ')}`;
   return { value, formula, components, isMelee, conditionReasons: reasons };
 }
 
@@ -958,7 +690,7 @@ export interface WeaponDamageRoll {
   /** Quantidade e faces do dado principal (ex.: 1d8). */
   count: number;
   sides: number;
-  /** Modificador fixo total (bônus da arma + Força, quando aplicável). */
+  /** Modificador fixo total. */
   modifier: number;
   /** Texto pronto para exibir: "1d8+3". */
   formula: string;
@@ -966,36 +698,100 @@ export interface WeaponDamageRoll {
   addsStrength: boolean;
 }
 
+/** Tabela 3-2: Dano de Armas — passos (Cap. 3, pág. 143). Índice 2 = dano normal. */
+const DAMAGE_STEPS: Record<string, string[]> = {
+  '1d3': ['1', '1d2', '1d3', '1d4', '1d6', '1d8'],
+  '1d4': ['1d2', '1d3', '1d4', '1d6', '1d8', '1d10'],
+  '1d6': ['1d3', '1d4', '1d6', '1d8', '1d10', '1d12'],
+  '1d8': ['1d4', '1d6', '1d8', '1d10', '1d12', '3d6'],
+  '2d4': ['1d4', '1d6', '2d4', '1d10', '1d12', '3d6'],
+  '1d10': ['1d6', '1d8', '1d10', '1d12', '3d6', '4d6'],
+  '1d12': ['1d8', '1d10', '1d12', '3d6', '4d6', '4d8'],
+  '2d6': ['1d8', '1d10', '2d6', '3d6', '4d6', '4d8'],
+  '3d4': ['1d8', '1d10', '3d4', '3d6', '4d6', '4d8'],
+  '2d8': ['1d10', '2d6', '2d8', '3d8', '4d8', '4d10'],
+  '2d10': ['2d6', '2d8', '2d10', '3d10', '4d10', '4d12'],
+};
+
+/** Aumenta ou diminui o dano em passos (–2 a +3), conforme a Tabela 3-2. */
+export function stepDamage(dice: string, steps: number): string {
+  const row = DAMAGE_STEPS[dice];
+  if (!row) return dice;
+  return row[Math.max(0, Math.min(row.length - 1, 2 + steps))];
+}
+
 /**
- * Rolagem de dano com arma.
- * Dano corpo a corpo ou de arremesso = dano da arma + Força; dano com arma de disparo = dano da arma.
- * Para armas versáteis/duplas ("1d10/1d12", "1d6/1d6") usa o primeiro valor.
- * Retorna null quando a arma não causa dano (ex.: rede).
- * Referência: Tormenta 20 JDA (v1.3), Capítulo 5: Jogando — Dano, pág. 230 (PDF pág. 236).
+ * Dano com arma: dado da arma (com passos) + Força quando aplicável + bônus de melhorias e poderes.
+ * Para armas duplas/versáteis ("1d10/1d12") usa o primeiro valor. Retorna null se a arma não causa dano.
  */
 export function calculateWeaponDamage(
-  character: { totalAttributes: CharacterAttributes },
-  weapon: Pick<CharacterInventoryItem, 'damage' | 'subcategory' | 'description'>
+  character: { totalAttributes: CharacterAttributes; raceId?: string; classId?: string; classes?: { classId: string; level: number }[]; level?: number; powers?: { name: string }[] },
+  weapon: Pick<CharacterInventoryItem, 'damage' | 'subcategory' | 'description'> & Partial<Pick<CharacterInventoryItem, 'name' | 'equipmentId'>>
 ): WeaponDamageRoll | null {
   const raw = (weapon.damage || '').split('/')[0].trim();
-  const dice = raw.match(/(\d+)\s*d\s*(\d+)/i);
-  if (!dice) return null;
-
-  const count = parseInt(dice[1], 10);
-  const sides = parseInt(dice[2], 10);
-  const rest = raw.slice((dice.index || 0) + dice[0].length);
+  const m = raw.match(/(\d+)\s*d\s*(\d+)/i);
+  if (!m) return null;
+  let diceStr = `${m[1]}d${m[2]}`;
+  const rest = raw.slice((m.index || 0) + m[0].length);
   const flatMatch = rest.match(/([+-])\s*(\d+)/);
   const flat = flatMatch ? (flatMatch[1] === '-' ? -1 : 1) * parseInt(flatMatch[2], 10) : 0;
+  const name = `${weapon.name || ''} ${weapon.equipmentId || ''}`;
+  const powers = (character.powers || []).map((p) => p.name);
+  const components: StatBreakdown['components'] = [];
+  let modifier = flat;
 
-  const addsStrength = weaponAddsStrengthToDamage(weapon);
-  const strength = addsStrength ? character.totalAttributes?.for || 0 : 0;
-
-  const components: StatBreakdown['components'] = [{ label: 'Dado da arma', value: `${count}d${sides}` }];
+  // Hynne — Arremessador: dano +1 passo com funda ou arma de arremesso à distância (pág. 28)
+  const ranged = isRangedWeapon(weapon);
+  if (character.raceId === 'hynne' && ranged && (!DISPARO.test(name) || /funda/i.test(name))) {
+    const stepped = stepDamage(diceStr, 1);
+    if (stepped !== diceStr) {
+      components.push({ label: 'Arremessador (Hynne): +1 passo', value: `${diceStr}→${stepped}` });
+      diceStr = stepped;
+    }
+  }
+  const dm = diceStr.match(/(\d+)d(\d+)/);
+  const count = dm ? parseInt(dm[1], 10) : 1;
+  const sides = dm ? parseInt(dm[2], 10) : 1;
+  components.unshift({ label: 'Dado da arma', value: diceStr });
   if (flat) components.push({ label: 'Bônus da arma (melhorias)', value: flat });
-  if (addsStrength) components.push({ label: 'Força', value: strength });
 
-  const modifier = flat + strength;
+  const addsStrength = weaponAddsStrengthToDamage({ ...weapon, name: weapon.name || '', equipmentId: weapon.equipmentId });
+  if (addsStrength) {
+    const f = character.totalAttributes?.for || 0;
+    modifier += f;
+    components.push({ label: 'Força', value: f });
+  }
+  // Estilo de Disparo: soma Destreza no dano com armas de disparo (pág. 125)
+  if (ranged && DISPARO.test(name) && powers.includes('Estilo de Disparo')) {
+    const d = character.totalAttributes?.des || 0;
+    modifier += d;
+    components.push({ label: 'Estilo de Disparo (Des)', value: d });
+  }
+  // Mestre do Tridente (Sereia, pág. 30) e Arsenal das Profundezas (pág. 132): +2 com azagaias, lanças e tridentes
+  if (/azagaia|lan[cç]a(?! montada)|tridente/i.test(name)) {
+    if (character.raceId === 'sereia') {
+      modifier += 2;
+      components.push({ label: 'Mestre do Tridente', value: 2 });
+    }
+    if (powers.includes('Arsenal das Profundezas')) {
+      modifier += 2;
+      components.push({ label: 'Arsenal das Profundezas', value: 2 });
+    }
+  }
+  // Bárbaro — Instinto Selvagem: +1 em rolagens de dano no 3º nível, +1 a cada seis níveis (pág. 42)
+  const barbLevel = character.classes?.find((c) => c.classId === 'barbaro')?.level ?? (character.classId === 'barbaro' ? character.level || 1 : 0);
+  if (barbLevel >= 3) {
+    const b = 1 + Math.floor((barbLevel - 3) / 6);
+    modifier += b;
+    components.push({ label: 'Instinto Selvagem', value: b });
+  }
+
   const formula = `${count}d${sides}${modifier > 0 ? `+${modifier}` : modifier < 0 ? `${modifier}` : ''}`;
-
   return { count, sides, modifier, formula, components, addsStrength };
 }
+
+/* ==========================================================================
+   Compatibilidade: entrada posicional antiga (criador e personagens de exemplo)
+   ========================================================================== */
+
+export type { Contribution };

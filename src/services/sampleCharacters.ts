@@ -1,173 +1,87 @@
-import { CharacterSheet } from '../types/character';
-import {
-  calculateArmorPenalty,
-  calculateDefense,
-  calculateMaxHp,
-  calculateMaxMp,
-  calculateMaxSpaces,
-  calculateRacialModifiers,
-  calculateSkillBonus,
-  calculateSpeed,
-  calculateTotalAttributes,
-} from '../utils/rulesEngine';
+import type { CharacterInventoryItem, CharacterPower, CharacterSheet } from '../types/character';
+import { calculateRacialModifiers, calculateTotalAttributes, recalculateFullCharacterSheet } from '../utils/rulesEngine';
+import { CLASSES_LIST } from '../data/classes';
+import { EQUIPMENT_LIST } from '../data/equipment';
+import { GENERAL_POWERS_LIST } from '../data/generalPowers';
+import { ORIGINS_LIST } from '../data/origins';
+import { RACES_LIST } from '../data/races';
 import { SKILLS_LIST } from '../data/skills';
 import { SPELLS_LIST } from '../data/spells';
 
-export function createSampleCharacters(): CharacterSheet[] {
-  // 1. Thuran: Anão Guerreiro
-  const thuranBaseAttrs = { for: 3, des: 0, con: 3, int: 0, sab: 1, car: -1 };
-  const thuranRacial = calculateRacialModifiers('anao');
-  const thuranTotalAttrs = calculateTotalAttributes(thuranBaseAttrs, thuranRacial);
+/** Item do catálogo como item da mochila (equipamento inicial é gratuito — Cap. 3, pág. 140). */
+function item(equipmentId: string, extra: Partial<CharacterInventoryItem> = {}): CharacterInventoryItem {
+  const eq = EQUIPMENT_LIST.find((e) => e.id === equipmentId);
+  if (!eq) throw new Error(`Item inexistente: ${equipmentId}`);
+  return {
+    id: `inv_${equipmentId}`,
+    equipmentId,
+    name: eq.name,
+    category: eq.category,
+    subcategory: eq.subcategory,
+    spaces: eq.spaces,
+    quantity: 1,
+    isEquipped: eq.category.startsWith('arma') || eq.category.startsWith('armadura') || eq.category === 'escudo',
+    damage: eq.damage,
+    critical: eq.critical,
+    damageType: eq.damageType,
+    range: eq.range,
+    defenseBonus: eq.defenseBonus,
+    armorPenalty: eq.armorPenalty,
+    description: eq.description,
+    price: eq.price,
+    isFree: true,
+    source: 'inicial',
+    ...extra,
+  };
+}
 
-  const thuranInventory = [
-    {
-      id: 'inv_1',
-      equipmentId: 'martelo_guerra',
-      name: 'Martelo de guerra',
-      category: 'arma_marcial' as const,
-      damage: '1d8',
-      critical: 'x3',
-      spaces: 1,
-      quantity: 1,
-      isEquipped: true,
-      price: 'T$ 12',
-      description: 'Martelo de guerra pesado consagrado ao Deus Arsenal.',
-    },
-    {
-      id: 'inv_2',
-      equipmentId: 'cota_malha',
-      name: 'Cota de malha',
-      category: 'armadura_pesada' as const,
-      defenseBonus: 6,
-      armorPenalty: -2,
-      spaces: 5,
-      quantity: 1,
-      isEquipped: true,
-      price: 'T$ 150',
-      description: 'Armadura pesada de anéis metálicos. Não aplica Destreza na Defesa.',
-    },
-    {
-      id: 'inv_3',
-      equipmentId: 'escudo_pesado',
-      name: 'Escudo pesado',
-      category: 'escudo' as const,
-      defenseBonus: 2,
-      armorPenalty: -2,
-      spaces: 2,
-      quantity: 1,
-      isEquipped: true,
-      price: 'T$ 15',
-      description: 'Escudo de carvalho revestido com aço.',
-    },
-    {
-      id: 'inv_4',
-      equipmentId: 'mochila',
-      name: 'Mochila de Aventureiro',
-      category: 'item_geral' as const,
-      spaces: 0,
-      quantity: 1,
-      isEquipped: true,
-      price: 'T$ 2',
-      description: 'Aumenta capacidade de carga em +2.',
-    },
-    {
-      id: 'inv_5',
-      equipmentId: 'balsamo_restaurador',
-      name: 'Bálsamo restaurador',
-      category: 'item_geral' as const,
-      spaces: 1,
-      quantity: 2,
-      isEquipped: false,
-      price: 'T$ 10',
-      description: 'Recupera 2d4 PV ao ser aplicado.',
-    },
-  ];
+function racePowers(raceId: string): CharacterPower[] {
+  const race = RACES_LIST.find((r) => r.id === raceId)!;
+  return race.abilities.map((a) => ({ id: a.id, name: a.name, source: 'raca', description: a.description, cost: a.cost }));
+}
 
-  const thuranPowers = [
-    {
-      id: 'anao_conhecimento_rochas',
-      name: 'Conhecimento das Rochas',
-      source: 'raca' as const,
-      description: 'Você recebe visão no escuro e +2 em testes de Percepção e Sobrevivência realizados no subterrâneo.',
-    },
-    {
-      id: 'anao_devagar_sempre',
-      name: 'Devagar e Sempre',
-      source: 'raca' as const,
-      description: 'Seu deslocamento é 6m e não é reduzido por armadura pesada ou carga.',
-    },
-    {
-      id: 'anao_duro_como_pedra',
-      name: 'Duro como Pedra',
-      source: 'raca' as const,
-      description: 'Você recebe +3 pontos de vida no 1º nível e +1 por nível seguinte.',
-    },
-    {
-      id: 'anao_tradicao_heredrimm',
-      name: 'Tradição de Heredrimm',
-      source: 'raca' as const,
-      description: 'Para você, machados, martelos e picaretas contam como armas simples.',
-    },
-    {
-      id: 'guerreiro_ataque_especial',
-      name: 'Ataque Especial',
-      source: 'classe' as const,
-      cost: '1 PM',
-      description: 'Gaste 1 PM para receber +4 no teste de ataque ou +4 na rolagem de dano.',
-    },
-    {
-      id: 'minerador_ataque_poderoso',
-      name: 'Ataque Poderoso',
-      source: 'origem' as const,
-      description: 'Sofre -2 no teste de ataque para receber +5 no dano corpo a corpo.',
-    },
-    {
-      id: 'arsenal_sangue_ferro',
-      name: 'Sangue de Ferro',
-      source: 'divindade' as const,
-      cost: '1 PM',
-      description: 'Gaste 1 PM para receber redução de dano 2 e +2 em Fortitude até o fim da cena.',
-    },
-  ];
+function classPowers(classId: string): CharacterPower[] {
+  const cls = CLASSES_LIST.find((c) => c.id === classId)!;
+  return cls.abilitiesLevel1.map((a) => ({ id: a.id, name: a.name, source: 'classe', description: a.description, cost: a.cost }));
+}
 
-  const thuranArmorPenalty = calculateArmorPenalty(thuranInventory);
-  const thuranPowerNames = thuranPowers.map((p) => p.name);
-  const thuranMaxHp = calculateMaxHp(1, thuranTotalAttrs, 'guerreiro', 'anao', thuranPowerNames);
-  const thuranMaxMp = calculateMaxMp(1, 'guerreiro', 'anao', thuranPowerNames);
-  const thuranDefense = calculateDefense(1, thuranTotalAttrs, thuranInventory, 'anao', 'guerreiro', thuranPowerNames);
-  const thuranSpeed = calculateSpeed('anao', thuranInventory, thuranPowerNames);
-  const thuranMaxSpaces = calculateMaxSpaces(thuranTotalAttrs, thuranInventory, thuranPowerNames);
+function generalPower(name: string, source: CharacterPower['source']): CharacterPower {
+  const p = GENERAL_POWERS_LIST.find((g) => g.name === name);
+  const fromOrigin = ORIGINS_LIST.flatMap((o) => o.powers).find((o) => o.name === name);
+  return {
+    id: `${source}_${name.toLowerCase().replace(/\s+/g, '_')}`,
+    name,
+    source,
+    description: p?.description || fromOrigin?.description || '',
+    type: p?.category || fromOrigin?.type,
+  };
+}
 
-  // Perícias treinadas de Thuran: Luta, Fortitude (classe), Atletismo (origem Minerador), Iniciativa
-  const thuranTrained = ['luta', 'fortitude', 'atletismo', 'iniciativa'];
-  const thuranSkills: Record<string, any> = {};
-  SKILLS_LIST.forEach((s) => {
-    const isTrained = thuranTrained.includes(s.id);
-    const bonus = calculateSkillBonus(
+function skillsRecord(trained: string[]): CharacterSheet['skills'] {
+  return Object.fromEntries(
+    SKILLS_LIST.map((s) => [
       s.id,
-      1,
-      thuranTotalAttrs,
-      isTrained,
-      thuranArmorPenalty.value,
-      'anao',
-      thuranPowerNames
-    );
-    thuranSkills[s.id] = {
-      id: s.id,
-      name: s.name,
-      attribute: s.attribute,
-      isTrained,
-      total: bonus.total,
-      breakdown: bonus.breakdown,
-      source: isTrained ? 'classe' : 'custom',
-    };
-  });
+      { id: s.id, name: s.name, attribute: s.attribute, isTrained: trained.includes(s.id), total: 0, breakdown: { value: 0, formula: '', components: [] }, source: trained.includes(s.id) ? ('classe' as const) : ('custom' as const) },
+    ])
+  );
+}
 
-  const thuran: CharacterSheet = {
+const emptyStats = (): CharacterSheet['stats'] => {
+  const z = { value: 0, formula: '', components: [] };
+  return { maxHp: z, currentHp: 0, tempHp: 0, maxMp: z, currentMp: 0, tempMp: 0, defense: z, speed: z, armorPenalty: z, maxSpaces: z, currentSpaces: 0 };
+};
+
+/** Personagens de exemplo, montados segundo as regras de criação (Cap. 1) e calculados pelo motor. */
+export function createSampleCharacters(): CharacterSheet[] {
+  // 1. Thuran — Anão Guerreiro, origem Minerador, devoto de Arsenal
+  // Compra de pontos: For 3 (4) + Con 3 (4) + Sab 1 (1) + Car –1 (–1) = 8 de 10 pontos (Cap. 1, pág. 17)
+  const thuranBase = { for: 3, des: 0, con: 3, int: 0, sab: 1, car: -1 };
+  const thuranRacial = calculateRacialModifiers('anao');
+  const thuranDraft: CharacterSheet = {
     id: 'char_thuran_01',
     name: 'Thuran Martelo-de-Prata',
     playerName: 'Mestre da Masmorra',
-    concept: 'Defensor de Doherimm com martelo e escudo pesado',
+    concept: 'Defensor de Doherimm com martelo e escudo',
     level: 1,
     xp: 0,
     raceId: 'anao',
@@ -176,162 +90,58 @@ export function createSampleCharacters(): CharacterSheet[] {
     deityId: 'arsenal',
     selectedDeityPowers: ['Sangue de Ferro'],
     attributeMethod: 'point_buy',
-    baseAttributes: thuranBaseAttrs,
+    baseAttributes: thuranBase,
     racialModifiers: thuranRacial,
-    totalAttributes: thuranTotalAttrs,
-    selectedClassSkills: ['luta', 'fortitude', 'iniciativa'],
+    totalAttributes: calculateTotalAttributes(thuranBase, thuranRacial),
+    // Guerreiro: Luta (ou Pontaria) e Fortitude + 2 da lista (Cap. 1, pág. 65)
+    selectedClassSkills: ['luta', 'iniciativa', 'intimidacao'],
     selectedIntSkills: [],
     selectedOriginBenefits: [
       { type: 'pericia', name: 'atletismo' },
       { type: 'poder', name: 'Ataque Poderoso' },
     ],
-    stats: {
-      maxHp: thuranMaxHp,
-      currentHp: thuranMaxHp.value,
-      tempHp: 0,
-      maxMp: thuranMaxMp,
-      currentMp: thuranMaxMp.value,
-      tempMp: 0,
-      defense: thuranDefense,
-      speed: thuranSpeed,
-      armorPenalty: thuranArmorPenalty,
-      maxSpaces: thuranMaxSpaces,
-      currentSpaces: 9,
-    },
-    skills: thuranSkills,
-    powers: thuranPowers,
+    stats: emptyStats(),
+    skills: skillsRecord(['luta', 'fortitude', 'iniciativa', 'intimidacao', 'atletismo']),
+    powers: [
+      ...racePowers('anao'),
+      ...classPowers('guerreiro'),
+      generalPower('Ataque Poderoso', 'origem'),
+      generalPower('Sangue de Ferro', 'divindade'),
+    ],
     spells: [],
-    inventory: thuranInventory,
-    tibares: 45,
+    // Kit (Cap. 3, pág. 140): mochila, saco de dormir, traje, arma simples, arma marcial, brunea, escudo leve
+    // + itens do Minerador: gemas (T$ 100) e picareta (Cap. 1, pág. 93)
+    inventory: [
+      item('martelo_guerra', { kitSlot: 'c_arma_marcial', kitOption: 'martelo_guerra' }),
+      item('lanca', { isEquipped: false, kitSlot: 'c_arma_simples', kitOption: 'lanca' }),
+      item('brunea', { kitSlot: 'c_armadura', kitOption: 'brunea' }),
+      item('escudo_leve', { kitSlot: 'c_escudo', kitOption: 'escudo_leve' }),
+      item('mochila', { kitSlot: 'c_mochila', kitOption: 'mochila' }),
+      item('saco_dormir', { kitSlot: 'c_saco', kitOption: 'saco_dormir' }),
+      item('traje_viajante', { kitSlot: 'c_traje', kitOption: 'traje_viajante' }),
+      item('picareta', { isEquipped: false, source: 'origem', kitSlot: 'o_picareta', kitOption: 'picareta' }),
+    ],
+    tibares: 14, // média de 4d6
     activeConditions: [],
     bio: {
       gender: 'Masculino',
       age: '72 anos',
-      height: '1,38m',
-      weight: '84kg',
-      eyes: 'Castanhos escuros',
-      hair: 'Barba espessa trançada com anéis de prata',
-      appearance: 'Um anão atarracado com cicatrizes de minas e cota de malha impecavelmente polida.',
-      personality: 'Leal aos companheiros, teimoso como uma rocha e apaixonado pela forja de armas.',
-      history: 'Nascido nos túneis profundos de Doherimm, trabalhou na extração de minérios raros antes de atender ao chamado das armas para honrar Arsenal na superfície.',
+      appearance: 'Um anão atarracado com cicatrizes de minas e um escudo marcado por anos de túneis.',
+      history: 'Nascido nos túneis profundos de Doherimm, trabalhou na extração de minérios antes de atender ao chamado das armas para honrar Arsenal na superfície.',
     },
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
 
-  // 2. Lyra Stardust: Humana Arcanista (Maga)
-  const lyraBaseAttrs = { for: -1, des: 1, con: 1, int: 4, sab: 1, car: 1 };
-  const lyraRacial = { for: 0, des: 1, con: 0, int: 1, sab: 0, car: 1 }; // +1 em DES, INT, CAR
-  const lyraTotalAttrs = calculateTotalAttributes(lyraBaseAttrs, lyraRacial);
-
-  const lyraInventory = [
-    {
-      id: 'inv_l1',
-      equipmentId: 'adaga',
-      name: 'Adaga cerimonial',
-      category: 'arma_simples' as const,
-      damage: '1d4',
-      critical: '19',
-      spaces: 1,
-      quantity: 1,
-      isEquipped: true,
-      price: 'T$ 2',
-      description: 'Lâmina de prata gravada com runas arcanas.',
-    },
-    {
-      id: 'inv_l2',
-      equipmentId: 'mochila',
-      name: 'Mochila de Aventureiro',
-      category: 'item_geral' as const,
-      spaces: 0,
-      quantity: 1,
-      isEquipped: true,
-      price: 'T$ 2',
-      description: 'Contém pergaminhos, penas e tinta.',
-    },
-    {
-      id: 'inv_l3',
-      equipmentId: 'essencia_mana',
-      name: 'Essência de mana',
-      category: 'item_geral' as const,
-      spaces: 1,
-      quantity: 1,
-      isEquipped: false,
-      price: 'T$ 50',
-      description: 'Restaura 2d4 PM.',
-    },
-  ];
-
-  const lyraPowers = [
-    {
-      id: 'humano_versatil',
-      name: 'Versátil (Humano)',
-      source: 'raca' as const,
-      description: 'Treinada em perícias adicionais pelo dinamismo humano.',
-    },
-    {
-      id: 'arcanista_mago',
-      name: 'Caminho do Mago (Grimório)',
-      source: 'classe' as const,
-      description: 'Prepara suas magias em um grimório detalhado com base em sua alta Inteligência.',
-    },
-    {
-      id: 'estudioso_palpite',
-      name: 'Palpite Fundamentado',
-      source: 'origem' as const,
-      description: 'Gasta 1 PM para usar Conhecimento no lugar de testes mentais.',
-    },
-    {
-      id: 'wynna_bencao_mana',
-      name: 'Bênção do Mana (Wynna)',
-      source: 'divindade' as const,
-      description: 'Recebe +1 PM por nível de personagem pela bênção da Deusa da Magia.',
-    },
-  ];
-
-  const lyraArmorPenalty = calculateArmorPenalty(lyraInventory);
-  const lyraPowerNames = lyraPowers.map((p) => p.name);
-  const lyraMaxHp = calculateMaxHp(1, lyraTotalAttrs, 'arcanista', 'humano', lyraPowerNames);
-  const lyraMaxMp = calculateMaxMp(1, 'arcanista', 'humano', lyraPowerNames);
-  const lyraDefense = calculateDefense(1, lyraTotalAttrs, lyraInventory, 'humano', 'arcanista', lyraPowerNames);
-  const lyraSpeed = calculateSpeed('humano', lyraInventory, lyraPowerNames);
-  const lyraMaxSpaces = calculateMaxSpaces(lyraTotalAttrs, lyraInventory, lyraPowerNames);
-
-  // Perícias de Lyra: Misticismo, Vontade (obrigatórias) + Conhecimento, Investigação (classe) + 5 perícias por INT > 0 (Diplomacia, Guerra, Percepção, Nobreza, Iniciativa)
-  const lyraTrained = ['misticismo', 'vontade', 'conhecimento', 'investigacao', 'diplomacia', 'guerra', 'percepcao', 'nobreza', 'iniciativa'];
-  const lyraSkills: Record<string, any> = {};
-  SKILLS_LIST.forEach((s) => {
-    const isTrained = lyraTrained.includes(s.id);
-    const bonus = calculateSkillBonus(
-      s.id,
-      1,
-      lyraTotalAttrs,
-      isTrained,
-      lyraArmorPenalty.value,
-      'humano',
-      lyraPowerNames
-    );
-    lyraSkills[s.id] = {
-      id: s.id,
-      name: s.name,
-      attribute: s.attribute,
-      isTrained,
-      total: bonus.total,
-      breakdown: bonus.breakdown,
-      source: isTrained ? 'classe' : 'custom',
-    };
-  });
-
-  // Magias aprendidas de Lyra (T20 JDA Cap. 4: Magia)
-  const lyraSpells = [
-    SPELLS_LIST.find((s) => s.id === 'armadura_arcana'),
-    SPELLS_LIST.find((s) => s.id === 'adaga_mental'),
-    SPELLS_LIST.find((s) => s.id === 'explosao_de_chamas'),
-  ]
+  // 2. Lyra — Humana Arcanista (Mago), origem Estudiosa, devota de Wynna
+  // Compra de pontos: For –1 (–1) + Des 1 (1) + Con 1 (1) + Int 4 (7) + Sab 1 (1) + Car 1 (1) = 10 pontos
+  const lyraBase = { for: -1, des: 1, con: 1, int: 4, sab: 1, car: 1 };
+  const lyraRacial = calculateRacialModifiers('humano', undefined, ['des', 'int', 'car']);
+  const lyraSpells = ['armadura_arcana', 'adaga_mental', 'explosao_de_chamas', 'seta_infalivel_de_talude']
+    .map((id) => SPELLS_LIST.find((s) => s.id === id))
     .filter((s): s is (typeof SPELLS_LIST)[number] => Boolean(s))
     .map((s) => ({ ...s, learnedFrom: 'classe' as const }));
-
-  const lyra: CharacterSheet = {
+  const lyraDraft: CharacterSheet = {
     id: 'char_lyra_02',
     name: 'Lyra Stardust',
     playerName: 'Mestre da Masmorra',
@@ -340,54 +150,57 @@ export function createSampleCharacters(): CharacterSheet[] {
     xp: 0,
     raceId: 'humano',
     selectedRacialAttributes: ['des', 'int', 'car'],
+    // Versátil: duas perícias (Cap. 1, pág. 19)
+    selectedRacialSkills: ['iniciativa', 'percepcao'],
     classId: 'arcanista',
     classSubclass: 'mago',
     originId: 'estudioso',
     deityId: 'wynna',
     selectedDeityPowers: ['Bênção do Mana'],
     attributeMethod: 'point_buy',
-    baseAttributes: lyraBaseAttrs,
+    baseAttributes: lyraBase,
     racialModifiers: lyraRacial,
-    totalAttributes: lyraTotalAttrs,
+    totalAttributes: calculateTotalAttributes(lyraBase, lyraRacial),
+    // Arcanista: Misticismo e Vontade + 2 da lista (Cap. 1, pág. 37)
     selectedClassSkills: ['conhecimento', 'investigacao'],
-    selectedIntSkills: ['diplomacia', 'guerra', 'percepcao', 'nobreza', 'iniciativa'],
+    // Int 5: cinco perícias treinadas a escolha (Cap. 1, pág. 17)
+    selectedIntSkills: ['diplomacia', 'guerra', 'nobreza', 'intuicao', 'religiao'],
+    // Estudioso: Conhecimento já é treinada pela classe, então os dois benefícios são poderes (Cap. 1, pág. 90)
     selectedOriginBenefits: [
-      { type: 'pericia', name: 'conhecimento' },
       { type: 'poder', name: 'Palpite Fundamentado' },
+      { type: 'poder', name: 'Aparência Inofensiva' },
     ],
-    stats: {
-      maxHp: lyraMaxHp,
-      currentHp: lyraMaxHp.value,
-      tempHp: 0,
-      maxMp: lyraMaxMp,
-      currentMp: lyraMaxMp.value,
-      tempMp: 0,
-      defense: lyraDefense,
-      speed: lyraSpeed,
-      armorPenalty: lyraArmorPenalty,
-      maxSpaces: lyraMaxSpaces,
-      currentSpaces: 2,
-    },
-    skills: lyraSkills,
-    powers: lyraPowers,
+    stats: emptyStats(),
+    skills: skillsRecord(['misticismo', 'vontade', 'conhecimento', 'investigacao', 'iniciativa', 'percepcao', 'diplomacia', 'guerra', 'nobreza', 'intuicao', 'religiao']),
+    powers: [
+      ...racePowers('humano'),
+      ...classPowers('arcanista'),
+      generalPower('Palpite Fundamentado', 'origem'),
+      generalPower('Aparência Inofensiva', 'origem'),
+      generalPower('Bênção do Mana', 'divindade'),
+    ],
     spells: lyraSpells,
-    inventory: lyraInventory,
-    tibares: 85,
+    // Kit (Cap. 3, pág. 140) — arcanistas começam sem armadura — + coleção de livros do Estudioso (pág. 90)
+    inventory: [
+      item('adaga', { kitSlot: 'c_arma_simples', kitOption: 'adaga' }),
+      item('mochila', { kitSlot: 'c_mochila', kitOption: 'mochila' }),
+      item('saco_dormir', { kitSlot: 'c_saco', kitOption: 'saco_dormir' }),
+      item('traje_viajante', { kitSlot: 'c_traje', kitOption: 'traje_viajante' }),
+    ],
+    tibares: 14,
     activeConditions: [],
     bio: {
       gender: 'Feminino',
       age: '23 anos',
-      height: '1,65m',
-      weight: '55kg',
-      eyes: 'Violeta luminoso',
-      hair: 'Cabelos castanhos presos com fitas azuis',
       appearance: 'Túnica de viagem escura bordada com constelações de Arton e manto de lã leve.',
-      personality: 'Curiosa, metódica e sempre fascinada por fenômenos sobrenaturais inexplicados.',
-      history: 'Estudou na Academia Arcana de Valkaria, onde se destacou pela rápida assimilação das escolas de Evocação e Abjuração antes de partir em expedição exploratória.',
+      history: 'Estudou na Academia Arcana, onde se destacou pela rápida assimilação das escolas de Evocação e Abjuração antes de partir em expedição.',
     },
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
 
-  return [thuran, lyra];
+  return [thuranDraft, lyraDraft].map((c) => {
+    const full = recalculateFullCharacterSheet(c) as CharacterSheet;
+    return { ...full, stats: { ...full.stats, currentHp: full.stats.maxHp.value, currentMp: full.stats.maxMp.value } };
+  });
 }

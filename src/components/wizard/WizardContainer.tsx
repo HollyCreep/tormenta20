@@ -21,14 +21,11 @@ import {
 import {
   calculateRacialModifiers,
   calculateTotalAttributes,
-  calculateArmorPenalty,
-  calculateDefense,
-  calculateMaxHp,
-  calculateMaxMp,
-  calculateMaxSpaces,
   calculateSkillBonus,
-  calculateSpeed,
+  computeDerivedStats,
+  type RulesInput,
 } from '../../utils/rulesEngine';
+import { tormentaCharismaLoss } from '../../utils/passiveEffects';
 
 import { StepRace } from './StepRace';
 import { StepClass } from './StepClass';
@@ -205,7 +202,7 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
 
   // Modificadores raciais e Atributos totais
   const racialModifiers = calculateRacialModifiers(raceId, subraceId, selectedRacialAttributes);
-  const totalAttributes = calculateTotalAttributes(baseAttributes, racialModifiers);
+  const attributesBeforeTormenta = calculateTotalAttributes(baseAttributes, racialModifiers);
 
   // Poder geral racial (Humano, Osteon, Lefou)
   const racialGeneralPower = GENERAL_POWERS_LIST.find(
@@ -224,14 +221,28 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
     ...selectedDeityPowers,
   ];
 
+  // Poderes da Tormenta custam Carisma (Cap. 2, pág. 136); o poder da Deformidade do lefou não conta (pág. 24)
+  const baseRulesInput: RulesInput = {
+    level: 1,
+    classId,
+    classSubclass,
+    raceId,
+    subraceId,
+    attributes: attributesBeforeTormenta,
+    inventory,
+    powerNames,
+    selectedRacialSkills: raceId === 'lefou' ? selectedRacialSkills : [],
+    racialChoices,
+  };
+  const charismaLoss = tormentaCharismaLoss(baseRulesInput, racialGeneralPower?.name);
+  const totalAttributes = charismaLoss
+    ? { ...attributesBeforeTormenta, car: attributesBeforeTormenta.car - charismaLoss }
+    : attributesBeforeTormenta;
+  const rulesInput: RulesInput = { ...baseRulesInput, attributes: totalAttributes };
+
   // Cálculos Derivados
-  const armorPenalty = calculateArmorPenalty(inventory);
-  const maxHp = calculateMaxHp(1, totalAttributes, classId, raceId, powerNames);
-  const maxMp = calculateMaxMp(1, classId, raceId, powerNames);
-  const defense = calculateDefense(1, totalAttributes, inventory, raceId, classId, powerNames);
-  const speed = calculateSpeed(raceId, inventory, powerNames);
-  const maxSpaces = calculateMaxSpaces(totalAttributes, inventory, powerNames);
-  const currentSpaces = inventory.reduce((acc, item) => acc + item.spaces * item.quantity, 0);
+  const derived = computeDerivedStats(rulesInput);
+  const { armorPenalty, maxHp, maxMp, defense, speed, maxSpaces, currentSpaces } = derived;
 
   // Perícias Treinadas
   const trainedSkillIds = new Set<string>([
@@ -372,16 +383,7 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
     const fullSkillsRecord: Record<string, any> = {};
     SKILLS_LIST.forEach((s) => {
       const isTrained = trainedSkillIds.has(s.id);
-      const bonus = calculateSkillBonus(
-        s.id,
-        1,
-        totalAttributes,
-        isTrained,
-        armorPenalty.value,
-        raceId,
-        powerNames,
-        selectedRacialSkills
-      );
+      const bonus = calculateSkillBonus(s.id, isTrained, rulesInput, derived.effects);
       fullSkillsRecord[s.id] = {
         id: s.id,
         name: s.name,

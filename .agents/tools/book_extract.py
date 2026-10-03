@@ -78,6 +78,8 @@ def extract_blocks(names, pdf_from, pdf_to, stop_titles=(), score=None):
         while j < len(lines):
             if _norm(lines[j][2]) in stops:
                 break
+            if j + 1 < len(lines) and _norm(lines[j][2] + ' ' + lines[j + 1][2]) in stops:
+                break
             parts.append(lines[j][2])
             j += 1
         text = join_text(parts)

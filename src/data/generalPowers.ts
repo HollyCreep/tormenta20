@@ -706,7 +706,7 @@ export const GENERAL_POWERS_LIST: GeneralPower[] = [
     "id": "afinidade_com_a_tormenta",
     "name": "Afinidade com a Tormenta",
     "category": "concedido",
-    "description": "Você recebe +10 em testes de resistência contra efeitos da Tormenta, de suas criaturas e de devotos de Aharadak. Além disso, seu primeiro poder da Tormenta não conta para perda de Carisma. Almejar o Impossível Thwor, Valkaria Quando faz um teste de perícia, um resultado de 19 ou mais no dado sempre é um sucesso, não importando o valor a ser alcançado.",
+    "description": "Você recebe +10 em testes de resistência contra efeitos da Tormenta, de suas criaturas e de devotos de Aharadak. Além disso, seu primeiro poder da Tormenta não conta para perda de Carisma.",
     "deities": [
       "Aharadak"
     ],
@@ -747,7 +747,7 @@ export const GENERAL_POWERS_LIST: GeneralPower[] = [
     "id": "compreender_os_ermos",
     "name": "Compreender os Ermos",
     "category": "concedido",
-    "description": "Você recebe +2 em Sobrevivência e pode usar Sabedoria para Adestramento (em vez de Carisma). Conhecimento Enciclopédico Tanna-Toh Você se torna treinado em duas perícias baseadas em Inteligência a sua escolha.",
+    "description": "Você recebe +2 em Sobrevivência e pode usar Sabedoria para Adestramento (em vez de Carisma).",
     "deities": [
       "Allihanna"
     ],
@@ -1153,7 +1153,7 @@ export const GENERAL_POWERS_LIST: GeneralPower[] = [
     "id": "anfibio",
     "name": "Anfíbio",
     "category": "concedido",
-    "description": "Você pode respirar embaixo d’água e adquire deslocamento de natação igual a seu deslocamento terrestre. Apostar com o Trapaceiro Hyninn Quando faz um teste de perícia, você pode gastar 1 PM para apostar com Hyninn. Você e o mestre rolam 1d20, mas o mestre mantém o resultado dele em segredo. Você então escolhe entre usar seu próprio resultado ou o resultado oculto do mestre (neste caso, ele revela o resultado).",
+    "description": "Você pode respirar embaixo d’água e adquire deslocamento de natação igual a seu deslocamento terrestre.",
     "deities": [
       "Oceano"
     ],
@@ -1173,7 +1173,7 @@ export const GENERAL_POWERS_LIST: GeneralPower[] = [
     "id": "mestre_dos_mares",
     "name": "Mestre dos Mares",
     "category": "concedido",
-    "description": "Você pode falar com animais aquáticos (como o efeito da magia Voz Divina) e aprende e pode lançar Acalmar Animal, mas só contra criaturas aquáticas. Caso aprenda novamente essa magia, seu custo diminui em –1 PM. e Olhar Amedrontador Megalokk, Thwor Você aprende e pode lançar Amedrontar. Caso aprenda novamente essa magia, seu custo diminui em –1 PM.",
+    "description": "Você pode falar com animais aquáticos (como o efeito da magia Voz Divina) e aprende e pode lançar Acalmar Animal, mas só contra criaturas aquáticas. Caso aprenda novamente essa magia, seu custo diminui em –1 PM.",
     "deities": [
       "Oceano"
     ],
@@ -1334,7 +1334,7 @@ export const GENERAL_POWERS_LIST: GeneralPower[] = [
     "id": "tropas_duyshidakk",
     "name": "Tropas Duyshidakk",
     "category": "concedido",
-    "description": "Você pode gastar uma ação completa e 2 PM para invocar 1d4+1 goblinoides capangas em espaços desocupados em alcance curto. Você pode gastar uma ação de movimento para fazer os goblinoides andarem (eles têm deslocamento 9m) ou uma ação padrão para fazê-los causar dano a criaturas adjacentes (1d6+1 pontos de dano de corte cada). Os goblinoides têm For 1, Des 1, Defesa 15, 1 PV e falham automaticamente em qualquer teste de resistência ou oposto. Eles desaparecem quando morrem ou no fim da cena. Os goblinoides não agem sem receber uma ordem. Usos criativos para capangas fora de combate ficam a critério do mestre. e Presas Primordiais Kallyadranoch, Megalokk Você pode gastar 1 PM para transformar seus dentes em presas afiadas até o fim da cena. Você recebe uma arma natural de mordida (dano 1d6, crítico x2, perfuração). Uma vez por rodada, quando usa a ação agredir com outra arma, você pode gastar 1 PM para fazer um ataque corpo a corpo extra com a mordida. Se já possuir outro ataque natural de mordida, em vez disso, o dano desse ataque aumenta em dois passos.",
+    "description": "Você pode gastar uma ação completa e 2 PM para invocar 1d4+1 goblinoides capangas em espaços desocupados em alcance curto. Você pode gastar uma ação de movimento para fazer os goblinoides andarem (eles têm deslocamento 9m) ou uma ação padrão para fazê-los causar dano a criaturas adjacentes (1d6+1 pontos de dano de corte cada). Os goblinoides têm For 1, Des 1, Defesa 15, 1 PV e falham automaticamente em qualquer teste de resistência ou oposto. Eles desaparecem quando morrem ou no fim da cena. Os goblinoides não agem sem receber uma ordem. Usos criativos para capangas fora de combate ficam a critério do mestre.",
     "deities": [
       "Thwor"
     ],
@@ -1354,7 +1354,7 @@ export const GENERAL_POWERS_LIST: GeneralPower[] = [
     "id": "centelha_magica",
     "name": "Centelha Mágica",
     "category": "concedido",
-    "description": "Escolha uma magia arcana ou divina de 1º círculo. Você aprende e pode lançar essa magia. Compreender os Ermos Allihanna Você recebe +2 em Sobrevivência e pode usar Sabedoria para Adestramento (em vez de Carisma). Conhecimento Enciclopédico Tanna-Toh Você se torna treinado em duas perícias baseadas em Inteligência a sua escolha.",
+    "description": "Escolha uma magia arcana ou divina de 1º círculo. Você aprende e pode lançar essa magia.",
     "deities": [
       "Wynna"
     ],

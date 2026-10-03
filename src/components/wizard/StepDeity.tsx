@@ -108,7 +108,7 @@ export const StepDeity: React.FC<StepDeityProps> = ({
             }
           />
 
-          <div className="kv card-inset">
+          <div className="kv card-inset" style={{ gridTemplateColumns: 'repeat(2, minmax(min(140px, 100%), 1fr))' }}>
             <div className="kv-item">
               <span className="kv-key">Símbolo</span>
               <span className="kv-value">{deity.symbol}</span>

@@ -1,345 +1,249 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
-  calculateTotalAttributes,
+  calculateArmorPenalty,
+  calculateDefense,
   calculateMaxHp,
   calculateMaxMp,
-  calculateDefense,
-  calculateArmorPenalty,
   calculateMaxSpaces,
   calculateSkillBonus,
-  getAttackConditionPenalty,
-  getAttackOnlyConditionPenalty,
+  calculateSpeed,
+  calculateSpellCircleUnlocked,
+  calculateTotalAttributes,
   calculateWeaponAttack,
   calculateWeaponDamage,
+  getAttackOnlyConditionPenalty,
   recalculateFullCharacterSheet,
+  stepDamage,
+  type RulesInput,
 } from '../rulesEngine';
-import type { CharacterAttributes, CharacterSheet, CharacterInventoryItem } from '../../types/character';
+import { getConditionEffects } from '../conditionEffects';
+import { tormentaCharismaLoss } from '../passiveEffects';
+import type { CharacterInventoryItem, TrainedSkillData } from '../../types/character';
 
-describe('Tormenta 20 JDA (v1.3) — rulesEngine', () => {
-  describe('1. Atributos Básicos (Capítulo 1, pág. 17)', () => {
-    it('o valor do atributo É o próprio modificador direto (sem fórmula de D&D 5e/3.5e)', () => {
-      const base: CharacterAttributes = { for: 3, des: 1, con: 2, int: 0, sab: 0, car: -1 };
-      const racial: CharacterAttributes = { for: 1, des: 0, con: 1, int: 0, sab: 0, car: 0 };
-      const total = calculateTotalAttributes(base, racial);
+const ATTRS = { for: 0, des: 0, con: 0, int: 0, sab: 0, car: 0 };
+const input = (over: Partial<RulesInput> = {}): RulesInput => ({
+  level: 1,
+  classId: 'guerreiro',
+  raceId: 'humano',
+  attributes: { ...ATTRS },
+  inventory: [],
+  powerNames: [],
+  activeConditions: [],
+  ...over,
+});
+const gear = (over: Partial<CharacterInventoryItem>): CharacterInventoryItem => ({
+  id: over.name || 'x',
+  name: 'Item',
+  category: 'item_geral',
+  spaces: 1,
+  quantity: 1,
+  isEquipped: true,
+  ...over,
+});
+const LEATHER = gear({ name: 'Armadura de couro', category: 'armadura_leve', defenseBonus: 2, armorPenalty: 0, spaces: 2 });
+const STUDDED = gear({ name: 'Couro batido', category: 'armadura_leve', defenseBonus: 3, armorPenalty: -1, spaces: 2 });
+const CHAIN = gear({ name: 'Cota de malha', category: 'armadura_pesada', defenseBonus: 6, armorPenalty: -2, spaces: 5 });
+const HEAVY_SHIELD = gear({ name: 'Escudo pesado', category: 'escudo', defenseBonus: 2, armorPenalty: -2, spaces: 2 });
 
-      expect(total.for).toBe(4);
-      expect(total.con).toBe(3);
-      expect(total.des).toBe(1);
-      expect(total.car).toBe(-1);
-    });
+describe('Atributos (Cap. 1, pág. 17)', () => {
+  it('o valor do atributo é o próprio modificador', () => {
+    expect(calculateTotalAttributes({ ...ATTRS, for: 3 }, { ...ATTRS, for: 2 }).for).toBe(5);
   });
-
-  describe('2. Pontos de Vida (PV) e Pontos de Mana (PM) (Capítulo 1, pág. 34)', () => {
-    it('calcula PV corretamente no Nível 1 (Base da classe + CON)', () => {
-      // Guerreiro: hpInitial = 20, hpPerLevel = 5
-      const attrs: CharacterAttributes = { for: 3, des: 1, con: 3, int: 0, sab: 0, car: 0 };
-      const hp = calculateMaxHp(1, attrs, 'guerreiro', 'humano');
-      // Nível 1: 20 (base classe) + 3 (CON) = 23
-      expect(hp.value).toBe(23);
-    });
-
-    it('calcula PV corretamente em níveis superiores com avanço retroativo de CON', () => {
-      // Guerreiro Nível 5 com CON 2:
-      // Nível 1: 20 + 2 = 22
-      // Níveis 2 a 5: 4 * (5 + 2) = 28
-      // Total: 22 + 28 = 50
-      const attrs: CharacterAttributes = { for: 3, des: 1, con: 2, int: 0, sab: 0, car: 0 };
-      const hp = calculateMaxHp(5, attrs, 'guerreiro', 'humano');
-      expect(hp.value).toBe(50);
-    });
-
-    it('calcula PM por nível conforme a progressão da classe', () => {
-      // Arcanista: mpPerLevel = 6
-      const mpLvl1 = calculateMaxMp(1, 'arcanista', 'humano');
-      expect(mpLvl1.value).toBe(6);
-
-      const mpLvl3 = calculateMaxMp(3, 'arcanista', 'humano');
-      expect(mpLvl3.value).toBe(18); // 3 * 6
-    });
-
-    it('aplica bônus racial de PM de Elfo (+1 PM por nível)', () => {
-      // Arcanista Nível 3 Elfo: 3 * 6 + 3 = 21 PM
-      const mpElfo = calculateMaxMp(3, 'arcanista', 'elfo');
-      expect(mpElfo.value).toBe(21);
-    });
-  });
-
-  describe('3. Defesa e Armaduras (Capítulo 5 & Capítulo 3, pág. 226)', () => {
-    it('defesa sem armadura: 10 + DES', () => {
-      const attrs: CharacterAttributes = { for: 0, des: 3, con: 0, int: 0, sab: 0, car: 0 };
-      const defense = calculateDefense(1, attrs, [], 'humano', 'guerreiro');
-      expect(defense.value).toBe(13); // 10 + 3
-    });
-
-    it('armadura leve soma bônus de armadura + Destreza integral', () => {
-      const attrs: CharacterAttributes = { for: 0, des: 2, con: 0, int: 0, sab: 0, car: 0 };
-      const items: CharacterInventoryItem[] = [
-        {
-          id: 'couro_batido',
-          name: 'Couro Batido',
-          category: 'armadura_leve',
-          spaces: 2,
-          quantity: 1,
-          isEquipped: true,
-          defenseBonus: 3,
-          armorPenalty: 1,
-        },
-      ];
-      const defense = calculateDefense(1, attrs, items, 'humano', 'guerreiro');
-      expect(defense.value).toBe(15); // 10 + 2 (DES) + 3 (armadura)
-    });
-
-    it('armadura pesada ANULA bônus de Destreza na Defesa canônica de T20', () => {
-      const attrs: CharacterAttributes = { for: 4, des: 4, con: 2, int: 0, sab: 0, car: 0 };
-      const items: CharacterInventoryItem[] = [
-        {
-          id: 'armadura_completa',
-          name: 'Armadura Completa',
-          category: 'armadura_pesada',
-          spaces: 5,
-          quantity: 1,
-          isEquipped: true,
-          defenseBonus: 10,
-          armorPenalty: 5,
-        },
-      ];
-      // Mesmo com DES 4, a armadura pesada anula o bônus de Destreza
-      const defense = calculateDefense(1, attrs, items, 'humano', 'guerreiro');
-      expect(defense.value).toBe(20); // 10 + 0 (DES anulada) + 10 (armadura)
-    });
-
-    it('escudo acumula com armadura leve e armadura pesada', () => {
-      const attrs: CharacterAttributes = { for: 3, des: 3, con: 2, int: 0, sab: 0, car: 0 };
-      const items: CharacterInventoryItem[] = [
-        {
-          id: 'cota_malha',
-          name: 'Cota de Malha',
-          category: 'armadura_pesada',
-          spaces: 5,
-          quantity: 1,
-          isEquipped: true,
-          defenseBonus: 6,
-          armorPenalty: 2,
-        },
-        {
-          id: 'escudo_pesado',
-          name: 'Escudo Pesado',
-          category: 'escudo',
-          spaces: 2,
-          quantity: 1,
-          isEquipped: true,
-          defenseBonus: 2,
-          armorPenalty: 2,
-        },
-      ];
-      const defense = calculateDefense(1, attrs, items, 'humano', 'guerreiro');
-      expect(defense.value).toBe(18); // 10 + 0 (DES anulada) + 6 + 2
-    });
-  });
-
-  describe('4. Penalidade de Armadura (Capítulo 3, pág. 142)', () => {
-    it('soma a penalidade de armaduras e escudos equipados', () => {
-      const items: CharacterInventoryItem[] = [
-        {
-          id: 'armadura',
-          name: 'Armadura',
-          category: 'armadura_pesada',
-          spaces: 5,
-          quantity: 1,
-          isEquipped: true,
-          defenseBonus: 6,
-          armorPenalty: 3,
-        },
-        {
-          id: 'escudo',
-          name: 'Escudo',
-          category: 'escudo',
-          spaces: 2,
-          quantity: 1,
-          isEquipped: true,
-          defenseBonus: 2,
-          armorPenalty: 1,
-        },
-        {
-          id: 'desequipado',
-          name: 'Outro Escudo',
-          category: 'escudo',
-          spaces: 2,
-          quantity: 1,
-          isEquipped: false,
-          defenseBonus: 1,
-          armorPenalty: 5,
-        },
-      ];
-      const penalty = calculateArmorPenalty(items);
-      expect(penalty.value).toBe(4); // 3 + 1 (o desequipado é ignorado)
-    });
-  });
-
-  describe('5. Capacidade de Carga em Espaços (Capítulo 3, pág. 142)', () => {
-    it('calcula capacidade de carga baseada na Força', () => {
-      const attrsFor3: CharacterAttributes = { for: 3, des: 0, con: 0, int: 0, sab: 0, car: 0 };
-      const spacesFor3 = calculateMaxSpaces(attrsFor3, []);
-      // 10 + 3 * 3 = 19
-      expect(spacesFor3.value).toBe(19);
-
-      const attrsFor0: CharacterAttributes = { for: 0, des: 0, con: 0, int: 0, sab: 0, car: 0 };
-      const spacesFor0 = calculateMaxSpaces(attrsFor0, []);
-      expect(spacesFor0.value).toBe(10); // 10 + 0
-    });
-  });
-
-  describe('6. Testes de Perícia e Resistências (Capítulo 2, pág. 114)', () => {
-    it('perícia destreinada = floor(nível / 2) + Atributo', () => {
-      // Nível 3 (metade = 1), Atributo Luta (FOR = 3), Destreinada (+0)
-      const attrs: CharacterAttributes = { for: 3, des: 0, con: 0, int: 0, sab: 0, car: 0 };
-      const skill = calculateSkillBonus('luta', 3, attrs, false, 0, 'humano');
-      expect(skill.total).toBe(4); // 1 (metade nível) + 3 (FOR)
-    });
-
-    it('perícia treinada nos níveis 1 a 6 recebe bônus de treino +2', () => {
-      // Nível 1 (metade = 0), Atributo Pontaria (DES = 2), Treinada (+2)
-      const attrs: CharacterAttributes = { for: 0, des: 2, con: 0, int: 0, sab: 0, car: 0 };
-      const skill = calculateSkillBonus('pontaria', 1, attrs, true, 0, 'humano');
-      expect(skill.total).toBe(4); // 0 + 2 + 2
-    });
-
-    it('perícia treinada nos níveis 7 a 14 recebe bônus de treino +4', () => {
-      // Nível 7 (metade = 3), Atributo Vontade (SAB = 3), Treinada (+4)
-      const attrs: CharacterAttributes = { for: 0, des: 0, con: 0, int: 0, sab: 3, car: 0 };
-      const skill = calculateSkillBonus('vontade', 7, attrs, true, 0, 'humano');
-      expect(skill.total).toBe(10); // 3 + 3 + 4
-    });
-
-    it('perícia treinada nos níveis 15 a 20 recebe bônus de treino +6', () => {
-      // Nível 20 (metade = 10), Atributo Fortitude (CON = 5), Treinada (+6)
-      const attrs: CharacterAttributes = { for: 0, des: 0, con: 5, int: 0, sab: 0, car: 0 };
-      const skill = calculateSkillBonus('fortitude', 20, attrs, true, 0, 'humano');
-      expect(skill.total).toBe(21); // 10 + 5 + 6
-    });
-
-    it('aplica penalidade de armadura em perícias afetadas (Acrobacia, Furtividade, Ladinagem)', () => {
-      // Nível 1, DES 3, Treinada (+2), Penalidade de armadura -3
-      const attrs: CharacterAttributes = { for: 0, des: 3, con: 0, int: 0, sab: 0, car: 0 };
-      const skill = calculateSkillBonus('acrobacia', 1, attrs, true, -3, 'humano');
-      expect(skill.total).toBe(2); // 0 + 3 + 2 - 3 = 2
-    });
-  });
-
-  describe('7. Condições Ativas e Penalidades de Ataque (Apêndice: Condições, pág. 394)', () => {
-    it('aplica penalidades de condições cumulativas para ataque corpo a corpo', () => {
-      // Abalado (-2) e Caído (-5 para corpo a corpo)
-      const { penalty, reasons } = getAttackConditionPenalty(['abalado', 'caido'], true);
-      expect(penalty).toBe(-7);
-      expect(reasons).toContain('Abalado (-2)');
-      expect(reasons).toContain('Caído (-5 corpo a corpo)');
-    });
-  });
-
-  describe('8. Recálculo Completo da Ficha (recalculateFullCharacterSheet)', () => {
-    it('recalcula de forma coerente e consistente todos os atributos, defesas e perícias', () => {
-      const mockCharacter: CharacterSheet = {
-        id: 'test_char',
-        name: 'Valeros',
-        playerName: 'Lucas',
-        level: 1,
-        xp: 0,
-        classId: 'guerreiro',
-        raceId: 'humano',
-        originId: 'soldado',
-        selectedClassSkills: ['luta', 'fortitude'],
-        selectedIntSkills: ['iniciativa'],
-        selectedOriginBenefits: [],
-        deityId: 'valkaria',
-        selectedDeityPowers: [],
-        attributeMethod: 'point_buy',
-        baseAttributes: { for: 3, des: 2, con: 2, int: 1, sab: 0, car: -1 },
-        racialModifiers: { for: 1, des: 0, con: 1, int: 0, sab: 0, car: 0 },
-        totalAttributes: { for: 4, des: 2, con: 3, int: 1, sab: 0, car: -1 },
-        stats: {
-          currentHp: 23,
-          maxHp: { value: 23, formula: '20 + 3', components: [] },
-          currentMp: 3,
-          maxMp: { value: 3, formula: '3', components: [] },
-          tempHp: 0,
-          tempMp: 0,
-          defense: { value: 12, formula: '10 + 2', components: [] },
-          armorPenalty: { value: 0, formula: '0', components: [] },
-          speed: { value: 9, formula: '9m', components: [] },
-          currentSpaces: 0,
-          maxSpaces: { value: 22, formula: '10 + 4×3', components: [] },
-        },
-        skills: {},
-        inventory: [],
-        spells: [],
-        powers: [],
-        activeConditions: [],
-        bio: {},
-        notes: [],
-        tibares: 100,
-        createdAt: '2026-10-02',
-        updatedAt: '2026-10-02',
-      };
-
-      const updated = recalculateFullCharacterSheet(mockCharacter);
-      expect(updated.totalAttributes.for).toBe(4);
-      expect(updated.totalAttributes.con).toBe(3);
-      expect(updated.stats.maxHp.value).toBe(23); // 20 + 3
-      expect(updated.stats.defense.value).toBe(12); // 10 + 2
-      expect(updated.skills['luta']).toBeDefined();
-    });
+  it('poderes da Tormenta: –1 Car pelo primeiro e –1 a cada dois outros (Cap. 2, pág. 136)', () => {
+    expect(tormentaCharismaLoss(input({ powerNames: ['Antenas'] }))).toBe(1);
+    expect(tormentaCharismaLoss(input({ powerNames: ['Antenas', 'Carapaça'] }))).toBe(1);
+    expect(tormentaCharismaLoss(input({ powerNames: ['Antenas', 'Carapaça', 'Dentes Afiados'] }))).toBe(2);
+    expect(tormentaCharismaLoss(input({ raceId: 'lefou', powerNames: ['Antenas'] }), 'Antenas')).toBe(0);
   });
 });
 
-describe('Tormenta 20 JDA (v1.3) — ataque e dano com armas (Cap. 5, pág. 230)', () => {
+describe('PV e PM (Cap. 1, classes)', () => {
+  it('Guerreiro: 20 + Con no 1º nível e 5 + Con por nível (pág. 65)', () => {
+    expect(calculateMaxHp(input({ attributes: { ...ATTRS, con: 2 } })).value).toBe(22);
+    expect(calculateMaxHp(input({ level: 5, attributes: { ...ATTRS, con: 2 } })).value).toBe(22 + 4 * 7);
+  });
+  it('Anão: +3 PV no 1º nível e +1 por nível seguinte (pág. 20)', () => {
+    expect(calculateMaxHp(input({ raceId: 'anao', level: 3 })).value).toBe(20 + 2 * 5 + 3 + 2);
+  });
+  it('Arcanista soma o atributo-chave do Caminho nos PM (pág. 37)', () => {
+    expect(calculateMaxMp(input({ classId: 'arcanista', classSubclass: 'mago', attributes: { ...ATTRS, int: 4 } })).value).toBe(6 + 4);
+    expect(calculateMaxMp(input({ classId: 'arcanista', classSubclass: 'feiticeiro', attributes: { ...ATTRS, car: 3, int: 4 } })).value).toBe(6 + 3);
+  });
+  it('Clérigo soma Sabedoria; Bardo soma Carisma; Paladino soma Carisma (págs. 57, 44, 82)', () => {
+    expect(calculateMaxMp(input({ classId: 'clerigo', attributes: { ...ATTRS, sab: 3 } })).value).toBe(5 + 3);
+    expect(calculateMaxMp(input({ classId: 'bardo', attributes: { ...ATTRS, car: 2 } })).value).toBe(4 + 2);
+    expect(calculateMaxMp(input({ classId: 'paladino', attributes: { ...ATTRS, car: 2 } })).value).toBe(3 + 2);
+  });
+  it('Elfo +1 PM por nível; Bênção do Mana +1 PM a cada nível ímpar (págs. 22 e 132)', () => {
+    expect(calculateMaxMp(input({ raceId: 'elfo', level: 3 })).value).toBe(9 + 3);
+    expect(calculateMaxMp(input({ level: 3, powerNames: ['Bênção do Mana'] })).value).toBe(9 + 2);
+  });
+});
+
+describe('Defesa (Cap. 1, pág. 106; Cap. 3, pág. 152)', () => {
+  it('10 + Destreza + armadura + escudo', () => {
+    expect(calculateDefense(input({ attributes: { ...ATTRS, des: 3 }, inventory: [LEATHER, HEAVY_SHIELD] })).value).toBe(10 + 3 + 2 + 2);
+  });
+  it('armadura pesada não aplica Destreza', () => {
+    expect(calculateDefense(input({ attributes: { ...ATTRS, des: 3 }, inventory: [CHAIN] })).value).toBe(16);
+  });
+  it('tamanho NÃO altera a Defesa (Tabela 1-21, pág. 107)', () => {
+    expect(calculateDefense(input({ raceId: 'goblin' })).value).toBe(10);
+    expect(calculateDefense(input({ raceId: 'silfide' })).value).toBe(10);
+  });
+  it('Nobre usa Carisma EM VEZ de Destreza (Autoconfiança, pág. 79)', () => {
+    expect(calculateDefense(input({ classId: 'nobre', attributes: { ...ATTRS, des: 1, car: 4 } })).value).toBe(14);
+  });
+  it('Minotauro +1, Golem +2, Trog +1 (págs. 25, 27, 31)', () => {
+    expect(calculateDefense(input({ raceId: 'minotauro' })).value).toBe(11);
+    expect(calculateDefense(input({ raceId: 'golem' })).value).toBe(12);
+    expect(calculateDefense(input({ raceId: 'trog' })).value).toBe(11);
+  });
+  it('Estilo de Arma e Escudo +2 e Carapaça +1 (+1 a cada dois outros poderes da Tormenta)', () => {
+    expect(calculateDefense(input({ inventory: [HEAVY_SHIELD], powerNames: ['Estilo de Arma e Escudo'] })).value).toBe(14);
+    expect(calculateDefense(input({ powerNames: ['Carapaça'] })).value).toBe(11);
+    expect(calculateDefense(input({ powerNames: ['Carapaça', 'Antenas', 'Dentes Afiados'] })).value).toBe(12);
+  });
+  it('condições com o mesmo efeito não acumulam: desprevenido + vulnerável = –5 (Apêndice, pág. 394)', () => {
+    expect(calculateDefense(input({ activeConditions: ['desprevenido', 'vulneravel'] })).value).toBe(5);
+    expect(calculateDefense(input({ activeConditions: ['imovel'] })).value).toBe(10);
+    expect(calculateDefense(input({ activeConditions: ['exausto'] })).value).toBe(8); // exausto ⇒ vulnerável
+  });
+});
+
+describe('Carga, sobrecarga e deslocamento (Cap. 3, pág. 141)', () => {
+  it('10 espaços + 2 por ponto de Força, –1 por ponto negativo; mochila não dá espaço', () => {
+    expect(calculateMaxSpaces(input({ attributes: { ...ATTRS, for: 2 } })).value).toBe(14);
+    expect(calculateMaxSpaces(input({ attributes: { ...ATTRS, for: -2 } })).value).toBe(8);
+    expect(calculateMaxSpaces(input({ inventory: [gear({ name: 'Mochila', equipmentId: 'mochila', spaces: 0 })] })).value).toBe(10);
+  });
+  it('sobrecarregado: penalidade de armadura –5 e deslocamento –3m', () => {
+    const heavyLoad = input({ inventory: [gear({ name: 'Baú', spaces: 11, isEquipped: false })] });
+    expect(calculateArmorPenalty(heavyLoad).value).toBe(-5);
+    expect(calculateSpeed(heavyLoad).value).toBe(6);
+  });
+  it('anão e golem não perdem deslocamento por armadura nem carga', () => {
+    expect(calculateSpeed(input({ raceId: 'anao', inventory: [CHAIN] })).value).toBe(6);
+    expect(calculateSpeed(input({ raceId: 'golem', inventory: [CHAIN] })).value).toBe(6);
+    expect(calculateSpeed(input({ inventory: [CHAIN] })).value).toBe(6);
+  });
+  it('Atlético +3m; lento divide por dois em incrementos de 1,5m', () => {
+    expect(calculateSpeed(input({ powerNames: ['Atlético'] })).value).toBe(12);
+    expect(calculateSpeed(input({ activeConditions: ['lento'] })).value).toBe(4.5);
+  });
+});
+
+describe('Perícias (Cap. 2, págs. 114–115)', () => {
+  it('metade do nível + atributo + treino (+2, +4 no 7º, +6 no 15º)', () => {
+    expect(calculateSkillBonus('luta', false, input({ level: 3, attributes: { ...ATTRS, for: 2 } })).total).toBe(3);
+    expect(calculateSkillBonus('vontade', true, input({ level: 7, attributes: { ...ATTRS, sab: 2 } })).total).toBe(9);
+    expect(calculateSkillBonus('fortitude', true, input({ level: 20, attributes: { ...ATTRS, con: 4 } })).total).toBe(20);
+  });
+  it('penalidade de armadura só em Acrobacia, Furtividade e Ladinagem (não Pilotagem)', () => {
+    const i = input({ inventory: [STUDDED] });
+    expect(calculateSkillBonus('furtividade', false, i).total).toBe(-1);
+    expect(calculateSkillBonus('pilotagem', false, i).total).toBe(0);
+    expect(calculateSkillBonus('atletismo', false, i).total).toBe(0);
+  });
+  it('sem proficiência: penalidade em todas as perícias de For e Des (pág. 152)', () => {
+    const i = input({ classId: 'arcanista', inventory: [CHAIN] });
+    expect(calculateSkillBonus('luta', false, i).total).toBe(-2);
+  });
+  it('tamanho: Pequeno +2 e Minúsculo +5 em Furtividade (Tabela 1-21)', () => {
+    expect(calculateSkillBonus('furtividade', false, input({ raceId: 'goblin' })).total).toBe(2);
+    expect(calculateSkillBonus('furtividade', false, input({ raceId: 'silfide' })).total).toBe(5);
+  });
+  it('Hynne usa Destreza em Atletismo; Elfo +2 em Misticismo e Percepção', () => {
+    expect(calculateSkillBonus('atletismo', false, input({ raceId: 'hynne', attributes: { ...ATTRS, for: -1, des: 3 } })).total).toBe(3);
+    expect(calculateSkillBonus('misticismo', false, input({ raceId: 'elfo' })).total).toBe(2);
+  });
+  it('cego (–5 For/Des) e fraco (–2) não acumulam; vale o mais severo', () => {
+    expect(calculateSkillBonus('luta', false, input({ activeConditions: ['cego', 'fraco'] })).total).toBe(-5);
+  });
+});
+
+describe('Condições (Apêndice, págs. 394–395)', () => {
+  it('exausto implica debilitado, lento e vulnerável; agarrado implica desprevenido e imóvel', () => {
+    const e = getConditionEffects(['exausto']);
+    expect(['debilitado', 'lento', 'vulneravel'].every((c) => e.set.has(c))).toBe(true);
+    expect(getConditionEffects(['agarrado']).speedZero).toBe(true);
+  });
+  it('penalidades exclusivas de ataque não acumulam', () => {
+    expect(getAttackOnlyConditionPenalty(['enredado', 'agarrado', 'ofuscado']).penalty).toBe(-2);
+    expect(getAttackOnlyConditionPenalty(['enredado', 'caido'], true).penalty).toBe(-5);
+    expect(getAttackOnlyConditionPenalty(['abalado'], true).penalty).toBe(0);
+  });
+});
+
+describe('Magias (Cap. 1 e Cap. 4)', () => {
+  it('Arcanista: 2º círculo no 5º nível; Bardo/Druida: 2º no 6º, máximo 4º', () => {
+    expect(calculateSpellCircleUnlocked(5, 'arcanista')).toBe(2);
+    expect(calculateSpellCircleUnlocked(5, 'bardo')).toBe(1);
+    expect(calculateSpellCircleUnlocked(6, 'druida')).toBe(2);
+    expect(calculateSpellCircleUnlocked(20, 'bardo')).toBe(4);
+  });
+});
+
+describe('Ataque e dano (Cap. 3, págs. 142–148)', () => {
   const skills = {
     luta: { id: 'luta', name: 'Luta', attribute: 'for', isTrained: true, total: 5, breakdown: { value: 5, formula: '', components: [] }, source: 'classe' },
     pontaria: { id: 'pontaria', name: 'Pontaria', attribute: 'des', isTrained: false, total: 1, breakdown: { value: 1, formula: '', components: [] }, source: 'custom' },
-  } as any;
+  } as unknown as Record<string, TrainedSkillData>;
   const attrs = { for: 3, des: 1, con: 2, int: 0, sab: 0, car: 0 };
 
-  it('ataque corpo a corpo usa Luta + bônus da arma (Certeira +1)', () => {
+  it('corpo a corpo: Luta + bônus da arma (Certeira +1)', () => {
     const atk = calculateWeaponAttack({ skills, activeConditions: [] }, { name: 'Espada longa', subcategory: 'uma_mao', attackBonus: 1 });
     expect(atk.value).toBe(6);
     expect(atk.isMelee).toBe(true);
   });
-
-  it('não reaplica Abalado (já descontado na perícia), mas aplica Caído no corpo a corpo', () => {
-    const atk = calculateWeaponAttack({ skills, activeConditions: ['abalado', 'caido'] }, { name: 'Espada longa', subcategory: 'uma_mao' });
-    expect(atk.value).toBe(0); // Luta 5 (já com Abalado) − 5 (Caído)
-    expect(getAttackOnlyConditionPenalty(['abalado'], true).penalty).toBe(0);
+  it('sem proficiência: –5 no ataque; anão trata martelos como simples e recebe +2', () => {
+    const base = { skills, activeConditions: [], classId: 'arcanista', level: 1, totalAttributes: attrs, inventory: [], powers: [] };
+    expect(calculateWeaponAttack({ ...base, raceId: 'humano' }, { name: 'Espada longa', subcategory: 'uma_mao', category: 'arma_marcial' }).value).toBe(0);
+    expect(calculateWeaponAttack({ ...base, raceId: 'anao' }, { name: 'Martelo de guerra', subcategory: 'uma_mao', category: 'arma_marcial' }).value).toBe(7);
   });
-
-  it('ataque à distância usa Pontaria e ignora Caído', () => {
+  it('não reaplica Abalado (já na perícia), mas aplica Caído no corpo a corpo', () => {
+    expect(calculateWeaponAttack({ skills, activeConditions: ['abalado', 'caido'] }, { name: 'Espada longa', subcategory: 'uma_mao' }).value).toBe(0);
+  });
+  it('à distância usa Pontaria e ignora Caído', () => {
     const atk = calculateWeaponAttack({ skills, activeConditions: ['caido'] }, { name: 'Arco curto', subcategory: 'distancia' });
     expect(atk.value).toBe(1);
     expect(atk.isMelee).toBe(false);
   });
-
-  it('dano corpo a corpo soma Força: espada longa 1d8 com Força 3 = 1d8+3', () => {
-    const dmg = calculateWeaponDamage({ totalAttributes: attrs }, { damage: '1d8', subcategory: 'uma_mao' });
-    expect(dmg).toMatchObject({ count: 1, sides: 8, modifier: 3, formula: '1d8+3', addsStrength: true });
+  it('dano corpo a corpo soma Força: 1d8 com Força 3 = 1d8+3', () => {
+    expect(calculateWeaponDamage({ totalAttributes: attrs }, { damage: '1d8', subcategory: 'uma_mao' })).toMatchObject({ formula: '1d8+3', addsStrength: true });
   });
-
-  it('dano de arma de disparo NÃO soma Força', () => {
-    const dmg = calculateWeaponDamage(
-      { totalAttributes: attrs },
-      { damage: '1d8', subcategory: 'distancia', description: 'Besta leve com mecanismo de disparo.' }
-    );
-    expect(dmg?.formula).toBe('1d8');
-    expect(dmg?.addsStrength).toBe(false);
+  it('disparo não soma Força, exceto arco longo e funda (págs. 146 e 148)', () => {
+    expect(calculateWeaponDamage({ totalAttributes: attrs }, { name: 'Besta leve', damage: '1d8', subcategory: 'distancia' })?.formula).toBe('1d8');
+    expect(calculateWeaponDamage({ totalAttributes: attrs }, { name: 'Arco longo', damage: '1d8', subcategory: 'distancia' })?.formula).toBe('1d8+3');
+    expect(calculateWeaponDamage({ totalAttributes: attrs }, { name: 'Funda', damage: '1d4', subcategory: 'distancia' })?.formula).toBe('1d4+3');
   });
-
-  it('arma de arremesso soma Força e melhorias de dano (Cruel +1) entram no modificador', () => {
-    const dmg = calculateWeaponDamage(
-      { totalAttributes: attrs },
-      { damage: '1d6 + 1', subcategory: 'distancia', description: 'Lança feita para arremesso.' }
-    );
-    expect(dmg?.modifier).toBe(4);
-    expect(dmg?.formula).toBe('1d6+4');
+  it('arremesso soma Força e melhorias de dano', () => {
+    expect(calculateWeaponDamage({ totalAttributes: attrs }, { name: 'Azagaia', damage: '1d6 + 1', subcategory: 'distancia' })?.formula).toBe('1d6+4');
   });
-
+  it('Hynne (Arremessador): +1 passo de dano com funda (Tabela 3-2)', () => {
+    expect(stepDamage('1d4', 1)).toBe('1d6');
+    expect(calculateWeaponDamage({ totalAttributes: attrs, raceId: 'hynne' }, { name: 'Funda', damage: '1d4', subcategory: 'distancia' })?.formula).toBe('1d6+3');
+  });
   it('armas sem dano (rede) retornam null', () => {
     expect(calculateWeaponDamage({ totalAttributes: attrs }, { damage: '-', subcategory: 'distancia' })).toBeNull();
+  });
+});
+
+describe('Recálculo completo', () => {
+  it('recalcula PV, PM, Defesa e perícias de forma coerente', () => {
+    const sheet = recalculateFullCharacterSheet({
+      level: 1,
+      classId: 'guerreiro',
+      raceId: 'anao',
+      totalAttributes: { for: 3, des: -1, con: 5, int: 0, sab: 2, car: -1 },
+      inventory: [CHAIN],
+      powers: [],
+      skills: { luta: { isTrained: true } },
+      stats: {},
+    });
+    expect(sheet.stats.maxHp.value).toBe(20 + 5 + 3);
+    expect(sheet.stats.defense.value).toBe(16);
+    expect(sheet.stats.speed.value).toBe(6);
+    expect(sheet.skills.luta.total).toBe(5);
   });
 });

@@ -103,7 +103,7 @@ for o in app:
                                'description': 'Um poder da Tormenta a sua escolha (Cap. 2).'})
             elif pl in gp:
                 g = gp[pl]
-                bt = book_gp_l.get(pl, {}).get('text') or g['description']
+                bt = g['description']  # texto já extraído do livro em generalPowers.ts
                 powers.append({'name': g['name'], 'type': g['category'], 'description': clean(bt)})
             else:
                 unique_names.append(p)

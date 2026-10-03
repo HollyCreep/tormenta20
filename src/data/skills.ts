@@ -190,7 +190,7 @@ export const SKILLS_LIST: Skill[] = [
     name: 'Pilotagem',
     attribute: 'des',
     trainedOnly: true,
-    armorPenalty: true,
+    armorPenalty: false, // Tabela 2-1 (Cap. 2, pág. 115): Pilotagem não sofre penalidade de armadura
     description: 'Você sabe conduzir veículos não-vivos complexos, como carroças, carruagens de corrida, barcos a remo, veleiros, galeões de guerra e engenhos voadores.',
   },
   {

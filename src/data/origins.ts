@@ -23,7 +23,7 @@ export const ORIGINS_LIST: Origin[] = [
       {
         "name": "Medicina",
         "type": "destino",
-        "description": "Você pode gastar uma ação completa para fazer um teste de Cura (CD 15) em uma criatura. Se você passar, ela recupera 1d6 PV, mais 1d6 para cada 5 pontos pelos quais o resultado do teste exceder a CD (2d6 com um resultado 20, 3d6 com um resultado 25 e assim por diante). Você só pode usar este poder uma vez por dia numa mesma criatura. Pré-requisitos: Sab 1, treinado em Cura."
+        "description": "Você pode gastar uma ação completa para fazer um teste de Cura (CD 15) em uma criatura. Se você passar, ela recupera 1d6 PV, mais 1d6 para cada 5 pontos pelos quais o resultado do teste exceder a CD (2d6 com um resultado 20, 3d6 com um resultado 25 e assim por diante). Você só pode usar este poder uma vez por dia numa mesma criatura."
       },
       {
         "name": "Membro da Igreja",
@@ -33,7 +33,7 @@ export const ORIGINS_LIST: Origin[] = [
       {
         "name": "Vontade de Ferro",
         "type": "destino",
-        "description": "Você recebe +1 PM para cada dois níveis de personagem e +2 em Vontade. Pré-requisito: Sab 1. Poderes de Magia Todos os poderes deste grupo possuem como pré-requisito lançar magias."
+        "description": "Você recebe +1 PM para cada dois níveis de personagem e +2 em Vontade."
       }
     ]
   },
@@ -90,7 +90,7 @@ export const ORIGINS_LIST: Origin[] = [
       {
         "name": "Comandar",
         "type": "destino",
-        "description": "Você pode gastar uma ação de movimento e 1 PM para gritar ordens para seus aliados em alcance médio. Eles recebem +1 em testes de perícia até o fim da cena. Pré-requisito: Car 1."
+        "description": "Você pode gastar uma ação de movimento e 1 PM para gritar ordens para seus aliados em alcance médio. Eles recebem +1 em testes de perícia até o fim da cena."
       },
       {
         "name": "Sangue Azul",
@@ -139,7 +139,7 @@ export const ORIGINS_LIST: Origin[] = [
       {
         "name": "Atraente",
         "type": "destino",
-        "description": "Você recebe +2 em testes de perícias baseadas em Carisma contra criaturas que possam se sentir fisicamente atraídas por você. Pré-requisito: Car 1."
+        "description": "Você recebe +2 em testes de perícias baseadas em Carisma contra criaturas que possam se sentir fisicamente atraídas por você."
       },
       {
         "name": "Dom Artístico",
@@ -154,7 +154,7 @@ export const ORIGINS_LIST: Origin[] = [
       {
         "name": "Torcida",
         "type": "destino",
-        "description": "Você recebe +2 em testes de perícia e Defesa quando tem a torcida a seu favor. Entenda-se por “torcida” qualquer número de criaturas inteligentes em alcance médio que não esteja realizando nenhuma ação além de torcer por você. Pré-requisito: Car 1."
+        "description": "Você recebe +2 em testes de perícia e Defesa quando tem a torcida a seu favor. Entenda-se por “torcida” qualquer número de criaturas inteligentes em alcance médio que não esteja realizando nenhuma ação além de torcer por você."
       }
     ]
   },
@@ -178,7 +178,7 @@ export const ORIGINS_LIST: Origin[] = [
       {
         "name": "Venefício",
         "type": "destino",
-        "description": "Quando usa um veneno, você não corre risco de se envenenar acidentalmente. Além disso, a CD para resistir aos seus venenos aumenta em +2. Pré-requisito: treinado em Ofício (alquimista)."
+        "description": "Quando usa um veneno, você não corre risco de se envenenar acidentalmente. Além disso, a CD para resistir aos seus venenos aumenta em +2."
       },
       {
         "name": "Poder da Tormenta",
@@ -210,12 +210,12 @@ export const ORIGINS_LIST: Origin[] = [
       {
         "name": "Estilo de Disparo",
         "type": "combate",
-        "description": "Se estiver usando uma arma de disparo, você soma sua Destreza nas rolagens de dano. Pré-requisito: treinado em Pontaria."
+        "description": "Se estiver usando uma arma de disparo, você soma sua Destreza nas rolagens de dano."
       },
       {
         "name": "Sentidos Aguçados",
         "type": "destino",
-        "description": "Você recebe +2 em Percepção, não fica desprevenido contra inimigos que não possa perceber e, sempre que erra um ataque devido a camuflagem, pode rolar mais uma vez o dado da chance de falha. Pré-requisitos: Sab 1, treinado em Percepção."
+        "description": "Você recebe +2 em Percepção, não fica desprevenido contra inimigos que não possa perceber e, sempre que erra um ataque devido a camuflagem, pode rolar mais uma vez o dado da chance de falha."
       }
     ]
   },
@@ -265,7 +265,7 @@ export const ORIGINS_LIST: Origin[] = [
       {
         "name": "Aparência Inofensiva",
         "type": "destino",
-        "description": "A primeira criatura inteligente (Int –3 ou maior) que atacar você em uma cena deve fazer um teste de Vontade (CD Car). Se falhar, perderá sua ação. Este poder só funciona uma vez por cena; independentemente de a criatura falhar ou não no teste, poderá atacá-lo nas rodadas seguintes. Pré-requisito: Car 1."
+        "description": "A primeira criatura inteligente (Int –3 ou maior) que atacar você em uma cena deve fazer um teste de Vontade (CD Car). Se falhar, perderá sua ação. Este poder só funciona uma vez por cena; independentemente de a criatura falhar ou não no teste, poderá atacá-lo nas rodadas seguintes."
       },
       {
         "name": "Sortudo",
@@ -290,12 +290,12 @@ export const ORIGINS_LIST: Origin[] = [
       {
         "name": "Acrobático",
         "type": "destino",
-        "description": "Você pode usar sua Destreza em vez de Força em testes de Atletismo. Além disso, terreno difícil não reduz seu deslocamento nem o impede de realizar investidas. Pré-requisito: Des 2."
+        "description": "Você pode usar sua Destreza em vez de Força em testes de Atletismo. Além disso, terreno difícil não reduz seu deslocamento nem o impede de realizar investidas."
       },
       {
         "name": "Torcida",
         "type": "destino",
-        "description": "Você recebe +2 em testes de perícia e Defesa quando tem a torcida a seu favor. Entenda-se por “torcida” qualquer número de criaturas inteligentes em alcance médio que não esteja realizando nenhuma ação além de torcer por você. Pré-requisito: Car 1."
+        "description": "Você recebe +2 em testes de perícia e Defesa quando tem a torcida a seu favor. Entenda-se por “torcida” qualquer número de criaturas inteligentes em alcance médio que não esteja realizando nenhuma ação além de torcer por você."
       },
       {
         "name": "Truque de Mágica",
@@ -325,7 +325,7 @@ export const ORIGINS_LIST: Origin[] = [
       {
         "name": "Venefício",
         "type": "destino",
-        "description": "Quando usa um veneno, você não corre risco de se envenenar acidentalmente. Além disso, a CD para resistir aos seus venenos aumenta em +2. Pré-requisito: treinado em Ofício (alquimista)."
+        "description": "Quando usa um veneno, você não corre risco de se envenenar acidentalmente. Além disso, a CD para resistir aos seus venenos aumenta em +2."
       }
     ]
   },
@@ -345,7 +345,7 @@ export const ORIGINS_LIST: Origin[] = [
       {
         "name": "Medicina",
         "type": "destino",
-        "description": "Você pode gastar uma ação completa para fazer um teste de Cura (CD 15) em uma criatura. Se você passar, ela recupera 1d6 PV, mais 1d6 para cada 5 pontos pelos quais o resultado do teste exceder a CD (2d6 com um resultado 20, 3d6 com um resultado 25 e assim por diante). Você só pode usar este poder uma vez por dia numa mesma criatura. Pré-requisitos: Sab 1, treinado em Cura."
+        "description": "Você pode gastar uma ação completa para fazer um teste de Cura (CD 15) em uma criatura. Se você passar, ela recupera 1d6 PV, mais 1d6 para cada 5 pontos pelos quais o resultado do teste exceder a CD (2d6 com um resultado 20, 3d6 com um resultado 25 e assim por diante). Você só pode usar este poder uma vez por dia numa mesma criatura."
       },
       {
         "name": "Médico de Campo",
@@ -355,7 +355,7 @@ export const ORIGINS_LIST: Origin[] = [
       {
         "name": "Venefício",
         "type": "destino",
-        "description": "Quando usa um veneno, você não corre risco de se envenenar acidentalmente. Além disso, a CD para resistir aos seus venenos aumenta em +2. Pré-requisito: treinado em Ofício (alquimista)."
+        "description": "Quando usa um veneno, você não corre risco de se envenenar acidentalmente. Além disso, a CD para resistir aos seus venenos aumenta em +2."
       }
     ]
   },
@@ -407,7 +407,7 @@ export const ORIGINS_LIST: Origin[] = [
       {
         "name": "Vitalidade",
         "type": "combate",
-        "description": "Você recebe +1 PV por nível de personagem e +2 em Fortitude. Pré-requisito: Con 1. Poderes de Destino"
+        "description": "Você recebe +1 PV por nível de personagem e +2 em Fortitude."
       }
     ]
   },
@@ -427,7 +427,7 @@ export const ORIGINS_LIST: Origin[] = [
       {
         "name": "Aparência Inofensiva",
         "type": "destino",
-        "description": "A primeira criatura inteligente (Int –3 ou maior) que atacar você em uma cena deve fazer um teste de Vontade (CD Car). Se falhar, perderá sua ação. Este poder só funciona uma vez por cena; independentemente de a criatura falhar ou não no teste, poderá atacá-lo nas rodadas seguintes. Pré-requisito: Car 1."
+        "description": "A primeira criatura inteligente (Int –3 ou maior) que atacar você em uma cena deve fazer um teste de Vontade (CD Car). Se falhar, perderá sua ação. Este poder só funciona uma vez por cena; independentemente de a criatura falhar ou não no teste, poderá atacá-lo nas rodadas seguintes."
       },
       {
         "name": "Palpite Fundamentado",
@@ -461,7 +461,7 @@ export const ORIGINS_LIST: Origin[] = [
       {
         "name": "Ginete",
         "type": "combate",
-        "description": "Você passa automaticamente em testes de Cavalgar para não cair da montaria quando sofre dano. Além disso, não sofre penalidades para atacar à distância ou lançar magias quando montado. Pré-requisito: treinado em Cavalgar."
+        "description": "Você passa automaticamente em testes de Cavalgar para não cair da montaria quando sofre dano. Além disso, não sofre penalidades para atacar à distância ou lançar magias quando montado."
       }
     ]
   },
@@ -508,7 +508,7 @@ export const ORIGINS_LIST: Origin[] = [
       {
         "name": "Atraente",
         "type": "destino",
-        "description": "Você recebe +2 em testes de perícias baseadas em Carisma contra criaturas que possam se sentir fisicamente atraídas por você. Pré-requisito: Car 1."
+        "description": "Você recebe +2 em testes de perícias baseadas em Carisma contra criaturas que possam se sentir fisicamente atraídas por você."
       },
       {
         "name": "Pão e Circo",
@@ -518,7 +518,7 @@ export const ORIGINS_LIST: Origin[] = [
       {
         "name": "Torcida",
         "type": "destino",
-        "description": "Você recebe +2 em testes de perícia e Defesa quando tem a torcida a seu favor. Entenda-se por “torcida” qualquer número de criaturas inteligentes em alcance médio que não esteja realizando nenhuma ação além de torcer por você. Pré-requisito: Car 1."
+        "description": "Você recebe +2 em testes de perícia e Defesa quando tem a torcida a seu favor. Entenda-se por “torcida” qualquer número de criaturas inteligentes em alcance médio que não esteja realizando nenhuma ação além de torcer por você."
       },
       {
         "name": "Poder de Combate",
@@ -550,7 +550,7 @@ export const ORIGINS_LIST: Origin[] = [
       {
         "name": "Investigador",
         "type": "destino",
-        "description": "Você recebe +2 em Investigação e soma sua Inteligência em Intuição. Pré-requisito: Int 1."
+        "description": "Você recebe +2 em Investigação e soma sua Inteligência em Intuição."
       },
       {
         "name": "Poder de Combate",
@@ -575,7 +575,7 @@ export const ORIGINS_LIST: Origin[] = [
       {
         "name": "Comandar",
         "type": "destino",
-        "description": "Você pode gastar uma ação de movimento e 1 PM para gritar ordens para seus aliados em alcance médio. Eles recebem +1 em testes de perícia até o fim da cena. Pré-requisito: Car 1."
+        "description": "Você pode gastar uma ação de movimento e 1 PM para gritar ordens para seus aliados em alcance médio. Eles recebem +1 em testes de perícia até o fim da cena."
       },
       {
         "name": "Herança",
@@ -615,7 +615,7 @@ export const ORIGINS_LIST: Origin[] = [
       {
         "name": "Torcida",
         "type": "destino",
-        "description": "Você recebe +2 em testes de perícia e Defesa quando tem a torcida a seu favor. Entenda-se por “torcida” qualquer número de criaturas inteligentes em alcance médio que não esteja realizando nenhuma ação além de torcer por você. Pré-requisito: Car 1."
+        "description": "Você recebe +2 em testes de perícia e Defesa quando tem a torcida a seu favor. Entenda-se por “torcida” qualquer número de criaturas inteligentes em alcance médio que não esteja realizando nenhuma ação além de torcer por você."
       }
     ]
   },
@@ -636,7 +636,7 @@ export const ORIGINS_LIST: Origin[] = [
       {
         "name": "Acrobático",
         "type": "destino",
-        "description": "Você pode usar sua Destreza em vez de Força em testes de Atletismo. Além disso, terreno difícil não reduz seu deslocamento nem o impede de realizar investidas. Pré-requisito: Des 2."
+        "description": "Você pode usar sua Destreza em vez de Força em testes de Atletismo. Além disso, terreno difícil não reduz seu deslocamento nem o impede de realizar investidas."
       },
       {
         "name": "Passagem de Navio",
@@ -669,7 +669,7 @@ export const ORIGINS_LIST: Origin[] = [
       {
         "name": "Sentidos Aguçados",
         "type": "destino",
-        "description": "Você recebe +2 em Percepção, não fica desprevenido contra inimigos que não possa perceber e, sempre que erra um ataque devido a camuflagem, pode rolar mais uma vez o dado da chance de falha. Pré-requisitos: Sab 1, treinado em Percepção."
+        "description": "Você recebe +2 em Percepção, não fica desprevenido contra inimigos que não possa perceber e, sempre que erra um ataque devido a camuflagem, pode rolar mais uma vez o dado da chance de falha."
       },
       {
         "name": "Vendedor de Carcaças",
@@ -695,7 +695,7 @@ export const ORIGINS_LIST: Origin[] = [
       {
         "name": "Foco em Perícia",
         "type": "destino",
-        "description": "Escolha uma perícia. Quando faz um teste dessa perícia, você pode gastar 1 PM para rolar dois dados e usar o melhor resultado. Você pode escolher este poder outras vezes para perícias diferentes. Este poder não pode ser aplicado em Luta e Pontaria (mas veja Foco em Arma). Pré-requisito: treinado na perícia escolhida."
+        "description": "Escolha uma perícia. Quando faz um teste dessa perícia, você pode gastar 1 PM para rolar dois dados e usar o melhor resultado. Você pode escolher este poder outras vezes para perícias diferentes. Este poder não pode ser aplicado em Luta e Pontaria (mas veja Foco em Arma)."
       },
       {
         "name": "Rede de Contatos",
@@ -753,7 +753,7 @@ export const ORIGINS_LIST: Origin[] = [
       {
         "name": "Ataque Poderoso",
         "type": "combate",
-        "description": "Sempre que faz um ataque corpo a corpo, você pode sofrer –2 no teste de ataque para receber +5 na rolagem de dano. Pré-requisito: For 1."
+        "description": "Sempre que faz um ataque corpo a corpo, você pode sofrer –2 no teste de ataque para receber +5 na rolagem de dano."
       },
       {
         "name": "Escavador",
@@ -763,7 +763,7 @@ export const ORIGINS_LIST: Origin[] = [
       {
         "name": "Sentidos Aguçados",
         "type": "destino",
-        "description": "Você recebe +2 em Percepção, não fica desprevenido contra inimigos que não possa perceber e, sempre que erra um ataque devido a camuflagem, pode rolar mais uma vez o dado da chance de falha. Pré-requisitos: Sab 1, treinado em Percepção."
+        "description": "Você recebe +2 em Percepção, não fica desprevenido contra inimigos que não possa perceber e, sempre que erra um ataque devido a camuflagem, pode rolar mais uma vez o dado da chance de falha."
       }
     ]
   },
@@ -794,7 +794,7 @@ export const ORIGINS_LIST: Origin[] = [
       {
         "name": "Sentidos Aguçados",
         "type": "destino",
-        "description": "Você recebe +2 em Percepção, não fica desprevenido contra inimigos que não possa perceber e, sempre que erra um ataque devido a camuflagem, pode rolar mais uma vez o dado da chance de falha. Pré-requisitos: Sab 1, treinado em Percepção."
+        "description": "Você recebe +2 em Percepção, não fica desprevenido contra inimigos que não possa perceber e, sempre que erra um ataque devido a camuflagem, pode rolar mais uma vez o dado da chance de falha."
       }
     ]
   },
@@ -816,12 +816,12 @@ export const ORIGINS_LIST: Origin[] = [
       {
         "name": "Acrobático",
         "type": "destino",
-        "description": "Você pode usar sua Destreza em vez de Força em testes de Atletismo. Além disso, terreno difícil não reduz seu deslocamento nem o impede de realizar investidas. Pré-requisito: Des 2."
+        "description": "Você pode usar sua Destreza em vez de Força em testes de Atletismo. Além disso, terreno difícil não reduz seu deslocamento nem o impede de realizar investidas."
       },
       {
         "name": "Aparência Inofensiva",
         "type": "destino",
-        "description": "A primeira criatura inteligente (Int –3 ou maior) que atacar você em uma cena deve fazer um teste de Vontade (CD Car). Se falhar, perderá sua ação. Este poder só funciona uma vez por cena; independentemente de a criatura falhar ou não no teste, poderá atacá-lo nas rodadas seguintes. Pré-requisito: Car 1."
+        "description": "A primeira criatura inteligente (Int –3 ou maior) que atacar você em uma cena deve fazer um teste de Vontade (CD Car). Se falhar, perderá sua ação. Este poder só funciona uma vez por cena; independentemente de a criatura falhar ou não no teste, poderá atacá-lo nas rodadas seguintes."
       },
       {
         "name": "Quebra-Galho",
@@ -851,7 +851,7 @@ export const ORIGINS_LIST: Origin[] = [
       {
         "name": "Vontade de Ferro",
         "type": "destino",
-        "description": "Você recebe +1 PM para cada dois níveis de personagem e +2 em Vontade. Pré-requisito: Sab 1. Poderes de Magia Todos os poderes deste grupo possuem como pré-requisito lançar magias."
+        "description": "Você recebe +1 PM para cada dois níveis de personagem e +2 em Vontade."
       }
     ]
   },
@@ -911,7 +911,7 @@ export const ORIGINS_LIST: Origin[] = [
       {
         "name": "Vitalidade",
         "type": "combate",
-        "description": "Você recebe +1 PV por nível de personagem e +2 em Fortitude. Pré-requisito: Con 1. Poderes de Destino"
+        "description": "Você recebe +1 PV por nível de personagem e +2 em Fortitude."
       }
     ]
   },
@@ -970,7 +970,7 @@ export const ORIGINS_LIST: Origin[] = [
       {
         "name": "Vitalidade",
         "type": "combate",
-        "description": "Você recebe +1 PV por nível de personagem e +2 em Fortitude. Pré-requisito: Con 1. Poderes de Destino"
+        "description": "Você recebe +1 PV por nível de personagem e +2 em Fortitude."
       }
     ]
   },
@@ -989,7 +989,7 @@ export const ORIGINS_LIST: Origin[] = [
       {
         "name": "Atlético",
         "type": "destino",
-        "description": "Você recebe +2 em Atletismo e +3m em seu deslocamento. Pré-requisito: For 2."
+        "description": "Você recebe +2 em Atletismo e +3m em seu deslocamento."
       },
       {
         "name": "Esforçado",
