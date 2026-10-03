@@ -13,6 +13,7 @@ import { POWER_CATEGORY_META } from '../common/T20Badge';
 import { Segmented, SelectField } from '../ui/controls';
 import { ChoiceCard, ChoiceSection, OptionPickerSheet, SelectedChips, StepIntro, type PickerOption } from './wizardUi';
 import { formatSigned } from '../../utils/displayNames';
+import { OSTEON_FORMER_KEY, OSTEON_FORMER_RACES, osteonFormer } from '../../utils/raceAbilities';
 
 interface StepRaceProps {
   selectedRaceId: string;
@@ -43,7 +44,7 @@ const VERSATILITY: Record<string, { title: string; text: string; a: string; b: s
   },
   osteon: {
     title: 'Memória póstuma',
-    text: 'Uma perícia treinada ou um poder geral da sua antiga vida.',
+    text: 'Uma perícia treinada, um poder geral ou — se você era de outra raça humanoide que não humano — uma habilidade dessa raça (e o tamanho dela, se não era Médio). Cap. 1, pág. 29.',
     a: '1 perícia',
     b: '1 poder geral',
   },
@@ -54,6 +55,8 @@ const VERSATILITY: Record<string, { title: string; text: string; a: string; b: s
     b: '+2 em 1 perícia + 1 poder',
   },
 };
+
+type RacialOption = 'skills' | 'power' | 'former';
 
 /** Todas as habilidades com escolha (incluindo as da sub-raça). */
 const abilitiesWithChoice = (abilities: RaceAbility[]) => abilities.filter((a) => a.choice);
@@ -78,14 +81,18 @@ export const StepRace: React.FC<StepRaceProps> = ({
 }) => {
   const [choicePicker, setChoicePicker] = useState<RaceAbilityChoice | null>(null);
   const [filter, setFilter] = useState<'todas' | 'padrao' | 'rara'>('todas');
-  const [racialOption, setRacialOption] = useState<'skills' | 'power'>(selectedRacialPower ? 'power' : 'skills');
+  const [racialOption, setRacialOption] = useState<RacialOption>(
+    racialChoices[OSTEON_FORMER_KEY]?.length ? 'former' : selectedRacialPower ? 'power' : 'skills'
+  );
   const [powerCategory, setPowerCategory] = useState('todas');
-  const [picker, setPicker] = useState<'race' | 'skills' | 'power' | null>(null);
+  const [picker, setPicker] = useState<'race' | 'skills' | 'power' | 'formerRace' | 'formerAbility' | null>(null);
 
   const race = RACES_LIST.find((r) => r.id === selectedRaceId) || RACES_LIST[0];
   const versatility = VERSATILITY[race.id];
   const subrace = race.customSelections?.subraces?.find((s) => s.id === (selectedSubraceId || race.customSelections?.subraces?.[0].id));
-  const choiceAbilities = abilitiesWithChoice([...race.abilities, ...(subrace?.abilities || [])]);
+  const former = osteonFormer({ raceId: race.id, racialChoices });
+  const formerRaceDef = OSTEON_FORMER_RACES.find((r) => r.id === racialChoices[OSTEON_FORMER_KEY]?.[0]);
+  const choiceAbilities = abilitiesWithChoice([...race.abilities, ...(subrace?.abilities || []), ...(former?.ability ? [former.ability] : [])]);
   const isGolem = race.id === 'golem';
 
   useEffect(() => {
@@ -101,14 +108,33 @@ export const StepRace: React.FC<StepRaceProps> = ({
         ? 1
         : 2
       : race.id === 'osteon'
-        ? racialOption === 'power'
-          ? 0
-          : 1
+        ? racialOption === 'skills'
+          ? 1
+          : 0
         : race.customSelections?.skillChoiceCount || 0;
 
-  const selectOption = (opt: 'skills' | 'power') => {
+  /** Remove a raça anterior do osteon (e a escolha da habilidade herdada, se tiver). */
+  const clearFormer = () => {
+    if (!racialChoices[OSTEON_FORMER_KEY]) return;
+    const next = { ...racialChoices };
+    delete next[OSTEON_FORMER_KEY];
+    if (former?.ability?.choice) delete next[former.ability.choice.key];
+    onChangeRacialChoices?.(next);
+  };
+
+  const setFormer = (raceId: string, abilityId = '') => {
+    const next: Record<string, string[]> = { ...racialChoices, [OSTEON_FORMER_KEY]: [raceId, abilityId] };
+    if (former?.ability?.choice && former.ability.id !== abilityId) delete next[former.ability.choice.key];
+    onChangeRacialChoices?.(next);
+  };
+
+  const selectOption = (opt: RacialOption) => {
     setRacialOption(opt);
-    if (opt === 'skills') onSelectRacialPower('');
+    if (opt !== 'former') clearFormer();
+    if (opt === 'former') {
+      onSelectRacialPower('');
+      onSelectRacialSkills([]);
+    } else if (opt === 'skills') onSelectRacialPower('');
     else if ((race.id === 'humano' || race.id === 'lefou') && selectedRacialSkills.length > 1) onSelectRacialSkills(selectedRacialSkills.slice(0, 1));
     else if (race.id === 'osteon') onSelectRacialSkills([]);
   };
@@ -295,13 +321,14 @@ export const StepRace: React.FC<StepRaceProps> = ({
           }
         >
           {race.customSelections.allowsGeneralPowerChoice && versatility && (
-            <Segmented<'skills' | 'power'>
+            <Segmented<RacialOption>
               value={racialOption}
               onChange={selectOption}
               ariaLabel="Benefício racial"
               options={[
                 { value: 'skills', label: versatility.a },
                 { value: 'power', label: versatility.b },
+                ...(race.id === 'osteon' ? [{ value: 'former' as const, label: 'Raça anterior' }] : []),
               ]}
             />
           )}
@@ -322,6 +349,30 @@ export const StepRace: React.FC<StepRaceProps> = ({
                 onOpen={() => setPicker('skills')}
                 onRemove={(id) => onSelectRacialSkills(selectedRacialSkills.filter((s) => s !== id))}
               />
+            </div>
+          )}
+
+          {race.id === 'osteon' && racialOption === 'former' && (
+            <div className="stack-xs">
+              <span className="t-sm t-semibold">Raça anterior</span>
+              <SelectedChips
+                labels={formerRaceDef ? [{ id: formerRaceDef.id, label: `${formerRaceDef.name} · ${formerRaceDef.size}` }] : []}
+                placeholder="Escolher raça humanoide"
+                onOpen={() => setPicker('formerRace')}
+                onRemove={clearFormer}
+              />
+              {formerRaceDef && (
+                <>
+                  <span className="t-sm t-semibold">Habilidade herdada</span>
+                  <SelectedChips
+                    labels={former?.ability ? [{ id: former.ability.id, label: former.ability.name }] : []}
+                    placeholder={`Escolher habilidade de ${formerRaceDef.name.toLowerCase()}`}
+                    onOpen={() => setPicker('formerAbility')}
+                    onRemove={() => setFormer(formerRaceDef.id)}
+                  />
+                  {formerRaceDef.size !== 'Médio' && <span className="t-xs t-2">Seu tamanho passa a ser {formerRaceDef.size}.</span>}
+                </>
+              )}
             </div>
           )}
 
@@ -362,6 +413,35 @@ export const StepRace: React.FC<StepRaceProps> = ({
           ))}
         </div>
       </ChoiceSection>
+
+      <OptionPickerSheet
+        open={picker === 'formerRace'}
+        onClose={() => setPicker(null)}
+        title="Raça anterior"
+        subtitle="Raça humanoide que não humano (Memória Póstuma, pág. 29)"
+        options={OSTEON_FORMER_RACES.map((r) => ({ id: r.id, title: r.name, subtitle: `${r.size} · ${r.abilities.length} habilidades` }))}
+        value={formerRaceDef ? [formerRaceDef.id] : []}
+        onChange={([id]) => {
+          if (!id) return;
+          if (id !== formerRaceDef?.id) setFormer(id);
+          setPicker('formerAbility');
+        }}
+        searchPlaceholder="Buscar raça…"
+      />
+
+      <OptionPickerSheet
+        open={picker === 'formerAbility'}
+        onClose={() => setPicker(null)}
+        title={`Habilidade de ${formerRaceDef?.name.toLowerCase() || 'raça'}`}
+        subtitle="Você ganha uma habilidade dessa raça a sua escolha"
+        options={(formerRaceDef?.abilities || []).map((a) => ({ id: a.id, title: a.name, subtitle: a.description }))}
+        value={former?.ability ? [former.ability.id] : []}
+        onChange={([id]) => {
+          if (id && formerRaceDef) setFormer(formerRaceDef.id, id);
+          setPicker(null);
+        }}
+        searchPlaceholder="Buscar habilidade…"
+      />
 
       <OptionPickerSheet
         open={picker === 'race'}

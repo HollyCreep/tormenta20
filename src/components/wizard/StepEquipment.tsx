@@ -185,8 +185,43 @@ export const StepEquipment: React.FC<StepEquipmentProps> = ({
     );
   };
 
+  /** Orçamento de um item do kit (Herança, Espólio, Protótipo...): o limite menos o resto já escolhido no espaço. */
+  const kitBudgetFor = (it?: CharacterInventoryItem) => {
+    const slot = it?.kitSlot ? kitGroups.flatMap((g) => g.slots).find((sl) => sl.id === it.kitSlot) : undefined;
+    if (!it || !slot?.budget) return null;
+    return slot.budget.max - (budgetUsed(inventory, slot.id) - priceValue(it.price) * (it.quantity || 1));
+  };
+
   const saveForge = (customized: EquipmentItem, modIds: string[], totalCost: number) => {
     if (!forging) return;
+    const kitBudget = kitBudgetFor(forging.target);
+    if (kitBudget !== null) {
+      // O item do kit pode ser superior, desde que o preço total caiba no limite (ex.: Herança, Cap. 1, pág. 91)
+      if (priceValue(customized.price) > kitBudget) {
+        toast(`O item com melhorias custa ${customized.price}; o limite deste item é T$ ${kitBudget.toLocaleString('pt-BR')}.`, { tone: 'warning' });
+        return;
+      }
+      onUpdateInventory(
+        inventory.map((it) =>
+          it.id === forging.target!.id
+            ? {
+                ...it,
+                name: customized.name,
+                price: customized.price,
+                spaces: customized.spaces,
+                defenseBonus: customized.defenseBonus,
+                armorPenalty: customized.armorPenalty,
+                damage: customized.damage,
+                attackBonus: customized.attackBonus,
+                critical: customized.critical,
+                appliedModifiers: modIds,
+              }
+            : it
+        )
+      );
+      setForging(null);
+      return;
+    }
     if (!forging.target) {
       if (remaining < totalCost) {
         toast('Tibares insuficientes para este item superior.', { tone: 'warning' });
@@ -315,6 +350,24 @@ export const StepEquipment: React.FC<StepEquipmentProps> = ({
                         </span>
                         <ChevronRight size={18} className="t-3" />
                       </button>
+                      {slot.budget &&
+                        items
+                          .filter((it) => isModifiable(it.category))
+                          .map((it) => (
+                            <button
+                              key={it.id}
+                              type="button"
+                              className="icon-btn icon-btn-sm"
+                              aria-label={`Melhorias em ${it.name} (até T$ ${slot.budget!.max})`}
+                              title="Item superior dentro do limite"
+                              onClick={() => {
+                                const base = EQUIPMENT_LIST.find((e) => e.id === it.equipmentId);
+                                if (base) setForging({ item: base, target: it });
+                              }}
+                            >
+                              <Wrench size={17} />
+                            </button>
+                          ))}
                     </div>
                   );
                 })}
@@ -497,7 +550,9 @@ export const StepEquipment: React.FC<StepEquipmentProps> = ({
             key={forging.target?.id || forging.item.id}
             item={forging.item}
             initialModifiers={forging.target?.appliedModifiers || []}
-            characterTibares={remaining + (forging.target && !forging.target.isFree ? parsePrice(forging.target.price) : 0)}
+            characterTibares={
+              kitBudgetFor(forging.target) ?? remaining + (forging.target && !forging.target.isFree ? parsePrice(forging.target.price) : 0)
+            }
             isOpen={!!forging}
             chargeMode="full"
             onClose={() => setForging(null)}

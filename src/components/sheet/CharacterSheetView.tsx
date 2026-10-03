@@ -47,6 +47,7 @@ import { DEITIES_LIST } from '../../data/deities';
 import { RULES_CITATIONS } from '../../data/rulesCitations';
 import { EQUIPMENT_LIST } from '../../data/equipment';
 import { heroLine, skillName } from '../../utils/displayNames';
+import { effectiveSize, osteonFormer } from '../../utils/raceAbilities';
 
 const SpellCastModal = lazy(() => import('./SpellCastModal').then((m) => ({ default: m.SpellCastModal })));
 const LevelUpModal = lazy(() => import('./LevelUpModal').then((m) => ({ default: m.LevelUpModal })));
@@ -326,7 +327,9 @@ export const CharacterSheetView: React.FC<CharacterSheetViewProps> = ({
     setModalDetail({
       title: race.name,
       category: 'Raça',
-      subtitle: `Tamanho ${race.size} · Deslocamento ${race.speed}m`,
+      subtitle: `Tamanho ${effectiveSize(character)} · Deslocamento ${race.speed}m${
+        osteonFormer(character) ? ` · Osteon ${osteonFormer(character)!.raceName.toLowerCase()}` : ''
+      }`,
       description:
         race.description + '\n\n' + race.abilities.map((a) => `• ${a.name} (${a.type}): ${a.description}`).join('\n\n'),
       ruleCitation: {

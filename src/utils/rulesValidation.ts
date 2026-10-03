@@ -6,6 +6,7 @@ import { DEITIES_LIST } from '../data/deities';
 import { GENERAL_POWERS_LIST } from '../data/generalPowers';
 import { CLASS_POWERS_LIST } from '../data/classPowers';
 import { SPELLS_LIST } from '../data/spells';
+import { OSTEON_FORMER_KEY, osteonFormer } from './raceAbilities';
 
 export interface PrerequisiteContext {
   attributes: CharacterAttributes;
@@ -212,6 +213,7 @@ export const grantedPowerCount = (classId: string) => (classId === 'clerigo' || 
  */
 export const REPEATABLE_POWER_NAMES = new Set([
   'Foco em Arma',
+  'Herança', // "Você pode escolher este poder duas vezes" — Cap. 1, pág. 91
   'Foco em Magia',
   'Foco em Perícia',
   'Proficiência',
@@ -376,9 +378,16 @@ export function validateAllWizardSteps(input: WizardValidationInput): Record<num
       }
       checkRacialPower();
     } else if (currentRace.id === 'osteon') {
-      // Memória Póstuma: 1 perícia ou 1 poder geral (pág. 29)
-      if (!input.selectedRacialPower && skills !== 1) errors.push('Memória Póstuma: escolha 1 perícia treinada ou 1 poder geral.');
-      checkRacialPower();
+      // Memória Póstuma: 1 perícia, 1 poder geral ou uma habilidade da raça humanoide anterior (pág. 29)
+      const formerChoice = input.racialChoices?.[OSTEON_FORMER_KEY];
+      if (formerChoice?.length) {
+        if (!osteonFormer({ raceId: 'osteon', racialChoices: input.racialChoices })?.ability)
+          errors.push('Memória Póstuma: escolha a raça anterior e uma habilidade dela.');
+        if (skills > 0 || input.selectedRacialPower) errors.push('Memória Póstuma: escolha só uma opção (perícia, poder geral ou raça anterior).');
+      } else {
+        if (!input.selectedRacialPower && skills !== 1) errors.push('Memória Póstuma: escolha 1 perícia treinada, 1 poder geral ou uma raça anterior.');
+        checkRacialPower();
+      }
     } else if (currentRace.noOrigin) {
       // Golem — Propósito de Criação: um poder geral a sua escolha (pág. 27)
       if (!input.selectedRacialPower) errors.push('Propósito de Criação: escolha um poder geral.');
@@ -387,7 +396,8 @@ export function validateAllWizardSteps(input: WizardValidationInput): Record<num
 
     // Escolhas de habilidades (elemento, magias, perícia do Kliren...)
     const subrace = currentRace.customSelections?.subraces?.find((sr) => sr.id === (input.subraceId || currentRace.customSelections?.subraces?.[0].id));
-    [...currentRace.abilities, ...(subrace?.abilities || [])].forEach((ab) => {
+    const inherited = osteonFormer({ raceId: currentRace.id, racialChoices: input.racialChoices })?.ability;
+    [...currentRace.abilities, ...(subrace?.abilities || []), ...(inherited ? [inherited] : [])].forEach((ab) => {
       if (!ab.choice) return;
       const got = input.racialChoices?.[ab.choice.key]?.length || 0;
       if (got !== ab.choice.count) errors.push(`${ab.name}: escolha ${ab.choice.count} (${ab.choice.label.toLowerCase()}).`);

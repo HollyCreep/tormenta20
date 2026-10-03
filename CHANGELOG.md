@@ -12,6 +12,8 @@ Todas as alterações notáveis deste projeto serão documentadas neste arquivo.
 - Pré-requisitos de poderes de classe validados; Aumento de Atributo uma vez por patamar; poderes da Tormenta reduzem Carisma (pág. 136).
 - Devoção: raça/classe devem constar nos devotos; clérigo e druida recebem dois poderes concedidos.
 - Magias: Truque custa 0 e é exclusivo; bardo e druida escolhem três escolas; limite de PM por nível da classe.
+- Herança pode ser escolhida duas vezes (item de até T$ 2.000) e o item herdado pode ter melhorias, desde que o preço total caiba no limite — Cap. 1, pág. 91 (vale também para Espólio e Protótipo).
+- Osteon: Memória Póstuma permite ser osteon de outra raça humanoide (exceto humano), herdando uma habilidade dela e o tamanho, se não for Médio — Cap. 1, pág. 29. Os efeitos raciais agora são ligados a cada habilidade.
 - Citações de `rulesCitations.ts` verificadas literalmente; servidor MCP e documentação `.agents/rules` atualizados.
 
 ---

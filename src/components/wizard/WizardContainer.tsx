@@ -43,6 +43,7 @@ import { AppBar } from '../ui/AppBar';
 import { Sheet } from '../ui/Sheet';
 import { useBackHandler } from '../ui/backStack';
 import { useFeedback } from '../ui/Feedback';
+import { osteonFormer } from '../../utils/raceAbilities';
 
 interface WizardContainerProps {
   initialCharacter?: CharacterSheet | null;
@@ -402,6 +403,7 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
     });
 
     // Monta lista de poderes do personagem
+    const formerRace = osteonFormer({ raceId: currentRace.id, racialChoices });
     const allPowers: CharacterPower[] = [
       ...currentRace.abilities.map((a) => ({
         id: a.id,
@@ -411,6 +413,19 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
         cost: a.cost,
         type: a.type,
       })),
+      // Memória Póstuma: habilidade da raça anterior do osteon (Cap. 1, pág. 29)
+      ...(formerRace?.ability
+        ? [
+            {
+              id: formerRace.ability.id,
+              name: formerRace.ability.name,
+              source: 'raca' as const,
+              description: `${formerRace.ability.description} (Memória Póstuma — osteon ${formerRace.raceName.toLowerCase()}.)`,
+              cost: formerRace.ability.cost,
+              type: formerRace.ability.type,
+            },
+          ]
+        : []),
       ...(racialGeneralPower
         ? [
             {
@@ -432,6 +447,8 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
       })),
       ...selectedOriginBenefits
         .filter((b) => b.type === 'poder')
+        // Herança escolhida duas vezes vira um só poder (item de até T$ 2.000 — Cap. 1, pág. 91)
+        .filter((b, i, arr) => arr.findIndex((x) => x.name === b.name) === i)
         .map((b) => {
           const powDef = currentOrigin.powers.find((p) => p.name === b.name);
           const generalPowDef = GENERAL_POWERS_LIST.find((gp) => gp.name === b.name || gp.id === b.name);
@@ -439,7 +456,9 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
             id: 'origem_' + b.name.toLowerCase().replace(/\s+/g, '_'),
             name: b.name,
             source: 'origem' as const,
-            description: powDef?.description || generalPowDef?.description || 'Poder garantido por sua origem.',
+            description:
+              (powDef?.description || generalPowDef?.description || 'Poder garantido por sua origem.') +
+              (selectedOriginBenefits.filter((x) => x.type === 'poder' && x.name === b.name).length > 1 ? ' (Escolhido duas vezes.)' : ''),
             type: powDef?.type || generalPowDef?.category,
           };
         }),
@@ -472,7 +491,8 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
         })
       : [];
     const subrace = currentRace.customSelections?.subraces?.find((sr) => sr.id === subraceId);
-    const racialSpells = [...currentRace.abilities, ...(subrace?.abilities || [])].flatMap((ab) => {
+    const inheritedAbility = osteonFormer({ raceId: currentRace.id, racialChoices })?.ability;
+    const racialSpells = [...currentRace.abilities, ...(subrace?.abilities || []), ...(inheritedAbility ? [inheritedAbility] : [])].flatMap((ab) => {
       const ids = [...(ab.grantedSpells?.spellIds || []), ...(ab.choice?.kind === 'spell' ? racialChoices[ab.choice.key] || [] : [])];
       const key = ab.grantedSpells?.keyAttribute || 'car';
       return ids

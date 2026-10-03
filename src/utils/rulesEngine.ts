@@ -20,6 +20,7 @@ import {
   skillAttributeFor,
   wearsHeavyArmor,
 } from './passiveEffects';
+import { hasRaceAbility } from './raceAbilities';
 
 export type { RulesInput } from './passiveEffects';
 
@@ -135,12 +136,12 @@ export function isWeaponProficient(input: RulesInput, weapon: Pick<CharacterInve
   if (cat === 'arma_simples') return true;
   const name = `${weapon.name} ${weapon.equipmentId || ''}`.toLowerCase();
   // Tradição de Heredrimm: machados, martelos, marretas e picaretas são armas simples (pág. 20)
-  if (input.raceId === 'anao' && /machad|martel|marreta|picareta/.test(name)) return true;
+  if (hasRaceAbility(input, 'anao_tradicao_heredrimm') && /machad|martel|marreta|picareta/.test(name)) return true;
   // Mestre do Tridente: o tridente é uma arma simples (pág. 30)
-  if (input.raceId === 'sereia' && /tridente/.test(name)) return true;
+  if (hasRaceAbility(input, 'sereia_mestre_tridente') && /tridente/.test(name)) return true;
   const weapons = proficienciesOf(input)?.weapons || [];
   if (cat === 'arma_marcial') return weapons.includes('marciais') || has(input, 'Proficiência');
-  if (cat === 'arma_fogo') return weapons.includes('fogo') || input.raceId === 'kliren' || has(input, 'Proficiência');
+  if (cat === 'arma_fogo') return weapons.includes('fogo') || hasRaceAbility(input, 'kliren_vanguardista') || has(input, 'Proficiência');
   if (cat === 'arma_exotica') return weapons.includes('exoticas') || has(input, 'Proficiência');
   return true;
 }
@@ -183,7 +184,7 @@ export function calculateSpeed(input: RulesInput, effects = collectPassiveEffect
   const components: StatBreakdown['components'] = [{ label: `Raça (${race?.name || 'base'})`, value: `${base}m` }];
   let total = base;
   // Anão (Devagar e Sempre, pág. 20) e Golem (Chassi, pág. 27): não reduz por armadura nem carga
-  const immune = input.raceId === 'anao' || input.raceId === 'golem';
+  const immune = hasRaceAbility(input, 'anao_devagar_sempre') || input.raceId === 'golem';
 
   effects
     .filter((e) => e.speed)
@@ -700,7 +701,7 @@ export function calculateWeaponAttack(
     const proficient = isWeaponProficient(input, { category: weapon.category, name: weapon.name, equipmentId: weapon.equipmentId });
     if (!proficient) push('Sem proficiência (Cap. 3, pág. 142)', -5);
     // Tradição de Heredrimm: +2 em ataques com machados, martelos, marretas e picaretas (pág. 20)
-    if (input.raceId === 'anao' && isAxeHammerPick({ name: weapon.name, equipmentId: weapon.equipmentId })) push('Tradição de Heredrimm', 2);
+    if (hasRaceAbility(input, 'anao_tradicao_heredrimm') && isAxeHammerPick({ name: weapon.name, equipmentId: weapon.equipmentId })) push('Tradição de Heredrimm', 2);
     // Armas da Ambição: +1 com armas em que é proficiente (pág. 132)
     if (proficient && powers.includes('Armas da Ambição')) push('Armas da Ambição', 1);
     // Estilo de Uma Arma: +2 com a arma corpo a corpo empunhada sozinha (pág. 128)
@@ -758,7 +759,7 @@ export function stepDamage(dice: string, steps: number): string {
  * Para armas duplas/versáteis ("1d10/1d12") usa o primeiro valor. Retorna null se a arma não causa dano.
  */
 export function calculateWeaponDamage(
-  character: { totalAttributes: CharacterAttributes; raceId?: string; classId?: string; classes?: { classId: string; level: number }[]; level?: number; powers?: { name: string }[] },
+  character: { totalAttributes: CharacterAttributes; raceId?: string; racialChoices?: Record<string, string[]>; classId?: string; classes?: { classId: string; level: number }[]; level?: number; powers?: { name: string }[] },
   weapon: Pick<CharacterInventoryItem, 'damage' | 'subcategory' | 'description'> & Partial<Pick<CharacterInventoryItem, 'name' | 'equipmentId'>>
 ): WeaponDamageRoll | null {
   const raw = (weapon.damage || '').split('/')[0].trim();
@@ -775,7 +776,7 @@ export function calculateWeaponDamage(
 
   // Hynne — Arremessador: dano +1 passo com funda ou arma de arremesso à distância (pág. 28)
   const ranged = isRangedWeapon(weapon);
-  if (character.raceId === 'hynne' && ranged && (!DISPARO.test(name) || /funda/i.test(name))) {
+  if (hasRaceAbility(character, 'hynne_arremessador') && ranged && (!DISPARO.test(name) || /funda/i.test(name))) {
     const stepped = stepDamage(diceStr, 1);
     if (stepped !== diceStr) {
       components.push({ label: 'Arremessador (Hynne): +1 passo', value: `${diceStr}→${stepped}` });
@@ -802,7 +803,7 @@ export function calculateWeaponDamage(
   }
   // Mestre do Tridente (Sereia, pág. 30) e Arsenal das Profundezas (pág. 132): +2 com azagaias, lanças e tridentes
   if (/azagaia|lan[cç]a(?! montada)|tridente/i.test(name)) {
-    if (character.raceId === 'sereia') {
+    if (hasRaceAbility(character, 'sereia_mestre_tridente')) {
       modifier += 2;
       components.push({ label: 'Mestre do Tridente', value: 2 });
     }

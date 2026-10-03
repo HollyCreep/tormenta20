@@ -74,6 +74,15 @@ export const StepOrigin: React.FC<StepOriginProps> = ({
     if (!full) onSelectOriginBenefits([...selectedOriginBenefits, { type, name }]);
   };
 
+  // "Você pode escolher este poder duas vezes, para um item de até T$ 2.000" (Cap. 1, pág. 91)
+  const herancaCount = selectedOriginBenefits.filter((b) => b.type === 'poder' && b.name === 'Herança').length;
+  const toggleHerancaTwice = () => {
+    if (herancaCount === 2) {
+      const i = selectedOriginBenefits.findIndex((b) => b.type === 'poder' && b.name === 'Herança');
+      onSelectOriginBenefits(selectedOriginBenefits.filter((_, j) => j !== i));
+    } else if (!full) onSelectOriginBenefits([...selectedOriginBenefits, { type: 'poder', name: 'Herança' }]);
+  };
+
   /** Benefício já escolhido para um "Poder de X" genérico da origem. */
   const slotBenefit = (slotName: string, category: Category) =>
     selectedOriginBenefits.find((b) => {
@@ -380,7 +389,11 @@ export const StepOrigin: React.FC<StepOriginProps> = ({
                   <span className={`mark${checked ? ' is-on' : ''}`}>{checked && <Check size={14} strokeWidth={3} />}</span>
                   <span className="row-main">
                     <span className="row-title">{pow.name}</span>
-                    {takenBy ? (
+                    {pow.name === 'Herança' && herancaCount > 0 ? (
+                      <span className="row-sub">
+                        {herancaCount === 2 ? 'Escolhido duas vezes: item de até T$ 2.000' : 'Item de até T$ 1.000'} (Cap. 1, pág. 91)
+                      </span>
+                    ) : takenBy ? (
                       <span className="t-xs t-warning">Já escolhido como benefício de {takenBy}</span>
                     ) : !prereq.isMet ? (
                       <span className="t-xs t-warning">Falta: {prereq.unmetRequirements.join(', ')}</span>
@@ -389,6 +402,17 @@ export const StepOrigin: React.FC<StepOriginProps> = ({
                     )}
                   </span>
                 </button>
+                {pow.name === 'Herança' && checked && (
+                  <button
+                    type="button"
+                    className={`btn btn-xs ${herancaCount === 2 ? 'btn-primary' : 'btn-ghost'}`}
+                    aria-pressed={herancaCount === 2}
+                    disabled={herancaCount < 2 && full}
+                    onClick={toggleHerancaTwice}
+                  >
+                    ×2
+                  </button>
+                )}
                 <button
                   type="button"
                   className="icon-btn icon-btn-sm"

@@ -9,6 +9,7 @@ import type { CharacterAttributes, CharacterInventoryItem } from '../types/chara
 import type { AttributeKey } from '../types/rules';
 import { GENERAL_POWERS_LIST } from '../data/generalPowers';
 import { RACES_LIST } from '../data/races';
+import { effectiveSize, hasRaceAbility, osteonFormer } from './raceAbilities';
 
 export interface RulesInput {
   level: number;
@@ -81,32 +82,34 @@ const SIZE_STEALTH: Record<string, number> = { Minúsculo: 5, Pequeno: 2, Médio
 
 type EffectFn = (input: RulesInput) => Contribution | null;
 
+/**
+ * Efeitos por habilidade racial das raças humanoides. Ficam ligados ao id da habilidade porque o osteon
+ * pode herdar uma delas pela Memória Póstuma (Cap. 1, pág. 29).
+ */
+const ABILITY_EFFECTS: Record<string, EffectFn> = {
+  anao_duro_como_pedra: (i) => ({ source: 'Duro como Pedra (Anão)', citation: 'Cap. 1, pág. 20', hp: 3 + Math.max(0, i.level - 1) }),
+  elfo_sangue_magico: (i) => ({ source: 'Sangue Mágico (Elfo)', citation: 'Cap. 1, pág. 22', mp: i.level }),
+  elfo_sentidos_elficos: () => ({ source: 'Sentidos Élficos (Elfo)', citation: 'Cap. 1, pág. 22', skills: { misticismo: 2, percepcao: 2 } }),
+  goblin_rato_ruas: () => ({ source: 'Rato das Ruas (Goblin)', citation: 'Cap. 1, pág. 23', skills: { fortitude: 2 } }),
+  minotauro_couro_rigido: () => ({ source: 'Couro Rígido (Minotauro)', citation: 'Cap. 1, pág. 25', defense: 1 }),
+  hynne_pequeno_rechonchudo: () => ({
+    source: 'Pequeno e Rechonchudo (Hynne)',
+    citation: 'Cap. 1, pág. 28',
+    skills: { enganacao: 2 },
+    skillAttribute: { atletismo: 'des' },
+  }),
+  kliren_vanguardista: () => ({ source: 'Vanguardista (Kliren)', citation: 'Cap. 1, pág. 28', skills: { oficio: 2 } }),
+};
+
+/** Efeitos das raças não humanoides, que o osteon não pode herdar. */
 const RACE_EFFECTS: Record<string, EffectFn[]> = {
-  anao: [
-    (i) => ({ source: 'Duro como Pedra (Anão)', citation: 'Cap. 1, pág. 20', hp: 3 + Math.max(0, i.level - 1) }),
-  ],
-  elfo: [
-    (i) => ({ source: 'Sangue Mágico (Elfo)', citation: 'Cap. 1, pág. 22', mp: i.level }),
-    () => ({ source: 'Sentidos Élficos (Elfo)', citation: 'Cap. 1, pág. 22', skills: { misticismo: 2, percepcao: 2 } }),
-  ],
-  goblin: [() => ({ source: 'Rato das Ruas (Goblin)', citation: 'Cap. 1, pág. 23', skills: { fortitude: 2 } })],
   lefou: [
     (i) =>
       i.selectedRacialSkills?.length
         ? { source: 'Deformidade (Lefou)', citation: 'Cap. 1, pág. 24', skills: Object.fromEntries(i.selectedRacialSkills.map((s) => [s, 2])) }
         : null,
   ],
-  minotauro: [() => ({ source: 'Couro Rígido (Minotauro)', citation: 'Cap. 1, pág. 25', defense: 1 })],
   golem: [() => ({ source: 'Chassi (Golem)', citation: 'Cap. 1, pág. 27', defense: 2, armorPenalty: -2 })],
-  hynne: [
-    () => ({
-      source: 'Pequeno e Rechonchudo (Hynne)',
-      citation: 'Cap. 1, pág. 28',
-      skills: { enganacao: 2 },
-      skillAttribute: { atletismo: 'des' },
-    }),
-  ],
-  kliren: [() => ({ source: 'Vanguardista (Kliren)', citation: 'Cap. 1, pág. 28', skills: { oficio: 2 } })],
   suraggel: [
     (i) =>
       (i.subraceId || 'aggelus') === 'aggelus'
@@ -238,13 +241,24 @@ export function collectPassiveEffects(input: RulesInput): Contribution[] {
   if (input.inventory.some((it) => it.isEquipped && /mochila de aventureiro/i.test(it.name))) {
     out.push({ source: 'Mochila de aventureiro', citation: 'Cap. 3, pág. 157', spaces: 2 });
   }
-  const race = RACES_LIST.find((r) => r.id === input.raceId);
-  const stealth = race ? SIZE_STEALTH[race.size] || 0 : 0;
-  if (stealth) out.push({ source: `Tamanho ${race!.size}`, citation: 'Tabela 1-21, Cap. 1, pág. 107', skills: { furtividade: stealth } });
+  const size = effectiveSize(input);
+  const stealth = SIZE_STEALTH[size] || 0;
+  if (stealth) out.push({ source: `Tamanho ${size}`, citation: 'Tabela 1-21, Cap. 1, pág. 107', skills: { furtividade: stealth } });
+  Object.entries(ABILITY_EFFECTS).forEach(([abilityId, fn]) => {
+    if (!hasRaceAbility(input, abilityId)) return;
+    const c = fn(input);
+    if (c) out.push(c);
+  });
   (RACE_EFFECTS[input.raceId] || []).forEach((fn) => {
     const c = fn(input);
     if (c) out.push(c);
   });
+  // Osteon com habilidade de deslocamento herdada (Memória Póstuma, pág. 29): ajusta os 9m do osteon
+  const former = osteonFormer(input);
+  const formerSpeed: Record<string, number> = { elfo_graca_glorienn: 12, anao_devagar_sempre: 6, hynne_pequeno_rechonchudo: 6 };
+  if (former?.ability && formerSpeed[former.ability.id]) {
+    out.push({ source: `${former.ability.name} (Memória Póstuma)`, citation: 'Cap. 1, pág. 29', speed: formerSpeed[former.ability.id] - 9 });
+  }
   CLASS_EFFECTS.forEach((fn) => {
     const c = fn(input);
     if (c) out.push(c);
