@@ -197,7 +197,7 @@ def t20_validate_character(character_json: str) -> str:
     Verifica:
     1. Compra de atributos (começa em 0, máximo 10 pontos distribuídos, custos 1=1, 2=2, 3=4, 4=7, no máx um -1).
     2. Duplicidade de perícias treinadas entre Raça, Classe e Origem.
-    3. Capacidade de carga (limite de espaços = 10 + 2*FOR).
+    3. Capacidade de carga (10 espaços +2 por ponto de Força, –1 por ponto negativo — Cap. 3, pág. 141).
     4. Pré-requisitos de poderes e círculos de magia.
     """
     try:
@@ -246,14 +246,19 @@ def t20_validate_character(character_json: str) -> str:
             errors.append(f"Perícia duplicada detectada: '{skill_id}'. Treinamento não se acumula (Cap. 2, pág. 114).")
         seen_skills.add(skill_id)
 
-    # 3. Capacidade de Carga
-    for_total = attrs_base.get("for", 0)
-    max_spaces = 10 + 2 * for_total
+    # 3. Capacidade de Carga (Cap. 3, pág. 141)
+    total_attrs = data.get("totalAttributes") or {
+        k: attrs_base.get(k, 0) + (data.get("racialModifiers") or {}).get(k, 0) for k in ["for", "des", "con", "int", "sab", "car"]
+    }
+    for_total = total_attrs.get("for", 0)
+    max_spaces = 10 + (2 * for_total if for_total >= 0 else for_total)
     current_spaces = data.get("usedSpaces") or 0
-    if current_spaces > max_spaces:
+    if current_spaces > 2 * max_spaces:
+        errors.append(f"Carga de {current_spaces} espaços excede o dobro do limite ({2 * max_spaces}); não é possível carregar (Cap. 3, pág. 141).")
+    elif current_spaces > max_spaces:
         warnings.append(
-            f"Sobrecarga: Carregando {current_spaces} espaços (Limite: {max_spaces} espaços = 10 + 2×FOR). "
-            "Aplica penalidade de -2 em todos os testes e deslocamento reduzido (Cap. 3, pág. 142)."
+            f"Sobrecarregado: {current_spaces} espaços (limite {max_spaces} = 10 +2 por ponto de Força, –1 por ponto negativo). "
+            "Sofre penalidade de armadura –5 e deslocamento –3m (Cap. 3, pág. 141)."
         )
 
     # Resultado formatado
@@ -284,9 +289,9 @@ def t20_calculate_stats(character_json: str) -> str:
     Calcula as estatísticas canônicas de um personagem segundo o T20 Edição Jogo do Ano:
     - Modificadores totais de atributos (o valor é o próprio modificador).
     - PV Máximo (PV da classe + CON no 1º nível, e por nível).
-    - PM Máximo (PM da classe + Atributo-chave de conjuração se aplicável).
+    - PM Máximo (PM da classe por nível + atributo-chave dos conjuradores; paladino soma Carisma).
     - Defesa Canônica (10 + DES [exceto se armadura pesada] + Armadura + Escudo + Outros).
-    - Capacidade de Carga (10 + 2×FOR).
+    - Capacidade de Carga (10 espaços +2 por ponto de Força, –1 por ponto negativo; Cap. 3, pág. 141).
     - Bônus de Perícias (1/2 nível + atributo + treino +2/+4/+6 - penalidade de armadura).
     """
     try:
@@ -318,7 +323,21 @@ def t20_calculate_stats(character_json: str) -> str:
     mp_per_level = class_def.get("mpPerLevel", 3)
 
     max_hp = hp_initial + total_attrs["con"] + (level - 1) * (hp_per_level + total_attrs["con"])
-    max_mp = mp_initial + (level - 1) * mp_per_level
+    # PM: PM da classe por nível; conjuradores somam o atributo-chave (arcanista pág. 37, bardo 44,
+    # clérigo 57, druida 61) e o paladino soma Carisma (Abençoado, pág. 82)
+    max_mp = mp_per_level * level
+    key_attr = None
+    if class_def.get("spellcaster"):
+        if class_id == "arcanista":
+            key_attr = "car" if "feiticeiro" in (data.get("classSubclass") or "").lower() else "int"
+        elif class_id == "bardo":
+            key_attr = "car"
+        else:
+            key_attr = "sab"
+    elif class_id == "paladino":
+        key_attr = "car"
+    if key_attr:
+        max_mp += total_attrs[key_attr]
 
     # Defesa
     is_heavy_armor = data.get("isHeavyArmor", False)
@@ -328,19 +347,19 @@ def t20_calculate_stats(character_json: str) -> str:
     des_to_defense = 0 if is_heavy_armor else total_attrs["des"]
     defense = 10 + des_to_defense + armor_bonus + shield_bonus + other_defense
 
-    # Carga
-    max_spaces = 10 + 2 * total_attrs["for"]
+    # Carga: 10 espaços +2 por ponto de Força (–1 por ponto negativo) — Cap. 3, pág. 141
+    max_spaces = 10 + (2 * total_attrs["for"] if total_attrs["for"] >= 0 else total_attrs["for"])
 
     return (
         f"=== ESTATÍSTICAS CANÔNICAS CALCULADAS (Nível {level}) ===\n"
         f"• Atributos Totais: FOR {total_attrs['for']}, DES {total_attrs['des']}, CON {total_attrs['con']}, "
         f"INT {total_attrs['int']}, SAB {total_attrs['sab']}, CAR {total_attrs['car']}\n"
         f"• Pontos de Vida (PV): {max_hp} (Base {hp_initial} + CON {total_attrs['con']})\n"
-        f"• Pontos de Mana (PM): {max_mp}\n"
+        f"• Pontos de Mana (PM): {max_mp}{f' (inclui {key_attr.upper()} {total_attrs[key_attr]})' if key_attr else ''}\n"
         f"• Defesa Total: {defense} [10 Base + DES {des_to_defense}{' (Sem DES por Armadura Pesada)' if is_heavy_armor else ''} + Armadura {armor_bonus} + Escudo {shield_bonus} + Outros {other_defense}]\n"
         f"• Bônus de Treino de Perícias: +{training_bonus} (Nível {level})\n"
         f"• Metade do Nível: +{half_level}\n"
-        f"• Capacidade de Carga: {max_spaces} espaços (10 + 2×FOR)"
+        f"• Capacidade de Carga: {max_spaces} espaços (10 +2 por ponto de Força, –1 por ponto negativo; máximo {2 * max_spaces})"
     )
 
 

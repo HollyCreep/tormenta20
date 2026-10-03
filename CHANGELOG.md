@@ -4,6 +4,18 @@ Todas as alterações notáveis deste projeto serão documentadas neste arquivo.
 
 ---
 
+## [Não lançado] — Auditoria completa das regras (T20 JdA v1.3)
+
+### 📖 Regras conferidas com o livro
+- Catálogos regenerados a partir do texto do livro: origens, poderes gerais, classes (PV/PM, proficiências, habilidades e progressão), 298 poderes de classe, divindades, 198 magias, armas/armaduras/itens (Tabelas 3-3 a 3-6), melhorias e materiais (Tabela 3-9), encantos (Tabelas 8-8 e 8-10) e 35 condições (Apêndice, págs. 394–395).
+- Motor de regras: carga 10 +2 por For (–1 por ponto negativo) e sobrecarga (–5 penalidade de armadura, –3m) — Cap. 3, pág. 141; Defesa sem bônus de tamanho (pág. 107); PM com atributo-chave dos conjuradores e Car do paladino; condições sem acúmulo (aplica a mais severa); –5 sem proficiência; arco longo e funda somam For.
+- Pré-requisitos de poderes de classe validados; Aumento de Atributo uma vez por patamar; poderes da Tormenta reduzem Carisma (pág. 136).
+- Devoção: raça/classe devem constar nos devotos; clérigo e druida recebem dois poderes concedidos.
+- Magias: Truque custa 0 e é exclusivo; bardo e druida escolhem três escolas; limite de PM por nível da classe.
+- Citações de `rulesCitations.ts` verificadas literalmente; servidor MCP e documentação `.agents/rules` atualizados.
+
+---
+
 ## [0.5.1] - 2026-10-02 — Correções pós-0.5
 
 ### 🐛 Correções

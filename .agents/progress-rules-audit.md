@@ -21,7 +21,7 @@ Ferramentas: `.agents/tools/book_extract.py` (extrai blocos do livro por título
 - [x] 8. Divindades — devotos, poderes concedidos, obrigações
 - [x] 9. Magias — círculo, escola, execução, alcance, duração, resistência, aprimoramentos
 - [x] 10. Equipamentos — Tabelas 3-x (armas, armaduras, itens), melhorias, materiais
-- [ ] 11. Documentação: `.agents/rules/*.md`, `.agents/mcp_config.json`, `rulesCitations.ts`, CHANGELOG
+- [x] 11. Documentação: `.agents/rules/*.md`, `.agents/mcp_config.json`, `rulesCitations.ts`, CHANGELOG
 
 ## Divergências encontradas (livro × app)
 

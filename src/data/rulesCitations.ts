@@ -26,25 +26,25 @@ export const RULES_CITATIONS: Record<string, RuleCitation> = {
     id: 'SKILL_TRAINING_NO_STACK',
     title: 'Treinamento de Perícias & Não Cumulatividade',
     book: 'Tormenta 20: Edição Jogo do Ano (v1.3)',
-    chapter: 'Capítulo 2: Perícias & Capítulo 5: Jogando',
-    section: 'Valor de Perícia & Acumulando Efeitos',
-    page: 'Páginas 114 e 226',
+    chapter: 'Capítulo 2: Perícias & Poderes',
+    section: 'Valor de Perícia',
+    page: 'Página 114 (PDF pág. 120)',
     quote:
-      '“Nas perícias treinadas, você recebe um bônus de +2. No 7º nível, esse bônus aumenta para +4. No 15º nível, aumenta para +6. Efeitos de mesma função não se acumulam: uma perícia é treinada ou não treinada.”',
+      '“Nas perícias treinadas, você recebe um bônus de +2. No 7º nível, esse bônus aumenta para +4. No 15º nível, aumenta para +6.”',
     explanation:
-      'Não é permitido selecionar o treinamento de uma mesma perícia mais de uma vez. O aplicativo identifica qual fonte concedeu o treino (Classe, Raça ou Inteligência) e impede seleções duplicadas.',
+      'Uma perícia é treinada ou não: o bônus de treinamento é um só, então treinar a mesma perícia por duas fontes não acrescenta nada. Por isso o app impede escolher de novo uma perícia já treinada; trocar a perícia repetida por outra segue a regra de ajustar a origem com o mestre (Cap. 1, pág. 95).',
   },
   GENERAL_POWER_PREREQUISITES: {
     id: 'GENERAL_POWER_PREREQUISITES',
     title: 'Pré-requisitos de Poderes Gerais',
     book: 'Tormenta 20: Edição Jogo do Ano (v1.3)',
-    chapter: 'Capítulo 2: Perícias & Poderes',
-    section: 'Poderes Gerais',
-    page: 'Página 124',
+    chapter: 'Capítulo 1: Construção de Personagem',
+    section: 'Características das Classes — Poderes; Origens — Benefícios',
+    page: 'Página 33 (PDF pág. 39) e Página 85 (PDF pág. 91)',
     quote:
-      '“Para poder escolher um poder geral, você precisa cumprir todos os seus pré-requisitos no momento em que o escolhe. Se perder um pré-requisito mais tarde, você não pode mais usar aquele poder até recuperá-lo.”',
+      '“Alguns poderes têm pré-requisitos. Para escolhê-los e usá-los, você deve possuir todos os requerimentos mencionados. Você pode escolher um poder no nível em que atinge seus pré-requisitos. A menos que especificado o contrário, você não pode escolher um mesmo poder mais de uma vez.”',
     explanation:
-      'O aplicativo calcula em tempo real seus atributos, perícias treinadas, proficiências com escudo/armadura pesada e habilidades de conjurador para garantir que você só adquira poderes cujos pré-requisitos foram estritamente atendidos.',
+      'O app só libera poderes cujos pré-requisitos o personagem cumpre no nível em que os escolhe (inclusive os poderes recebidos pela origem: "Você recebe o poder escolhido, mas ainda precisa cumprir seus pré-requisitos", pág. 85) e não permite escolher o mesmo poder duas vezes, exceto os que o livro declara repetíveis.',
   },
   INTELLIGENCE_SKILLS: {
     id: 'INTELLIGENCE_SKILLS',
@@ -78,7 +78,7 @@ export const RULES_CITATIONS: Record<string, RuleCitation> = {
     section: 'Atributos Básicos — Definindo seus Atributos',
     page: 'Página 17 (Tabela 1-1: Atributos)',
     quote:
-      '“Pontos. Você começa com todos os atributos em 0 e recebe 10 pontos para aumentá-los. O custo para aumentar cada atributo está descrito na tabela abaixo. Você também pode reduzir um atributo para -1 para receber 1 ponto adicional.”\n\nCustos: 0 (0 pt) • 1 (1 pt) • 2 (2 pts) • 3 (4 pts) • 4 (7 pts). Reduzir um atributo para -1 concede +1 pt.',
+      '“Pontos. Você começa com todos os atributos em 0 e recebe 10 pontos para aumentá-los. O custo para aumentar cada atributo está descrito na tabela abaixo. Você também pode reduzir um atributo para –1 para receber 1 ponto adicional.”',
     explanation:
       'Você tem 10 pontos totais para distribuir entre os 6 atributos. Cada valor possui custo progressivo. Reduzir no máximo um atributo para -1 libera 1 ponto extra para investir nos demais.',
   },
@@ -159,12 +159,12 @@ export const RULES_CITATIONS: Record<string, RuleCitation> = {
     title: 'Equipamento, Carga e Armaduras',
     book: 'Tormenta 20: Edição Jogo do Ano (v1.3)',
     chapter: 'Capítulo 3: Equipamento',
-    section: 'Capacidade de Carga & Tipos de Itens',
-    page: 'Página 142-177',
+    section: 'Equipamento Inicial; Usando & Carregando',
+    page: 'Páginas 140–141 (PDF págs. 146–147)',
     quote:
-      '“Você pode carregar até 10 + 2×For espaços em itens sem penalidade. Itens empunhados contam em suas mãos disponíveis. Armaduras pesadas e escudos aplicam sua Penalidade de Armadura em testes de perícias baseadas em Destreza e Força (Acrobacia, Furtividade, Ladinagem).”',
+      '“Personagens de 1º nível começam com os itens fornecidos pela sua origem e os itens a seguir.” […] “Você pode carregar 10 espaços +2 por ponto de Força (ou –1 por ponto de Força negativo). Se ultrapassar esse limite, fica sobrecarregado — sofre penalidade de armadura –5 e seu deslocamento é reduzido em –3m. Você não pode carregar mais do que o dobro do seu limite.”',
     explanation:
-      'Cada item ocupa um número determinado de espaços (slots) no inventário. O dinheiro padrão de Arton é o Tibar (T$). Armaduras fornecem bônus de Defesa, mas limitam seu bônus de Destreza e podem aplicar penalidades de armadura.',
+      'Kit inicial: mochila, saco de dormir e traje de viajante; uma arma simples (e uma marcial, se proficiente); armadura de couro, couro batido ou gibão de peles (brunea com proficiência em armaduras pesadas; escudo leve com proficiência em escudos; arcanistas sem armadura); itens da origem; e T$ 4d6. A carga e a sobrecarga são calculadas automaticamente na ficha.',
   },
   WEAPON_ATTACK_DAMAGE: {
     id: 'WEAPON_ATTACK_DAMAGE',
